@@ -1,0 +1,43 @@
+<ng-template #coursePreviewDialog let-c="close" let-d="dismiss">
+    <div class="modal-header">
+        <h4 class="modal-title">
+            {{coursePreviewObj.name}}
+            <br>
+            <sub>{{coursePreviewObj.code}}</sub>
+        </h4>
+        <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <p>
+            {{coursePreviewObj.description}}
+        </p>
+        <div class="row" *ngFor="let chapter of coursePreviewObj.chapters; let i=index;">
+            <div class="col-sm-12">
+                <div class="card mb-3">
+                    <div class="card-header">
+                        {{chapter.name}}
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group">
+                            <li class="list-group-item" *ngFor="let lesson of chapter.lessons;  let j=index;">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                      - {{lesson.name}}
+                                    </div>
+                                    <div class="col-md-12 ml-2" *ngIf="lesson.description">
+                                        {{lesson.description}}
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="d('Cancel click')">Close</button>
+    </div>
+</ng-template>

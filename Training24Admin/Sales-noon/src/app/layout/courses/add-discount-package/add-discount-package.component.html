@@ -1,0 +1,72 @@
+<div>
+    <h4>
+        <a class="btn btn-success btn-lg back" backDirection>
+            <span class="fa fa-arrow-left"></span>
+        </a>
+        <span *ngIf="isEditView">Edit</span><span *ngIf="!isEditView">Add</span> discount package
+        <noon-loader *ngIf="isCallingApi"></noon-loader>
+    </h4>
+    <div class="row">
+        <div class="col col-xl-6 col-lg-12">
+            <form class="form-horizontal noon-form" #manageDiscountPackageForm="ngForm" (ngSubmit)="manageDiscountPackageForm.form.valid && manageDiscountPackage()">
+                <div class="form-group row">
+                    <label class="control-label col-sm-4" for="name">Package Name :</label>
+                    <div class="col col-sm-8">
+                        <input type="text" id="name" class="form-control" placeholder="Enter package name" name="packageName"
+                            [(ngModel)]="discountPackage.packageName" #packageName="ngModel" required>
+                        <div *ngIf="packageName.invalid && (packageName.touched || manageDiscountPackageForm.submitted)">
+                            <p class="input-info error-message" *ngIf="name.errors.required">Package Name is required</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="control-label col-sm-4" for="offTotalPrice">% off Total Price :</label>
+                    <div class="col col-sm-8">
+                        <input type="tel" id="offTotalPrice" name="offTotalPrice" class="form-control input-underline input-lg"
+                            placeholder="% off Total Price" #offTotalPrice="ngModel" [(ngModel)]="discountPackage.offTotalPrice"
+                            required>
+                        <div *ngIf="offTotalPrice.invalid && (offTotalPrice.touched || manageDiscountPackageForm.submitted)">
+                            <p class="input-info error-message" *ngIf="offTotalPrice.errors.required">% off Total Price
+                                is required</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="control-label col-sm-4" for="offSubscriptions">% off Total Subscription :</label>
+                    <div class="col col-sm-8">
+                        <input type="tel" id="freeSubscription" name="offSubscription" class="form-control input-underline input-lg"
+                            placeholder="% off Total Subscription" #offSubscription="ngModel" [(ngModel)]="discountPackage.offSubscriptions"
+                            required>
+                        <div *ngIf="offSubscription.invalid && (offSubscription.touched || manageDiscountPackageForm.submitted)">
+                            <p class="input-info error-message" *ngIf="offSubscription.errors.required">% off Total
+                                Subscription is required</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="control-label col-sm-4" for="freeSubscriptions">Free Subscription :</label>
+                    <div class="col col-sm-8">
+                        <input type="tel" id="freeSubscription" name="freeSubscription" class="form-control input-underline input-lg"
+                            placeholder="% off Total Subscription" #freeSubscription="ngModel" [(ngModel)]="discountPackage.freeSubscriptions"
+                            required>
+                        <div *ngIf="freeSubscription.invalid && (freeSubscription.touched || manageDiscountPackageForm.submitted)">
+                            <p class="input-info error-message" *ngIf="freeSubscription.errors.required">Free
+                                Subscription is required</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-8 pull-right">
+                        <button type="submit" class="btn btn-primary m-r-20px" *ngIf="isEditView" [disabled]="manageDiscountPackageForm.invalid || isCallingApi">Edit
+                            discount package</button>
+                        <button type="submit" class="btn btn-primary m-r-20px" *ngIf="!isEditView" [disabled]="manageDiscountPackageForm.invalid || isCallingApi">Add
+                            discount package
+                        </button>
+                        <button class="btn btn-danger" backDirection>Cancel</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

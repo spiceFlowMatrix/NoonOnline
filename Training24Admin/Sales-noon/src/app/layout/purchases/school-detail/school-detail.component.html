@@ -1,0 +1,272 @@
+<div>
+  <h4>
+    <noon-loader *ngIf="isCallingApi"></noon-loader>
+  </h4>
+  <form class="form-horizontal noon-form" style="min-height:500px" #manageSchoolDetailForm="ngForm">
+    <h5>
+      School information
+    </h5>
+    <hr>
+    <div class="row">
+      <div class="col col-md-12">
+        <div class="form-group row">
+          <label class="control-label col-sm-2" for="register_number">Select existing :</label>
+          <div class="col col-sm-4">
+            <input id="scholldetailInput" type="text" name="account" placeholder="Select account" class="form-control"
+              [(ngModel)]="schoolDetailModel.account" [resultFormatter]="rformatter" [inputFormatter]="formatter"
+              (focus)="focus$.next($event.target.value)"
+              [ngbTypeahead]="searchUser" #instance="ngbTypeahead" (selectItem)="accountSelected($event)" />
+              <i class="fa fa-caret-down" aria-hidden="true" style="position: absolute;right: 25px;top: 10px;cursor: pointer;"
+                    (click)="focusOnAccountSelection()"></i>
+          </div>
+          <div class="control-label col-sm-3" *ngIf="selectedAccount.id">
+            <span class="setting-icon mr-4" title="Reset" (click)="reset()">
+              <i aria-hidden="true" class="fa fa-times pos-rel"></i>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col col-md-6">
+        <div class="form-group row">
+          <label class="control-label col-sm-4" for="registernumber">Register number :</label>
+          <div class="col col-sm-8">
+            <input type="text" id="registernumber" class="form-control" placeholder="Enter register number" name="registernumber"
+              [(ngModel)]="schoolDetailModel.registernumber" #registernumber="ngModel" required>
+            <div *ngIf="registernumber.invalid && (registernumber.touched || manageSchoolDetailForm.submitted)">
+              <p class="input-info error-message" *ngIf="registernumber.errors.required">Register number is required</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col col-md-6">
+        <div class="form-group row">
+          <label class="control-label col-sm-4" for="schooltypeid">School type :</label>
+          <div class="col col-sm-8">
+            <select id="schooltypeid" class="form-control" placeholder="Enter school type" name="schooltypeid"
+              [(ngModel)]="schoolDetailModel.schooltypeid" #schooltypeid="ngModel" required>
+              <option [value]=undefined disabled>Select</option>
+              <option value="private">Private</option>
+              <option value="public">Public</option>
+            </select>
+            <div *ngIf="schooltypeid.invalid && (schooltypeid.touched || manageSchoolDetailForm.submitted)">
+              <p class="input-info error-message" *ngIf="schooltypeid.errors.required">School type is required</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col col-md-6">
+        <div class="form-group row">
+          <label class="control-label col-sm-4" for="schoolname">School name :</label>
+          <div class="col col-sm-8">
+            <input type="text" id="schoolName" class="form-control" placeholder="Enter School Name" name="schoolname"
+              [(ngModel)]="schoolDetailModel.schoolname" #schoolname="ngModel" required>
+            <div *ngIf="schoolname.invalid && (schoolname.touched || manageSchoolDetailForm.submitted)">
+              <p class="input-info error-message" *ngIf="schoolname.errors.required">School Name is required</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col col-md-6">
+        <div class="form-group row">
+          <label class="control-label col-sm-4" for="schooladdress">School address :</label>
+          <div class="col col-sm-8">
+            <input type="text" id="schooladdress" class="form-control" placeholder="Enter School Address" name="schooladdress"
+              [(ngModel)]="schoolDetailModel.schooladdress" #schooladdress="ngModel" required>
+            <div *ngIf="schooladdress.invalid && (schooladdress.touched || manageSchoolDetailForm.submitted)">
+              <p class="input-info error-message" *ngIf="schooladdress.errors.required">School address is required</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col col-md-6">
+        <div class="form-group row">
+          <label class="control-label col-sm-4" for="sectiontypeid">Section type :</label>
+          <div class="col col-sm-8">
+            <select id="sectiontypeid" class="form-control" placeholder="Enter Section type" name="sectiontypeid"
+              [(ngModel)]="schoolDetailModel.sectiontypeid" #sectiontypeid="ngModel" required>
+              <option [value]=undefined disabled>Select</option>
+              <option value="primary">Primary</option>
+              <option value="secondary">Secondary</option>
+              <!-- <option value="higher_secondary">Higher Secondary</option> -->
+            </select>
+            <div *ngIf="sectiontypeid.invalid && (sectiontypeid.touched || manageSchoolDetailForm.submitted)">
+              <p class="input-info error-message" *ngIf="sectiontypeid.errors.required">Section type is required</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col col-md-6">
+        <div class="form-group row">
+          <label class="control-label col-sm-4" for="no_of_teachers">No. of teachers :</label>
+          <div class="col col-sm-4" id="no_of_teachers">
+            <!-- <button class="btn btn-default part-btn d-sm-inline-block" tabindex="-1">
+              M
+            </button> -->
+            <input type="tel" id="numberofteachermale" class="form-control d-sm-inline-block" placeholder="Male"
+              name="numberofteachermale" [(ngModel)]="schoolDetailModel.numberofteachermale" #numberofteachermale="ngModel"
+              required>
+          </div>
+          <div class="col col-sm-4">
+            <!-- <button class="btn btn-default part-btn d-sm-inline-block" tabindex="-1">
+              F
+            </button> -->
+            <input type="tel" id="numberofteacherfemale" class="form-control d-sm-inline-block" placeholder="Female"
+              name="numberofteacherfemale" [(ngModel)]="schoolDetailModel.numberofteacherfemale" #numberofteacherfemale="ngModel"
+              required>
+          </div>
+        </div>
+      </div>
+      <div class="col col-md-6">
+        <div class="form-group row">
+          <label class="control-label col-sm-4" for="no_of_students">No. of students :</label>
+          <div class="col col-sm-4" id="no_of_students">
+            <!-- <button class="btn btn-default part-btn d-sm-inline-block" tabindex="-1">
+              M
+            </button> -->
+            <input type="tel" id="numberofstudentmale" class="form-control d-sm-inline-block" placeholder="Male"
+              name="numberofstudentmale" [(ngModel)]="schoolDetailModel.numberofstudentmale" #numberofstudentmale="ngModel"
+              required>
+          </div>
+          <div class="col col-sm-4">
+            <!-- <button class="btn btn-default part-btn d-sm-inline-block" tabindex="-1">
+              F
+            </button> -->
+            <input type="tel" id="numberofstudentfemale" class="form-control d-sm-inline-block" placeholder="Female"
+              name="numberofstudentfemale" [(ngModel)]="schoolDetailModel.numberofstudentfemale" #numberofstudentfemale="ngModel"
+              required>
+          </div>
+        </div>
+      </div>
+      <div class="col col-md-6">
+        <div class="form-group row">
+          <label class="control-label col-sm-4" for="no_of_staff">No. of staff :</label>
+          <div class="col col-sm-4" id="no_of_staff">
+            <!-- <button class="btn btn-default part-btn d-sm-inline-block" tabindex="-1">
+              M
+            </button> -->
+            <input type="tel" id="numberofstaffmale" class="form-control d-sm-inline-block" placeholder="Male"
+              name="numberofstaffmale" [(ngModel)]="schoolDetailModel.numberofstaffmale" #numberofstaffmale="ngModel"
+              required>
+          </div>
+          <div class="col col-sm-4">
+            <!-- <button class="btn btn-default part-btn d-sm-inline-block" tabindex="-1">
+              F
+            </button> -->
+            <input type="tel" id="numberofstafffemale" class="form-control d-sm-inline-block" placeholder="Female"
+              name="numberofstafffemale" [(ngModel)]="schoolDetailModel.numberofstafffemale" #numberofstafffemale="ngModel"
+              required>
+          </div>
+        </div>
+      </div>
+      <div class="col col-md-6">
+        <div class="form-group row">
+          <label class="control-label col-sm-4" for="poweraddressid">Power address :</label>
+          <div class="col col-sm-8">
+            <select id="poweraddressid" class="form-control" placeholder="Enter Section type" name="poweraddressid"
+              [(ngModel)]="schoolDetailModel.poweraddressid" #poweraddressid="ngModel">
+              <option [value]=undefined disabled>Select</option>
+              <option value="solar">Solar</option>
+              <option value="grid">Grid</option>
+              <option value="generator">Generator</option>
+              <option value="all">All</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="col col-md-6">
+        <div class="form-group row">
+          <label class="control-label col-sm-4" for="internetaccessid">Internet access :</label>
+          <div class="col col-sm-8">
+            <select id="internetaccessid" class="form-control" placeholder="Enter Section type" name="internetaccessid"
+              [(ngModel)]="schoolDetailModel.internetaccessid" #internetaccessid="ngModel">
+              <option [value]=undefined disabled>Select</option>
+              <option value="3g">3G</option>
+              <option value="dsl">DSL</option>
+              <option value="satellite">Satellite</option>
+            </select>
+
+          </div>
+        </div>
+      </div>
+      <div class="col col-md-6">
+        <div class="form-group row">
+          <label class="control-label col-sm-4 pr-0" for="buildingownershipid">Building owenership :</label>
+          <div class="col col-sm-8">
+            <select id="buildingownershipid" class="form-control" placeholder="Enter Section type" name="buildingownershipid"
+              [(ngModel)]="schoolDetailModel.buildingownershipid" #buildingownershipid="ngModel">
+              <option [value]=undefined disabled>Select</option>
+              <option value="owned">Owned</option>
+              <option value="rental">Rental</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+    <h5>
+      Existing equipments
+    </h5>
+    <hr>
+    <div class="row">
+      <div class="col col-md-6">
+        <div class="form-group row">
+          <label class="control-label col-sm-4" for="computers">Computers :</label>
+          <div class="col col-sm-8">
+            <input type="tel" id="computers" class="form-control" placeholder="Enter computers" name="computers"
+              [(ngModel)]="schoolDetailModel.computers" #computers="ngModel">
+          </div>
+        </div>
+      </div>
+      <div class="col col-md-6">
+        <div class="form-group row">
+          <label class="control-label col-sm-4" for="monitors">Monitors :</label>
+          <div class="col col-sm-8">
+            <input type="tel" id="monitors" class="form-control" placeholder="Enter monitors" name="monitors"
+              [(ngModel)]="schoolDetailModel.monitors" #monitors="ngModel">
+          </div>
+        </div>
+      </div>
+      <div class="col col-md-6">
+        <div class="form-group row">
+          <label class="control-label col-sm-4" for="routers">Routers :</label>
+          <div class="col col-sm-8">
+            <input type="tel" id="routers" class="form-control" placeholder="Enter routers" name="routers" [(ngModel)]="schoolDetailModel.routers"
+              #routers="ngModel" required>
+          </div>
+        </div>
+      </div>
+      <div class="col col-md-6">
+        <div class="form-group row">
+          <label class="control-label col-sm-4" for="dongles">3G dongles :</label>
+          <div class="col col-sm-8">
+            <input type="tel" id="dongles" class="form-control" placeholder="Enter dongles" name="dongles" [(ngModel)]="schoolDetailModel.dongles"
+              #dongles="ngModel" required>
+          </div>
+        </div>
+      </div>
+    </div>
+    <h5>
+      Documents
+    </h5>
+    <hr>
+    <div class="row">
+      <div class="col col-md-6">
+        <div class="form-group row">
+          <label class="control-label col-sm-4 pr-0" for="schoollicense">School license :</label>
+          <div class="col col-sm-8">
+            <input type="file" multiple="true" id="schoollicense" name="schoollicense" (change)="onFileSelected($event,'schoollicense')">
+          </div>
+        </div>
+      </div>
+      <div class="col col-md-6">
+        <div class="form-group row">
+          <label class="control-label col-sm-4 pr-0" for="registerationpaper">Registration paper :</label>
+          <div class="col col-sm-8">
+            <input type="file" multiple="true" id="registerationpaper" name="registerationpaper" (change)="onFileSelected($event,'registerationpaper')">
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

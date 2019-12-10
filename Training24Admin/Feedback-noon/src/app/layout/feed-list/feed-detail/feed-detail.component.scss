@@ -1,0 +1,92 @@
+.main-container {
+  background: white;
+  padding: 10px 0 0 15px;
+}
+.feed-list-header {
+  display: flex;
+  align-items: center;
+  mat-icon {
+    cursor: pointer;
+  }
+  .title {
+    font-size: 29px;
+    margin-left: 15px;
+  }
+  .done {
+    margin-left: 15px;
+    color: #0390d1;
+    cursor: pointer;
+  }
+  .progress-text {
+    margin-left: 10px;
+    color: #0390d1;
+    cursor: pointer;
+  }
+  .close {
+    margin-left: 15px;
+    color: #ff0000cc;
+    display: flex;
+    cursor: pointer;
+    align-items: center;
+  }
+  .archive {
+    margin-left: 10px;
+    color: #ff0000cc;
+    cursor: pointer;
+    font-weight: 500;
+  }
+  mat-form-field {
+    margin-left: 15px;
+  }
+}
+.table-container {
+  th {
+    font-size: 13px;
+    width: 20%;
+  }
+  td {
+    font-size: 13px;
+    color: darkgray;
+  }
+  .issue-title {
+    margin-top: 1rem !important;
+    font-weight: bold;
+  }
+  .desc-container {
+    .desc {
+      margin-top: 1rem !important;
+      font-weight: bold;
+      margin-bottom: 0.2rem !important;
+    }
+    .text {
+      font-size: 12px;
+      margin: 0;
+    }
+  }
+  .attach-container {
+    margin-top: 10px;
+    .attach {
+      font-weight: 400;
+      margin-bottom: 0.2rem !important;
+    }
+    .name {
+      font-weight: bold;
+      margin-left: 10px;
+      border-bottom: 1px solid lightgray;
+    }
+    .files {
+      margin-left: 5px;
+      display: flex;
+      border-bottom: 1px solid lightgray;
+      align-items: center;
+      justify-content: space-between;
+      p {
+        margin: 5px;
+        font-size: 12px;
+      }
+      mat-icon {
+        cursor: pointer;
+      }
+    }
+  }
+}

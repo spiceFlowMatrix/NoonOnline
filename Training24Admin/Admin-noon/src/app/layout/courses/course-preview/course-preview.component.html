@@ -1,0 +1,115 @@
+<app-course-header [data]="coursePreviewObj" (courseChangeEvent)="courseChangeEvent($event)"></app-course-header>
+<div>
+    <noon-loader *ngIf="isCallingApi"></noon-loader>
+    <div class="row course-preview-container">
+        <div class="col col-md-3 col-lg-3 part"
+            style="height: calc(100vh - 80px);overflow-y: auto;overflow-x: hidden;background-color: #f2f3f5;padding: 20px">
+            <!-- <form class="form-horizontal noon-form">
+                <div class="form-group row">
+                    <div class="col col-sm-12" style="position:relative">
+                        <input id="typeahead-focus" type="text" class="form-control" placeholder="Select course" id="courseSelectionInput"
+                            name="course" [(ngModel)]="selectedCourse" [ngbTypeahead]="search" (focus)="focus$.next($event.target.value)"
+                            (selectItem)="selectCourse($event)" #course="ngbTypeahead" [inputFormatter]="formatter"
+                            [resultFormatter]="rformatter" />
+                        <ng-template #rt let-r="result" let-t="term">
+                            <ngb-highlight [result]="r.name" [term]="t"></ngb-highlight>
+                        </ng-template>
+                        <i class="fa fa-caret-down" aria-hidden="true" style="position: absolute;right: 30px;bottom: 10px;cursor: pointer;"
+                            (click)="focusOnCourseselection()"></i>
+                    </div>
+                </div>
+            </form> -->
+            <div class="mt-10" dragula="CHAPTERS" [(dragulaModel)]="coursePreviewObj.chapters">
+                <div class="card card-default mb-3" *ngFor="let chapter of coursePreviewObj.chapters;let i=index;">
+
+                    <div class="card-header" style="background: white" (mouseenter)="chapter.hover =true"
+                        (mouseleave)="chapter.hover =false" id="chapter_{{i}}">
+                        <span [hidden]="!chapter.hover"><i class="fa fa-times fa-fw"
+                                (click)="deleteConfirmationPopup('chapter',i)"></i></span>
+                        &nbsp;<a href="javascript:void(0)"
+                            routerLink='/courses/course-preview/{{coursePreviewObj.id}}/edit-chapter/{{chapter.id}}'
+                            routerLinkActive="router-link-active">
+                            <span style="color: black">{{chapter.name}}</span>
+
+                            <i class="fa fa-angle-right fa-fw pull-right del-icon" style="color: black"
+                                *ngIf="!chapter.isExpanded"
+                                (click)="chapter.isExpanded = true;chapterExpanded(chapter.id,true)"></i>
+                            <i class="fa fa-angle-down fa-fw pull-right del-icon" style="color: black"
+                                *ngIf="chapter.isExpanded"
+                                (click)="chapter.isExpanded = false;chapterExpanded(chapter.id,false)"></i>
+                        </a>
+                    </div>
+                    <div class="card-body chapter-body" [hidden]="!chapter.isExpanded">
+                        <div class="list-group" [attr.data-chapter]="chapter.id" dragula="LESSONS"
+                            [(dragulaModel)]="chapter.lessons">
+                            <a href="javascript:void(0)" class="list-group-item clearfix d-block lesson-group"
+                                *ngFor="let lesson of chapter.lessons;let j=index;">
+                                <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
+                                <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
+
+                                <span (click)="openLesson(chapter,lesson)" style="min-width:100px;padding-left: 10px">
+                                    {{lesson.name}} -
+                                    <!-- <span *ngIf="lesson.lessonfiles && (lesson.lessonfiles.length > 0)">
+                                        {{lesson.lessonfiles[0].files.filetypename}}
+                                    </span> -->
+                                    <span *ngIf="lesson.type == 1">LESSON</span>
+                                    <span *ngIf="lesson.type == 2">QUIZ</span>
+                                    <span *ngIf="lesson.type == 3">ASSIGNMENT</span>
+                                </span>
+                                <i class="fa fa-trash fa-fw pull-right del-icon"
+                                    (click)="deleteConfirmationPopup('lesson',i,j)"></i>
+                            </a>
+                        </div>
+                        <div class="row mt-10" style="color: gray">
+                            <div class="col col-md-4 add-item text-center"
+                                routerLink='/courses/course-preview/{{coursePreviewObj.id}}/add-lesson'
+                                [queryParams]="{chapterid:chapter.id,chaptername:chapter.name,courseid:coursePreviewObj.id}">
+                                <p>
+                                    <!-- <i class="fa fa-video-camera fa-fw"></i> -->
+                                    <i class="fa fa-file-video-o"></i>
+                                </p>
+                                <!-- <p class="item-label">Video</p> -->
+                                <p class="item-label">Add Lesson</p>
+                            </div>
+                            <div class="col col-md-4 add-item text-center"
+                                routerLink='/courses/course-preview/{{coursePreviewObj.id}}/add-quiz'
+                                [queryParams]="{chapterid:chapter.id,type:'quiz',chaptername:chapter.name,courseid:coursePreviewObj.id,itemorder:''+coursePreviewObj.chapters[i].lessons.length}">
+                                <p>
+                                    <!-- <i class="fa fa-question-circle fa-fw"></i> -->
+                                    <i class="fa fa-pencil-square-o"></i>
+
+                                </p>
+                                <!-- <p class="item-label">Quiz</p> -->
+                                <p class="item-label">Add Quiz</p>
+                            </div>
+                            <div class="col col-md-4 add-item text-center"
+                                routerLink='/courses/course-preview/{{coursePreviewObj.id}}/add-assignment'
+                                [queryParams]="{chapterid:chapter.id,chaptername:chapter.name,courseid:coursePreviewObj.id}">
+                                <p>
+                                    <!-- <i class="fa fa-file-pdf-o fa-fw"></i> -->
+                                    <i class="fa fa-check-square-o"></i>
+                                </p>
+                                <p class="item-label">Add Assignment</p>
+                                <!-- <p class="item-label">Pdf</p> -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="add-chap">
+                <button mat-button *ngIf="coursePreviewObj.id" class="btn btn-info pull-right m-r-20px add-btn"
+                    title="Add chapter" routerLink="/courses/course-preview/{{coursePreviewObj.id}}/add-chapter"
+                    [queryParams]="{ courseid: coursePreviewObj.id, index: coursePreviewObj.chapters.length + 1 }">Add
+                    chapter
+                </button>
+            </div>
+            <!-- <button *ngIf="coursePreviewObj.id" class="btn btn-info pull-right m-r-20px add-btn" (click)="seeOrder()">See order</button> -->
+        </div>
+        <div class="col col-md-9 col-lg-9 part"
+            style="height: calc(100vh - 80px);overflow-y: auto;overflow-x:hidden;background-color: #f2f3f5;">
+            <!-- <div class="col col-md-9 col-lg-9 part" style="height: calc(100vh - 80px);background-color: #f2f3f5;"> -->
+            <router-outlet></router-outlet>
+        </div>
+    </div>
+</div>
+<app-common-dialog #deleteConfirmationDialog (deleteEvent)="deleteItem($event)"></app-common-dialog>

@@ -1,0 +1,23 @@
+.setting-icon {
+    position: absolute;
+    right: 15px;
+    font-size: 25px;
+    bottom: 8px;
+}
+
+.filter-courses {
+    position: absolute;
+    bottom: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: contents;
+}
+
+.reset-filter-label{
+    background: #f92020;
+    padding: 2px 15px;
+    border-radius: 30px;
+    color: white;
+    cursor: pointer;
+}

@@ -1,0 +1,98 @@
+<div class="metadata noon-tab-content" *ngIf="feedbackDetails.category">
+  <div class="row">
+    <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+      Category :
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+      <p>{{feedbackDetails.category.name}}</p>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+        Graphics manager
+      </div>
+      <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+        <select class="form-control" name="categoryId">
+          <option [value]=undefined disabled>Select</option>
+          <option>Paras chodavadiya</option>
+          <option>Rujal parekh</option>
+          <option>Ravi kate</option>
+        </select>
+      </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+      Grade :
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+      <span *ngIf="feedbackDetails.grade">{{feedbackDetails.grade.name}}</span>
+      <span *ngIf="!feedbackDetails.grade"> -- </span>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+      Editing manager
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+      <select class="form-control" name="categoryId">
+        <option [value]=undefined disabled>Select</option>
+        <option>Paras chodavadiya</option>
+        <option>Rujal parekh</option>
+        <option>Ravi kate</option>
+      </select>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+      Course :
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+      <span *ngIf="feedbackDetails.course">{{feedbackDetails.course.name}}</span>
+      <span *ngIf="!feedbackDetails.course"> -- </span>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+      Filming manager
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+      <select class="form-control" name="categoryId">
+        <option [value]=undefined disabled>Select</option>
+        <option>Paras chodavadiya</option>
+        <option>Rujal parekh</option>
+        <option>Ravi kate</option>
+      </select>
+    </div>
+  </div>
+  <div class="row" [hidden]="!feedbackDetails.lesson || !feedbackDetails.chapter">
+    <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+      <span *ngIf="feedbackDetails.lesson">Lesson :</span>
+      <span *ngIf="feedbackDetails.chapter">Chapter :</span>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+      <span *ngIf="feedbackDetails.lesson">{{feedbackDetails.lesson.name}}</span>
+      <span *ngIf="feedbackDetails.chapter">{{feedbackDetails.chapter.name}}</span>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+      Graphics manager
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+      <select class="form-control" name="categoryId">
+        <option [value]=undefined disabled>Select</option>
+        <option>Paras chodavadiya</option>
+        <option>Rujal parekh</option>
+        <option>Ravi kate</option>
+      </select>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+      <!-- &lt;Username&gt; marked these issues as actionable. -->
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+      QA manager
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12">
+      <select class="form-control" name="categoryId">
+        <option [value]=undefined disabled>Select</option>
+        <option>Paras chodavadiya</option>
+        <option>Rujal parekh</option>
+        <option>Ravi kate</option>
+      </select>
+    </div>
+  </div>
+</div>

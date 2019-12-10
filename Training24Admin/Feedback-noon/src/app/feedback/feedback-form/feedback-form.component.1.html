@@ -1,0 +1,291 @@
+<div class="noon-container">
+  <noon-loader *ngIf="isCallingApi"></noon-loader>
+  <div class="row">
+    <div class="col-lg-9 col-md-9 col-sm-12">
+      <ngb-accordion [closeOthers]="true" activeIds="contactDetail" #feedbackAccordin (panelChange)="beforeChange($event)">
+        <ngb-panel id="contactDetail">
+          <ng-template ngbPanelTitle>
+            <div class="row no-margin">
+              <div class="col-md-9 no-padding">
+                <p class="mb-0">{{'CONTACT_DETAIL' | translate}}
+                  <span *ngIf="isFormSubmitted">
+                    {{contactDetail.firstName ? ': ':''}}{{contactDetail.firstName}}
+                  </span>
+                </p>
+              </div>
+              <div class="col-md-2 text-right" *ngIf="isFormSubmitted && contactDetail.firstName">
+                <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+              </div>
+            </div>
+          </ng-template>
+          <ng-template ngbPanelContent>
+            <div class="row">
+              <div class="col-lg-5 col-sm-12 col-xs-12">
+                <form role="form" #contactDetailForm="ngForm" (ngSubmit)="contactDetailForm.form.valid && onAddContactDetailForm()">
+                  <div class="form-content">
+                    <div class="form-group">
+                      <input type="text" name="firstName" class="form-control input-underline input-lg" placeholder="{{'FULL_NAME' | translate}}"
+                        #firstName="ngModel" [(ngModel)]="contactDetail.firstName" required>
+                      <div *ngIf="firstName.invalid && (firstName.touched || contactDetailForm.submitted)">
+                        <p class="input-info error-message" *ngIf="firstName.errors.required">{{'FULLNAME_REQUIRED'|
+                          translate}}</p>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <input type="email" name="email" class="form-control input-underline input-lg" placeholder="{{'EMAIl' | translate}}"
+                        [pattern]="emailPattern" #email="ngModel" [(ngModel)]="contactDetail.email" required>
+                      <div *ngIf="email.invalid && (email.touched || contactDetailForm.submitted)">
+                        <p class="input-info error-message" *ngIf="email.errors.required">{{'EMAIL_REQUIRED'|
+                          translate}}</p>
+                        <p class="input-info error-message" *ngIf="email.errors.pattern">{{'EMAIL_INVALID'| translate}}</p>
+                      </div>
+                    </div>
+                    <div class="form-group row no-margin">
+                      <div class="col-md-2 no-padding">
+                        <input type="tel" id="phone_num_code" name="phone_num_code" class="form-control input-underline input-lg"
+                          style="max-width:70px;" placeholder="+91" #phone_num_code="ngModel" [(ngModel)]="contactDetail.countryCode">
+                      </div>
+                      <div class="col-md-10 no-padding">
+                        <input type="tel" id="phone_num" name="phone_num" class="form-control input-underline input-lg"
+                          placeholder="{{'PHONE_NUMBER' | translate}}" #phone_num="ngModel" [(ngModel)]="contactDetail.phone"
+                          required>
+                        <div *ngIf="phone_num.invalid && (phone_num.touched || contactDetailForm.submitted)">
+                          <p class="input-info error-message" *ngIf="phone_num.errors.required">{{'PHONENUM_REQUIRED'|
+                            translate}}</p>
+                          <p class="input-info error-message" *ngIf="phone_num.errors.pattern">{{'PHONE_INVALID'|
+                            translate}}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <button class="btn btn-primary rounded-btn" style="margin-top:1rem;" type="submit" [disabled]="contactDetailForm.invalid || isLoading">
+                    {{'ADD_CONTACT_DETAIL' | translate}}</button>&nbsp;
+                </form>
+              </div>
+            </div>
+          </ng-template>
+        </ngb-panel>
+        <ngb-panel id="feedBackDetail">
+          <ng-template ngbPanelTitle>
+            <p class="mb-0">{{'FEEDBACK_DETAIL' | translate}}</p>
+          </ng-template>
+          <ng-template ngbPanelContent>
+            <form class="form-horizontal">
+              <div class="row">
+                <div class="form-group col-lg-5">
+                  <label class="control-label no-padding" for="category">{{'PLEASE_SELECT_CATEGORY' | translate}}</label>
+                  <select class="form-control" name="categoryId" [(ngModel)]="feedBackDetailModel.categoryId" (change)="cetegoryChange()">
+                    <option [value]=undefined disabled>{{'SELECT_CATEGORY' | translate}}</option>
+                    <option *ngFor="let category of categotyLists" [value]="category.id">{{category.name | translate}}</option>
+                  </select>
+                </div>
+              </div>
+              <div *ngIf="feedBackDetailModel.categoryId">
+                <div class="row">
+                  <div class="form-group col-lg-5">
+                    <label class="control-label no-padding" for="grade">{{'Grade' | translate}}</label>
+                    <select class="form-control" name="roleId" [(ngModel)]="feedBackDetailModel.gradeId" (change)="gradeChange(feedBackDetailModel.gradeId)"
+                      [ngClass]="{'error' : isValiationError && !feedBackDetailModel.gradeId}">
+                      <option [value]=undefined disabled>{{'Select' | translate}}</option>
+                      <option *ngFor="let grade of gradeList" [value]="grade.id">{{grade.name | translate}}</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="form-group col-lg-5">
+                    <label class="control-label no-padding" for="course">{{'Course' | translate}}</label>
+                    <select class="form-control" name="roleId" [(ngModel)]="feedBackDetailModel.courseId" (change)="courseChange(feedBackDetailModel.courseId)"
+                      [ngClass]="{'error' : isValiationError && !feedBackDetailModel.courseId}">
+                      <option [value]=undefined disabled>{{'Select' | translate}}</option>
+                      <option *ngFor="let course of gradeCourseList" [value]="course.courseid">{{course.name |
+                        translate}}</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="row" *ngIf="feedBackDetailModel.categoryId !=6">
+                  <div class="form-group col-lg-5">
+                    <label class="control-label no-padding" for="lesson">{{'Lesson' | translate}}</label>
+                    <select class="form-control" name="roleId" [(ngModel)]="feedBackDetailModel.lessonId" [ngClass]="{'error' : isValiationError && !feedBackDetailModel.lessonId}">
+                      <option [value]=undefined disabled>{{'Select' | translate}}</option>
+                      <option *ngFor="let lesson of lessonsList" [value]="lesson.id">{{lesson.name}}</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="row" *ngIf="feedBackDetailModel.categoryId ==6">
+                  <div class="form-group col-lg-5">
+                    <label class="control-label no-padding" for="chapters">{{'Chapter' | translate}}</label>
+                    <select class="form-control" name="roleId" [(ngModel)]="feedBackDetailModel.chapterId" [ngClass]="{'error' : isValiationError && !feedBackDetailModel.chapterId}">
+                      <option [value]=undefined disabled>{{'Select' | translate}}</option>
+                      <option *ngFor="let chapter of chaptersList" [value]="chapter.id">{{chapter.name}}</option>
+                    </select>
+                  </div>
+                </div>
+                <!-- <div class="row" *ngIf="feedBackDetailModel.categoryId == 1 || feedBackDetailModel.categoryId == 4">
+                  <div class="form-group col-lg-5">
+                    <label class="control-label no-padding" for="chapters">{{'Description' | translate}}</label>
+                    <textarea class="form-control" placeholder="Description" rows="3" name="feedback_description"
+                      [(ngModel)]="feedBackDetailModel.Description"></textarea>
+                  </div>
+                </div> -->
+                <section>
+                  <h6 *ngIf="(feedBackDetailModel.categoryId != 6 && feedBackDetailModel.categoryId != 5)">
+                    {{'FEEDBACK_START_TIMES' | translate}}
+                  </h6>
+                  <div class="row">
+                    <div class="col-lg-4 col-md-4" *ngIf="(feedBackDetailModel.categoryId != 6 && feedBackDetailModel.categoryId != 5)">
+                      <ul class="list-group recording-list">
+                        <li class="list-group-item text-right">
+                          <button class="btn btn-primary rounded-btn" (click)="openfeedBackInputModal()">
+                            {{'Add' | translate}}
+                          </button>
+                        </li>
+                        <li class="list-group-item" style="padding: 0.25rem 1.25rem;cursor: pointer;" *ngFor="let feedBack of feedBackTimes;let i= index;">
+                          <div class="row" (click)="feedBackActiveIndex = i;">
+                            <div class="col-md-8" style="padding: 5px;">
+                              {{feedBack.timeLabel}}
+                            </div>
+                            <div class="col-md-4 actions">
+                              <i class="control fa fa-pencil-square-o text-left" aria-hidden="true" (click)="openfeedBackInputModal(i)"></i>
+                              <i class="control fa fa-minus text-right" aria-hidden="true" (click)="removeFeedbackTime(i)"></i>
+                            </div>
+                          </div>
+                        </li>
+                      </ul>
+                    </div>
+                    <div class="col-lg-8 col-md-8" *ngIf="feedBackTimes.length > 0">
+                      <div class="form-group">
+                        <label>{{'ISSUE_DESCRIPTION' | translate}}</label>
+                        <textarea class="form-control" rows="3" name="description_{{feedBackActiveIndex}}" [(ngModel)]="feedBackTimes[feedBackActiveIndex].description"></textarea>
+                      </div>
+                      <div class="row">
+                        <div class="col-lg-7 col-md-7">
+                          <ul class="list-group files-list">
+                            <li class="list-group-item">
+                              <div class="row">
+                                <div class="col-md-8">
+                                  {{'IMAGE_ATTACHMENTS' | translate}}
+                                </div>
+                                <div class="col-md-4 actions" style="padding: 0px;">
+                                  <button class="btn btn-primary rounded-btn" style="padding: 0.375rem 0.4rem;" (click)="selectFile('imageFilesInput')">{{'Browse'
+                                    | translate}}</button>
+                                  <input type="file" style="display:none;" (change)="onSelectFiles($event)" id="imageFilesInput"
+                                    multiple="true" accept="image/*">
+                                </div>
+                              </div>
+                            </li>
+                            <li class="list-group-item" *ngFor="let file of feedBackTimes[feedBackActiveIndex].imageFiles;let i=index;">
+                              <div class="row">
+                                <div class="col-md-9">
+                                  <a href="javascript:void(0)">{{file.name}}</a>
+                                </div>
+                                <div class="col-md-3 actions">
+                                  <i class="control fa fa-minus text-right" aria-hidden="true" (click)="feedBackTimes[feedBackActiveIndex].imageFiles.splice(i,1);"></i>
+                                </div>
+                              </div>
+                            </li>
+                            <li class="list-group-item">
+                              <div class="row">
+                                <div class="col-md-12 text-center">
+                                  <file-drop headertext="{{'DROP_FILES_HERE' | translate}}" (onFileDrop)="dropped($event)"
+                                    class="drop-file">
+                                  </file-drop>
+                                </div>
+                              </div>
+                            </li>
+                          </ul>
+                        </div>
+                        <div class="col-lg-5 col-md-5">
+                          <ul class="list-group files-list">
+                            <li class="list-group-item">
+                              <div class="row">
+                                <div class="col-md-8">
+                                  {{'VOICE_NOTES' | translate}}
+                                </div>
+                                <div class="col-md-4 actions">
+                                  <i class="control fa fa-microphone text-right" aria-hidden="true" (click)="feedBackTimes[feedBackActiveIndex].audioFiles.push(1)"></i>
+                                </div>
+                              </div>
+                            </li>
+                            <li class="list-group-item" *ngFor="let item of feedBackTimes[feedBackActiveIndex].audioFiles;let i=index;">
+                              <div class="row">
+                                <div class="col-md-8">
+                                  Audio {{i}}
+                                </div>
+                                <div class="col-md-4 actions">
+                                  <i class="control fa fa-minus text-right" aria-hidden="true" (click)="feedBackTimes[feedBackActiveIndex].audioFiles.splice(i,1)"></i>
+                                </div>
+                              </div>
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+              </div>
+              <div *ngIf="feedBackTimes.length> 0" class="mt-3 text-center">
+                <button class="btn btn-primary" style="margin:0 auto;" [disabled]="feedBackTimes.length < 1" (click)="submitFeedback()"
+                  *ngIf="feedBackDetailModel.categoryId">
+                  <div class="card-body btn text-center">
+                    {{'SUBMIT_FEEDBACK' | translate}}
+                  </div>
+                </button>
+              </div>
+            </form>
+          </ng-template>
+        </ngb-panel>
+      </ngb-accordion>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-12">
+      <ul class="list-group files-list">
+        <li class="list-group-item">
+          {{'News' | translate}}
+        </li>
+        <li class="list-group-item description-text">
+          <div>
+            <h6>
+              {{'Build' | translate}}
+            </h6>
+            <p class="description">{{'B_TEXT' | translate}}</p>
+          </div>
+          <div>
+            <h6>{{'NEW_FEATURES' | translate}}</h6>
+            <p class="description">{{'N_TEXT'| translate}}</p>
+          </div>
+          <div>
+            <h6>{{'BUG_FIXES' | translate}}</h6>
+            <p class="description">{{'F_TEXT' | translate}}</p>
+          </div>
+          <!-- <div>
+            <h6>{{'Changes' | translate}}</h6>
+            <p class="description">Lorem Ipsum is simply dummy text of the printing</p>
+            <p class="description">Lorem Ipsum is simply dummy text of the printing</p>
+            <p class="description">Lorem Ipsum is simply dummy text of the printing</p>
+          </div> -->
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<ng-template #feedbackTimeModelContent>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">{{'FEEDBACK_TIME' | translate}}</h4>
+    <button type="button" class="close" aria-label="Close" (click)="feedbackModalRef.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form>
+      <div class="form-group">
+        <label for="time">{{'Time' | translate}} :</label>
+        <div class="input-group">
+          <ngb-timepicker [(ngModel)]="time" name="time" [seconds]="true"></ngb-timepicker>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-dark" (click)="manageFeedbackTime()">{{'Save' | translate}}</button>
+  </div>
+</ng-template>

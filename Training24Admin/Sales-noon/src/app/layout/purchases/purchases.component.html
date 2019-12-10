@@ -1,0 +1,604 @@
+<noon-loader *ngIf="isCallingApi"></noon-loader>
+<div style="position: absolute;opacity: 0;">
+    <div id="pdf_elements" class="black" style="width:842px;padding-top: 20px;">
+        <div>
+            <div class="row text-center" style="font-size:23px">
+                <div class="col col-md-6 pt-4">
+                    <p> <b>{{receiptTitle}}</b></p>
+                    <p><b>Noon online education</b></p>
+                </div>
+                <div class="col col-md-6">
+                    <img src="assets/images/logo.png" style="width: 90px;">
+                    <p> <b>{{receiptTitle}}</b></p>
+                </div>
+            </div>
+            <p class="text-center"><b>RECEIPT</b></p>
+            <hr style="border-top: 1px solid rgba(0, 0, 0, 0.98);">
+            <div class="row ml-4" style="font-size:13px">
+                <div class="col col-md-6">
+                    <p class="mb-0" style="display: flex;">
+                        <span style="width:50%;display:inline-block;"><b>Student name</b></span>
+                        <span style="width:50%;display:inline-block;">{{pdfdata.studentname}}</span>
+                    </p>
+                    <p class="mb-0" style="display: flex;">
+                        <span style="width:50%;display:inline-block;"><b>Grade</b></span>
+                        <span style="width:50%;display:inline-block;">{{pdfdata.grades}}</span>
+                    </p>
+                    <p class="mb-0">
+                        <span style="width:50%;display:inline-block;"><b>Discount Package</b></span>
+                        <span style="width:50%;display:inline-block;">{{pdfdata.package}}</span>
+                    </p>
+                    <p class="mb-0">
+                        <span style="width:50%;display:inline-block;"><b>Start date</b></span>
+                        <span style="width:50%;display:inline-block;">{{pdfdata.start_date}}</span>
+                    </p>
+                    <p class="mb-0">
+                        <span style="width:50%;display:inline-block;"><b>End date</b></span>
+                        <span style="width:50%;display:inline-block;">{{pdfdata.end_date}}</span>
+                    </p>
+                    <p class="mb-0">
+                        <span style="width:50%;display:inline-block;"><b>Paid</b></span>
+                        <span style="width:50%;display:inline-block;">{{pdfdata.paid}}</span>
+                    </p>
+                </div>
+                <div class="col col-md-6">
+                    <p class="mb-0">
+                        <span style="width:50%;display:inline-block;"><b>Sales partner</b></span>
+                        <span style="width:50%;display:inline-block;">{{pdfdata.sales_agent}}</span>
+                    </p>
+                    <p class="mb-0">
+                        <span style="width:50%;display:inline-block;"><b>Additional purchase</b></span>
+                        <span style="width:50%;display:inline-block;">{{pdfdata.servicedetails}}</span>
+                    </p>
+                    <p class="mb-0">
+                        <span style="width:50%;display:inline-block;"><b>Total</b></span>
+                        <span style="width:50%;display:inline-block;">{{purchaseModel.final_price}}</span>
+                    </p>
+                    <p class="mb-0">
+                        <span style="width:50%;display:inline-block;"><b>Package</b></span>
+                        <span style="width:50%;display:inline-block;">{{pdfdata.packagedesc}}</span>
+                    </p>
+                    <p class="mb-0">
+                        <span style="width:50%;display:inline-block;"><b>Tax</b></span>
+                        <span *ngIf="taxValue" style="width:50%;display:inline-block;">{{taxValue.tax}}%</span>
+                        <span *ngIf="!taxValue" style="width:50%;display:inline-block;">N/A</span>
+                    </p>
+                </div>
+            </div>
+            <hr style="border-top: 1px solid rgba(0, 0, 0, 0.98);">
+            <div class="ml-4 info-text" style="font-size:13px" id="detailInfo">
+            </div>
+            <div class="ml-4 info-text" style="font-size:13px" id="backgroundInfo">
+            </div>
+        </div>
+    </div>
+</div>
+<!-- <div id="pdf_elements" class="black" style="width:842px;padding-top: 20px;" *ngIf="pdfdata.id"> -->
+
+<!-- <img [src]="pdfdata" *ngIf="pdfdata"> -->
+<div class="row">
+    <div class="col col-md-3 pl-0">
+        <!-- <div class="list-group-item pl-2 pr-2">
+            <p class="m-0">Number of purchases: <b>{{purchaseSummary.noofpurchase}}</b></p>
+            <p class="m-0">Number of subscriptions: <b>{{purchaseSummary.noofsubscription}}</b></p>
+            <p class="m-0">Total amount: <b>{{purchaseSummary.totalamountcompletedpending}}</b></p>
+        </div> -->
+        <div class="justify-content-md-end mt-1 mb-1 text-right">
+            <!-- <div class="col-md-6 text-right"> -->
+            <div class="d-md-inline-block mr-1">
+                <span class="setting-icon mr-4" (click)="initForm();filterModel.showsDatePicker=false;">
+                    <i class="fa fa-cog pos-rel" aria-hidden="true" placement="bottom" [autoClose]="false"
+                        [ngbPopover]="popContent" [popoverClass]="'settingpopover'" #filterPopOver="ngbPopover"></i>
+                </span>
+            </div>
+            <button type="button" class="btn btn-primary d-md-inline-block mr-3" (click)="resetInitdata()">Reset and
+                New</button>
+            <!-- </div> -->
+        </div>
+        <div class="list-group" style="max-height: 100vh;overflow-y: auto;overflow-x: hidden;" infinite-scroll
+            [infiniteScrollDistance]="1" [infiniteScrollUpDistance]="2" [infiniteScrollThrottle]="300"
+            (scrolled)="onScrollDown()" [scrollWindow]="false">
+            <!-- <li class="list-group-item p-1">
+                <div class="form-group m-0">
+                    <input type="search" name="search" class="form-control input-underline input-lg" [(ngModel)]="search"
+                        placeholder="Search..." required>
+                </div>
+            </li> -->
+            <li *ngFor="let purchase of purchaseList; let i = index" [ngClass]="{ 'list-selected' : isSelected == i }"
+                class="list-group-item p-1 noon-list-item" (click)="getPurchaseDetail(i,purchase)">
+                <div class="card p-2">
+                    <div class="purchase-body">
+                        <span class="info d-md-inline-block">
+                            <b class="title" style="font-size:13px;">{{purchase.purchaseid}}</b>
+                        </span>
+                        <span class="status d-md-inline-block {{purchase.status}}">{{purchase.status}}</span>
+                    </div>
+                    <label style="position: relative;top: 7px;font-size:12px;">
+                        <code *ngIf="!purchase.lastmodifieddate">{{purchase.purchasedate}}</code>
+                        <code *ngIf="purchase.lastmodifieddate">{{purchase.lastmodifieddate}}</code>
+                    </label>
+                </div>
+            </li>
+            <div class="pos-rel">
+                <noon-loader *ngIf="isListLoading"></noon-loader>
+            </div>
+        </div>
+    </div>
+    <div class="col col-9">
+        <div class="noon-container">
+            <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12">
+                    <div>
+                        <div>
+                            <ngb-tabset activeId="metadata" [destroyOnHide]="false">
+                                <ngb-tab title="Metadata" id="metadata">
+                                    <ng-template ngbTabContent>
+                                        <noon-metadata [data]="purchaseModel.metadatadetails"
+                                            (subscriptionChangeEvent)="categoryChanged($event)"
+                                            (metaDataEvent)="saveMetaDataEvent($event)"
+                                            (discountPackageChangeEvent)="discountPackageChangeEvent($event)"
+                                            (courseChangeEvent)="courseChangeEvent($event)"
+                                            (additionalServiceChangeEvent)="additionalServiceChangeEvent($event)"
+                                            (packageChangeEvent)="packageChangeEvent($event)">
+                                        </noon-metadata>
+                                    </ng-template>
+                                </ngb-tab>
+                                <ngb-tab title="Individual details" [disabled]="purchaseModel.categoryId != 1"
+                                    id="individual_detail">
+                                    <!-- <ngb-tab title="Individual details" id="individual_detail"> -->
+                                    <ng-template ngbTabContent>
+                                        <noon-individual-detail [data]="purchaseModel.individualdetails"
+                                            #individualDetail></noon-individual-detail>
+                                    </ng-template>
+                                </ngb-tab>
+                                <ngb-tab title="School details" [disabled]="purchaseModel.categoryId != 2"
+                                    id="school_detail">
+                                    <!-- <ngb-tab title="School details" id="school_detail"> -->
+                                    <ng-template ngbTabContent>
+                                        <noon-school-detail [data]="purchaseModel.schooldetails" #schoolDetail>
+                                        </noon-school-detail>
+                                    </ng-template>
+                                </ngb-tab>
+                            </ngb-tabset>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <ngb-accordion (panelChange)="beforePanelChange($event)" #acc="ngbAccordion">
+            <ngb-panel title="Subscriptions" id="subscriptions_panel">
+                <ng-template ngbPanelContent>
+                    <div class="noon-list-container" style="height: 300px;">
+                        <div class="d-md-inline-block" style="width: 100%;">
+                            <button class="btn btn-primary pull-right" [disabled]="!isSalesAgent" title="Add new user"
+                                (click)="(purchaseModel.subscriptions.length == 0 ? addTempSubscription():'');addParentUserModal()">Add
+                                new parent</button>
+                            <button class="btn btn-primary pull-right m-r-20px" [disabled]="!isSalesAgent"
+                                title="Add new user"
+                                (click)="(purchaseModel.subscriptions.length == 0 ? addTempSubscription():'');addUserModal()">Add
+                                new user</button>
+                        </div>
+                        <div class="row custom-list align-items-md-center"
+                            *ngFor="let subscription of purchaseModel.subscriptions;let i=index;let last=last">
+                            <div class="col-lg-4 col-md-4 col-sm-12">
+                                <span
+                                    *ngIf="subscription.userids && subscription.userids.email">{{subscription.userids.email}}</span>
+                                <span
+                                    *ngIf="!subscription.userids || (subscription.userids && !subscription.userids.email)">Select
+                                    account first</span>
+                            </div>
+                            <div class="col-lg-4 col-md-4 col-sm-12">
+                                <div class="form-group mb-0" style="position: relative;" id="accountSelection_{{i}}">
+                                    <input [disabled]="!isSalesAgent" id="typeahead-focus_{{i}}" type="text"
+                                        name="account_{{i}}" placeholder="Select account" class="form-control"
+                                        [(ngModel)]="subscription.userids" [resultFormatter]="rformatter"
+                                        [inputFormatter]="formatter"
+                                        (focus)="focusOnDropDown(i);focus$.next($event.target.value);"
+                                        [ngbTypeahead]="searchUser" 
+                                        (selectItem)="accountSelected($event)" />
+                                    <i class="fa fa-caret-down" aria-hidden="true"
+                                        style="position: absolute;right: 10px;top: 10px;cursor: pointer;"
+                                        (click)="focusOnAccountSelection(i)"></i>
+                                </div>
+                                <!-- <div class="form-group mb-0" style="position: relative;" id="parentAccountSelection_{{i}}">
+                                    <input type="text" name="parent_{{i}}" id="typeahead-focus_parent{{i}}"
+                                        [ngbTypeahead]="searchParent" [(ngModel)]="parentModal[i]" [resultFormatter]="parentformatter"
+                                        (focus)="focusOnParentDropDown(i);parentfocus$.next($event.target.value);"
+                                        [inputFormatter]="pformatter" class="form-control"
+                                        (selectItem)="parentAccountSelected($event)">
+                                    <i class="fa fa-caret-down" aria-hidden="true"
+                                        style="position: absolute;right: 10px;top: 10px;cursor: pointer;"
+                                        (click)="focusOnParentAccountSelection(i)"></i>
+                                </div>
+                         -->
+                                <ng-template #rt let-r="result" let-t="term">
+                                    <ngb-highlight [result]="r.name" [term]="t"></ngb-highlight>
+                                </ng-template>
+                            </div>
+                            <div class="col-lg-4 col-md-4 col-sm-12 text-right">
+                                <button [disabled]="!isSalesAgent" class="btn btn-primary btn-action" title="Add"
+                                    *ngIf="last" (click)="addTempSubscription()">
+                                    <i class="fa fa-plus"></i>
+                                </button>
+                                <!-- <button class="btn btn-primary btn-action" title="Edit">
+                  <i class="fa fa-pencil"></i>
+                </button> -->
+                                <button [disabled]="!isSalesAgent" class="btn btn-danger btn-action" title="Delete"
+                                    (click)="removeTempSubscription(i)">
+                                    <i class="fa fa-trash"></i></button>
+                                <button [disabled]="!isSalesAgent" class="btn btn-primary btn-action" title="Add"
+                                    *ngIf="parentalControl && subscription.userids" (click)="addParent(i)">
+                                    <i class="fa fa-users"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="d-md-inline-block mt-2" style="width: 100%;"
+                            [hidden]="purchaseModel.subscriptions < 1">
+                            <button [disabled]="!isSalesAgent" class="btn btn-info pull-right" title="Save"
+                                (click)="saveSubscriptions()">Save</button>
+                        </div>
+                    </div>
+                </ng-template>
+            </ngb-panel>
+            <ngb-panel title="Price Summary" id="price_summery_panel">
+                <ng-template ngbPanelContent>
+                    <div class="row">
+                        <div class="col-lg-4 col-md-4 col-sm-12 row">
+                            <div class="form-group col-md-12">
+                                <label class="control-label no-padding title-label" for="total_subscription">
+                                    Total Subscriptions
+                                </label>
+                                <input id="total_subscription" disabled type="text" class="form-control"
+                                    name="total_subscription" [(ngModel)]="purchaseModel.total_subscription"
+                                    #total_subscription="ngModel" />
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label class="control-label no-padding title-label" for="total_base_price">
+                                    Total Base Price
+                                </label>
+                                <input id="total_base_price" disabled type="text" class="form-control"
+                                    name="total_base_price" [(ngModel)]="purchaseModel.total_base_price"
+                                    #total_base_price="ngModel" />
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label class="control-label no-padding title-label" for="total_amount">
+                                    Final price
+                                </label>
+                                <input id="total_amount" disabled type="text" class="form-control" name="total_amount"
+                                    [(ngModel)]="purchaseModel.total_amount" #total_amount="ngModel" />
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-12">
+                            <div *ngIf="discountPackage">
+                                <label class="control-label no-padding title-label">Discount definition</label>
+                                <p>Discounted off total price - <b>{{discountPackage.offTotalPrice}}%</b></p>
+                                <p>Number of free subscriptions - <b>{{discountPackage.freeSubscriptions}}</b></p>
+                                <p>Discounted off subscriptions - <b>{{discountPackage.offSubscriptions}}%</b></p>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-12">
+                            <label class="control-label no-padding title-label"
+                                *ngIf="this.purchaseModel.courseSubscriptions">Subscriptions courses</label>
+                            <ul class="list-group" style="max-height: 210px;overflow: auto;">
+                                <li class="list-group-item"
+                                    *ngFor="let courseSubscription of this.purchaseModel.courseSubscriptions">
+                                    <p class="text-left mb-0">{{courseSubscription.courseName}}</p>
+                                    <p class="text-right mb-0">
+                                        <span *ngIf="courseSubscription.calculatedPrice">
+                                            {{courseSubscription.calculatedPrice * courseSubscription.validSub}}
+                                        </span>
+                                        <span *ngIf="!courseSubscription.calculatedPrice">
+                                            {{courseSubscription.basePrice * courseSubscription.validSub}}
+                                        </span>
+                                    </p>
+                                </li>
+                            </ul>
+                            <label class="control-label no-padding title-label"
+                                *ngIf="purchaseModel.packagedetails">Selected Package</label>
+                            <ul class="list-group" style="max-height: 210px;overflow: auto;"
+                                *ngIf="purchaseModel.packagedetails">
+                                <li class="list-group-item">
+                                    <p class="text-left mb-0">{{purchaseModel.packagedetails.name}}</p>
+                                    <p class="text-right mb-0">
+                                        <span *ngIf="purchaseModel.total_subscription > 0">
+                                            {{purchaseModel.packagedetails.price * purchaseModel.total_subscription}}
+                                        </span>
+                                        <span *ngIf="purchaseModel.total_subscription < 1">
+                                            {{purchaseModel.packagedetails.price}}
+                                        </span>
+                                    </p>
+                                </li>
+                            </ul>
+                            <label class="control-label no-padding title-label"
+                                *ngIf="purchaseModel.servicedetails">Additional Services</label>
+                            <ul class="list-group" style="max-height: 210px;overflow: auto;"
+                                *ngIf="purchaseModel.servicedetails">
+                                <li class="list-group-item" *ngFor=" let servicedet of purchaseModel.servicedetails">
+                                    <p class="text-left mb-0">{{servicedet.name}}</p>
+                                    <p class="text-right mb-0">
+                                        <span *ngIf="purchaseModel.total_subscription > 0">
+                                            {{servicedet.price * purchaseModel.total_subscription}}
+                                        </span>
+                                        <span *ngIf="purchaseModel.total_subscription < 1">
+                                            {{servicedet.price}}
+                                        </span>
+                                    </p>
+                                </li>
+                            </ul>
+                            <hr class="">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    Total
+                                </div>
+                                <div class="col-md-6 text-right">
+                                    <!-- <label class="control-label no-padding title-label">{{purchaseModel.total_amount}}</label> -->
+                                    <label
+                                        class="control-label no-padding title-label">{{purchaseModel.total_base_price}}</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row ml-4 mr-4">
+                        <!-- <div class="col-lg-6 col-md-6 col-sm-12 mb-2  text-center" [routerLink]="['/details']"
+                            routerLinkActive="router-link-active">
+                            <button class="btn btn-primary ml-4 mr-4">Generate New Agreement</button>
+                        </div> -->
+                        <div class="col-lg-6 col-md-6 col-sm-12 mb-2 text-left">
+                            <button [disabled]="!isSalesAgent" class="btn btn-primary ml-4 mr-4"
+                                (click)="generateSignableReport()">Generate
+                                Signable Receipt</button>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-12 text-center">
+                            <!-- <button class="btn btn-primary ml-4 mr-4">View Agreement</button> -->
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-12 text-left">
+                            <!-- <button class="btn btn-primary ml-4 mr-4" (click)="generateSignedReport()">Upload Signed -->
+                            <button [disabled]="!isSalesAgent" class="btn btn-primary ml-4 mr-4"
+                                (click)="selectReportFile()">
+                                Upload Signed Receipt
+                            </button>
+                            <form ngNoForm>
+                                <input type="file" id="signed_report" (change)="reportFileSelected($event)"
+                                    style="display:none;" />
+                            </form>
+                        </div>
+                    </div>
+                </ng-template>
+            </ngb-panel>
+        </ngb-accordion>
+    </div>
+</div>
+
+<ng-template #assignPersonsDialog let-c="close" let-d="dismiss">
+    <form class="form-horizontal noon-form" #manageUserForm="ngForm"
+        (ngSubmit)="manageUserForm.form.valid && addUser()">
+        <div class="modal-header">
+            <h4 class="modal-title">Add user</h4>
+            <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group row">
+                <label class="control-label col-sm-4" for="username">
+                    Username :
+                    &nbsp;<i class="fa fa-refresh fa-spin" *ngIf="isUserNameChecking"></i>
+                </label>
+                <div class="col col-sm-8">
+                    <input type="text" class="form-control" placeholder="Enter Username" name="username"
+                        [(ngModel)]="userModel.username" #username="ngModel" debounce delay="700"
+                        (func)="checkUsernameExist()" required>
+                    <div *ngIf="username.invalid && (username.touched || manageUserForm.submitted)">
+                        <p class="input-info error-message" *ngIf="username.errors.required">Username is required</p>
+                    </div>
+                    <p class="input-info error-message" *ngIf="userModel.username && isUserNameExist">Username is
+                        already taken</p>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="control-label col-sm-4" for="email">Email :</label>
+                <div class="col col-sm-8">
+                    <input type="email" [disabled]="isEditView" class="form-control" placeholder="Enter email"
+                        [pattern]="emailPattern" name="email" [(ngModel)]="userModel.email" #email="ngModel" required>
+                    <div *ngIf="email.invalid && (email.touched || manageUserForm.submitted)">
+                        <p class="input-info error-message" *ngIf="email.errors.required">Email is required</p>
+                        <p class="input-info error-message" *ngIf="email.errors.pattern">Email is not valid.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="control-label col-sm-4" for="pwd">Password :</label>
+                <div class="col col-sm-8">
+                    <input type="password" class="form-control" placeholder="Enter password"
+                        title="Use 8 or more characters with a mix of letters, numbers & symbols" name="password"
+                        [(ngModel)]="userModel.password" #password="ngModel" [required]="!isEditView">
+                    <!-- [pattern]="passwordPattern" -->
+                    <div *ngIf="password.invalid && (password.touched || manageUserForm.submitted)">
+                        <p class="input-info error-message" *ngIf="password.errors.required">Password is required</p>
+                        <p class="input-info error-message" *ngIf="password.errors.pattern">Password must contain 8
+                            or
+                            more characters with a mix of letters, numbers & symbols.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="control-label col-sm-4" for="pwd">Confirm Password :</label>
+                <div class="col col-sm-8">
+                    <input type="password" class="form-control" name="confirmPassword"
+                        [(ngModel)]="userModel.confirmPassword" placeholder="Confirm Password"
+                        #confirmPassword="ngModel" [required]="!isEditView">
+                    <div *ngIf="(password.touched || manageUserForm.submitted)">
+                        <p class="input-info error-message"
+                            *ngIf="userModel.password && (userModel.password !== userModel.confirmPassword)">
+                            Password and confirm password not matches.
+                        </p>
+                        <p class="input-info success-message"
+                            *ngIf="userModel.password && (userModel.password == userModel.confirmPassword)">
+                            Password and confirm password matches.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-info" [disabled]="!manageUserForm.valid">Add
+                user</button>
+        </div>
+    </form>
+</ng-template>
+
+<ng-template #detailUploadDialog let-c="close" let-d="dismiss">
+    <div class="modal-header">
+        <h4 class="modal-title">Uploading in progress...</h4>
+        <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <div class="form-group row justify-content-md-start">
+            <div class="col col-md-12" style="position:relative">
+                <h4 style="position: absolute;z-index: 9999;top: 40%;left: 17%;"
+                    *ngIf="purchaseModel['individualDetail'] && purchaseModel['individualDetail'].length > 0">
+                    Uploading {{individualUploadingIndex+1}} of {{purchaseModel['individualDetail'].length}} individual
+                    details
+                </h4>
+                <div>
+                    <div class="timeline-item">
+                        <div class="animated-background">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+
+<ng-template #assignParentDialog let-c="close" let-d="dismiss">
+    <form class="form-horizontal noon-form" #manageParentUserForm="ngForm">
+        <div class="modal-header">
+            <h4 class="modal-title">Add parent user</h4>
+            <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group row">
+                <label class="control-label col-sm-4" for="username">
+                    Select Parent :
+                </label>
+                <div class="col col-sm-8">
+                    <div>
+                        <div style="display: flex;align-items: center"
+                            *ngFor="let x of parentModal;let i = index;let last=last;">
+                            <div class="form-group mb-0" style="position: relative;" id="parentAccountSelection_{{i}}">
+                                <input type="text" name="parent_{{i}}" id="typeahead-focus_parent_{{i}}"
+                                    [ngbTypeahead]="searchParent" [(ngModel)]="x.userids" [resultFormatter]="parentformatter"
+                                    (focus)="focusOnParentDropDown(i);parentfocus$.next($event.target.value);"
+                                    [inputFormatter]="pformatter" class="form-control"
+                                    (selectItem)="parentAccountSelected($event)">
+                                <i class="fa fa-caret-down" aria-hidden="true"
+                                    style="position: absolute;right: 10px;top: 10px;cursor: pointer;"
+                                    (click)="focusOnParentAccountSelection(i)"></i>
+                            </div>
+                    
+                            <ng-template #rt let-pr="result" let-pt="term">
+                                <ngb-highlight [result]="pr.name" [term]="pt"></ngb-highlight>
+                            </ng-template>
+                            <div class="list-inline-item" style="position: relative;bottom: 3px;">
+                                <button class="btn btn-danger btn-action" title="Delete" *ngIf="!last"
+                                    (click)="removeParent(i)">
+                                    <i class="fa fa-minus"></i></button>
+                                <button class="btn btn-danger btn-action" title="Add" *ngIf="last"
+                                    (click)="addMoreParent(i)">
+                                    <i class="fa fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-info" (click)="addParentUser()"
+                [disabled]="!manageParentUserForm.valid">Assign
+                parent user</button>
+        </div>
+    </form>
+</ng-template>
+
+<ng-template #popContent>
+    <form #feedbackFilterForm="ngForm" role="form">
+        <div class="filter-container">
+            <div class="text-right mb-1">
+                <span class="d-md-inline-block mr-4 reset-filter-label" *ngIf="filterModel.isfilterneeded"
+                    (click)="resetfilter()">
+                    Reset
+                </span>
+                <span class="d-md-inline-block text-right mr-4">
+                    <i class="fa fa-check close-icon" aria-hidden="true" (click)="filterData()"></i>
+                </span>
+                <span class="d-md-inline-block text-right">
+                    <i class="fa fa-times close-icon" aria-hidden="true" (click)="closeFilterPopOver()"></i>
+                </span>
+            </div>
+            <div class="row">
+                <div *ngIf="isAdmin || isSalesAdmin" class="col-md-6">
+                    <label>Sales agent</label>
+                    <select class="form-control filter-control" name="sales_agent"
+                        [(ngModel)]="filterModel.salesagentid">
+                        <option [value]=undefined>All</option>
+                        <option *ngFor="let agent of filterPopUpMetaData.agents" [value]="agent.salesAgentId">
+                            {{agent.agentName}}</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label>Discount Packages</label>
+                    <select class="form-control filter-control" name="discountPackages"
+                        [(ngModel)]="filterModel.discountpackageid">
+                        <option [value]=undefined>All</option>
+                        <option *ngFor="let discountPackage of filterPopUpMetaData.discountPackages"
+                            [value]="discountPackage.id">{{discountPackage.packageName}}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <label>Course</label>
+                    <select class="form-control filter-control" name="CourseSubjects"
+                        [(ngModel)]="filterModel.courseid">
+                        <option [value]=undefined>All</option>
+                        <option *ngFor="let course of filterPopUpMetaData.courseList" [value]="course.id">
+                            {{course.subject}}</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label>Status</label>
+                    <select class="form-control filter-control" name="status" [(ngModel)]="filterModel.status">
+                        <option [value]=undefined>All</option>
+                        <option [value]="'Completed'">Completed</option>
+                        <option [value]="'Pending'">Pending</option>
+                    </select>
+                </div>
+                <div class="col-md-6 mt-1">
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary calendar" type="button" (click)="togglePicker()">
+                            <i class="fa fa-calendar"></i>
+                        </button>
+                    </div>
+                    <div *ngIf="filterPopUpMetaData.showsDatePicker">
+                        <ngb-datepicker #dp [displayMonths]="2" [dayTemplate]="t" outsideDays="hidden"
+                            (select)="onDateSelection($event)">
+                        </ngb-datepicker>
+                        <ng-template #t let-date let-focused="focused">
+                            <span class="custom-day" [class.focused]="focused" [class.range]="isRange(date)"
+                                [class.faded]="isHovered(date) || isInside(date)" (mouseenter)="hoveredDate = date"
+                                (mouseleave)="hoveredDate = null">
+                                {{ date.day }}
+                            </span>
+                        </ng-template>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</ng-template>

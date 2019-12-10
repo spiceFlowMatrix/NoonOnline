@@ -1,0 +1,190 @@
+<div>
+    <h4>
+        <a class="btn btn-success btn-lg back" backDirection>
+            <span class="fa fa-arrow-left"></span>
+        </a>
+        <span *ngIf="isEditView">Edit</span><span *ngIf="!isEditView">Add</span> agent
+        <noon-loader *ngIf="isCallingApi"></noon-loader>
+    </h4>
+    <div class="row">
+        <div class="col col-xl-6 col-lg-12">
+            <form class="form-horizontal noon-form" #manageAgentForm="ngForm" (ngSubmit)="manageAgentForm.form.valid && manageAgents()">
+                <div class="form-group row">
+                    <label class="control-label col-sm-4" for="name">Email :</label>
+                    <div class="col col-sm-8">
+                        <input type="email" name="email" class="form-control input-underline input-lg" placeholder="Email"
+                            #email="ngModel" [pattern]="emailPattern" [(ngModel)]="agentModel.email" required>
+                        <div *ngIf="email.invalid && (email.touched || manageAgentForm.submitted)">
+                            <p class="input-info error-message" *ngIf="email.errors.required">Email is required</p>
+                            <p class="input-info error-message" *ngIf="email.errors.pattern">Email is invalid</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="control-label col-sm-4" for="agentName">Partner name :</label>
+                    <div class="col col-sm-8">
+                        <input type="text" id="agentName" class="form-control" placeholder="Enter agent name" name="agentName"
+                            [(ngModel)]="agentModel.username" #agentName="ngModel" required>
+                        <div *ngIf="agentName.invalid && (agentName.touched || manageAgentForm.submitted)">
+                            <p class="input-info error-message" *ngIf="agentName.errors.required">Partner name is
+                                required</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="control-label col-sm-4" for="description">Partner background :</label>
+                    <div class="col col-sm-8">
+                        <textarea rows="3" id="description" class="form-control" placeholder="Enter partner background"
+                            name="description" [(ngModel)]="agentModel.partnerBackgroud" #description="ngModel" required></textarea>
+                        <div *ngIf="description.invalid && (description.touched || manageAgentForm.submitted)">
+                            <p class="input-info error-message" *ngIf="description.errors.required">
+                                Enter partner background is required
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="control-label col-sm-4" for="focalPoint">Focal point :</label>
+                    <div class="col col-sm-8">
+                        <input type="text" id="focalPoint" class="form-control" placeholder="Enter Focal point" name="focalPoint"
+                            [(ngModel)]="agentModel.focalPoint" #focalPoint="ngModel" required>
+                        <div *ngIf="focalPoint.invalid && (focalPoint.touched || manageAgentForm.submitted)">
+                            <p class="input-info error-message" *ngIf="focalPoint.errors.required">Focal point is
+                                required</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="control-label col-sm-4" for="position">Position :</label>
+                    <div class="col col-sm-8">
+                        <input type="text" id="position" class="form-control" placeholder="Enter position" name="position"
+                            [(ngModel)]="agentModel.position" #position="ngModel" required>
+                        <div *ngIf="position.invalid && (position.touched || manageAgentForm.submitted)">
+                            <p class="input-info error-message" *ngIf="position.errors.required">Position is
+                                required</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="control-label col-sm-4" for="phone">Phone :</label>
+                    <div class="col col-sm-8">
+                        <input type="tel" id="phone" name="phone" class="form-control input-underline input-lg"
+                            placeholder="Phone" #phone="ngModel" [(ngModel)]="agentModel.phonenumber" required>
+                        <div *ngIf="phone.invalid && (phone.touched || manageAgentForm.submitted)">
+                            <p class="input-info error-message" *ngIf="phone.errors.required">Phone is required</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="control-label col-sm-4" for="status">Is Active :</label>
+                    <div class="col col-md-8">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="status" [(ngModel)]="agentModel.isActive"
+                                    #status="ngModel">
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="control-label col-sm-4" for="physical_address">Physical address :</label>
+                    <div class="col col-sm-8">
+                        <input type="text" id="physicalAddress" class="form-control" placeholder="Enter Physical address"
+                            name="physical_address" [(ngModel)]="agentModel.physicalAddress" #physical_address="ngModel"
+                            required>
+                        <div *ngIf="physical_address.invalid && (physical_address.touched || manageAgentForm.submitted)">
+                            <p class="input-info error-message" *ngIf="physical_address.errors.required">
+                                Physical address is required
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="control-label col-sm-4" for="category">Category :</label>
+                    <div class="col col-sm-8">
+                        <select id="category" class="form-control" placeholder="Enter category" name="category"
+                            [(ngModel)]="agentModel.agentCategoryId" #category="ngModel" required>
+                            <option [value]=undefined disabled>Select</option>
+                            <option *ngFor="let category of categorylist" [value]="category.id">{{category.categoryName}}</option>
+                        </select>
+                        <div *ngIf="category.invalid && (category.touched || manageAgentForm.submitted)">
+                            <p class="input-info error-message" *ngIf="category.errors.required">
+                                Category selection is required
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="control-label col-sm-4" for="currency">Currency :</label>
+                    <div class="col col-sm-8">
+                        <select id="currency" class="form-control" placeholder="Enter currency" name="currency"
+                            [(ngModel)]="agentModel.currencyCode" #currency="ngModel" required>
+                            <option [value]=undefined disabled>Select</option>
+                            <option *ngFor="let currency of currencyLists" [value]="currency.code">{{currency.code}}</option>
+                        </select>
+                        <div *ngIf="currency.invalid && (currency.touched || manageAgentForm.submitted)">
+                            <p class="input-info error-message" *ngIf="currency.errors.required">
+                                Currency selection is required
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="control-label col-sm-4" for="agreedMonthlyDeposit">Agreed monthly deposit :</label>
+                    <div class="col col-sm-8">
+                        <input type="tel" id="agreedMonthlyDeposit" name="agreedMonthlyDeposit" class="form-control input-underline input-lg"
+                            placeholder="Agreed monthly deposit" #agreedMonthlyDeposit="ngModel" [(ngModel)]="agentModel.agreedMonthlyDeposit" required>
+                        <div *ngIf="agreedMonthlyDeposit.invalid && (agreedMonthlyDeposit.touched || manageAgentForm.submitted)">
+                            <p class="input-info error-message" *ngIf="agreedMonthlyDeposit.errors.required">
+                                Agreed monthly deposit is required
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="control-label col-sm-4" for="pwd">Password :</label>
+                    <div class="col col-sm-8">
+                        <input type="password" class="form-control" placeholder="Enter password" title="Use 8 or more characters with a mix of letters, numbers & symbols"
+                            name="password" [(ngModel)]="agentModel.password" #password="ngModel"
+                            [pattern]="'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[^\w\s]).{8,}$'"
+                             [required]="!isEditView">
+                        <!-- [pattern]="passwordPattern" -->
+                        <div *ngIf="password.invalid && (password.touched || manageAgentForm.submitted)">
+                            <p class="input-info error-message" *ngIf="password.errors.required">Password is required</p>
+                            <p class="input-info error-message" *ngIf="password.errors.pattern">Password must contain 8
+                                or
+                                more characters with a mix of letters, numbers & symbols.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="control-label col-sm-4" for="pwd">Confirm Password :</label>
+                    <div class="col col-sm-8">
+                        <input type="password" class="form-control" name="confirmPassword" [(ngModel)]="agentModel.confirmPassword"
+                            placeholder="Confirm Password" #confirmPassword="ngModel" [required]="!isEditView">
+                        <div *ngIf="(password.touched || manageAgentForm.submitted)">
+                            <p class="input-info error-message" *ngIf="agentModel.password && (agentModel.password !== agentModel.confirmPassword)">
+                                Password and confirm password not matches.
+                            </p>
+                            <p class="input-info success-message" *ngIf="agentModel.password && (agentModel.password == agentModel.confirmPassword)">
+                                Password and confirm password matches.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-8 pull-right">
+                        <button type="submit" class="btn btn-primary m-r-20px" *ngIf="isEditView" [disabled]="manageAgentForm.invalid || isCallingApi">Edit
+                            agent</button>
+                        <button type="submit" class="btn btn-primary m-r-20px" *ngIf="!isEditView" [disabled]="manageAgentForm.invalid || isCallingApi">Add
+                            agent
+                        </button>
+                        <button class="btn btn-danger" backDirection>Cancel</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

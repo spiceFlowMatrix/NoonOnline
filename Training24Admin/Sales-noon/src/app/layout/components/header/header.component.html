@@ -1,0 +1,250 @@
+<nav class="navbar navbar-expand-lg fixed-top">
+    <a class="navbar-brand" href="#">Noon </a>
+    <button class="navbar-toggler" type="button" (click)="toggleSidebar()">
+        <!-- <span class="navbar-toggler-icon"></span> -->
+        <i class="fa fa-bars text-muted" aria-hidden="true"></i>
+    </button>
+    <div class="collapse navbar-collapse">
+        -->
+        <ul class="navbar-nav ml-auto">
+            <!-- <li class="nav-item d-none d-xl-block">
+                <a
+                    href="https://github.com/start-angular/SB-Admin-BS4-Angular-2/archive/master.zip"
+                    class="nav-link btn mt-1" role="button"
+                    style="padding: .375rem 1rem !important;border-color: #999;"
+                >
+                    {{ 'Download Now' | translate }}
+                </a>
+            </li> &nbsp; -->
+            <li class="nav-item">
+                <a href="javascript:void(0)" class="nav-link mt-1" style="padding: 0.375rem 1rem !important; border-color: #999;" (click)="rltAndLtr()">
+                    RTL/LTR
+                </a>
+            </li> &nbsp;
+            <li class="nav-item dropdown" ngbDropdown>
+                <a class="nav-link" href="javascript:void(0)" ngbDropdownToggle>
+                    <i class="fa fa-envelope"></i> <b class="caret"></b><span class="sr-only">(current)</span>
+                </a>
+                <ul class="dropdown-menu-right messages" ngbDropdownMenu>
+                    <li class="media">
+                        <img class="d-flex align-self-center mr-3" src="http://i.huffpost.com/gadgets/slideshows/461162/slide_461162_6224974_sq50.jpg"
+                            alt="Generic placeholder image">
+                        <div class="media-body">
+                            <h5 class="mt-0 mb-1">Hamza Rahimy</h5>
+                            <p class="small text-muted"><i class="fa fa-clock-o"></i> Yesterday at 4:32 PM</p>
+                            <p class="last"> Lorem ipsum dolor sit amet, consectetur...</p>
+                        </div>
+                    </li>
+                    <li class="media">
+                        <img class="d-flex align-self-center mr-3" src="http://i.huffpost.com/gadgets/slideshows/461162/slide_461162_6224974_sq50.jpg"
+                            alt="Generic placeholder image">
+                        <div class="media-body">
+                            <h5 class="mt-0 mb-1">Hamza Rahimy</h5>
+                            <p class="small text-muted"><i class="fa fa-clock-o"></i> Yesterday at 4:32 PM</p>
+                            <p class="last"> Lorem ipsum dolor sit amet, consectetur...</p>
+                        </div>
+                    </li>
+                    <li class="media">
+                        <img class="d-flex align-self-center mr-3" src="http://i.huffpost.com/gadgets/slideshows/461162/slide_461162_6224974_sq50.jpg"
+                            alt="Generic placeholder image" />
+                        <div class="media-body">
+                            <h5 class="mt-0 mb-1">Hamza Rahimy</h5>
+                            <p class="small text-muted"><i class="fa fa-clock-o"></i> Yesterday at 4:32 PM</p>
+                            <p class="last"> Lorem ipsum dolor sit amet, consectetur...</p>
+                        </div>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-item dropdown" ngbDropdown>
+                <a href="javascript:void(0)" class="nav-link" ngbDropdownToggle>
+                    <i class="fa fa-bell"></i> <b class="caret"></b><span class="sr-only">(current)</span>
+                </a>
+                <div class="dropdown-menu-right" ngbDropdownMenu>
+                    <a href="javascript:void(0)" class="dropdown-item">
+                        {{ 'Pending Task' | translate }} <span class="badge badge-info">6</span>
+                    </a>
+                    <a href="javascript:void(0)" class="dropdown-item">
+                        {{ 'In queue' | translate }} <span class="badge badge-info"> 13</span>
+                    </a>
+                    <a href="javascript:void(0)" class="dropdown-item">
+                        {{ 'Mail' | translate }} <span class="badge badge-info"> 45</span>
+                    </a>
+                    <li class="dropdown-divider"></li>
+                    <a href="javascript:void(0)" class="dropdown-item">
+                        {{ 'View All' | translate }}
+                    </a>
+                </div>
+            </li>
+            <li class="nav-item dropdown" ngbDropdown>
+                <a href="javascript:void(0)" class="nav-link" ngbDropdownToggle>
+                    <i class="fa fa-language"></i> {{ 'Language' | translate }} <b class="caret"></b>
+                </a>
+                <div class="dropdown-menu-right" ngbDropdownMenu>
+                    <a class="dropdown-item" href="javascript:void(0)" (click)="changeLang('en')">
+                        {{ 'English' | translate }}
+                    </a>
+                    <a class="dropdown-item" href="javascript:void(0)" (click)="changeLang('fr')">
+                        {{ 'French' | translate }}
+                    </a>
+                    <a class="dropdown-item" href="javascript:void(0)" (click)="changeLang('ur')">
+                        {{ 'Urdu' | translate }}
+                    </a>
+                    <a class="dropdown-item" href="javascript:void(0)" (click)="changeLang('es')">
+                        {{ 'Spanish' | translate }}
+                    </a>
+                    <a class="dropdown-item" href="javascript:void(0)" (click)="changeLang('it')">
+                        {{ 'Italian' | translate }}
+                    </a>
+                    <a class="dropdown-item" href="javascript:void(0)" (click)="changeLang('fa')">
+                        {{ 'Farsi' | translate }}
+                    </a>
+                    <a class="dropdown-item" href="javascript:void(0)" (click)="changeLang('de')">
+                        {{ 'German' | translate }}
+                    </a>
+                    <a class="dropdown-item" href="javascript:void(0)" (click)="changeLang('zh-CHS')">
+                        {{ 'Simplified Chinese' | translate }}
+                    </a>
+                </div>
+            </li>
+            <li class="nav-item dropdown"  *ngIf="utilService.getAccountDetails()" ngbDropdown>
+                <a href="javascript:void(0)" class="nav-link" ngbDropdownToggle>
+                    <i class="fa fa-user"></i>
+                    <span>{{utilService.getAccountDetails().name}}</span>
+                    <!-- <span *ngIf="utilService.getAccountDetails().RoleId !=1">{{utilService.getAccountDetails().FullName}}</span> -->
+                    <b class="caret"></b>
+                </a>
+                <div class="dropdown-menu-right header-user-menu" ngbDropdownMenu style="left: -12px;">
+                    <a class="dropdown-item" href="javascript:void(0)" (click)="openProfileModal()">
+                        <i class="fa fa-fw fa-user"></i> {{ 'Profile' | translate }}
+                    </a>
+                    <a class="dropdown-item" href="javascript:void(0)" (click)="openChangePassword()">
+                        <i class="fa fa-fw fa-lock"></i> {{ 'Change password' | translate }}
+                    </a>
+                    <a class="dropdown-item" href="javascript:void(0)">
+                        <i class="fa fa-fw fa-gear"></i> {{ 'Settings' | translate }}
+                    </a>
+                    <a class="dropdown-item" href="javascript:void(0)" (click)="onLoggedout()">
+                        <i class="fa fa-fw fa-power-off"></i> {{ 'Log Out' | translate }}
+                    </a>
+                </div>
+            </li>
+        </ul>
+    </div>
+</nav>
+<ng-template #changePasswordContent let-c="close" let-d="dismiss">
+    <form #changePasswordForm="ngForm" novalidate (ngSubmit)="changePasswordForm.form.valid && updatePassword();">
+        <div class="modal-header">
+            <h4 class="modal-title" id="modal-basic-title">Change Password</h4>
+            <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group noon-form">
+                <label class="control-label col-sm-3" for="pwd">Old password :</label>
+                <div class="col col-sm-8">
+                    <input type="password" name="old_password" class="form-control input-underline input-lg" [(ngModel)]="userModel.old_password"
+                        placeholder="Old password" #old_password="ngModel" required>
+                    <div *ngIf="old_password.invalid && (old_password.touched || changePasswordForm.submitted)">
+                        <p class="input-info error-message" *ngIf="old_password.errors.required">Old password is required</p>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group noon-form">
+                <label class="control-label col-sm-3" for="pwd">New password :</label>
+                <div class="col col-sm-8">
+                    <input type="password" class="form-control" [pattern]="'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[^\w\s]).{8,}$'" placeholder="New password" title="Use 8 or more characters with a mix of letters, numbers & symbols"
+                        name="password" [(ngModel)]="userModel.new_password" #password="ngModel" [required]="!isEditView">
+                    <div *ngIf="password.invalid && (password.touched || changePasswordForm.submitted)">
+                        <p class="input-info error-message" *ngIf="password.errors.required">Password is required</p>
+                        <p class="input-info error-message" *ngIf="password.errors.pattern">Password must contain 8 or more
+                            characters with a mix of letters, numbers & symbols.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group noon-form">
+                <label class="control-label col-sm-3" for="pwd">Confirm password :</label>
+                <div class="col col-sm-8">
+                    <input type="password" class="form-control" name="confirmPassword" [(ngModel)]="userModel.confirm_password" placeholder="Confirm Password"
+                        #confirmPassword="ngModel" [required]="!isEditView">
+                    <div *ngIf="(password.touched || changePasswordForm.submitted)">
+                        <p class="input-info error-message" *ngIf="userModel.password && (userModel.password !== userModel.confirmPassword)">
+                            Password and confirm password not matches.
+                        </p>
+                        <p class="input-info success-message" *ngIf="userModel.password && (userModel.password == userModel.confirmPassword)">
+                            Password and confirm password matches.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-outline-dark">Change password</button>
+        </div>
+    </form>
+</ng-template>
+<ng-template #profileContent let-c="close" let-d="dismiss">
+    <form #userProfileForm="ngForm" novalidate (ngSubmit)="userProfileForm.form.valid && updateProfile();">
+        <div class="modal-header">
+            <h4 class="modal-title" id="modal-basic-title">Profile
+                <span *ngIf="userModel.rolename">&nbsp;&nbsp;({{userModel.rolename}})</span>
+                <span *ngIf="isLoading">&nbsp;&nbsp;<i title="loading" class="fa fa-spinner fa-spin"></i></span>
+            </h4>
+            <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group noon-form row avatar">
+                <img src="assets/images/logo.png" *ngIf="!userModel.profilepicurl" class="user-avatar" />
+                <img src="{{userModel.profilepicurl}}" *ngIf="userModel.profilepicurl" class="user-avatar" />
+                <!-- <img src="assets/images/logo.png" class="user-avatar" /> -->
+                <span class="edit-pic">&nbsp;&nbsp;<i class="fa fa-pencil" (click)="openFileSelecter('profilePic')"></i></span>
+                <input type="file" style="display:none;" id="profilePic" name="profilePic" (change)="onPicSelected($event)" accept="image/*">
+            </div>
+            <div class="form-group noon-form row">
+                <label class="control-label col-sm-3" for="pwd">Email :</label>
+                <div class="col col-sm-9">
+                    <input type="email" id="pwd" class="form-control" name="email" [(ngModel)]="userModel.email" placeholder="Email" #email="ngModel"
+                        disabled required>
+                    <div *ngIf="email.invalid && (email.touched || userProfileForm.submitted)">
+                        <p class="input-info error-message" *ngIf="email.errors.required">Email is required</p>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group noon-form row">
+                <label class="control-label col-sm-3" for="username">
+                    Username:
+                    <span *ngIf="isUserNameChecking">&nbsp;&nbsp;<i title="loading" class="fa fa-spinner fa-spin"></i></span>
+                </label>
+                <div class="col col-sm-9">
+                    <input type="text" id="username" class="form-control" name="username" [(ngModel)]="userModel.username" placeholder="Username"
+                        #username="ngModel" required (input)="checkUserNameExistOrnot(userModel.username)">
+                    <p class="input-info error-message" *ngIf="isUserNameExist">Username is already exist.</p>
+                    <div *ngIf="username.invalid && (username.touched || userProfileForm.submitted)">
+                        <p class="input-info error-message" *ngIf="username.errors.required">Username is required</p>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group noon-form row">
+                <label class="control-label col-sm-3" for="fullname">Full name :</label>
+                <div class="col col-sm-9">
+                    <input type="text" id="fullname" class="form-control" name="fullname" [(ngModel)]="userModel.fullname" placeholder="Full name"
+                        #fullname="ngModel" required>
+                    <div *ngIf="fullname.invalid && (fullname.touched || userProfileForm.submitted)">
+                        <p class="input-info error-message" *ngIf="fullname.errors.required">Full name is required</p>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group noon-form row">
+                <label class="control-label col-sm-3" for="bio">Bio :</label>
+                <div class="col col-sm-9">
+                    <textarea class="form-control" rows="3" name="bio" [(ngModel)]="userModel.bio"></textarea>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-outline-dark" [disabled]="isLoading || userProfileForm.invalid || isUserNameExist">Save</button>
+        </div>
+    </form>
+</ng-template>

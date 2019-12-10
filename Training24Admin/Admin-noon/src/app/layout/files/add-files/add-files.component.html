@@ -1,0 +1,63 @@
+<div>
+    <h4>
+        <a class="btn btn-success btn-lg back" backDirection>
+            <span class="fa fa-arrow-left"></span>
+        </a>
+        <span *ngIf="isEditView">Edit</span><span *ngIf="!isEditView">Add</span> File
+        <noon-loader *ngIf="isCallingApi"></noon-loader>
+    </h4>
+    <div class="row">
+        <div class="col col-xl-6 col-lg-12">
+            <form class="form-horizontal noon-form" #manageFilesForm="ngForm" (ngSubmit)="manageFilesForm.form.valid && manageFile()">
+                <div class="form-group row">
+                    <label class="control-label col-sm-4" for="fileTypeId">File Type :</label>
+                    <div class="col col-sm-8">
+                        <select id="fileTypeId" class="form-control" placeholder="Enter fileTypeId" name="fileTypeId"
+                            [(ngModel)]="fileModel.fileTypeId" #fileTypeId="ngModel" required name="fileTypeId">
+                            <option [value]=undefined disabled>Select</option>
+                            <option *ngFor="let fileType of fileTypeList" [value]="fileType.id">{{fileType.name}}</option>
+                        </select>
+                        <div *ngIf="fileTypeId.invalid && (fileTypeId.touched || manageFilesForm.submitted)">
+                            <p class="input-info error-message" *ngIf="fileTypeId.errors.required">
+                                File Type selection is required</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="control-label col-sm-4" for="description">Description :</label>
+                    <div class="col col-sm-8">
+                        <textarea rows="3" id="description" class="form-control" placeholder="Enter description" name="description"
+                            [(ngModel)]="fileModel.description" #description="ngModel" required></textarea>
+                        <div *ngIf="description.invalid && (description.touched || manageFilesForm.submitted)">
+                            <p class="input-info error-message" *ngIf="description.errors.required">Description is
+                                required</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group noon-form row">
+                    <label class="control-label col-sm-4" for="file">File :</label>
+                    <div class="col col-sm-8">
+                        <input type="file" id="file" name="file" (change)="fileSelected($event)" accept="image/*,application/pdf,application/vnd.ms-excel,video/*">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-8 pull-right">
+                        <button type="submit" class="btn btn-primary m-r-20px" *ngIf="isEditView" [disabled]="manageFilesForm.invalid || isCallingApi">Edit
+                            file</button>
+                        <button type="submit" class="btn btn-primary m-r-20px" *ngIf="!isEditView" [disabled]="manageFilesForm.invalid || !file || isCallingApi">Add
+                            file
+                        </button>
+                        <button class="btn btn-danger" backDirection>Cancel</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <video id="myVideo" width="320" height="176" controls style="display:none">
+        <!-- <video id="myVideo" width="320" height="176" controls > -->
+        <!-- <source src="mov_bbb.mp4" type="video/mp4"> -->
+        <!-- <source src="mov_bbb.ogg" type="video/ogg"> -->
+        Your browser does not support HTML5 video.
+    </video>
+</div>
+<noon-upload-status #fileUploadStatusDialog [data]="uploadedPercentage"></noon-upload-status>

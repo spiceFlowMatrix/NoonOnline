@@ -1,0 +1,48 @@
+$topnav-background-color: #F2F2F2;
+:host {
+    .navbar {
+        height: 56px;
+        background-color: $topnav-background-color;
+        .navbar-brand {
+            color: #000000DE;
+        }
+        .nav-item>a {
+            color: #000000DE;
+            &:hover {
+                color: #000000DE;
+            }
+        }
+    }
+    .dropdown-menu-right {
+        min-width: 170px;
+    }
+    .header-user-menu {
+        left: -12px !important;
+    }
+    .header-user-menu a {
+        padding: 0.5px !important;
+    }
+    .messages {
+        width: 300px;
+        .media {
+            border-bottom: 1px solid #ddd;
+            padding: 5px 10px;
+            &:last-child {
+                border-bottom: none;
+            }
+        }
+        .media-body {
+            h5 {
+                font-size: 13px;
+                font-weight: 600;
+            }
+            .small {
+                margin: 0;
+            }
+            .last {
+                font-size: 12px;
+                margin: 0;
+            }
+        }
+    }
+}

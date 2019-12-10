@@ -1,0 +1,459 @@
+<div>
+    <h4>
+        <!-- <a class="btn btn-success btn-lg back" backDirection>
+            <span class="fa fa-arrow-left"></span>
+        </a> -->
+        <!-- <span *ngIf="quizModel.chaptername">{{quizModel.chaptername}}
+            <i class="fa fa-arrow-right" aria-hidden="true"></i>&nbsp;
+        </span>
+        <span *ngIf="isEditView">Edit</span><span *ngIf="!isEditView">Add</span> Quiz -->
+        <noon-loader *ngIf="isCallingApi"></noon-loader>
+    </h4>
+    <div>
+        <!-- <mat-form-field class="full-width">
+            <textarea matInput [(ngModel)]="paragraph" placeholder="Enter Question"></textarea>
+        </mat-form-field>
+        <ng-katex-paragraph [paragraph]="paragraph"></ng-katex-paragraph> -->
+
+        <!-- <div class="col col-xl-12 col-lg-12"> -->
+        <form #manageQuizForm="ngForm" (ngSubmit)="manageQuizForm.form.valid && manageQuiz()">
+
+            <div class="card-container">
+                <p class="fs-20">
+                    <span *ngIf="quizModel.chaptername">{{quizModel.chaptername}}
+                        <i class="fa fa-arrow-right" aria-hidden="true"></i>&nbsp;
+                    </span>
+                    <span *ngIf="isEditView">Edit</span><span *ngIf="!isEditView">Add</span> Quiz
+                </p>
+            </div>
+            <div class="card-container">
+                <mat-card>
+                    <mat-form-field class="full-width">
+                        <input matInput type="text" id="quiz_name" placeholder="Enter name" name="quiz_name"
+                            [(ngModel)]="quizModel.name" #quiz_name="ngModel" required>
+                        <div *ngIf="quiz_name.invalid && (quiz_name.touched || manageQuizForm.submitted)">
+                            <p class="input-info error-message" *ngIf="quiz_name.errors.required">Quiz name is
+                                required
+                            </p>
+                        </div>
+                    </mat-form-field>
+                    <mat-form-field class="full-width">
+                        <input matInput type="number" min="0" step="0.10" id="pass_mark" placeholder="Enter pass mark"
+                            name="pass_mark" [(ngModel)]="quizModel.passMark" #pass_mark="ngModel" required>
+                        <div *ngIf="pass_mark.invalid && (pass_mark.touched || manageQuizForm.submitted)">
+                            <p class="input-info error-message" *ngIf="pass_mark.errors.required">Pass mark is
+                                required
+                            </p>
+                        </div>
+                    </mat-form-field>
+                    <mat-form-field class="full-width">
+                        <input matInput type="number" min="0" step="1" id="num_que" placeholder="Enter Number of que."
+                            name="num_que" [(ngModel)]="quizModel.numQuestions" #num_que="ngModel" required>
+                        <div *ngIf="num_que.invalid && (num_que.touched || manageQuizForm.submitted)">
+                            <p class="input-info error-message" *ngIf="num_que.errors.required">Number of que. is
+                                required</p>
+                        </div>
+                    </mat-form-field>
+                </mat-card>
+            </div>
+        </form>
+    </div>
+    <div class="card-container">
+        <button mat-raised-button class="outline-0">
+            IMPORT QUESTIONS
+        </button>
+    </div>
+    <div>
+        <form class="form-horizontal noon-form quiz-form" #manageQuestionForm="ngForm" id="manageQuestionForm">
+            <div class="card-container">
+                <mat-card>
+                    <div *ngFor="let question of quizQuestionList; let i=index;let qLast =last;">
+                        <div>
+                            <div>
+                                <div style="padding: 15px;">
+                                    <div>
+                                        <h6>Question detail - {{i+1}}
+
+                                            <span class="del-pic" style="float: right"
+                                                (click)="deleteQuizPart('question',i);">&nbsp;&nbsp;<i
+                                                    class="fa fa-times"></i></span>
+                                        </h6>
+                                    </div>
+                                    <!-- <mat-form-field class="full-width"> -->
+                                    <div class="full-width attach-quill">
+                                        <!-- <div>
+                                            <mat-checkbox color="primary" name="isequation_{{i}}"
+                                                [(ngModel)]="question.isequation" #isequation="ngModel" debounce
+                                                delay="700">
+                                            </mat-checkbox>
+                                        </div> -->
+                                        <div class="full-width">
+                                            <!-- <input matInput type="text" id="questiontext{{i}}"
+                                                    placeholder="Enter question text" name="questiontext{{i}}{{j}}"
+                                                    [(ngModel)]="question.questiontext" #questiontext="ngModel" debounce
+                                                    delay="700" (func)="updatedItem($event,'question',i)"> -->
+                                            <quill-editor id="questiontext{{i}}" class="form-control custom-quill"
+                                                placeholder="Enter question text" name="questiontext_{{i}}"
+                                                [(ngModel)]="question.questiontext" debounce delay="700"
+                                                (func)="updatedItem($event,'question',i)" #questiontext="ngModel">\
+                                                <div quill-editor-toolbar>
+                                                </div>
+                                            </quill-editor>
+
+                                        </div>
+
+                                        <div *ngIf="question.images.length === 0">
+                                            <input type="file" multiple="true" style="display:none;" id="card_{{i}}"
+                                                name="card_{{i}}" (change)="onPicSelected($event,'question',i)"
+                                                accept="image/*">
+                                            <div>
+                                                <i (click)="openFileSelecter(i)" class="fa fa-paperclip">
+                                                </i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div *ngFor="let image of question.images;let imgIndex=index">
+
+                                        <img src="{{image}}" style="width: 100px;height: 100%" *ngIf="!image.url"
+                                            class="quiz-avatar" />
+                                        <img src="{{image.url}}" style="width: 100px;height: 100%" *ngIf="image.url"
+                                            class="quiz-avatar" />
+                                        <span class="edit-pic"
+                                            (click)="deleteQuizPart('questionfile',i,0,imgIndex)">&nbsp;&nbsp;<i
+                                                class="fa fa-times"></i></span>
+                                    </div>
+                                    <!-- <div class="full-width" *ngIf="question.isequation">
+                                        <mat-form-field class="full-width">
+                                            <textarea matInput [(ngModel)]="paragraph" placeholder="Leave a comment"></textarea>
+                                        </mat-form-field>
+                                    </div>
+                                    <ng-katex-paragraph [paragraph]="paragraph"></ng-katex-paragraph> -->
+                                    <!-- <ng-katex [equation]="equation" [options]="options"></ng-katex> -->
+                                    <!-- </mat-form-field> -->
+                                    <mat-form-field class="full-width">
+                                        <input type="text" matInput id="explanation_{{i}}"
+                                            placeholder="Enter explanation" name="explanation[_{{i}}]"
+                                            [(ngModel)]="question.explanation" #explanation="ngModel" debounce
+                                            delay="700" (func)="updatedItem($event,'question',i)">
+                                    </mat-form-field>
+                                    <div>
+                                        <span>Choices</span>
+                                        <button mat-raised-button type="button" style="line-height: 2"
+                                            class="add-btn m-l-20px outline-0" (click)="addAnswer(i)">
+                                            Add
+                                        </button>
+                                    </div>
+
+                                    <div style="padding: 15px;">
+                                        <div *ngFor="let answerObj of question.answers;let j=index">
+                                            <!-- <h6>Answers detail - {{j+1}}</h6> -->
+                                            <!-- <span class="del-pic" (click)="deleteQuizPart('answer',i,j);">&nbsp;&nbsp;<i
+                                                    class="fa fa-times"></i></span> -->
+
+                                            <div class="container-check">
+                                                <div>
+                                                    <mat-checkbox color="primary" name="iscorrect_{{i}}{{j}}"
+                                                        [(ngModel)]="answerObj.iscorrect" #iscorrect="ngModel" debounce
+                                                        delay="700" (func)="updatedItem($event,'answer',i,j)">
+                                                    </mat-checkbox>
+                                                </div>
+                                                <!-- <mat-form-field class="full-width"> -->
+                                                <div class="attach-quill full-width">
+                                                    <div class="full-width">
+                                                        <!-- <input type="text" matInput id="answer_{{i}}{{j}}"
+                                                            placeholder="Answers detail {{j+1}}"
+                                                            name="answer_{{i}}{{j}}" [(ngModel)]="answerObj.answer"
+                                                            #answer="ngModel" debounce delay="700"
+                                                            (func)="updatedItem($event,'answer',i,j)"> -->
+                                                        <quill-editor id="answer_{{i}}{{j}}"
+                                                            class="form-control custom-quill"
+                                                            placeholder="Enter answer text" name="answer_{{i}}{{j}}"
+                                                            [(ngModel)]="answerObj.answer" #answer="ngModel" debounce
+                                                            delay="700" (func)="updatedItem($event,'answer',i,j)">
+                                                            <div quill-editor-toolbar>
+                                                            </div>
+                                                        </quill-editor>
+                                                    </div>
+                                                    <div *ngIf="answerObj.images.length === 0">
+                                                        <input type="file" multiple="true" style="display:none;"
+                                                            id="card_{{i}}{{j}}" name="card_{{i}}{{j}}"
+                                                            (change)="onPicSelected($event,'answer',i,j)"
+                                                            accept="image/*">
+                                                        <i (click)="openFileSelecter(i,j,answerObj)"
+                                                            class="fa fa-paperclip"></i>
+                                                    </div>
+                                                    <div class="remove-choice">
+                                                        <span class="del-pic"
+                                                            (click)="deleteQuizPart('answer',i,j);">&nbsp;&nbsp;<i
+                                                                class="fa fa-times"></i></span>
+                                                    </div>
+                                                </div>
+                                                <!-- </mat-form-field> -->
+                                            </div>
+                                            <div *ngFor="let aImage of answerObj.images;let imgIndex=index">
+                                                <img src="{{aImage}}" style="width: 100px;height: 100%"
+                                                    *ngIf="!aImage.url" class="quiz-avatar" />
+                                                <img src="{{aImage.url}}" style="width: 100px;height: 100%"
+                                                    *ngIf="aImage.url" class="quiz-avatar" />
+                                                <span class="edit-pic"
+                                                    (click)="deleteQuizPart('answerfile',i,j,imgIndex)">&nbsp;&nbsp;<i
+                                                        class="fa fa-times"></i></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <span>Questions</span>
+                        <button mat-raised-button type="button" class="add-btn m-l-20px outline-0" (click)="addQuestion()">
+                            Add
+                        </button>
+                        <!-- <button mat-raised-button type="button" class="m-l-20px" (click)="openAddQuestionModal()">
+                                Add
+                            </button> -->
+                    </div>
+                </mat-card>
+            </div>
+            <!-- <div class="text-right m-r-20px m-t-20px">
+                <button mat-raised-button class="add-btn" title="Assign answers" type="button"
+                    (click)="saveQuiz(0)">Save
+                    questions</button>
+            </div> -->
+
+            <div class="text-right card-container">
+                <button mat-raised-button class="cancel-btn outline-0" backDirection>Cancel</button>
+                <button mat-raised-button class="m-l-20px add-btn outline-0" type="submit"
+                    [disabled]="manageQuizForm.invalid || isCallingApi" (click)="manageQuiz()">Save Quiz</button>
+            </div>
+        </form>
+
+    </div>
+
+</div>
+<div class="mt-2 row" *ngIf="isEditView">
+    <!-- <div class="col col-xl-6 col-lg-12">
+        <div class="col-sm-offset-2 col-sm-8 pull-right">
+            <button type="button" class="btn btn-primary m-r-20px" (click)="openAddQuestionModal()">
+                Add questions
+            </button>
+        </div>
+    </div> -->
+    <div class="mt-2 col col-xl-12 col-lg-12" *ngIf="isQuestionEditView">
+        <div class="mt-2 col col-xl-12 col-lg-12">
+            <!-- <form class="form-horizontal noon-form quiz-form" #manageQuestionForm="ngForm" id="manageQuestionForm"> -->
+            <!-- <div class="row" *ngFor="let question of quizQuestionList; let i=index;let qLast =last;"> -->
+            <!-- <div class="col-sm-12">
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <h6>Question detail - {{i+1}}</h6>
+                                <span class="del-pic" (click)="deleteQuizPart('question',i);">&nbsp;&nbsp;<i
+                                        class="fa fa-times"></i></span>
+                                <div class="form-group row">
+                                    <div class="col col-md-6">
+                                        <input type="text" id="questiontext{{i}}" class="form-control"
+                                            placeholder="Enter question text" name="questiontext_{{i}}"
+                                            [(ngModel)]="question.questiontext" debounce delay="700"
+                                            (func)="updatedItem($event,'question',i)" #questiontext="ngModel">
+                                        <quill-editor id="questiontext{{i}}" class="form-control custom-quill"
+                                            placeholder="Enter question text" name="questiontext_{{i}}"
+                                            [(ngModel)]="question.questiontext" debounce delay="700"
+                                            (func)="updatedItem($event,'question',i)" #questiontext="ngModel">\
+                                            <div quill-editor-toolbar>
+                                            </div>
+                                        </quill-editor>
+                                    </div>
+                                    <div class="col col-md-6">
+                                        <input type="text" id="explanation_{{i}}" class="form-control"
+                                            placeholder="Enter explanation" name="explanation[_{{i}}]"
+                                            [(ngModel)]="question.explanation" #explanation="ngModel" debounce
+                                            delay="700" (func)="updatedItem($event,'question',i)">
+                                    </div>
+                                </div>
+                                <div class="form-group row justify-content-md-start">
+                                    <div class="col col-md-1">
+                                        <input type="file" multiple="true" style="display:none;" id="card_{{i}}"
+                                            name="card_{{i}}" (change)="onPicSelected($event,'question',i)"
+                                            accept="image/*">
+                                        <button class="btn btn-primary btn-action" title="Assign answers" type="button"
+                                            (click)="openFileSelecter(i)"><i class="fa fa-paperclip"></i></button>
+                                    </div>
+                                    <div class="col col-md-3 q-avatar"
+                                        *ngFor="let image of question.images;let imgIndex=index">
+                                        <span class="edit-pic"
+                                            (click)="deleteQuizPart('questionfile',i,0,imgIndex)">&nbsp;&nbsp;<i
+                                                class="fa fa-times"></i></span>
+                                        <img src="{{image}}" *ngIf="!image.url" class="quiz-avatar" />
+                                        <img src="{{image.url}}" *ngIf="image.url" class="quiz-avatar" />
+                                    </div>
+                                </div>
+                                <div class="row justify-content-md-end">
+                                    <div class="card mb-3 col-md-11"
+                                        *ngFor="let answerObj of question.answers;let j=index">
+                                        <div class="card-body">
+                                            <h6>Answers detail - {{j+1}}</h6>
+                                            <span class="del-pic" (click)="deleteQuizPart('answer',i,j);">&nbsp;&nbsp;<i
+                                                    class="fa fa-times"></i></span>
+                                            <div class="form-group row">
+                                                <div class="col col-md-6">
+                                                    <quill-editor id="answer_{{i}}{{j}}"
+                                                        class="form-control custom-quill"
+                                                        placeholder="Enter answer text" name="answer_{{i}}{{j}}"
+                                                        [(ngModel)]="answerObj.answer" #answer="ngModel" debounce
+                                                        delay="700" (func)="updatedItem($event,'answer',i,j)">
+                                                        <div quill-editor-toolbar>
+                                                        </div>
+                                                    </quill-editor>
+                                                </div>
+                                                <div class="col col-md-6">
+                                                    <input type="text" id="extratext_{{i}}{{j}}" class="form-control"
+                                                        placeholder="Enter extra text" name="extratext_{{i}}{{j}}"
+                                                        [(ngModel)]="answerObj.extratext" #extratext="ngModel" debounce
+                                                        delay="700" (func)="updatedItem($event,'answer',i,j)">
+                                                </div>
+                                                <div class="col col-md-4">
+                                                    <div class="checkbox">
+                                                        <label style="margin-top: 0.5rem;">
+                                                            <input type="checkbox" value="" name="iscorrect_{{i}}{{j}}"
+                                                                [(ngModel)]="answerObj.iscorrect" #iscorrect="ngModel"
+                                                                debounce delay="700"
+                                                                (func)="updatedItem($event,'answer',i,j)">
+                                                            This is correct answer
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group row justify-content-md-start">
+                                                <div class="col col-md-1">
+                                                    <input type="file" multiple="true" style="display:none;"
+                                                        id="card_{{i}}{{j}}" name="card_{{i}}{{j}}"
+                                                        (change)="onPicSelected($event,'answer',i,j)" accept="image/*">
+                                                    <button class="btn btn-primary btn-action" title="Assign answers"
+                                                        type="button" (click)="openFileSelecter(i,j,answerObj)"><i
+                                                            class="fa fa-paperclip"></i></button>
+                                                </div>
+                                                <div class="col col-md-3 q-avatar"
+                                                    *ngFor="let aImage of answerObj.images;let imgIndex=index">
+                                                    <span class="edit-pic"
+                                                        (click)="deleteQuizPart('answerfile',i,j,imgIndex)">&nbsp;&nbsp;<i
+                                                            class="fa fa-times"></i></span>
+                                                    <img src="{{aImage}}" *ngIf="!aImage.url" class="quiz-avatar" />
+                                                    <img src="{{aImage.url}}" *ngIf="aImage.url" class="quiz-avatar" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 text-right">
+                                        <button class="btn btn-primary" title="Assign answers" type="button"
+                                            (click)="addAnswer(i)">Add
+                                            choice</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div> -->
+            <!-- <div class="col-sm-12 text-right" *ngIf="qLast">
+                        <button class="btn btn-primary mr-3" title="Assign answers" type="button"
+                            (click)="addQuestion()">Add
+                            question</button>
+                    </div> -->
+            <!-- </div> -->
+            <!-- <div class="row ">
+                    <div class="col-md-12 text-right mt-3">
+                        <button class="btn btn-primary mr-3" title="Assign answers" type="button"
+                            (click)="saveQuiz(0)">Save
+                            questions</button>
+                    </div>
+                </div> -->
+            <!-- </form> -->
+            <!-- <div class="row" *ngFor="let question of quizQuestionList; let i=index;">
+                <div class="col-sm-12">
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            {{question.questiontext}}
+                            <button class="btn btn-info btn-action btn-noon-info" *ngIf="question.explanation" title="{{question.explanation}}">
+                                <i class="fa fa-info"></i></button>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <div class="checkbox" *ngFor="let answer of question.answers; let j=index;">
+                                    <label>
+                                        <input type="checkbox">
+                                        {{answer.answer}}
+                                        <button class="btn btn-info btn-action btn-noon-info" *ngIf="answer.extraText"
+                                            title="{{answer.extraText}}">
+                                            <i class="fa fa-info"></i></button>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> -->
+        </div>
+        <app-common-dialog #listdialog (deleteEvent)="deleteQuestionFromQuiz($event)"></app-common-dialog>
+    </div>
+</div>
+<ng-template #questionsUploadDialog let-c="close" let-d="dismiss">
+    <div class="modal-header">
+        <h4 class="modal-title">Uploading in progress...</h4>
+        <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <div class="form-group row justify-content-md-start">
+            <div class="col col-md-12" style="position:relative">
+                <h4 style="position: absolute;z-index: 9999;top: 40%;left: 25%;">
+                    Uploading {{questionUploadingIndex+1}} of {{quizQuestionList.length}} questions
+                </h4>
+                <div>
+                    <div class="timeline-item">
+                        <div class="animated-background">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
+<!-- <ng-template #assignQuestionsDialog let-c="close" let-d="dismiss">
+    <form class="form-horizontal noon-form" #assignQuestionsForm="ngForm">
+        <div class="modal-header">
+            <h4 class="modal-title">Add question to quiz</h4>
+            <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group row">
+                <label class="control-label col-sm-4" for="questionId">Question :</label>
+                <div class="col col-sm-8">
+                    <select id="questionId" class="form-control" name="question" [(ngModel)]="addQuizQuestionModel.questionId"
+                        #questionId="ngModel" required name="questionId" (change)="addQuestionId(addQuizQuestionModel.questionId)">
+                        <option [value]=undefined disabled>Select</option>
+                        <option *ngFor="let questionId of questionsList" [value]="questionId.id">{{questionId.questionText}}</option>
+                    </select>
+                    <ul class="list-group files-list">
+                        <li class="list-group-item" *ngFor="let question of questionIds;let i=index;">
+                            <div class="row">
+                                <div class="col-md-10">
+                                    {{question.questionText}}
+                                </div>
+                                <div class="col-md-2 actions" style="padding: 0px;">
+                                    <button class="btn btn-danger btn-action" title="Delete" (click)="questionIds.splice(i,1);">
+                                        <i class="fa fa-trash"></i></button>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-info" (click)="addQuizQuestion()">Add
+                course</button>
+        </div>
+    </form>
+</ng-template> -->

@@ -1,0 +1,74 @@
+<div>
+    <h2 class="text-capitalize">Dashboard <small>{{utilService.getRole()}} Overview</small></h2>
+    <div class="row">
+        <noon-loader *ngIf="isCallingApi"></noon-loader>
+        <h3 class="control-label col-md-4 col-sm-12"></h3>
+        <h3 class="control-label col-md-8 col-sm-12 no-padding" *ngIf="utilService.getRole()">
+            <button class="btn btn-info pull-right m-r-20px" title="Add user" *ngIf="utilService.getRole().indexOf('admin') > -1" (click)="openDefaultsModal()">Manage
+                reminders
+            </button>
+        </h3>
+    </div>
+    <hr>
+</div>
+
+<ng-template #manageDefaultsDialog let-c="close" let-d="dismiss">
+    <form class="form-horizontal noon-form" #manageDefaultsForm="ngForm" (ngSubmit)="manageDefaultsForm.form.valid && manageDefaults()">
+        <div class="modal-header">
+            <h4 class="modal-title">Manage reminders</h4>
+            <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="row">
+                <div class="col col-md-6 col-lg-12">
+                    <div class="form-group row">
+                        <label class="control-label col-sm-4" for="reminders">Reminders :</label>
+                        <div class="col col-sm-8">
+                            <input type="number" class="form-control" id="reminders" placeholder="Enter Reminders" name="reminders"
+                                [(ngModel)]="defaultsModel.reminder" #reminders="ngModel" required>
+                            <div *ngIf="reminders.invalid && (reminders.touched || manageDefaultsForm.submitted)">
+                                <p class="input-info error-message" *ngIf="reminders.errors.required">
+                                    Reminders is required</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="control-label col-sm-4" for="intervals">Intervals (In hours) :</label>
+                        <div class="col col-sm-8">
+                            <input type="number" class="form-control" id="intervals" placeholder="Enter intervals" name="intervals"
+                                [(ngModel)]="defaultsModel.intervals" #intervals="ngModel" required>
+                            <div *ngIf="intervals.invalid && (intervals.touched || manageDefaultsForm.submitted)">
+                                <p class="input-info error-message" *ngIf="intervals.errors.required">
+                                    Intervals is required</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="control-label col-sm-4" for="istimeout">Timeout (On/Off) :</label>
+                        <div class="col col-md-8">
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" name="istimeout" [(ngModel)]="defaultsModel.istimeouton"
+                                        #istimeout="ngModel">
+                                </label>
+                            </div>
+                        </div>
+                    </div>                    
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-8 pull-right">
+                    <button type="submit" class="btn btn-primary m-r-20px" [disabled]="manageDefaultsForm.invalid || isCallingApi">Submit
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</ng-template>

@@ -1,0 +1,177 @@
+<div>
+    <h4>
+        <!-- <a class="btn btn-success btn-lg back" backDirection>
+            <span class="fa fa-arrow-left"></span>
+        </a> -->
+        <!-- <span *ngIf="isEditView">Edit</span><span *ngIf="!isEditView">Add</span> Assignment -->
+        <noon-loader *ngIf="isCallingApi"></noon-loader>
+    </h4>
+    <div class="row">
+        <div class="col col-lg-12">
+            <form class="form-horizontal noon-form" #manageAssignmentForm="ngForm">
+                <div class="text-right card-container">
+                    <button mat-raised-button class="cancel-btn outline-0" backDirection>Cancel</button>
+                    <button mat-raised-button class="m-l-20px save-btn outline-0" type="submit"
+                        [disabled]="manageAssignmentForm.invalid || isCallingApi"
+                        (click)="manageAssignment()">Save</button>
+                </div>
+                <div class="card-container">
+                    <p class="fs-20">
+                        <span *ngIf="isEditView">Edit</span><span *ngIf="!isEditView">Add</span> Assignment
+                    </p>
+                </div>
+
+
+                <div class="card-container">
+                    <mat-card>
+                        <mat-form-field class="full-width">
+                            <input type="text" matInput id="name" [(ngModel)]="assignmentModel.name"
+                                #assignname="ngModel" required placeholder="Enter name" name="name">
+                            <!-- [(ngModel)]="assignmentModel.name"   #name="ngModel" required -->
+                            <div *ngIf="assignname.invalid && (assignname.touched || manageAssignmentForm.submitted)">
+                                <p class="input-info error-message" *ngIf="assignname.errors.required">Name is required
+                                </p>
+                            </div>
+                        </mat-form-field>
+                        <mat-form-field class="full-width">
+                            <textarea matInput placeholder="Description" id="description"
+                                placeholder="Enter description" [(ngModel)]="assignmentModel.description"
+                                #description="ngModel" name="description"></textarea>
+                        </mat-form-field>
+                        <div class="col-12 rmpm dropzone" appDrag (files)="assignmentFilesDropped($event)">
+                            <div class="text-wrapper">
+                                <div class="centered">Drop your file here</div>
+                                <div class="centered">Or</div>
+                                <div class="centered">
+                                    <button mat-raised-button class="file-btn outline-0" for="assignfile"
+                                        (click)="openAllFileModal()">SELECT
+                                        FILE</button>
+                                    <input type="file" id="assignfile" name="assignfile" style="display: none"
+                                        multiple="multiple" (change)="assignmentfileSelected($event)" accept="image/*,application/pdf,
+                                        application/vnd.ms-excel,.xlsx,
+                                        application/msword,
+                                        .docs,application/vnd.ms-powerpoint,.pptx,.pps,
+                                        application/vnd.openxmlformats-officedocument.presentationml.presentation,
+                                        application/vnd.openxmlformats-officedocument.presentationml.slideshow,
+                                        video/*">
+                                </div>
+                            </div>
+                        </div>
+                        <mat-progress-bar *ngIf="showAssignmentProgress" class="m-t-20px" [color]="primary"
+                            [mode]="mode" [value]="uploadedPercentage" [bufferValue]="0">
+                        </mat-progress-bar>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Filename</th>
+                                    <th>Type</th>
+                                    <!-- <th>Code</th> -->
+                                    <th>Size</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody *ngIf="assignmentfiles">
+                                <tr *ngFor="let files of assignmentfiles;let i = index">
+                                    <td>{{files.filename}}</td>
+                                    <td>{{files.filetypename}}</td>
+                                    <td>{{files.filesize/1024}}Kb</td>
+                                    <td>
+                                        <button mat-icon-button class="btn btn-danger outline-0" title="Delete">
+                                            <i class="fa fa-trash" (click)="DeleteFile(files,i)"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                    </mat-card>
+                </div>
+                <video id="mynAllVideo" width="320" height="176" controls style="display:none">
+                    <!-- <video id="myVideo" width="320" height="176" controls> -->
+                    <!-- <source src="mov_bbb.mp4" type="video/mp4"> -->
+                    <!-- <source src="mov_bbb.ogg" type="video/ogg"> -->
+                    Your browser does not support HTML5 video.
+                </video>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+<ng-template #assignWorkDialog let-c="close" let-d="dismiss">
+    <form class="form-horizontal noon-form" #assignWorkForm="ngForm"
+        (ngSubmit)="assignWorkForm.form.valid && addAssignMentToUser()">
+        <div class="modal-header">
+            <h4 class="modal-title">Add Assignment to user</h4>
+            <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group row">
+                <label class="control-label col-md-2 col-sm-4" for="student">Student :</label>
+                <div class="col col-sm-8">
+                    <select id="student" class="form-control" placeholder="Enter student" name="student"
+                        [(ngModel)]="addAssignmentToUserModel.studentid" #student="ngModel" required name="student">
+                        <option [value]=undefined disabled>Select</option>
+                        <option *ngFor="let student of studentsList" [value]="student.id">{{student.username}}</option>
+                    </select>
+                    <div *ngIf="student.invalid && (student.touched || assignWorkForm.submitted)">
+                        <p class="input-info error-message" *ngIf="student.errors.required">Student selection is
+                            required</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-info" [disabled]="!addAssignmentToUserModel.studentid || isCallingApi">
+                Assign assignment
+            </button>
+        </div>
+    </form>
+</ng-template>
+<ng-template #addallFileDialog let-c="close" let-d="dismiss">
+    <form class="form-horizontal noon-form" #manageFilesForm="ngForm" (ngSubmit)="manageAssignFile()">
+        <!-- manageAssignFilesForm.form.valid && -->
+        <div class="modal-header">
+            <h4 class="modal-title">Add file</h4>
+            <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="row">
+                <div class="col col-md-6 col-lg-12">
+                    <div class="form-group noon-form row">
+                        <label class="control-label col-sm-4" for="file">File :</label>
+                        <div class="col col-sm-8">
+                            <input type="file" id="file" name="file" multiple="multiple"
+                                (change)="assignmentfileSelected($event)" accept="application/pdf,video/*">
+                            <!-- image/*,application/vnd.ms-excel -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <video id="myAllVideo" width="320" height="176" controls style="display:none">
+                <!-- <video id="myVideo" width="320" height="176" controls> -->
+                <!-- <source src="mov_bbb.mp4" type="video/mp4"> -->
+                <!-- <source src="mov_bbb.ogg" type="video/ogg"> -->
+                Your browser does not support HTML5 video.
+            </video>
+        </div>
+        <div class="modal-footer">
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-8 pull-right">
+                    <!-- <button type="submit" class="btn btn-primary m-r-20px" *ngIf="isEditView" [disabled]="manageFilesForm.invalid || isCallingApi">Edit
+                        file</button> -->
+                    <button type="submit" class="btn btn-primary m-r-20px" [disabled]="isCallingApi">Add
+                        file
+                    </button>
+                    <!-- manageFilesForm.invalid || !file ||  -->
+                </div>
+            </div>
+        </div>
+    </form>
+</ng-template>
+<!-- <noon-addallfile-dialog #fileDialog (addFileEvent)="manageFile($event)"></noon-addallfile-dialog> -->
+<noon-upload-status #fileUploadStatusDialog [data]="uploadedPercentage"></noon-upload-status>

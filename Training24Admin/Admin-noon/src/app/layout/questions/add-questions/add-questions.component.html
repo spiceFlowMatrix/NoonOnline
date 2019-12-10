@@ -1,0 +1,99 @@
+<div>
+    <h4>
+        <a class="btn btn-success btn-lg back" backDirection>
+            <span class="fa fa-arrow-left"></span>
+        </a>
+        <span *ngIf="isEditView">Edit</span><span *ngIf="!isEditView">Add</span> Questions
+        <noon-loader *ngIf="isCallingApi"></noon-loader>
+    </h4>
+    <!-- "isMultiAnswer": true, -->
+    <div class="row">
+        <div class="col col-xl-6 col-lg-12">
+            <form class="form-horizontal noon-form" #manageQuestionForm="ngForm" (ngSubmit)="manageQuestionForm.form.valid && manageQuestionType()">
+                <div class="form-group row">
+                    <label class="control-label col-sm-4" for="questionTypeId">Question Type :</label>
+                    <div class="col col-sm-8">
+                        <select id="questionTypeId" class="form-control" name="questionTypeId" [(ngModel)]="questionModel.questionTypeId"
+                            #questionTypeId="ngModel" required name="questionTypeId">
+                            <option [value]=undefined disabled>Select</option>
+                            <option *ngFor="let questionType of questionTypeList" [value]="questionType.id">{{questionType.code}}</option>
+                        </select>
+                        <div *ngIf="questionTypeId.invalid && (questionTypeId.touched || manageQuestionForm.submitted)">
+                            <p class="input-info error-message" *ngIf="questionTypeId.errors.required">Question type
+                                selection is
+                                required</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="control-label col-sm-4" for="questionText">Question Text :</label>
+                    <div class="col col-sm-8">
+                        <input type="text" id="questionText" class="form-control" placeholder="Enter question text" name="questionText"
+                            [(ngModel)]="questionModel.questionText" #questionText="ngModel" required>
+                        <div *ngIf="questionText.invalid && (questionText.touched || manageQuestionForm.submitted)">
+                            <p class="input-info error-message" *ngIf="questionText.errors.required">Question Text is
+                                required</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="control-label col-sm-4" for="explanation">Explanation :</label>
+                    <div class="col col-sm-8">
+                        <input type="text" id="explanation" class="form-control" placeholder="Enter explanation" name="explanation"
+                            [(ngModel)]="questionModel.explanation" #explanation="ngModel" required>
+                        <div *ngIf="explanation.invalid && (explanation.touched || manageQuestionForm.submitted)">
+                            <p class="input-info error-message" *ngIf="explanation.errors.required">Explanation is
+                                required</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="control-label col-sm-4" for="explanation">Explanation :</label>
+                    <div class="col col-sm-8">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" value="" name="isMultiAnswer" [(ngModel)]="questionModel.isMultiAnswer"
+                                    #isMultiAnswer="ngModel">
+                                Is Multiple Answer
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row" *ngIf="isEditView">
+                    <label class="control-label col-sm-4" for="file">Files :</label>
+                    <div class="col col-sm-8">
+                        <!-- <ngx-select-dropdown class="file-selection" (change)="selectionChanged($event)" [multiple]="true"
+                                [(value)]="lessonModel.file" [config]="config" [options]="fileList"></ngx-select-dropdown> -->
+                        <div *ngFor="let chapterFile of questionModel.files;let index=index;let last=last;">
+                            <div>
+                                <select id="file" class="form-control noon-form-control list-inline-item" placeholder="Enter file"
+                                    name="file" [(ngModel)]="questionModel.files[index].fileid" #file="ngModel" name="chapterFile_{{index}}">
+                                    <option value='' disabled>Select</option>
+                                    <option *ngFor="let file of fileList" [value]="file.id">{{file.name}}</option>
+                                </select>
+                                <div class="list-inline-item" style="position: relative;bottom: 3px;">
+                                    <button class="btn btn-danger btn-action" title="Delete" *ngIf="questionModel.files.length > 1 && !last"
+                                        (click)="questionModel.files.splice(index,1);">
+                                        <i class="fa fa-minus"></i></button>
+                                    <button class="btn btn-danger btn-action" [disabled]="!questionModel.files[index].fileid"
+                                        title="Add" *ngIf="last" (click)="questionModel.files.push({ fileid: '' })">
+                                        <i class="fa fa-plus"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-8 pull-right">
+                        <button type="submit" class="btn btn-primary m-r-20px" *ngIf="isEditView" [disabled]="manageQuestionForm.invalid || isCallingApi">Edit
+                            question</button>
+                        <button type="submit" class="btn btn-primary m-r-20px" *ngIf="!isEditView" [disabled]="manageQuestionForm.invalid || isCallingApi">Add
+                            question
+                        </button>
+                        <button class="btn btn-danger" backDirection>Cancel</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

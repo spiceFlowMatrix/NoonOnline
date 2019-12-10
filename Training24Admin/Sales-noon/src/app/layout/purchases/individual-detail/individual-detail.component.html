@@ -1,0 +1,344 @@
+<div>
+  <h4>
+    <noon-loader *ngIf="isCallingApi"></noon-loader>
+  </h4>
+  <form class="form-horizontal noon-form" style="min-height:500px" #manageIndividualDetailForm="ngForm">
+    <div class="card" *ngFor="let individualDetailModel of individualDetails;let i=index;">
+      <div class="card-body" style="position:relative">
+        <!-- <span><i class="fa fa-times fa-fw pull-right del-icon" (click)="individualDetails.pop(i,1)"></i></span> -->
+        <h5>
+          Student information
+        </h5>
+        <hr>
+        <div class="row">
+          <div class="col col-md-12">
+            <div class="form-group row">
+              <label class="control-label col-sm-2" for="register_number">Select existing :</label>
+              <div class="col col-sm-4">
+                <input id="individualdetailInput" type="text" name="account_{{i}}" placeholder="Select account" class="form-control"
+                  [(ngModel)]="individualDetailModel.account" [resultFormatter]="rformatter" [inputFormatter]="formatter"
+                  (focus)="focus$.next($event.target.value)" [ngbTypeahead]="searchUser" #instance="ngbTypeahead"
+                  (selectItem)="accountSelected($event,i)" />
+                <i class="fa fa-caret-down" aria-hidden="true" style="position: absolute;right: 25px;top: 10px;cursor: pointer;"
+                  (click)="focusOnAccountSelection()"></i>
+              </div>
+              <div class="control-label col-sm-3" *ngIf="selectedAccount.id">
+                  <span class="setting-icon mr-4" title="Reset" (click)="reset()">
+                    <i aria-hidden="true" class="fa fa-times pos-rel"></i>
+                  </span>
+                </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col col-md-6">
+            <div class="form-group row">
+              <label class="control-label col-sm-4" for="studentcode">Student code :</label>
+              <div class="col col-sm-8">
+                <input [disabled]="!isSalesAgent" type="text" id="studentcode" disabled class="form-control" placeholder="Enter Student code" name="studentcode_{{i}}"
+                  [(ngModel)]="individualDetailModel.studentcode" #studentcode="ngModel" required>
+                <!-- <div *ngIf="studentcode.invalid && (studentcode.touched || manageIndividualDetailForm.submitted)">
+                  <p class="input-info error-message" *ngIf="studentcode.errors.required">Student code is
+                    required</p>
+                </div> -->
+              </div>
+            </div>
+          </div>
+          <div class="col col-md-6">
+            <div class="form-group row">
+              <label class="control-label col-sm-4" for="studentname">Student name :</label>
+              <div class="col col-sm-8">
+                <input [disabled]="!isSalesAgent" type="text" id="studentname" class="form-control" placeholder="Enter Student Name" name="studentname_{{i}}"
+                  [(ngModel)]="individualDetailModel.studentname" #studentname="ngModel" required>
+                <!-- <div *ngIf="studentname.invalid && (studentname.touched || manageIndividualDetailForm.submitted)">
+                  <p class="input-info error-message" *ngIf="studentname.errors.required">Student Name is required</p>
+                </div> -->
+              </div>
+            </div>
+          </div>
+          <div class="col col-md-6">
+            <div class="form-group row">
+              <label class="control-label col-sm-4" for="schoolname">School name :</label>
+              <div class="col col-sm-8">
+                <input [disabled]="!isSalesAgent" type="text" id="schoolname" class="form-control" placeholder="Enter School Name" name="schoolname_{{i}}"
+                  [(ngModel)]="individualDetailModel.schoolname" #schoolname="ngModel" required>
+                <!-- <div *ngIf="schoolname.invalid && (schoolname.touched || manageIndividualDetailForm.submitted)">
+                  <p class="input-info error-message" *ngIf="schoolname.errors.required">School Name is required</p>
+                </div> -->
+              </div>
+            </div>
+          </div>
+          <div class="col col-md-6">
+            <div class="form-group row">
+              <label class="control-label col-sm-4" for="fathernumber">Father number :</label>
+              <div class="col col-sm-8">
+                <input [disabled]="!isSalesAgent" type="tel" id="fathernumber" class="form-control" placeholder="Enter father number" name="fathernumber_{{i}}"
+                  [(ngModel)]="individualDetailModel.fathernumber" #fathernumber="ngModel">
+              </div>
+            </div>
+          </div>
+          <div class="col col-md-6">
+            <div class="form-group row">
+              <label class="control-label col-sm-4" for="idcardnumber">Id card no. :</label>
+              <div class="col col-sm-8">
+                <input [disabled]="!isSalesAgent" type="text" id="idcardnumber" class="form-control" placeholder="Enter Id card no." name="idcardnumber_{{i}}"
+                  [(ngModel)]="individualDetailModel.idcardnumber" #idcardnumber="ngModel" required>
+                <!-- <div *ngIf="idcardnumber.invalid && (idcardnumber.touched || manageIndividualDetailForm.submitted)">
+                  <p class="input-info error-message" *ngIf="idcardnumber.errors.required">Id card no. is
+                    required</p>
+                </div> -->
+              </div>
+            </div>
+          </div>
+          <div class="col col-md-6">
+            <div class="form-group row">
+              <label class="control-label col-sm-4 pr-0" for="permanentaddress">Permanant address :</label>
+              <div class="col col-sm-8">
+                <input [disabled]="!isSalesAgent" type="text" id="permanentaddress" class="form-control" placeholder="Enter Permanant address"
+                  name="permanentaddress_{{i}}" [(ngModel)]="individualDetailModel.permanentaddress" #permanentaddress="ngModel"
+                  required>
+                <!-- <div *ngIf="permanentaddress.invalid && (permanentaddress.touched || manageIndividualDetailForm.submitted)">
+                  <p class="input-info error-message" *ngIf="permanentaddress.errors.required">Permanant address is
+                    required</p>
+                </div> -->
+              </div>
+            </div>
+          </div>
+          <div class="col col-md-6">
+            <div class="form-group row">
+              <label class="control-label col-sm-4 pr-0" for="village">Village :</label>
+              <div class="col col-sm-8">
+                <input [disabled]="!isSalesAgent" type="text" id="village" class="form-control" placeholder="Enter Village" name="village_{{i}}"
+                  [(ngModel)]="individualDetailModel.village" #village="ngModel" required>
+                <!-- <div *ngIf="village.invalid && (village.touched || manageIndividualDetailForm.submitted)">
+                  <p class="input-info error-message" *ngIf="village.errors.required">Village is
+                    required</p>
+                </div> -->
+              </div>
+            </div>
+          </div>
+          <div class="col col-md-6">
+            <div class="form-group row">
+              <label class="control-label col-sm-4" for="provinceid">Province :</label>
+              <div class="col col-sm-8">
+                <select [disabled]="!isSalesAgent" id="provinceid" class="form-control" placeholder="Enter province" name="provinceid_{{i}}"
+                  [(ngModel)]="individualDetailModel.provinceid" #provinceid="ngModel" required (change)="provinceChanged(i)">
+                  <option [value]=undefined disabled>Select</option>
+                  <option *ngFor="let provision of provisions" [value]="provision">{{provision}}</option>
+                </select>
+                <!-- <div *ngIf="provinceid.invalid && (provinceid.touched || manageIndividualDetailForm.submitted)">
+                  <p class="input-info error-message" *ngIf="provinceid.errors.required">Province is required</p>
+                </div> -->
+              </div>
+            </div>
+          </div>
+          <div class="col col-md-6">
+            <div class="form-group row">
+              <label class="control-label col-sm-4" for="cityid">City :</label>
+              <div class="col col-sm-8">
+                <select [disabled]="!isSalesAgent" id="cityid" class="form-control" placeholder="Enter City" name="cityid_{{i}}" [(ngModel)]="individualDetailModel.cityid"
+                  #cityid="ngModel" required>
+                  <option [value]=undefined disabled>Select</option>
+                  <option *ngFor="let city of individualDetailModel.cities" [value]="city">{{city}}</option>
+                </select>
+                <!-- <div *ngIf="cityid.invalid && (cityid.touched || manageIndividualDetailForm.submitted)">
+                  <p class="input-info error-message" *ngIf="cityid.errors.required">City is required</p>
+                </div> -->
+              </div>
+            </div>
+          </div>
+          <div class="col col-md-6">
+            <div class="form-group row">
+              <label class="control-label col-sm-4 pr-0" for="Phone">Phone :</label>
+              <div class="col col-sm-8">
+                <input [disabled]="!isSalesAgent" type="text" id="Phone" class="form-control" placeholder="Enter Phone" name="Phone_{{i}}"
+                  [(ngModel)]="individualDetailModel.phone" #Phone="ngModel" required>
+                <!-- <div *ngIf="Phone.invalid && (Phone.touched || manageIndividualDetailForm.submitted)">
+                  <p class="input-info error-message" *ngIf="Phone.errors.required">Phone is
+                    required</p>
+                </div> -->
+              </div>
+            </div>
+          </div>
+          <div class="col col-md-6">
+            <div class="form-group row">
+              <label class="control-label col-sm-4 pr-0" for="countryid">Country :</label>
+              <div class="col col-sm-8">
+                <input [disabled]="!isSalesAgent" type="text" id="countryid" class="form-control" placeholder="Enter Country" name="countryid_{{i}}"
+                  [(ngModel)]="individualDetailModel.countryid" #countryid="ngModel" required>
+                <!-- <div *ngIf="countryid.invalid && (countryid.touched || manageIndividualDetailForm.submitted)">
+                  <p class="input-info error-message" *ngIf="countryid.errors.required">Country is
+                    required</p>
+                </div> -->
+              </div>
+            </div>
+          </div>
+          <div class="col col-md-6">
+            <div class="form-group row">
+              <label class="control-label col-sm-4 pr-0" for="refferedby">Reffered By :</label>
+              <div class="col col-sm-8">
+                <input [disabled]="!isSalesAgent" type="text" id="refferedby" class="form-control" placeholder="Enter Reffered By" name="refferedby_{{i}}"
+                  [(ngModel)]="individualDetailModel.refferedby" #refferedby="ngModel">
+              </div>
+            </div>
+          </div>
+          <div class="col col-md-6">
+            <div class="form-group row">
+              <label class="control-label col-sm-4 pr-0" for="email">Email :</label>
+              <div class="col col-sm-8">
+                <input [disabled]="!isSalesAgent" type="text" id="email" class="form-control" placeholder="Enter Email" name="email_{{i}}"
+                  [(ngModel)]="individualDetailModel.email" #email="ngModel">
+              </div>
+            </div>
+          </div>
+        </div>
+        <h5>
+          Other information
+        </h5>
+        <hr>
+        <div class="row">
+          <div class="col col-md-6">
+            <div class="form-group row">
+              <label class="control-label col-sm-4 pr-0" for="passportnumber">Enter Tazkira/Passport no :</label>
+              <div class="col col-sm-8">
+                <input [disabled]="!isSalesAgent" type="text" id="passportnumber" class="form-control" placeholder="Enter Tazkira/Passport no"
+                  name="passportnumber_{{i}}" [(ngModel)]="individualDetailModel.passportnumber" #passportnumber="ngModel">
+              </div>
+            </div>
+          </div>
+          <div class="col col-md-6">
+            <div class="form-group row">
+              <label class="control-label col-sm-4" for="nationality">Nationality :</label>
+              <div class="col col-sm-8">
+                <input [disabled]="!isSalesAgent" type="text" id="nationality" class="form-control" placeholder="Enter nationality" name="nationality_{{i}}"
+                  [(ngModel)]="individualDetailModel.nationality" #nationality="ngModel">
+              </div>
+            </div>
+          </div>
+          <div class="col col-md-6">
+            <div class="form-group row">
+              <label class="control-label col-sm-4" for="sexid">Sex :</label>
+              <div class="col col-sm-8">
+                <select [disabled]="!isSalesAgent" id="sexid" class="form-control" placeholder="Enter sex" name="sexid_{{i}}" [(ngModel)]="individualDetailModel.sexid"
+                  #sexid="ngModel" required>
+                  <option [value]=undefined disabled>Select</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="col col-md-6">
+            <div class="form-group row">
+              <label class="control-label col-sm-4" for="dateofbirth">Date of birth :</label>
+              <div class="col col-sm-7">
+                  <!-- [(ngModel)]="individualDetailModel.dateofbirth" -->
+                <input [disabled]="!isSalesAgent" class="form-control" placeholder="yyyy-mm-dd" name="dateofbirth_{{i}}"  [(ngModel)]="dob"
+                  required [displayMonths]="1" ngbDatepicker #d="ngbDatepicker" (dateSelect)="dateSelect($event)" (focus)="d.toggle()" [minDate]="minDate">
+              </div>
+              <div class="form-group col-md-1 no-padding">
+                <button class="btn btn-outline-secondary " (click)="d.toggle()" type="button">
+                  <i class="fa fa-calendar"></i>
+                </button>
+              </div>
+              <!-- <div class="col col-sm-8">
+                <input type="text" id="dob" class="form-control" placeholder="MM/dd/yyyy" name="dob_{{i}}" [(ngModel)]="individualDetailModel.dob"
+                  #dob="ngModel">
+              </div> -->
+            </div>
+          </div>
+          <div class="col col-md-6">
+            <div class="form-group row">
+              <label class="control-label col-sm-4" for="placeofbirth">Place of birth :</label>
+              <div class="col col-sm-8">
+                <input [disabled]="!isSalesAgent" type="text" id="placeofbirth" class="form-control" placeholder="Enter place of birth" name="placeofbirth_{{i}}"
+                  [(ngModel)]="individualDetailModel.placeofbirth" #placeofbirth="ngModel">
+              </div>
+            </div>
+          </div>
+          <div class="col col-md-6">
+            <div class="form-group row">
+              <label class="control-label col-sm-4" for="currentaddress">Current address :</label>
+              <div class="col col-sm-8">
+                <input [disabled]="!isSalesAgent" type="text" id="currentaddress" class="form-control" placeholder="Enter Current address" name="currentaddress_{{i}}"
+                  [(ngModel)]="individualDetailModel.currentaddress" #currentaddress="ngModel" required>
+              </div>
+            </div>
+          </div>
+          <div class="col col-md-6">
+            <div class="form-group row">
+              <label class="control-label col-sm-4" for="maritalstatusid">Marital Status :</label>
+              <div class="col col-sm-8">
+                <select [disabled]="!isSalesAgent" id="maritalstatusid" class="form-control" placeholder="Enter marital status" name="maritalstatusid_{{i}}"
+                  [(ngModel)]="individualDetailModel.maritalstatusid" #maritalstatusid="ngModel" required>
+                  <option [value]=undefined disabled>Select</option>
+                  <option value="single">Single</option>
+                  <option value="married">Married</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="col col-md-6">
+            <div class="form-group row">
+              <label class="control-label col-sm-4" for="remarks">Remarks :</label>
+              <div class="col col-sm-8">
+                <textarea [disabled]="!isSalesAgent" type="text" id="remarks" class="form-control" placeholder="Enter remarks" name="remarks_{{i}}"
+                  [(ngModel)]="individualDetailModel.remarks" #remarks="ngModel" rows="3"></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+        <h5>
+          Documents
+        </h5>
+        <hr>
+        <div class="row">
+          <div class="col col-md-6">
+            <div class="form-group row">
+              <label class="control-label col-sm-4 pr-0" >Student tazkira :</label>
+              <label class="choose_files" for="studenttazrika"> Choose Files </label>
+              <div class="col col-sm-8">
+                <input [disabled]="!isSalesAgent" type="file" multiple="true"  [(ngModel)]="individualDetailModel.studenttazrika"  id="studenttazrika" name="studenttazrika_{{i}}" (change)="onStudentFileSelected($event,i)">
+           <p *ngIf="studentDownload" [ngClass]="{download_link: studentDownload }" (click)="downloadStudentFiles()"> {{studenttazrika}} </p>
+           <p *ngIf="!studentDownload"> {{studenttazrika}} </p>
+          
+          </div>
+            </div>
+          </div>
+          <div class="col col-md-6">
+            <div class="form-group row">
+              <label class="control-label col-sm-4 pr-0" >Parent/Guardian tazkira :</label>
+              <label class="choose_files" for="parenttazrika">
+                  Choose Files
+              </label>
+              <div class="col col-sm-8">
+                <input [disabled]="!isSalesAgent" type="file" multiple="true"  [(ngModel)]="individualDetailModel.parenttazrika" id="parenttazrika" name="parenttazrika_{{i}}" (change)="onParentFileSelected($event,i)">
+            <p  *ngIf="parentDownload" [ngClass]="{download_link: parentDownload }" (click)="downloadParentFiles()"> {{parenttazrika}}</p> 
+            <p  *ngIf="!parentDownload"> {{parenttazrika}}</p> 
+           
+          </div>
+            </div>
+          </div>
+          <div class="col col-md-6">
+            <div class="form-group row">
+              <label class="control-label col-sm-4 pr-0">Previous grade mark sheets :</label>
+              <label class="choose_files" for="previousmarksheets" >
+               Choose Files
+              </label>
+              <div class="col col-sm-8">
+                <input [disabled]="!isSalesAgent" type="file"  [(ngModel)]="individualDetailModel.previousmarksheets" id="previousmarksheets" name="previousmarksheets_{{i}}" (change)="onMarksheetFileSelected($event,i)">
+                  <p *ngIf="marksheetDownload" [ngClass]="{download_link: marksheetDownload }" (click)="downloadMarksheetFiles()"> {{previousmarksheets}}</p>
+                  <p *ngIf="!marksheetDownload"> {{previousmarksheets}}</p>
+          
+          </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- <h3 class="control-label col-md-12 col-sm-12 no-padding">
+      <button class="btn btn-info pull-right m-r-20px mt-1 mb-1" title="Add new detail" (click)="addNewDetail()">Add
+        new detail</button>
+    </h3> -->
+  </form>
+</div>

@@ -1,0 +1,6 @@
+<form class="form-horizontal noon-form" #searchForm>
+    <div class="form-group">
+        <input class="form-control mr-sm-2" type="search" placeholder="Search" name="search" debounce delay="700"
+            [(ngModel)]="search" (func)="searchItems($event)">
+    </div>
+</form>

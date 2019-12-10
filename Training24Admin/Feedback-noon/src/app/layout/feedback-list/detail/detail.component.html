@@ -1,0 +1,54 @@
+<div class="pos-rel">
+    <noon-loader *ngIf="isCallingApi"></noon-loader>
+    <div>
+        <div class="list-group">
+            <div class="list-group-item detail-header-section header">
+                <div class="row">
+                    <div class="col-md-9">
+                        <p style="margin-left: -8px;">
+                            <span class="mr-4 title"><b>{{feedbackDetail.text}}</b></span>
+                            <span class="darkgrey text-uppercase font-weight-medium" *ngIf="feedbackDetail.category">{{feedbackDetail.category.name}}
+                                issue</span>
+                        </p>
+                        <div class="row selection-boxes">
+                            <div class="col-md-6 pr-0">
+                                <noon-role-assignment [data]="dataService.getUsers().aafManagers" [avtcolor]="'white'"
+                                    [actionable]="isRoleActionable" [abackground]="'#5abfea'" [title]="'Quality Assurance'"
+                                    [dataModel]="feedbackDetail.qaUser" [userType]="4" (selectRoleEvent)="selectRoleEvent($event)"></noon-role-assignment>
+                            </div>
+                            <div class="col-md-6 pr-0">
+                                <noon-role-assignment [data]="dataService.getUsers().coordinators" [userType]="5"
+                                    [actionable]="isRoleActionable" [avtcolor]="'white'" [abackground]="'#9ac43c'"
+                                    [title]="'Product Coordinator'" [dataModel]="feedbackDetail.coordinator"
+                                    (selectRoleEvent)="selectRoleEvent($event)"></noon-role-assignment>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 text-right pl-0 pr-0" *ngIf="isTabVisible">
+                        <button type="button" class="btn tab-button" disabled *ngFor="let tab of tabs; let i=index"
+                            [ngClass]="{'statusdone': [0,1].indexOf(i) > -1 && feedbackDetail.status == tab.status }"
+                            [hidden]="!tab.visible">
+                            <i class="fa tab-icon" [ngClass]="(tab.selected && tab.isChangable) ? 'fa-exchange' : tab.icon"
+                                (click)="selectTab(i)"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- task-section -->
+            <div [hidden]="tabs[2].selected || tabs[3].selected">
+                <noon-task-management [data]="feedbackDetail" [currUserRoles]="currUserRoles" (selectRoleEvent)="selectRoleEvent($event)"
+                    (removeStaffEvent)="removeStaffEvent($event)">
+                </noon-task-management>
+            </div>
+            <!-- create feedback-section -->
+            <div [hidden]="!tabs[2].selected">
+                <noon-public-feedback-form [data]="feedbackDetail"></noon-public-feedback-form>
+            </div>
+            <!-- feedback notification-section -->
+            <div [hidden]="!tabs[3].selected">
+                Notifications
+            </div>
+        </div>
+    </div>
+</div>
+<app-common-dialog #listdialog (deleteEvent)="deleteEvent($event)"></app-common-dialog>

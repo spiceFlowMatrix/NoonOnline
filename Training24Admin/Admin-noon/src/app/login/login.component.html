@@ -1,0 +1,36 @@
+<div class="login-page">
+    <noon-loader *ngIf="isFormLoading || isLoading"></noon-loader>
+    <div class="row justify-content-md-center">
+        <div class="col-lg-4 col-md-8 col-sm-12">
+            <div class="form form-lg">
+                <img src="assets/images/logo.png" width="100px" class="user-avatar"  style="border:none"/>
+                <h1>Noon - Login</h1>
+                <!-- <form role="form" #loginForm="ngForm" (ngSubmit)="loginForm.form.valid && onLoggedin()"> -->
+                <form role="form" #loginForm="ngForm" (ngSubmit)="loginForm.form.valid && logout()">
+                    <!-- <div class="form-content">
+                        <div class="form-group">
+                            <input type="email" name="email" class="form-control input-underline input-lg" placeholder="Email"
+                                [pattern]="emailPattern" #email="ngModel" [(ngModel)]="loginModel.email" required>
+                            <div *ngIf="email.invalid && (email.touched || loginForm.submitted)">
+                                <p class="input-info error-message" *ngIf="email.errors.required">Email is required</p>
+                                <p class="input-info error-message" *ngIf="email.errors.pattern">Email is not valid.</p>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <input type="password" name="password" class="form-control input-underline input-lg"
+                                [(ngModel)]="loginModel.password" placeholder="Password" #password="ngModel" required>
+                            <div *ngIf="password.invalid && (password.touched || loginForm.submitted)">
+                                <p class="input-info error-message" *ngIf="password.errors.required">Password is
+                                    required</p>
+                            </div>
+                        </div>
+                    </div> -->
+                    <button class="btn btn-secondary rounded-btn" type="submit" [disabled]="isLoading"> Login </button>&nbsp;
+                    <!-- <button class="btn btn-secondary rounded-btn" [routerLink]="['/signup']">Register</button> -->
+                </form>
+                <p class="link"><i [routerLink]="['/forgot-password']">Forgot password?</i></p>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,40 @@
+<section>
+  <h6>Feedback Start Times</h6>
+  <div class="row">
+    <div class="col-lg-4 col-md-4">
+      <ul class="list-group recording-list">
+        <li class="list-group-item" style="padding: 0.25rem 1.25rem;cursor: pointer;" *ngFor="let i of [1,2,3]">
+          <div class="row">
+            <div class="col-md-8" style="padding: 5px;">
+              7:32
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <div class="col-lg-8 col-md-8">
+      <div class="form-group">
+        <label>Issue Description</label>
+        <textarea class="form-control" rows="3"></textarea>
+      </div>
+      <div class="row">
+        <div class="col-lg-7 col-md-7">
+          <div class="row">
+            <div class="col-md-8">
+              Image attachments
+            </div>
+          </div>
+          <ul class="list-group files-list">           
+            <div class="row">
+              <div class="col-md-9">
+                <li class="list-group-item" *ngFor="let file of [1,1]">
+                  <a href="javascript:void(0)">Attach file name</a>
+                </li>
+              </div>
+            </div>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

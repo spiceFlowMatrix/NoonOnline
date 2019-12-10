@@ -1,0 +1,88 @@
+<div>
+    <h4>
+        <a class="btn btn-success btn-lg back" backDirection>
+            <span class="fa fa-arrow-left"></span>
+        </a>
+        <span *ngIf="isEditView">Edit</span><span *ngIf="!isEditView">Add</span> deposit
+        <noon-loader *ngIf="isCallingApi"></noon-loader>
+    </h4>
+
+    <div class="row">
+        <div class="col col-xl-6 col-lg-12">
+            <form class="form-horizontal noon-form" style="min-height:500px" #manageAgentDepositForm="ngForm"
+                (ngSubmit)="manageAgentDepositForm.form.valid && manageAgentDeposit()">
+                <div class="form-group row">
+                    <label class="control-label col-sm-4" for="depositDate">Deposit date :</label>
+                    <div class="col col-sm-7">
+                        <input class="form-control" placeholder="yyyy-mm-dd" name="dp" [(ngModel)]="agentDepositModel.depositdate"
+                            ngbDatepicker #depositDate="ngbDatepicker" (focus)="depositDate.open()" placeholder="Enter Deposit date"
+                            required>
+                        <div *ngIf="depositDate.invalid && (depositDate.touched || manageAgentDepositForm.submitted)">
+                            <p class="input-info error-message" *ngIf="depositDate.errors.required">Deposit date is
+                                required</p>
+                        </div>
+                    </div>
+                    <div class="input-group-append col col-sm-1">
+                        <button class="btn btn-outline-secondary " (click)="depositDate.toggle()" type="button">
+                            <i class="fa fa-calendar"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="control-label col-sm-4" for="deposit_amount">Deposit amount :</label>
+                    <div class="col col-sm-8">
+                        <input type="tel" id="deposit_amount" class="form-control" placeholder="Enter deposit amount"
+                            name="deposit_amount" [(ngModel)]="agentDepositModel.depositamount" #deposit_amount="ngModel"
+                            required>
+                        <div *ngIf="deposit_amount.invalid && (deposit_amount.touched || manageAgentDepositForm.submitted)">
+                            <p class="input-info error-message" *ngIf="deposit_amount.errors.required">Deposit amount
+                                is required</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="control-label col-sm-4" for="sales_agent">Sales agent :</label>
+                    <div class="col col-sm-8">
+                        <select class="form-control" name="sales_agent" #sales_agent="ngModel" [(ngModel)]="agentDepositModel.salesagentid">
+                            <option [value]=undefined disabled>Select</option>
+                            <option *ngFor="let agent of agents" [value]="agent.salesAgentId">
+                                {{agent.agentName}}
+                            </option>
+                        </select>
+                        <div *ngIf="sales_agent.invalid && (sales_agent.touched || manageAgentDepositForm.submitted)">
+                            <p class="input-info error-message" *ngIf="sales_agent.errors.required">Sales agent is
+                                required</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group noon-form row">
+                    <label class="control-label col-sm-4" for="documents">Documents :</label>
+                    <div class="col col-sm-8">
+                        <button type="button" class="btn btn-primary" (click)="openFileSelecter('documents')">Select
+                            file</button>
+                        <input type="file" multiple="true" style="display:none;" id="documents" name="documents"
+                            (change)="onFileSelected($event)">
+                        <div class="row mt-1">
+                            <label class="control-label col-sm-4" *ngFor="let document of agentDepositModel.documentid;let i=index;">
+                                <span class="doc-name" title="{{document.name}}">{{document.name}}</span>
+                                <button class="btn btn-danger btn-action" title="Delete" (click)="agentDepositModel.documents.splice(i,1)">
+                                    <i class="fa fa-times"></i>
+                                </button>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-8 pull-right">
+                        <button type="submit" class="btn btn-primary m-r-20px" *ngIf="isEditView" [disabled]="manageAgentDepositForm.invalid || isCallingApi">Edit
+                            deposit</button>
+                        <button type="submit" class="btn btn-primary m-r-20px" *ngIf="!isEditView" [disabled]="manageAgentDepositForm.invalid || isCallingApi">Add
+                            deposit
+                        </button>
+                        <button class="btn btn-danger" backDirection>Cancel</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

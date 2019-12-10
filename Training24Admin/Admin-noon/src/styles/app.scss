@@ -1,0 +1,50 @@
+/* You can add global styles to this file, and also import other style files */
+@import '~quill/dist/quill.core.css';
+@import '~quill/dist/quill.bubble.css';
+@import '~quill/dist/quill.snow.css';
+
+/* You can add global styles to this file, and also import other style files */
+
+@import "bootstrap/bootstrap";
+@import "spinner";
+@import "utils";
+@import "rtl";
+@import "responsive";
+@import '~katex/dist/katex.css';
+@media print {
+    .breadcrumb {
+        display: none !important;
+    }
+}
+
+@mixin noon-shadow() {
+    box-shadow: 0 1px 6px rgba(10, 10, 10, 0.64);
+}
+
+@mixin noon-back() {
+    background: #134e5e;
+    background: -webkit-linear-gradient(to right, #134e5e, #71b280);
+    background: linear-gradient(to right, #134e5e, #71b280);
+}
+
+@media only screen and (min-width : 992px) {
+    .form-lg {
+        @include noon-back();
+        @include noon-shadow();
+        min-height: 500px;
+    }
+}
+
+/* Small Devices, Tablets */
+
+@media only screen and (max-width: 768px) {
+    .login-page{
+        padding: 3em 1em !important;
+    }
+}
+
+#grade-scroll{
+    .ngx-dorpdown-container .ngx-dropdown-list-container{
+    height: 250px !important;
+    }
+}
