@@ -1,0 +1,39 @@
+{
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
+    "iisExpress": {
+      "applicationUrl": "http://localhost:6020",
+      "sslPort": 0
+    }
+  },
+  "profiles": {
+    "IIS Express": {
+      "commandName": "IISExpress",
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Staging",
+        "ASPNET_DB_CONNECTIONSTRING": "server=localhost;user id=root;database=db_noon_oed_dev_auth;SslMode=none;Convert Zero Datetime=true;Allow User Variables=true;CharSet=utf8;"
+      }
+    },
+    "T24Development": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "ASPNET_DB_CONNECTIONSTRING": "server=35.204.80.96;user id=root;password=B@llastW!ll5565;database=coreapistaging;SslMode=none;Convert Zero Datetime=true;CharSet=utf8;"
+      }
+    },
+    "T24Staging": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Staging",
+        "ASPNET_DB_CONNECTIONSTRING": "server=localhost;user id=root;database=db_noon_oed_dev_auth;SslMode=none;Convert Zero Datetime=true;Allow User Variables=true;CharSet=utf8;"
+      }
+    }
+  }
+}

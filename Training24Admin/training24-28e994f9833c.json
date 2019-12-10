@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "training24-197210",
+  "private_key_id": "28e994f9833c8e703ceea11bfb4f2c3f5cebb68e",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDtRMrIkDVh0QcO\nYiUBXHQNFw0FhaVcDX20Eaqu0+yZBIAzCOvRtFazBcxlnkoYJlgMpfo0Y2nvBx+P\nYpGxCakGBBQq3tKHBVM1d7ehm2P5CLuNCrV2g1F5iL2n85M5x6k79lP3oa1fD73u\nZguKna7WzLjcVOdWMmjLe7ufiVHQtUZnAAT/MZvXTNBp/873NZP4awXciNQfweCo\nA3yVVFM94safNEQJUZWQouwan6j+V1NsGS6aFJ4HPTzL0rvzerB1PTCJEIHKjNxD\nBjLBI1Kr4lWLn+q+evOo1n6BHGsn+YiG5UrPzNXFfu4yNdJKOPaHOwnGQ68oh+aj\n0bOp6BgNAgMBAAECggEAW50ZU5HjGs7UE6ivszPYl4lT/NLaw41uAQ5lQjYQABFt\n0sbaD1G7vEo73uzcnTCJBPE9h+bu611rwTiFGr+pJOqEQv1gesQCmf2MyPiwBGNr\nz4zX/le8KNo0qNny+fdvD/kP+OjTgYYZhyidwjsaXFQV+PVLkcvLDO7MxlAGaDgn\n8xcaZgDVUb4F96TQa8fuXupZcHADieeNDj9q0jgc94+CHlqOacrhenZFpwx7YVV+\ngFq6CETUiDdc+4/oAc+l0ol2R+3dVmBq1PIu7TR90MWzpbThPATRx0jyz3GYmg3F\nBpjUWmKV9paIk5rs90pI8nkAkXXsiHuqdzcdpKxpHQKBgQD/MaiMweAwDu77xsZI\n2U0X6xHCj8+/Lr9HBmYXN9jy8UFZC1r+i9igZTnOWKMa8W4P7W+ik9gJHIkj8QSO\ni2puihFzQw/v7ahhn8EZ1RXMhDz4HcL+9hDqlgitpDGYtARQP95jQD0tbiCj6EaN\nainhdb/T5jJz+9e8x13TFnxKewKBgQDuBKPTHZxABc0QuSt2EN/ahbVcUfVymf8e\n1AVdAzZefeS8o9YRHPJ+2kxk5PAeBXTfxF+SFZCNIv5CfDTVqxRHCSdMzbHE4Nm+\nRgZ3h0RqmDpl7EY+zO+OW7oeMKsWUYmb5tw5I4GxdF4WEM0erD/XgFGr3s7Q3Y3j\nmkthzAsFFwKBgFhsKG69LqT4R65NrZ7ITIIhHUJA+kbQN86wVOdunmlvVqk32guh\nASpyaJkq9Tj8tpomNywp9g0SKiKd/Go3vGUYyfsaHYeQ3WsWI56Dys3WdBm0lkAp\nmqrt2Yvw/I5gsa3ss23IcGoxYnXooamWQ3SvjAwsEwdFF/d9TPE7NU3JAoGBAOW5\nGrkHKihssOhEH9tbHAMX69wHyoLqeN4zOl30XMREc8FRy6lGrBGc9gCnKc1/7LaQ\nHMGtCI//xzE6GfBjpzWMcx7gpIPllKLdiR5SMslC1ZJLwdyZBVj71R2QUYBAADW1\nUrXfPCyeqLRZUPAaxZ9j3O+qIyhZvbl/0OO6AKTPAoGBAJnZiq9p4uCpmsCTFEia\na+y3EdEfpdbdh38HF05l2dZqhfzWwo8EDpYFBe7aVbk8ZbsyUwyl7HWlncRUNIfg\niF8EagbRjwfNYTDtqkHP7DUt2S1jK1ECjGt3ea85aw4Iltn0itKBkwWHmdvIbA1O\nixwkRGAhC+zY+jTju22k+aoG\n-----END PRIVATE KEY-----\n",
+  "client_email": "paras-chodavadiya@training24-197210.iam.gserviceaccount.com",
+  "client_id": "116372878603769032005",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/paras-chodavadiya%40training24-197210.iam.gserviceaccount.com"
+}

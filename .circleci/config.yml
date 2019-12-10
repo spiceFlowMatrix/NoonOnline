@@ -1,0 +1,127 @@
+version: 2.1
+jobs:
+  build-job:
+    docker:
+      - image: microsoft/dotnet:sdk
+    steps:
+      - checkout
+      - run: dotnet restore
+      - run: dotnet publish -c Release -o release
+      - run: cp Training24Admin/training24-28e994f9833c.json Training24Admin/release
+      - run: cp Training24Admin/training24-62a718e47571.p12 Training24Admin/release
+      - run: cp Training24Admin/libwkhtmltox.dll Training24Admin/release
+      - run: cp Training24Admin/libwkhtmltox.dylib Training24Admin/release
+      - run: cp Training24Admin/libwkhtmltox.so Training24Admin/release
+      - persist_to_workspace:
+          root: .
+          paths: 
+            - Training24Admin/release
+            - Dockerfile
+            - .dockerignore
+  push-container:
+    docker:
+      - image: google/cloud-sdk
+    steps:
+      - attach_workspace:
+          at: workspace
+      - run: find .
+      - run:
+          name: Set up Google cloud SDK. Important to set up cluster based on deployment
+          command: |
+            echo $GCLOUD_SERVICE_KEY > gcloud-service-key.json
+            gcloud auth activate-service-account --key-file gcloud-service-key.json
+            gcloud --quiet config set project ${GOOGLE_PROJECT_ID}
+            gcloud --quiet config set compute/zone ${GOOGLE_COMPUTE_ZONE}
+      - setup_remote_docker
+      - run:
+          name: Tag docker image to GCR registry
+          command: |
+            docker build -t ${APPLICATION_NAME}:${CIRCLE_SHA1} ./workspace
+            docker tag ${APPLICATION_NAME}:${CIRCLE_SHA1} eu.gcr.io/${GOOGLE_PROJECT_ID}/${APPLICATION_NAME}:${CIRCLE_SHA1}
+            gcloud auth configure-docker
+            docker push eu.gcr.io/${GOOGLE_PROJECT_ID}/${APPLICATION_NAME}:${CIRCLE_SHA1}
+      - run: echo ${APPLICATION_NAME}:${CIRCLE_SHA1}
+  deploy-staging:
+    docker:
+      - image: google/cloud-sdk
+    steps:
+      - checkout
+      - run:
+          name: Set up Google cloud SDK. Important to set up cluster based on deployment
+          command: |
+            echo $GCLOUD_SERVICE_KEY > gcloud-service-key.json
+            gcloud auth activate-service-account --key-file gcloud-service-key.json
+            gcloud --quiet config set project ${GOOGLE_PROJECT_ID}
+            gcloud --quiet config set compute/zone ${GOOGLE_COMPUTE_ZONE}
+            gcloud --quiet container clusters get-credentials ${GOOGLE_STAGING_CLUSTER_NAME}
+      - setup_remote_docker
+      - run:
+          name: Push image to GRC & update k8s
+          command: |
+            kubectl patch deployment ${KUBEDEPLOYMENT_COREAPI_STAGING} -p '{"spec":{"template":{"spec":{"containers":[{"name":"'"$APPLICATION_NAME"'","image":"eu.gcr.io/'"$GOOGLE_PROJECT_ID"'/'"$APPLICATION_NAME"':'"$CIRCLE_SHA1"'"}]}}}}'
+            kubectl rollout status deployment/${KUBEDEPLOYMENT_COREAPI_STAGING}
+            kubectl get pods
+  deploy-dariprod:
+    docker:
+      - image: google/cloud-sdk
+    steps:
+      - checkout
+      - run:
+          name: Set up Google cloud SDK. Important to set up cluster based on deployment
+          command: |
+            echo $GCLOUD_SERVICE_KEY > gcloud-service-key.json
+            gcloud auth activate-service-account --key-file gcloud-service-key.json
+            gcloud --quiet config set project ${GOOGLE_PROJECT_ID}
+            gcloud --quiet config set compute/zone ${GOOGLE_COMPUTE_ZONE}
+            gcloud --quiet container clusters get-credentials ${GOOGLE_PRODUCTION_CLUSTER_NAME}
+      - setup_remote_docker
+      - run:
+          name: Push image to GRC & update k8s
+          command: |
+            kubectl patch deployment ${KUBEDEPLOYMENT_COREAPI_DARI_PRODUCTION} -p '{"spec":{"template":{"spec":{"containers":[{"name":"'"$APPLICATION_NAME"'","image":"eu.gcr.io/'"$GOOGLE_PROJECT_ID"'/'"$APPLICATION_NAME"':'"$CIRCLE_SHA1"'"}]}}}}'
+            kubectl rollout status deployment/${KUBEDEPLOYMENT_COREAPI_DARI_PRODUCTION}
+            kubectl get pods
+  deploy-pashtoprod:
+    docker:
+      - image: google/cloud-sdk
+    steps:
+      - checkout
+      - run:
+          name: Set up Google cloud SDK. Important to set up cluster based on deployment
+          command: |
+            echo $GCLOUD_SERVICE_KEY > gcloud-service-key.json
+            gcloud auth activate-service-account --key-file gcloud-service-key.json
+            gcloud --quiet config set project ${GOOGLE_PROJECT_ID}
+            gcloud --quiet config set compute/zone ${GOOGLE_COMPUTE_ZONE}
+            gcloud --quiet container clusters get-credentials ${GOOGLE_PRODUCTION_CLUSTER_NAME}
+      - setup_remote_docker
+      - run:
+          name: Push image to GRC & update k8s
+          command: |
+            kubectl patch deployment ${KUBEDEPLOYMENT_COREAPI_PASHTO_PRODUCTION} -p '{"spec":{"template":{"spec":{"containers":[{"name":"'"$APPLICATION_NAME"'","image":"eu.gcr.io/'"$GOOGLE_PROJECT_ID"'/'"$APPLICATION_NAME"':'"$CIRCLE_SHA1"'"}]}}}}'
+            kubectl rollout status deployment/${KUBEDEPLOYMENT_COREAPI_PASHTO_PRODUCTION}
+            kubectl get pods
+
+workflows:
+  version: 2.1
+  build-deploy:
+    jobs:
+      - build-job
+      - push-container:
+          requires:
+          - build-job
+      - deploy-staging:
+          requires:
+          - push-container
+      - deploy-dariprod:
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
+      - deploy-pashtoprod:
+          filters:
+            tags:
+              only: /^v.*/
+            branches:
+              ignore: /.*/
