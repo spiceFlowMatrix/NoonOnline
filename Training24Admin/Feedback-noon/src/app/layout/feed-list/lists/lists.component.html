@@ -62,9 +62,9 @@
 
                 <ng-container matColumnDef="selectQueue">
                     <th mat-header-cell *matHeaderCellDef>
-                        <mat-checkbox (change)="$event ? masterToggle('queue') : null"
-                            [checked]="queueSelection.hasValue() && isAllSelected('queue')"
-                            [indeterminate]="queueSelection.hasValue() && !isAllSelected(queue)"
+                        <mat-checkbox (change)="$event ? masterQueueToggle() : null"
+                            [checked]="queueSelection.hasValue() && isAllQueueSelected()"
+                            [indeterminate]="queueSelection.hasValue() && !isAllQueueSelected()"
                             [aria-label]="checkboxQueueLabel()">
                         </mat-checkbox>
                     </th>
@@ -147,9 +147,9 @@
 
                 <ng-container matColumnDef="selectProgress">
                     <th mat-header-cell *matHeaderCellDef>
-                        <mat-checkbox (change)="$event ? masterToggle('progress') : null"
-                            [checked]="progressSelection.hasValue() && isAllSelected('progress')"
-                            [indeterminate]="progressSelection.hasValue() && !isAllSelected('progress')"
+                        <mat-checkbox (change)="$event ? masterProgressToggle() : null"
+                            [checked]="progressSelection.hasValue() && isAllProgressSelected()"
+                            [indeterminate]="progressSelection.hasValue() && !isAllProgressSelected()"
                             [aria-label]="checkboxProgressLabel()">
                         </mat-checkbox>
                     </th>
@@ -237,9 +237,9 @@
 
                 <ng-container matColumnDef="selectCompleted">
                     <th mat-header-cell *matHeaderCellDef>
-                        <mat-checkbox (change)="$event ? masterToggle('complete') : null"
-                            [checked]="completeSelection.hasValue() && isAllSelected('complete')"
-                            [indeterminate]="completeSelection.hasValue() && !isAllSelected('complete')"
+                        <mat-checkbox (change)="$event ? masterCompleteToggle() : null"
+                            [checked]="completeSelection.hasValue() && isAllCompleteSelected()"
+                            [indeterminate]="completeSelection.hasValue() && !isAllCompleteSelected()"
                             [aria-label]="checkboxCompleteLabel()">
                         </mat-checkbox>
                     </th>
@@ -332,9 +332,9 @@
 
                 <ng-container matColumnDef="selectArchived">
                     <th mat-header-cell *matHeaderCellDef>
-                        <mat-checkbox (change)="$event ? masterToggle('archive') : null"
-                            [checked]="archiveSelection.hasValue() && isAllSelected('archive')"
-                            [indeterminate]="archiveSelection.hasValue() && !isAllSelected('archive')"
+                        <mat-checkbox (change)="$event ? masterArchiveToggle() : null"
+                            [checked]="archiveSelection.hasValue() && isAllArchiveSelected()"
+                            [indeterminate]="archiveSelection.hasValue() && !isAllArchiveSelected()"
                             [aria-label]="checkboxArchiveLabel()">
                         </mat-checkbox>
                     </th>

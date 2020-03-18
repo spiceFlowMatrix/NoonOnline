@@ -42,6 +42,10 @@ export let SalesMenuList = [
         link: '/purchases',
         icon: 'fa fa-shopping-cart',
         title: 'Purchases'
-    },
+    },{
+        link: '/agent-fin',
+        icon: 'fa-money',
+        title: 'Finance'
+    }
 ];
  

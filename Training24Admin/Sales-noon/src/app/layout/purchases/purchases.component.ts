@@ -126,9 +126,7 @@ export class PurchasesComponent implements OnInit {
     ngOnInit() {
         this.dataService.setSideMenu(true);
         this.resetInitdata();
-        this.getManagementInfo();
         this.checkForAgent();
-        this.getTax();
         this.getAccountData();
         // this.generatePdf();
     }
@@ -154,6 +152,7 @@ export class PurchasesComponent implements OnInit {
                 }
             }
             this.isCallingApi = false;
+            this.getTax();
         }, err => {
             this.isCallingApi = false;
             this.utilService.showErrorCall(err);
@@ -167,6 +166,7 @@ export class PurchasesComponent implements OnInit {
                 res => {
                     this.taxValue = res.data;
                     this.isCallingApi = false;
+                    this.getManagementInfo();
                 },
                 err => {
                     this.isCallingApi = false;
@@ -1058,12 +1058,12 @@ export class PurchasesComponent implements OnInit {
     }
 
     addMoreParent(i) {
-        if(this.parentModal[this.parentModal.length - 1].userids != '') {
-            console.log(this.parentModal);            
+        if (this.parentModal[this.parentModal.length - 1].userids != '') {
+            console.log(this.parentModal);
             this.parentModal.push({ userids: '' });
             console.log(this.parentModal);
 
-        }else {
+        } else {
             this.utilService.showErrorToast("Please Select Parents")
         }
     }
@@ -1077,7 +1077,7 @@ export class PurchasesComponent implements OnInit {
                 if (this.parentsubscription[this.parentIndex].parentsids.length != 0) {
                     // this.parentsubscription.splice(this.parentIndex, 1);
                     this.parentsubscription[this.parentIndex].parentsids.splice(i, 1)
-                } 
+                }
                 this.parentModal.splice(i, 1);
             }, err => {
                 this.isCallingApi = false;
@@ -1085,11 +1085,11 @@ export class PurchasesComponent implements OnInit {
             }))
         }
         else {
-            this.parentsubscription[this.parentIndex].parentsids.splice(i,1);
+            this.parentsubscription[this.parentIndex].parentsids.splice(i, 1);
             console.log(this.parentsubscription);
             this.parentModal.splice(i, 1);
-            
-            
+
+
         }
     }
 
@@ -1616,29 +1616,29 @@ export class PurchasesComponent implements OnInit {
             // }
             if (model) {
                 // if (this.letFileUpload) {
-                    this.isCallingApi = true;
-                    this.allSubscribers.push(
-                        this.purchasesService
-                            .generateSignedReceipt(model)
-                            .subscribe(
-                                res => {
-                                    this.letFileUpload = false;
-                                    this.isCallingApi = false;
-                                    let fIndex = _.findIndex(this.purchaseList, {
-                                        id: this.purchaseModel.metadatadetails.id
-                                    });
-                                    if (fIndex > -1) {
-                                        this.purchaseList[fIndex]["status"] =
-                                            res.data.status;
-                                    }
-                                    // this.addTransaction();
-                                },
-                                err => {
-                                    this.isCallingApi = false;
-                                    this.utilService.showErrorCall(err);
+                this.isCallingApi = true;
+                this.allSubscribers.push(
+                    this.purchasesService
+                        .generateSignedReceipt(model)
+                        .subscribe(
+                            res => {
+                                this.letFileUpload = false;
+                                this.isCallingApi = false;
+                                let fIndex = _.findIndex(this.purchaseList, {
+                                    id: this.purchaseModel.metadatadetails.id
+                                });
+                                if (fIndex > -1) {
+                                    this.purchaseList[fIndex]["status"] =
+                                        res.data.status;
                                 }
-                            )
-                    );
+                                // this.addTransaction();
+                            },
+                            err => {
+                                this.isCallingApi = false;
+                                this.utilService.showErrorCall(err);
+                            }
+                        )
+                );
                 // }
             }
         }

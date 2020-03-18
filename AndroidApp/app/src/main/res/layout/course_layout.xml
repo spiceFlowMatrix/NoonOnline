@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/_7sdp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/txtgradeName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_10sdp"
+                android:layout_marginTop="@dimen/_5sdp"
+                android:layout_marginEnd="@dimen/_10sdp"
+                android:layout_marginBottom="@dimen/_5sdp"
+                android:fontFamily="@font/bahij_helvetica_neue_bold"
+                android:textColor="@color/colorBlack"
+                android:textSize="@dimen/_10sdp"
+                android:textStyle="bold" />
+
+            <!--  <android.support.v7.widget.CardView
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_gravity="center_horizontal|center_vertical"
+                  android:foreground="?android:attr/selectableItemBackground"
+                  app:cardBackgroundColor="@android:color/transparent"
+                  app:cardCornerRadius="0dp"
+                  app:cardElevation="0dp">
+  -->
+
+            <include
+                android:id="@+id/rcHorizontalLayout"
+                layout="@layout/recycleview_verticle_layout"></include>
+
+            <!-- </android.support.v7.widget.CardView>
+ -->
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/expandCourse"
+                android:layout_width="@dimen/_25sdp"
+                android:layout_height="@dimen/_20sdp"
+                android:padding="@dimen/_2sdp"
+                android:src="@drawable/ic_down_arrow" />
+
+            <View
+                android:id="@+id/coursedivider"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/colorMoreDarkGray"></View>
+        </LinearLayout>
+
+    </LinearLayout>
+
+</layout>

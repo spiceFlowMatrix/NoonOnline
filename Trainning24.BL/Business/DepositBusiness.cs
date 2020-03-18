@@ -105,6 +105,27 @@ namespace Trainning24.BL.Business
             return EFDeposit.GetAll();
         }
 
+        public List<Deposit> DepositListByAgent(long agentId, PaginationModel paginationModel, out int total)
+        {
+            List<Deposit> DepositList = new List<Deposit>(); 
+            DepositList = EFDeposit.ListQuery(b => b.SalesAgentId == agentId && b.IsDeleted == false).ToList();
+
+            if (paginationModel.pagenumber != 0 && paginationModel.perpagerecord != 0) 
+            {
+                total = DepositList.Count();
+
+                DepositList = DepositList.OrderByDescending(b => b.Id).
+                        Skip(paginationModel.perpagerecord * (paginationModel.pagenumber - 1)).
+                        Take(paginationModel.perpagerecord).
+                        ToList();
+
+                return DepositList;
+            }
+
+            total = DepositList.Count();
+            return EFDeposit.GetAll();
+        }
+
         public Deposit getGradeById(long id)
         {
             return EFDeposit.GetById(b => b.Id == id && b.IsDeleted != true);
@@ -315,160 +336,168 @@ namespace Trainning24.BL.Business
         {
             var depositList = EFDeposit.GetAll().Where(b => b.SalesAgentId == id).ToList();
             AgentAccountSummary agentAccountSummary = new AgentAccountSummary();
-            agentAccountSummary.agentid = id;
-            agentAccountSummary.agentname = SalesAgentBusiness.getSalesAgentById(id).AgentName;
-
-            depositList = depositList.Where(b => b.IsConfirm == true).ToList();
-
-            if (depositList.Count != 0)
+            if (depositList.Count > 0)
             {
-                agentAccountSummary.totaldeposit = depositList.Where(b => b.IsConfirm == true && b.IsRevoke == false).Select(b => b.DepositAmount).Sum();
-                agentAccountSummary.depositcount = depositList.Where(b => b.IsConfirm == true && b.IsRevoke == false).Count();
-                agentAccountSummary.latestdeposit = depositList.OrderByDescending(b => b.Id).FirstOrDefault().DepositAmount;
-            }
+                //AgentAccountSummary agentAccountSummary = new AgentAccountSummary();
+                agentAccountSummary.agentid = id;
+                agentAccountSummary.agentname = SalesAgentBusiness.getSalesAgentById(id).AgentName;
 
-            //foreach (var deposit in depositList)
-            //{
-            List<SubscriptionMetadata> subscriptionMetadataList = SubscriptionMetadataBusiness.SubscriptionMetaDataList(id);
+                depositList = depositList.Where(b => b.IsConfirm == true).ToList();
 
-            if (subscriptionMetadataList.Count() != 0)
-            {
-                decimal finalpriced = 0;
-
-                foreach (var subscriptionMetadata in subscriptionMetadataList)
+                if (depositList.Count != 0)
                 {
-                    if (subscriptionMetadata.Status == "Completed")
+                    agentAccountSummary.totaldeposit = depositList.Where(b => b.IsConfirm == true && b.IsRevoke == false).Select(b => b.DepositAmount).Sum();
+                    agentAccountSummary.depositcount = depositList.Where(b => b.IsConfirm == true && b.IsRevoke == false).Count();
+                    agentAccountSummary.latestdeposit = depositList.OrderByDescending(b => b.Id).FirstOrDefault().DepositAmount;
+                }
+
+                //foreach (var deposit in depositList)
+                //{
+                List<SubscriptionMetadata> subscriptionMetadataList = SubscriptionMetadataBusiness.SubscriptionMetaDataList(id);
+
+                if (subscriptionMetadataList.Count() != 0)
+                {
+                    decimal finalpriced = 0;
+
+                    foreach (var subscriptionMetadata in subscriptionMetadataList)
                     {
-                        decimal finalprice = 0;
-
-                        decimal totalbaseprice = 0;
-
-                        Subscriptions Subscriptions = SubscriptionsBusiness.GetSubscriptionsByMetadataId(subscriptionMetadata.Id);
-
-                        if (Subscriptions != null)
+                        if (subscriptionMetadata.Status == "Completed")
                         {
-                            string[] uids = new string[] { };
-                            if (!string.IsNullOrEmpty(Subscriptions.UserId))
+                            decimal finalprice = 0;
+
+                            decimal totalbaseprice = 0;
+
+                            Subscriptions Subscriptions = SubscriptionsBusiness.GetSubscriptionsByMetadataId(subscriptionMetadata.Id);
+
+                            if (Subscriptions != null)
                             {
-                                uids = Subscriptions.UserId.Split(",");
-                            }
-                            string totalsubscriptions = uids.Length.ToString();
-
-                            agentAccountSummary.purchasecount = subscriptionMetadataList.Count();
-
-                            Discount discount = DiscountBusiness.getDiscountById(subscriptionMetadata.DiscountPackageId);
-
-                            string[] coursedefinationids = new string[] { };
-                            string[] additionalserviceids = new string[] { };
-
-                            if (!string.IsNullOrEmpty(subscriptionMetadata.CourseId))
-                            {
-                                coursedefinationids = subscriptionMetadata.CourseId.Split(",");
-                            }
-
-                            if (!string.IsNullOrEmpty(subscriptionMetadata.ServiceId))
-                            {
-                                additionalserviceids = subscriptionMetadata.ServiceId.Split(",");
-                            }
-
-                            List<ResponseCourseDefination> ResponseCourseDefinationList = new List<ResponseCourseDefination>();
-
-                            for (int i = 0; i < coursedefinationids.Length; i++)
-                            {
-                                CourseDefination courseDefination = CourseDefinationBusiness.getCourseDefinationById(int.Parse(coursedefinationids[i]));
-                                if (courseDefination != null)
+                                string[] uids = new string[] { };
+                                if (!string.IsNullOrEmpty(Subscriptions.UserId))
                                 {
-                                    totalbaseprice += decimal.Parse(courseDefination.BasePrice);
+                                    uids = Subscriptions.UserId.Split(",");
                                 }
-                            }
+                                string totalsubscriptions = uids.Length.ToString();
 
-                            if (subscriptionMetadata.PackageId != 0)
-                            {
-                                Package package = _packageBusiness.GetById(subscriptionMetadata.PackageId);
-                                if (package != null)
+                                agentAccountSummary.purchasecount = subscriptionMetadataList.Count();
+
+                                Discount discount = DiscountBusiness.getDiscountById(subscriptionMetadata.DiscountPackageId);
+
+                                string[] coursedefinationids = new string[] { };
+                                string[] additionalserviceids = new string[] { };
+
+                                if (!string.IsNullOrEmpty(subscriptionMetadata.CourseId))
                                 {
-                                    totalbaseprice += decimal.Parse(package.Price);
-                                }
-                            }
-
-                            for (int i = 0; i < additionalserviceids.Length; i++)
-                            {
-                                AddtionalServices addtionalServices = _addtionalServicesBusiness.GetById(int.Parse(additionalserviceids[i]));
-                                if (addtionalServices != null)
-                                {
-                                    totalbaseprice += decimal.Parse(addtionalServices.Price);
-                                }
-                            }
-
-
-                            decimal ftotalbaseprice = totalbaseprice * decimal.Parse(totalsubscriptions);
-
-                            if (subscriptionMetadata.NoOfMonths > 0)
-                            {
-                                ftotalbaseprice = ftotalbaseprice * subscriptionMetadata.NoOfMonths;
-                                if (decimal.Parse(totalsubscriptions) > 0)
-                                {
-                                    totalbaseprice = ftotalbaseprice / decimal.Parse(totalsubscriptions);
+                                    coursedefinationids = subscriptionMetadata.CourseId.Split(",");
                                 }
 
-                            }
-
-                            int ftotalsubscription = 0;
-
-                            if (discount != null)
-                            {
-                                if (int.Parse(totalsubscriptions) < discount.FreeSubscriptions)
+                                if (!string.IsNullOrEmpty(subscriptionMetadata.ServiceId))
                                 {
-                                    ftotalsubscription = 0;
+                                    additionalserviceids = subscriptionMetadata.ServiceId.Split(",");
+                                }
+
+                                List<ResponseCourseDefination> ResponseCourseDefinationList = new List<ResponseCourseDefination>();
+
+                                for (int i = 0; i < coursedefinationids.Length; i++)
+                                {
+                                    CourseDefination courseDefination = CourseDefinationBusiness.getCourseDefinationById(int.Parse(coursedefinationids[i]));
+                                    if (courseDefination != null)
+                                    {
+                                        totalbaseprice += decimal.Parse(courseDefination.BasePrice);
+                                    }
+                                }
+
+                                if (subscriptionMetadata.PackageId != 0)
+                                {
+                                    Package package = _packageBusiness.GetById(subscriptionMetadata.PackageId);
+                                    if (package != null)
+                                    {
+                                        totalbaseprice += decimal.Parse(package.Price);
+                                    }
+                                }
+
+                                for (int i = 0; i < additionalserviceids.Length; i++)
+                                {
+                                    AddtionalServices addtionalServices = _addtionalServicesBusiness.GetById(int.Parse(additionalserviceids[i]));
+                                    if (addtionalServices != null)
+                                    {
+                                        totalbaseprice += decimal.Parse(addtionalServices.Price);
+                                    }
+                                }
+
+
+                                decimal ftotalbaseprice = totalbaseprice * decimal.Parse(totalsubscriptions);
+
+                                if (subscriptionMetadata.NoOfMonths > 0)
+                                {
+                                    ftotalbaseprice = ftotalbaseprice * subscriptionMetadata.NoOfMonths;
+                                    if (decimal.Parse(totalsubscriptions) > 0)
+                                    {
+                                        totalbaseprice = ftotalbaseprice / decimal.Parse(totalsubscriptions);
+                                    }
+
+                                }
+
+                                int ftotalsubscription = 0;
+
+                                if (discount != null)
+                                {
+                                    if (int.Parse(totalsubscriptions) < discount.FreeSubscriptions)
+                                    {
+                                        ftotalsubscription = 0;
+                                    }
+                                    else
+                                    {
+                                        ftotalsubscription = int.Parse(totalsubscriptions) - discount.FreeSubscriptions;
+                                    }
+
+                                    if (ftotalsubscription != 0)
+                                    {
+                                        ftotalbaseprice = totalbaseprice * ftotalsubscription;
+
+                                        finalprice = ftotalbaseprice - ftotalbaseprice * (ftotalsubscription * discount.OffSubscriptions) / 100; // this is discount for discounted off subscriptions
+
+                                        finalprice = finalprice - (finalprice * discount.OffTotalPrice) / 100; // this is discount for discounted off total price 
+                                    }
+                                    else
+                                    {
+                                        finalprice = totalbaseprice * (ftotalsubscription * discount.OffTotalPrice) / 100;
+                                    }
                                 }
                                 else
                                 {
-                                    ftotalsubscription = int.Parse(totalsubscriptions) - discount.FreeSubscriptions;
-                                }
+                                    ftotalbaseprice = totalbaseprice;
 
-                                if (ftotalsubscription != 0)
-                                {
-                                    ftotalbaseprice = totalbaseprice * ftotalsubscription;
-
-                                    finalprice = ftotalbaseprice - ftotalbaseprice * (ftotalsubscription * discount.OffSubscriptions) / 100; // this is discount for discounted off subscriptions
-
-                                    finalprice = finalprice - (finalprice * discount.OffTotalPrice) / 100; // this is discount for discounted off total price 
+                                    finalprice = ftotalbaseprice;
                                 }
-                                else
-                                {
-                                    finalprice = totalbaseprice * (ftotalsubscription * discount.OffTotalPrice) / 100;
-                                }
+                                finalpriced += finalprice;
                             }
-                            else
-                            {
-                                ftotalbaseprice = totalbaseprice;
-
-                                finalprice = ftotalbaseprice;
-                            }
-                            finalpriced += finalprice;
                         }
+
+                        agentAccountSummary.totalexpenditure = finalpriced;
+
+                        SalesAgent salesAgent = SalesAgentBusiness.getSalesAgentById(id);
+
+                        AgentCategory agentc = AgentCategoryBusiness.getAgentCategoryById(salesAgent.AgentCategoryId);
+
+                        int commission = agentc.Commission;
+
+                        agentAccountSummary.totalexpenditure = agentAccountSummary.totalexpenditure - (agentAccountSummary.totalexpenditure * commission) / 100;
+
+                        agentAccountSummary.currentbalance = agentAccountSummary.totaldeposit - agentAccountSummary.totalexpenditure;
                     }
-
-                    agentAccountSummary.totalexpenditure = finalpriced;
-
-                    SalesAgent salesAgent = SalesAgentBusiness.getSalesAgentById(id);
-
-                    AgentCategory agentc = AgentCategoryBusiness.getAgentCategoryById(salesAgent.AgentCategoryId);
-
-                    int commission = agentc.Commission;
-
-                    agentAccountSummary.totalexpenditure = agentAccountSummary.totalexpenditure - (agentAccountSummary.totalexpenditure * commission) / 100;
-
+                }
+                else
+                {
                     agentAccountSummary.currentbalance = agentAccountSummary.totaldeposit - agentAccountSummary.totalexpenditure;
                 }
+                //}
+
+                return agentAccountSummary;
             }
             else
             {
-                agentAccountSummary.currentbalance = agentAccountSummary.totaldeposit - agentAccountSummary.totalexpenditure;
+                return agentAccountSummary;
             }
-            //}
-
-            return agentAccountSummary;
         }
     }
 }

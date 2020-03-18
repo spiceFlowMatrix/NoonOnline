@@ -16,7 +16,7 @@
                     {{ 'Download Now' | translate }}
                 </a>
             </li> &nbsp; -->
-            <li class="nav-item">
+            <!-- <li class="nav-item">
                 <a href="javascript:void(0)" class="nav-link mt-1" style="padding: 0.375rem 1rem !important; border-color: #999;" (click)="rltAndLtr()">
                     RTL/LTR
                 </a>
@@ -105,7 +105,7 @@
                         {{ 'Simplified Chinese' | translate }}
                     </a>
                 </div>
-            </li>
+            </li> -->
             <li class="nav-item dropdown"  *ngIf="utilService.getAccountDetails()" ngbDropdown>
                 <a href="javascript:void(0)" class="nav-link" ngbDropdownToggle>
                     <i class="fa fa-user"></i>
@@ -114,7 +114,7 @@
                     <b class="caret"></b>
                 </a>
                 <div class="dropdown-menu-right header-user-menu" ngbDropdownMenu style="left: -12px;">
-                    <a class="dropdown-item" href="javascript:void(0)" (click)="openProfileModal()">
+                    <!-- <a class="dropdown-item" href="javascript:void(0)" (click)="openProfileModal()">
                         <i class="fa fa-fw fa-user"></i> {{ 'Profile' | translate }}
                     </a>
                     <a class="dropdown-item" href="javascript:void(0)" (click)="openChangePassword()">
@@ -122,7 +122,7 @@
                     </a>
                     <a class="dropdown-item" href="javascript:void(0)">
                         <i class="fa fa-fw fa-gear"></i> {{ 'Settings' | translate }}
-                    </a>
+                    </a> -->
                     <a class="dropdown-item" href="javascript:void(0)" (click)="onLoggedout()">
                         <i class="fa fa-fw fa-power-off"></i> {{ 'Log Out' | translate }}
                     </a>

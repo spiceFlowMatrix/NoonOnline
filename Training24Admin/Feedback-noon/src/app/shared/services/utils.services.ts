@@ -115,7 +115,7 @@ export class UtilService {
                     "Unauthorized access",
                     "Please login again."
                 );
-                this.router.navigateByUrl('/login', { replaceUrl: true });
+                this.router.navigateByUrl('/feed', { replaceUrl: true });
                 localStorage.removeItem('access_token');
                 localStorage.removeItem('token');
                 localStorage.removeItem('isLoggedin');

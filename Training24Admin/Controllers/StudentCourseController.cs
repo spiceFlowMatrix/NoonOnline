@@ -395,7 +395,11 @@ namespace Training24Admin.Controllers
                             if (course != null)
                             {
                                 CourseGrade courseGrade = CourseGradeBusiness.GetGradeByCourseId(course.Id);
-                                Grade grade = GradeBusiness.getSchoolByGrade(courseGrade.Gradeid);
+                                Grade grade = new Grade();
+                                if (courseGrade != null)
+                                {
+                                    grade = GradeBusiness.getSchoolByGrade(courseGrade.Gradeid);
+                                }
                                 ResponseStudentCourseModel.id = student.Id;
                                 ResponseStudentCourseModel.studentid = student.UserId;
                                 ResponseStudentCourseModel.courseid = student.CourseId;
@@ -407,8 +411,12 @@ namespace Training24Admin.Controllers
                                 if (!string.IsNullOrEmpty(course.Image))
                                     ResponseStudentCourseModel.image = LessonBusiness.geturl(course.Image, Certificate);
                                 //ResponseStudentCourseModel.gradeid = courseGrade.Id;
-                                ResponseStudentCourseModel.gradeid = courseGrade.Gradeid;
-                                ResponseStudentCourseModel.schoolid = grade.SchoolId;
+
+                                if (courseGrade != null)
+                                    ResponseStudentCourseModel.gradeid = courseGrade.Gradeid;
+                                if (grade != null)
+                                    ResponseStudentCourseModel.schoolid = grade.SchoolId;
+
                                 ResponseStudentCourseModel.StartDate = student.StartDate.ToString();
                                 ResponseStudentCourseModel.EndDate = student.EndDate.ToString();
                                 StudentCourseResponseList.Add(ResponseStudentCourseModel);

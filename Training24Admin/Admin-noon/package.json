@@ -4,11 +4,9 @@
   "license": "Apache",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "ng serve --servePath / --baseHref /adminnoon/",
     "config": "ts-node ./config.ts",
-    "build": "ng build --prod",
-    "build::prod": "npm run config -- --environment=prod && ng build --prod",
-    "build::staging": "npm run config -- --environment=staging && ng build --prod",
+    "build": "ng build --prod --baseHref /adminnoon/",
     "gitbuild": "ng build --prod --base-href /start-angular/SB-Admin-BS4-Angular-6/master/dist/",
     "test": "ng test",
     "test-ci": "TEST_CI=true ng test",

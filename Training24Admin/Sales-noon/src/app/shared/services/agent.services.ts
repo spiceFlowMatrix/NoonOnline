@@ -10,31 +10,37 @@ export class AgentService {
     getSalesAgentById(id?: string) {
         return this.commonApiService.get('v1/SalesAgent' + (id ? '/' + id : ''));
     }
-    
+
     getSalesAgents(filterObj?: any) {
         return this.commonApiService.get('v1/SalesAgent', filterObj);
     }
-    
+
     manageSalesAgent(data: any) {
-        if(data.salesAgentId) {
-            return this.commonApiService.put('v1/SalesAgent/'+data.salesAgentId, data)
+        if (data.salesAgentId) {
+            return this.commonApiService.put('v1/SalesAgent/' + data.salesAgentId, data)
         }
         else {
             return this.commonApiService.post('v1/SalesAgent', data);
         }
     }
-    
+
     getAgentDeposit(filterObj?: any) {
         return this.commonApiService.get('v1/Deposit', filterObj);
     }
-    
+    getSalesAgentDeposit(filterObj?: any) {
+        return this.commonApiService.get('v1/Deposit/GetSalesAgentDeposit', filterObj);
+    }
+    getAgentSummary(id) {
+        return this.commonApiService.get('v1/Deposit/GetAgentSummaryDetails' + (id ? '/' + id : ''));
+    }
+
     getAgentDepositById(id?: string) {
         return this.commonApiService.get('v1/Deposit' + (id ? '/' + id : ''));
     }
     manageSalesAgentDeposit(data: any) {
         let formData = new FormData();
         Object.keys(data).forEach(key => {
-            if (key == 'documentid' && data[key]) {                
+            if (key == 'documentid' && data[key]) {
                 for (let index = 0; index < data[key].length; index++) {
                     if (!data[key][index].documenturl)
                         formData.append('documentid', data[key][index]);

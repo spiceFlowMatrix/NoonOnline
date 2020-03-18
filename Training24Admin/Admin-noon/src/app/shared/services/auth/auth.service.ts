@@ -126,7 +126,7 @@ export class AuthService {
           }
         } else if (err) {
           reject(err);
-          this.router.navigate(['/login']);
+          this.router.navigate(['/admin']);
           console.log(err);
           alert(`Error: Something went wrong.`);
         }

@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/toolbarLay"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <android.support.design.widget.AppBarLayout
+                    android:id="@+id/appbarChapter"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:theme="@style/AppTheme.AppBarOverlay">
+
+                    <android.support.v7.widget.Toolbar
+                        android:id="@+id/toolBar"
+                        android:layout_width="match_parent"
+                        android:layout_height="?attr/actionBarSize"
+                        android:background="@color/colorlightGray"
+                        android:theme="@style/AppTheme.Toolbar"
+                        app:popupTheme="@style/AppTheme.PopupOverlay">
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <RelativeLayout
+                                android:id="@+id/searchLay"
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent">
+
+                                <ImageView
+                                    android:id="@+id/btnbackDiscussion"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_centerVertical="true"
+                                    app:srcCompat="@drawable/ic_arrow_back" />
+
+                                <FrameLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:layout_alignParentStart="true"
+                                    android:layout_marginStart="30dp"
+                                    android:layout_marginEnd="0dp"
+                                    android:layout_toStartOf="@+id/menuLayout">
+
+                                    <SearchView
+                                        android:id="@+id/disccusionsearchview"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_centerVertical="true"
+                                        android:layout_toStartOf="@+id/advanceSearchMenu"
+                                        android:queryBackground="@color/colorlightGray"
+                                        android:theme="@style/SearchViewTheme"
+                                        android:visibility="gone"></SearchView>
+
+                                    <TextView
+                                        android:id="@+id/discussionText"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="match_parent"
+                                        android:layout_marginStart="@dimen/_25sdp"
+                                        android:gravity="center_vertical"
+                                        android:text="@string/item_4"
+                                        android:textColor="@color/colorBlack"
+                                        android:textSize="@dimen/_18sdp"
+                                        android:textStyle="bold" />
+                                </FrameLayout>
+
+                                <LinearLayout
+                                    android:id="@+id/menuLayout"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="match_parent"
+                                    android:layout_alignParentEnd="true"
+                                    android:layout_marginEnd="@dimen/_10sdp"
+                                    android:gravity="center_vertical">
+
+                                    <ImageView
+                                        android:id="@+id/serachDisccusionIcon"
+                                        android:layout_width="@dimen/_20sdp"
+                                        android:layout_height="@dimen/_20sdp"
+                                        app:srcCompat="@drawable/ic_search" />
+                                    <!-- <ImageView
+                                         android:id="@+id/addButton"
+                                         android:layout_width="@dimen/_15sdp"
+                                         android:layout_height="@dimen/_15sdp"
+                                         android:layout_margin="@dimen/_10sdp"
+                                         android:visibility="gone"
+                                         app:srcCompat="@drawable/ic_menu" />-->
+                                </LinearLayout>
+                            </RelativeLayout>
+                        </RelativeLayout>
+                        <!-- <RelativeLayout
+                             android:layout_width="match_parent"
+                             android:layout_height="wrap_content"
+                             android:background="@color/colorWhite">
+                             <TextView
+                                 android:layout_width="match_parent"
+                                 android:layout_height="wrap_content"
+                                 android:layout_marginStart="@dimen/_60sdp"
+                                 android:text="Private Mode"
+                                 android:textColor="@color/colorBlack"
+                                 android:textSize="@dimen/_15sdp" />
+                             <CheckBox
+                                 android:layout_width="wrap_content"
+                                 android:layout_height="wrap_content"
+                                 android:layout_alignParentEnd="true"
+                                 android:layout_marginEnd="@dimen/_10sdp"
+                                 android:checked="true" />
+                         </RelativeLayout>-->
+                    </android.support.v7.widget.Toolbar>
+
+                    <RelativeLayout
+                        android:id="@+id/privateModeLay"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/colorlightGray"
+                        android:paddingTop="@dimen/_5sdp"
+                        android:paddingBottom="@dimen/_10sdp"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:id="@+id/txt_private"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_marginEnd="@dimen/_10sdp"
+                            android:layout_toStartOf="@+id/chkprivate"
+                            android:text="@string/private_mode"
+                            android:textColor="@color/colorBlack"
+                            android:textSize="@dimen/_12sdp" />
+
+                        <CheckBox
+                            android:id="@+id/chkprivate"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:layout_marginEnd="@dimen/_10sdp"
+                            android:checked="false"
+                            android:theme="@style/checkBoxComponent" />
+                    </RelativeLayout>
+                </android.support.design.widget.AppBarLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/colorGray"
+                    android:elevation="@dimen/_5sdp" />
+            </LinearLayout>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <RelativeLayout
+                    android:id="@+id/layDiscussionList"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <include
+                        android:id="@+id/rcVerticalLayout"
+                        layout="@layout/recycleview_verticle_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_above="@+id/progressDialogLay"
+                        android:padding="@dimen/_15sdp" />
+
+                    <include
+                        android:id="@+id/progressDialogLay"
+                        layout="@layout/item_progressbar"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentBottom="true"></include>
+                </RelativeLayout>
+
+                <TextView
+                    android:id="@+id/noAccessDiscussion"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="@string/no_access_discussion"
+                    android:textSize="@dimen/_13sdp"
+                    android:visibility="gone" />
+            </FrameLayout>
+        </LinearLayout>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/addButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_margin="@dimen/_10sdp"
+            android:scaleType="center"
+            app:backgroundTint="@color/colorPrimary"
+            app:elevation="@dimen/_7sdp"
+            app:fabCustomSize="@dimen/_50sdp"
+            app:srcCompat="@drawable/ic_add" />
+    </RelativeLayout>
+</layout>

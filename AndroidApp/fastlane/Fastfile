@@ -1,0 +1,17 @@
+lane :beta do
+  gradle(task: 'assemble', build_type: 'Debug')
+  crashlytics(
+      api_token: '6f464d8e08fe20e531aed1c267141f189c1abbfd',
+      build_secret: 'c2dca5d29c7b6724d1a1d8659b2798a2e4c947f6b81acfa67856074a4a8d6e31',
+      emails: 'paras.chodavadiya@gmail.com,
+               Salamfaeq7@gmail.com,
+               fvasoya1992@gmail.com,
+               jatin.dudhat75@gmail.com,
+               mhamid.xi@gmail.com,
+               rahimy.hamza@gmail.com,
+               salam.faeq@edgsolutions.com,
+               androidtester1@edgsolutions.com'
+    )
+
+    # slack(message: 'Successfully distributed a new beta build')
+end

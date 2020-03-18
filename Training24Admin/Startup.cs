@@ -13,9 +13,11 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Versioning;
+using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Swashbuckle.AspNetCore.Swagger;
@@ -518,17 +520,17 @@ namespace Training24Admin
 
 
             //// this is used for live 
-            //string domainname = Environment.GetEnvironmentVariable("DOMAINNAME_ENVIRONMENT");
-            string domainname = "edgsolutions.eu.auth0.com";
+            string domainname = Environment.GetEnvironmentVariable("DOMAINNAME_ENVIRONMENT");
+            //string domainname = "edgsolutions.eu.auth0.com";
 
             //// this is used for live 
-            //string domain = $"https://" + domainname + "/";
-            //string audience = $"https://" + domainname + "/api/v2/";
+            string domain = $"https://" + domainname + "/";
+            string audience = $"https://" + domainname + "/api/v2/";
 
 
             //// this is used for local 
-            string domain = $"https://{Configuration["Auth0:Domain"]}/";
-            string audience = $"https://{Configuration["Auth0:Domain"]}/api/v2/";
+            //string domain = $"https://{Configuration["Auth0:Domain"]}/";
+            //string audience = $"https://{Configuration["Auth0:Domain"]}/api/v2/";
             //// ===== Add Jwt Authentication ========
             services.AddAuthentication(options =>
             {
@@ -592,8 +594,8 @@ namespace Training24Admin
                 app.UseHsts();
             }
 
+            app.UseStaticFiles();
             app.UseAuthentication();
-
             //app.UseHttpsRedirection();
             app.UseSwagger();
 
@@ -604,6 +606,101 @@ namespace Training24Admin
             });
             app.UseCors("AllowAnyOrigin");
             app.UseMvc();
+
+            #region Front end config
+
+            //Sales
+            app.Map("/salesnoon", client =>
+            {
+                string defaultSalesPath = env.IsDevelopment() ? "Sales-noon" : @"Sales-noon/dist";
+                StaticFileOptions defaultSalesDist = new StaticFileOptions()
+                {
+                    FileProvider = new PhysicalFileProvider(
+                            Path.Combine(Directory.GetCurrentDirectory(), defaultSalesPath)
+                        )
+                };
+                client.UseSpaStaticFiles(defaultSalesDist);
+
+                client.UseSpa(spa =>
+                {
+                    spa.Options.StartupTimeout = new TimeSpan(0, 5, 0);
+                    spa.Options.SourcePath = "Sales-noon";
+
+                    if (env.IsDevelopment())
+                    {
+                        // it will use package.json & will search for start command to run
+                        spa.Options.DefaultPageStaticFileOptions = defaultSalesDist;
+                    }
+                    else
+                    {
+                        //spa.UseAngularCliServer(npmScript: "start");
+                        spa.Options.DefaultPageStaticFileOptions = defaultSalesDist;
+                    }
+                });
+            });
+
+            //Admin
+            app.Map(new PathString("/adminnoon"), client =>
+             {
+                 string defaultAdminPath = env.IsDevelopment() ? "Admin-noon" : @"Admin-noon/dist";
+
+                 // Each map gets its own physical path for it to map the static files to. 
+                 StaticFileOptions defaultAdminDist = new StaticFileOptions()
+                 {
+                     FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), defaultAdminPath))
+                 };
+
+                 // Each map its own static files otherwise it will only ever serve index.html no matter the filename 
+                 client.UseSpaStaticFiles(defaultAdminDist);
+                 client.UseSpa(spa =>
+                 {
+                     spa.Options.StartupTimeout = new TimeSpan(0, 5, 0);
+                     spa.Options.SourcePath = "Admin";
+                     if (env.IsDevelopment())
+                     {
+                         // it will use package.json & will search for start command to run
+                         spa.Options.DefaultPageStaticFileOptions = defaultAdminDist;
+                         //spa.UseAngularCliServer(npmScript: "start");
+                     }
+                     else
+                     {
+                         //spa.UseAngularCliServer(npmScript: "start");
+                         spa.Options.DefaultPageStaticFileOptions = defaultAdminDist;
+                     }
+                 });
+             });           
+
+            ////Feedback
+            app.Map(new PathString("/feedbacknoon"), feedback =>
+                {
+                    string defaultFeedbackPath = env.IsDevelopment() ? "Feedback-noon" : @"Feedback-noon/dist";
+
+                    StaticFileOptions defaultFeedbackDist = new StaticFileOptions()
+                    {
+                        FileProvider = new PhysicalFileProvider(
+                            Path.Combine(Directory.GetCurrentDirectory(), defaultFeedbackPath)
+                        )
+                    };
+                    feedback.UseSpaStaticFiles(defaultFeedbackDist);
+
+                    feedback.UseSpa(spa =>
+                    {
+                        spa.Options.StartupTimeout = new TimeSpan(0, 5, 0);
+                        spa.Options.SourcePath = "Feedback-noon";
+
+                        if (env.IsDevelopment())
+                        {
+                            // it will use package.json & will search for start command to run
+                            spa.Options.DefaultPageStaticFileOptions = defaultFeedbackDist;
+                        }
+                        else
+                        {
+                            //spa.UseAngularCliServer(npmScript: "start");
+                            spa.Options.DefaultPageStaticFileOptions = defaultFeedbackDist;
+                        }
+                    });
+                });
+            #endregion
         }
 
         //2011

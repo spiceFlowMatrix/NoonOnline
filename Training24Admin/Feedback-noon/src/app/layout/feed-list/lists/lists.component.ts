@@ -75,6 +75,8 @@ export class ListsComponent implements OnInit {
   }
 
   applyFilter(type) {
+    console.log(this.start_date);
+    
     if (this.start_date == null)
       this.filterModel.startdate = "";
     if (this.sub_date == null) {
@@ -100,86 +102,80 @@ export class ListsComponent implements OnInit {
 
   }
 
-  isAllSelected(type) {
-    switch (type) {
-      case 'queue':
-        let numSelected = this.queueSelection.selected.length;
-        if (this.queueData) {
-          const numRows = this.queueData.length;
-          return numSelected === numRows;
-        }
-        break;
-    case 'progress':
-        const numpSelected = this.progressSelection.selected.length;
-        const numpRows = this.progressData.length;
-        return numpSelected === numpRows;
-    
-    case 'complete':
-        const numcSelected = this.completeSelection.selected.length;
-        const numcRows = this.completeData.length;
-        return numcSelected === numcRows;
-   
-    case 'archive':
-        const numaSelected = this.archiveSelection.selected.length;
-        const numaRows = this.archiveData.length;
-        return numaSelected === numaRows;
+  isAllQueueSelected() {
+    const numSelected = this.queueSelection.selected.length;
+    if (this.queueData) {
+      const numRows = this.queueData.length;
+      return numSelected === numRows;
     }
   }
 
-
-  masterToggle(type) {
-    switch (type) {
-      case 'queue':
-        this.isAllSelected('queue') ?
-        this.queueSelection.clear() :
-        this.queueData.forEach(row => this.queueSelection.select(row));
-        break;
-    case 'progress':
-        this.isAllSelected('progress') ?
-        this.progressSelection.clear() :
-        this.progressData.forEach(row => this.progressSelection.select(row));
-        break;
-    case 'complete':
-        this.isAllSelected('complete') ?
-        this.completeSelection.clear() :
-        this.completeData.forEach(row => this.completeSelection.select(row));
-        break;
-    case 'archive':
-        this.isAllSelected('archive') ?
-        this.archiveSelection.clear() :
-        this.archiveData.forEach(row => this.archiveSelection.select(row));
-        break;
-    }
-  
+  masterQueueToggle() {
+    this.isAllQueueSelected() ?
+      this.queueSelection.clear() :
+      this.queueData.forEach(row => this.queueSelection.select(row));
   }
 
   checkboxQueueLabel(row?: any): string {
     if (!row) {
-      return `${this.isAllSelected('queue') ? 'select' : 'deselect'} all`;
+      return `${this.isAllQueueSelected() ? 'select' : 'deselect'} all`;
     }
     return `${this.queueSelection.isSelected(row) ? 'deselect' : 'select'} row ${row.category + 1}`;
   }
 
+  isAllProgressSelected() {
+    const numSelected = this.progressSelection.selected.length;
+    const numRows = this.progressData.length;
+    return numSelected === numRows;
+  }
+
+  masterProgressToggle() {
+    this.isAllProgressSelected() ?
+      this.progressSelection.clear() :
+      this.progressData.forEach(row => this.progressSelection.select(row));
+  }
+
   checkboxProgressLabel(row?: any): string {
     if (!row) {
-      return `${this.isAllSelected('progress') ? 'select' : 'deselect'} all`;
+      return `${this.isAllProgressSelected() ? 'select' : 'deselect'} all`;
     }
     return `${this.progressSelection.isSelected(row) ? 'deselect' : 'select'} row ${row.category + 1}`;
   }
 
+  isAllCompleteSelected() {
+    const numSelected = this.completeSelection.selected.length;
+    const numRows = this.completeData.length;
+    return numSelected === numRows;
+  }
 
+  masterCompleteToggle() {
+    this.isAllCompleteSelected() ?
+      this.completeSelection.clear() :
+      this.completeData.forEach(row => this.completeSelection.select(row));
+  }
 
   checkboxCompleteLabel(row?: any): string {
     if (!row) {
-      return `${this.isAllSelected('complete') ? 'select' : 'deselect'} all`;
+      return `${this.isAllCompleteSelected() ? 'select' : 'deselect'} all`;
     }
     return `${this.completeSelection.isSelected(row) ? 'deselect' : 'select'} row ${row.category + 1}`;
   }
 
+  isAllArchiveSelected() {
+    const numSelected = this.archiveSelection.selected.length;
+    const numRows = this.archiveData.length;
+    return numSelected === numRows;
+  }
+
+  masterArchiveToggle() {
+    this.isAllCompleteSelected() ?
+      this.archiveSelection.clear() :
+      this.archiveData.forEach(row => this.archiveSelection.select(row));
+  }
 
   checkboxArchiveLabel(row?: any): string {
     if (!row) {
-      return `${this.isAllSelected('archive') ? 'select' : 'deselect'} all`;
+      return `${this.isAllArchiveSelected() ? 'select' : 'deselect'} all`;
     }
     return `${this.archiveSelection.isSelected(row) ? 'deselect' : 'select'} row ${row.category + 1}`;
   }

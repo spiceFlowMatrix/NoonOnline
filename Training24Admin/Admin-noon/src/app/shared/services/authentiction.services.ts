@@ -32,7 +32,7 @@ export class AuthenticationService {
     }
 
     public refreshStorage() {
-        this.router.navigateByUrl('/login', { replaceUrl: true });
+        this.router.navigateByUrl('/admin', { replaceUrl: true });
         localStorage.removeItem('access_token');
         localStorage.removeItem('token');
         localStorage.removeItem('isLoggedin');
