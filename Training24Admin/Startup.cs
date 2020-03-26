@@ -610,7 +610,7 @@ namespace Training24Admin
             #region Front end config
 
             //Sales
-            app.Map("/salesnoon", client =>
+            app.Map("/web/sales", client =>
             {
                 string defaultSalesPath = env.IsDevelopment() ? "Sales-noon" : @"Sales-noon/dist";
                 StaticFileOptions defaultSalesDist = new StaticFileOptions()
@@ -640,7 +640,7 @@ namespace Training24Admin
             });
 
             //Admin
-            app.Map(new PathString("/adminnoon"), client =>
+            app.Map(new PathString("/web/admin"), client =>
              {
                  string defaultAdminPath = env.IsDevelopment() ? "Admin-noon" : @"Admin-noon/dist";
 
@@ -671,7 +671,7 @@ namespace Training24Admin
              });           
 
             ////Feedback
-            app.Map(new PathString("/feedbacknoon"), feedback =>
+            app.Map(new PathString("/web/feedback"), feedback =>
                 {
                     string defaultFeedbackPath = env.IsDevelopment() ? "Feedback-noon" : @"Feedback-noon/dist";
 
