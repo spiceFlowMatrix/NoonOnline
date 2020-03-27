@@ -610,7 +610,7 @@ namespace Training24Admin
             #region Front end config
 
             //Sales
-            app.Map("/salesnoon", client =>
+            app.Map(new PathString("/web/sales"), client =>
             {
                 string defaultSalesPath = env.IsDevelopment() ? "Sales-noon" : @"Sales-noon/dist";
                 StaticFileOptions defaultSalesDist = new StaticFileOptions()
@@ -629,7 +629,8 @@ namespace Training24Admin
                     if (env.IsDevelopment())
                     {
                         // it will use package.json & will search for start command to run
-                        spa.Options.DefaultPageStaticFileOptions = defaultSalesDist;
+                        // spa.Options.DefaultPageStaticFileOptions = defaultSalesDist;
+                        spa.UseAngularCliServer(npmScript: "start");
                     }
                     else
                     {
@@ -640,7 +641,7 @@ namespace Training24Admin
             });
 
             //Admin
-            app.Map(new PathString("/adminnoon"), client =>
+            app.Map(new PathString("/web/manage"), client =>
              {
                  string defaultAdminPath = env.IsDevelopment() ? "Admin-noon" : @"Admin-noon/dist";
 
@@ -655,12 +656,12 @@ namespace Training24Admin
                  client.UseSpa(spa =>
                  {
                      spa.Options.StartupTimeout = new TimeSpan(0, 5, 0);
-                     spa.Options.SourcePath = "Admin";
+                     spa.Options.SourcePath = "Admin-noon";
                      if (env.IsDevelopment())
                      {
                          // it will use package.json & will search for start command to run
-                         spa.Options.DefaultPageStaticFileOptions = defaultAdminDist;
-                         //spa.UseAngularCliServer(npmScript: "start");
+                         // spa.Options.DefaultPageStaticFileOptions = defaultAdminDist;
+                         spa.UseAngularCliServer(npmScript: "start");
                      }
                      else
                      {
@@ -671,7 +672,7 @@ namespace Training24Admin
              });           
 
             ////Feedback
-            app.Map(new PathString("/feedbacknoon"), feedback =>
+            app.Map(new PathString("/web/feedback"), feedback =>
                 {
                     string defaultFeedbackPath = env.IsDevelopment() ? "Feedback-noon" : @"Feedback-noon/dist";
 
@@ -691,7 +692,8 @@ namespace Training24Admin
                         if (env.IsDevelopment())
                         {
                             // it will use package.json & will search for start command to run
-                            spa.Options.DefaultPageStaticFileOptions = defaultFeedbackDist;
+                            // spa.Options.DefaultPageStaticFileOptions = defaultFeedbackDist;
+                            spa.UseAngularCliServer(npmScript: "start");
                         }
                         else
                         {

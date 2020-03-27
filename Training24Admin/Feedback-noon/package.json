@@ -4,9 +4,9 @@
   "license": "Apache",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve --servePath / --baseHref /feedbacknoon/",
+    "start": "ng serve --servePath / --baseHref /web/feedback/",
     "config": "ts-node ./config.ts",
-    "build": "ng build --prod --baseHref /feedbacknoon/",
+    "build": "ng build --prod --baseHref /web/feedback/",
     "gitbuild": "ng build --prod --base-href /start-angular/SB-Admin-BS4-Angular-6/master/dist/",
     "test": "ng test",
     "test-ci": "TEST_CI=true ng test",
