@@ -108,6 +108,4 @@ https://docs.google.com/spreadsheets/d/1AjhI6ftsCt1G5oAxEgmtUolrOkbvWlGSu-28Jemg
 
 https://docs.google.com/document/d/1ZaqIHpCQ4N0X8MfXYiqRJTo48UzLRFQ6UuOqTOJ5mC8/edit?usp=sharing
 
-https://docs.google.com/document/d/1_V8Vcli8H3-8pgBa2IzpyiA1otovmaEi_bh_M4v8HJY/edit?usp=sharing
-
 
