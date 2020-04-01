@@ -1,6 +1,6 @@
 package com.ibl.apps.Model;
 
-import android.arch.persistence.room.ColumnInfo;
+import androidx.room.ColumnInfo;
 
 import java.util.Arrays;
 

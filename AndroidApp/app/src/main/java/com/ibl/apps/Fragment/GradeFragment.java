@@ -7,7 +7,6 @@ import android.content.DialogInterface;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.databinding.DataBindingUtil;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -18,9 +17,6 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
 import android.os.Process;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AlertDialog;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -28,6 +24,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.ActivityCompat;
+import androidx.databinding.DataBindingUtil;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
@@ -48,12 +49,12 @@ import com.ibl.apps.RoomDatabase.database.AppDatabase;
 import com.ibl.apps.RoomDatabase.entity.SyncTimeTrackingObject;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
 import com.ibl.apps.Service.CourseImageManager;
-import com.ibl.apps.Utils.Const;
-import com.ibl.apps.Utils.PrefUtils;
-import com.ibl.apps.Utils.SingleShotLocationProvider;
 import com.ibl.apps.noon.NoonApplication;
 import com.ibl.apps.noon.R;
 import com.ibl.apps.noon.databinding.GradeLayoutBinding;
+import com.ibl.apps.util.Const;
+import com.ibl.apps.util.PrefUtils;
+import com.ibl.apps.util.SingleShotLocationProvider;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -661,17 +662,19 @@ public class GradeFragment extends BaseFragment implements View.OnClickListener,
                 protected String doInBackground(Void... voids) {
                     for (int i = 0; i < Courselist.size(); i++) {
                         CourselistData = Courselist.get(i).getData();
-                        for (int j = 0; j < CourselistData.size(); j++) {
-                            for (int k = 0; k < CourselistData.get(j).getCourses().size(); k++) {
-                                int totalTrueLesson = AppDatabase.getAppDatabase(NoonApplication.getContext()).lessonProgressDao().getItemgradeIdProgress(CourselistData.get(j).getCourses().get(k).getId(), "100", userId);
-                                String totalLEssonITEm = AppDatabase.getAppDatabase(NoonApplication.getContext()).lessonProgressDao().getStringProgress(CourselistData.get(j).getCourses().get(k).getId(), userId);
+                        if (CourselistData != null && CourselistData.size() != 0) {
+                            for (int j = 0; j < CourselistData.size(); j++) {
+                                for (int k = 0; k < CourselistData.get(j).getCourses().size(); k++) {
+                                    int totalTrueLesson = AppDatabase.getAppDatabase(NoonApplication.getContext()).lessonProgressDao().getItemgradeIdProgress(CourselistData.get(j).getCourses().get(k).getId(), "100", userId);
+                                    String totalLEssonITEm = AppDatabase.getAppDatabase(NoonApplication.getContext()).lessonProgressDao().getStringProgress(CourselistData.get(j).getCourses().get(k).getId(), userId);
 
-                                if (totalLEssonITEm != null) {
-                                    int totalCount = Integer.parseInt(totalLEssonITEm);
-                                    if (totalCount != 0 && totalTrueLesson != 0) {
-                                        int countper = (int) ((totalTrueLesson + 1) * 100 / totalCount);
-                                        if (countper != 0) {
-                                            CourselistData.get(j).getCourses().get(k).setProgressVal(countper);
+                                    if (totalLEssonITEm != null) {
+                                        int totalCount = Integer.parseInt(totalLEssonITEm);
+                                        if (totalCount != 0 && totalTrueLesson != 0) {
+                                            int countper = (int) ((totalTrueLesson + 1) * 100 / totalCount);
+                                            if (countper != 0) {
+                                                CourselistData.get(j).getCourses().get(k).setProgressVal(countper);
+                                            }
                                         }
                                     }
                                 }

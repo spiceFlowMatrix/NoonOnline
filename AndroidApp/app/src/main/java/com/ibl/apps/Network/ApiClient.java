@@ -7,8 +7,8 @@ import android.util.Log;
 
 import com.ibl.apps.Model.AuthTokenObject;
 import com.ibl.apps.RoomDatabase.database.AppDatabase;
-import com.ibl.apps.Utils.Const;
-import com.ibl.apps.Utils.PrefUtils;
+import com.ibl.apps.util.Const;
+import com.ibl.apps.util.PrefUtils;
 import com.ibl.apps.noon.R;
 
 import java.io.IOException;

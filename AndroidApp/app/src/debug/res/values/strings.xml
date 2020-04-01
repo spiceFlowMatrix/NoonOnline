@@ -5,4 +5,5 @@
     <string name="com_auth0_audience" translatable="false"> https://satyamdev.auth0.com/api/v2/</string>
     <string name="com_auth0_database_connection" translatable="false">Username-Password-Authentication</string>
     <string name="com_auth0_scope" translatable="false">openid offline_access</string>
+    <string name="BASE_URL" translatable="false">http://192.168.22.11:8070/api/v1/</string>
 </resources>

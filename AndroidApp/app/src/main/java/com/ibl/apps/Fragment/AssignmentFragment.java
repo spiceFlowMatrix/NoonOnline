@@ -1,10 +1,10 @@
 package com.ibl.apps.Fragment;
 
-import android.databinding.DataBindingUtil;
+import androidx.databinding.DataBindingUtil;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,8 +15,8 @@ import com.ibl.apps.Adapter.AssignmentListAdapter;
 import com.ibl.apps.Base.BaseFragment;
 import com.ibl.apps.Model.AssignmentObject;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
-import com.ibl.apps.Utils.Const;
-import com.ibl.apps.Utils.PrefUtils;
+import com.ibl.apps.util.Const;
+import com.ibl.apps.util.PrefUtils;
 import com.ibl.apps.noon.AssignmentAddActivity;
 import com.ibl.apps.noon.R;
 import com.ibl.apps.noon.databinding.FragmentAssignmentLayoutBinding;

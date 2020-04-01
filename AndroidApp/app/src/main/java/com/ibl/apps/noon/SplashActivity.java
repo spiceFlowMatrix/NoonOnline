@@ -8,7 +8,7 @@ import android.text.TextUtils;
 import com.ibl.apps.Base.BaseActivity;
 import com.ibl.apps.Model.AuthTokenObject;
 import com.ibl.apps.RoomDatabase.database.AppDatabase;
-import com.ibl.apps.Utils.PrefUtils;
+import com.ibl.apps.util.PrefUtils;
 import com.ibl.apps.noon.databinding.SplashLayoutBinding;
 
 import io.reactivex.disposables.CompositeDisposable;

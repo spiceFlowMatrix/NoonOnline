@@ -1,9 +1,9 @@
 package com.ibl.apps.Fragment;
 
 
-import android.databinding.DataBindingUtil;
+import androidx.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,9 +24,9 @@ import com.ibl.apps.Network.ApiClient;
 import com.ibl.apps.Network.ApiService;
 import com.ibl.apps.RoomDatabase.database.AppDatabase;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
-import com.ibl.apps.Utils.CustomView.MultiSelectSpinner;
-import com.ibl.apps.Utils.PrefUtils;
-import com.ibl.apps.Utils.TimeAgoLastOnlineClass;
+import com.ibl.apps.util.CustomView.MultiSelectSpinner;
+import com.ibl.apps.util.PrefUtils;
+import com.ibl.apps.util.TimeAgoLastOnlineClass;
 import com.ibl.apps.noon.NoonApplication;
 import com.ibl.apps.noon.R;
 import com.ibl.apps.noon.databinding.FragmentOverAllProgressBinding;

@@ -15,8 +15,8 @@ import com.ibl.apps.Model.CheckForgetKey;
 import com.ibl.apps.Model.LoginObject;
 import com.ibl.apps.Model.UploadImageObject;
 import com.ibl.apps.RoomDatabase.database.AppDatabase;
-import com.ibl.apps.Utils.Const;
-import com.ibl.apps.Utils.Validator;
+import com.ibl.apps.util.Const;
+import com.ibl.apps.util.Validator;
 import com.ibl.apps.noon.databinding.ForgotPasswordLayoutBinding;
 
 import org.json.JSONException;

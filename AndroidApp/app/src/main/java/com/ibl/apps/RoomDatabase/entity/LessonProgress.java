@@ -1,7 +1,7 @@
 package com.ibl.apps.RoomDatabase.entity;
 
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.PrimaryKey;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
 
 /**
  * Created by lukegjpotter on 25/11/2017.

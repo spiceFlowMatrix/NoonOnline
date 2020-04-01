@@ -1,11 +1,11 @@
 package com.ibl.apps.noon;
 
 import android.content.Intent;
-import android.databinding.DataBindingUtil;
+import androidx.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.design.widget.BottomSheetBehavior;
-import android.support.design.widget.BottomSheetDialog;
-import android.support.v4.app.Fragment;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 
@@ -14,7 +14,7 @@ import com.ibl.apps.Base.BaseActivity;
 import com.ibl.apps.Fragment.CompletedFragment;
 import com.ibl.apps.Fragment.ProgressFragment;
 import com.ibl.apps.Fragment.QueueFragment;
-import com.ibl.apps.Utils.Const;
+import com.ibl.apps.util.Const;
 import com.ibl.apps.noon.databinding.ActivityFeedBackBinding;
 import com.ibl.apps.noon.databinding.BottomSheetBinding;
 
