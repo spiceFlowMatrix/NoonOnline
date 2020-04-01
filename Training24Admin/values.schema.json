@@ -61,6 +61,10 @@
         "auth0ManagementAudiencePashto": {
             "description": "auth0ManagementAudiencePashto is the auth0 management API's Audience value that will be used to instantiate the AUDIENCE_ENVIRONMENT system environment variable for the pashto version of the service",
             "type": "string"
+        },
+        "smtpServerEmailAddress": {
+            "description": "smtpServerEmailAddress is the email address from which the smtp server will send out emails",
+            "type": "string"
         }
     },
     "required": [
