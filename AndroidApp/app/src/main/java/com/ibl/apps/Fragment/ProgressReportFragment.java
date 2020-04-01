@@ -328,6 +328,7 @@ public class ProgressReportFragment extends BaseFragment implements View.OnClick
         } catch (JsonSyntaxException e) {
             e.printStackTrace();
         }
+
         disposable.add(apiService.getUsersLocation(jsonObject)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

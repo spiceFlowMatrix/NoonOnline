@@ -3,6 +3,8 @@ package com.ibl.apps.Utils;
 import android.os.Build;
 import android.os.Environment;
 
+import com.ibl.apps.noon.BuildConfig;
+
 import java.io.File;
 
 /**
@@ -16,7 +18,7 @@ public class Const {
 //    public final static String BASE_URL = "https://coreapistaging.noon-online.com/api/v1/";;
 
     // For Dari Production [Pointing to PLAY STORE] API URL
-    public final static String BASE_URL = "https://coreapidari.noon-online.com/api/v1/";
+    public final static String BASE_URL = BuildConfig.BASE_URL;
 
     // For Production Point Dari Feedback app
 //    public final static String FEEDBACK_URL = "https://feedbackdari.noon-online.com/feedback?hl=fa";
