@@ -39,7 +39,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         debug {
-//            buildConfigField 'String', 'BASE_URL', '"http://192.168.22.11:8070/api/v1/"'
             testCoverageEnabled true
             debuggable true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
