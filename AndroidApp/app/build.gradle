@@ -36,6 +36,16 @@ android {
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+        debug {
+            testCoverageEnabled true
+            debuggable true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        staging {
+            initWith debug
+//            buildConfigField 'String', 'BASE_URL', '"https://coreapistaging.noon-online.com/api/v1/"'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
     }
     repositories {
         maven { url 'https://jitpack.io' }
