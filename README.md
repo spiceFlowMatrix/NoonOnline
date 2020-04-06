@@ -104,33 +104,23 @@ To publish code in release mode using below command:
 dotnet publish -c Release
 ```
 
-# To run hosted applications (web apps) via docker image
+## To run hosted applications (web apps) via docker image
 
 [Here](https://www.whitehorses.nl/blog/running-angular-application-docker-dummies) you got the best explanation for running angular web app via docker image for angular apps.
 
 [Here](https://docs.microsoft.com/en-us/dotnet/core/docker/build-container)
 you got the explanation and tutorial to run .net core app via docker image.
 
-# The full list of prerequisite infrastructure for the application and critical configuration guidelines for them.
+## The full list of prerequisite infrastructure for the application and critical configuration guidelines for them.
 
-## For angular web apps
+### For angular web apps
 There’s no prerequisite infrastructure for the  application 
 
-The issue we might face in the future is sometimes if there’s a change in package.json we might have to add the new command in ci/cd for installing a new package due to that we have changed in package.json file.
+### For .Net Core app
 
-Because sometimes npm install failed to install the newly added package.
+There’s no prerequisite infrastructure for the  application
 
-And in the critical configuration, we have the auth0 variable which we are transforming from a local environment to a system environment.
-
-## For .Net Core app
-
-You need to take care that Nuget packages installed need to keep the same version for all class libraries.
-
-You need to make sure all class libraries need to build successfully.
-
-Need to provide Require environment variables to work without any errors.
-
-# The full list of system environment variables required to run the application in its target environment
+## The full list of system environment variables required to run the application in its target environment
 
 Enviroment Variable name| Porpose | Example Values
  --- | --- | ---
@@ -150,21 +140,43 @@ Enviroment Variable name| Porpose | Example Values
 `AUTH_DOMAIN` | this one is for angular app, optional because it's already set in above named with `DOMAINNAME_ENVIRONMENT` | ex `yourdomain.auth0.com`
 `AUDIENCE` | this one is for angular app, optional because it's already set in above named with `AUDIENCE_ENVIRONMENT` | ex `https://yourdomain.auth0.com/api/v2/`
 
-# The full list of system environment variables required to successfully perform the CI/CD process for the application.
+## The full list of system environment variables required to successfully perform the CI/CD process for the application.
 
-Please refer above table for all environment variables.
+Enviroment Variable name| Porpose | Example Values
+ --- | --- | ---
+`ASPNETCORE_ENVIRONMENT` | this one is for hosting environment like development or production | ex `Staging` or `Production`
+`ASPNET_DB_CONNECTIONSTRING` | database connection string | ex `server=ServerDetails;user id=UserName;database=NameOfDB;SslMode=none;Convert Zero Datetime=true;Allow User Variables=true;CharSet=utf8;`
+`MANAGEMENTURL_ENVIRONMENT`| this one is for Auth0 management environment | ex `https://yourdomain.auth0.com/oauth/token`
+`CLIENT_ID_ENVIRONMENT`| this one is for Auth0 client id | ex`Provide your auth0 client id`
+`CLIENT_SECRET_ENVIRONMENT` | this one is for client secret | ex `Provide your auth0 client secret key`
+`AUDIENCE_ENVIRONMENT`| this one for Auth0 audience environment | ex `https://yourdomain.auth0.com/api/v2/`
+`DOMAINNAME_ENVIRONMENT`| this one is for domain name with Auth0 | ex `yourdomain.auth0.com`
+`PRIMARY_DOMAIN`| domain provider of email server | ex `smtp.gmail.com`
+`PRIMARY_PORT`| email provider port | ex `587`
+`USERNAME_EMAIL` | your support email account | ex `yourmail@mail.com`
+`USERNAME_PASSWORD` | support email account password | ex `test@test`
+`LANGUAGE` | use fa for dari and pa for pashto if null then it consider as English | ex `fa`
+`CLIENT_ID` | this one is for angular app, optional because it's already set in above named with `CLIENT_ID_ENVIRONMENT` | ex`Provide your auth0 client id`
+`AUTH_DOMAIN` | this one is for angular app, optional because it's already set in above named with `DOMAINNAME_ENVIRONMENT` | ex `yourdomain.auth0.com`
+`AUDIENCE` | this one is for angular app, optional because it's already set in above named with `AUDIENCE_ENVIRONMENT` | ex `https://yourdomain.auth0.com/api/v2/`
 
-# Android application configuration details and documentation 
 
-## Run Build in Terminal using Environment Variable
+## Android application configuration details and documentation 
 
-### Production Environment Variables
+### Run Build in Terminal
+
+#### How to build app in production 
 
 Change  Credential in strings.xml file (Replace these values) from below location of repo:
 ```
 app>src>release>res>values>strings.xml
 ```
 Values you need to replace in string.xml file like below :
+
+1. Open string.xml file from location that provided above.
+2. Put values in front of Varible name 
+3. Save file in same location
+4. Proceed to build application in production by following below steps 
 
 Variable | Purpose | Example values
 --- | --- | ---
@@ -176,7 +188,7 @@ Variable | Purpose | Example values
 `BASE_URL` | your api hosting url | ex `https://yourdoamin.com/api/v1/`
 `YOUR_API_KEY` | file encryption library api key |ex `your api key`
 
-### Steps needs to follow:
+##### Steps needs to follow:
 
 Step 1: 
 
@@ -211,12 +223,18 @@ This step is defined to install an APK in a device/emulator which is connected t
 **Note: Must be connected to a device with a system via USB.**
 
 
-### Staging Environment Variables:
+#### How to build app in staging
 
 Change  Credential in strings.xml file (Replace these values) from below location of repo:
 ```
 app>src>staging>res>values>strings.xml
 ```
+
+1. Open string.xml file from location that provided above.
+2. Put values in front of Varible name 
+3. Save file in same location
+4. Proceed to build application in production by following below steps 
+
 Values you need to replace in string.xml file like below :
 
 Variable | Purpose | Example values
@@ -258,9 +276,14 @@ This step is defined to install an APK in a device/emulator which is connected t
 
 **Note : Must be connected to a device with a system via USB.**
 
+
 ## Generate Signed APK using Commands
 
 Step 1: 
+
+What is keystore ?
+
+As a security measure, Android requires that apps be signed in order to be installed. Signing an app first requires creating keystores. A keystore is a storage mechanism for security certificates. A public key certificate is used to sign an APK before deployment to services like the Google Play Store.  Signing the APK in this fashion allows Google to provide a high level of certainty that future updates to your APK of the same app come from you and not some malicious  third party.
 
 Type below command in terminal 
 
@@ -268,9 +291,19 @@ Type below command in terminal
 jarsigner -keystore YOUR_KEYSTORE_PATH -storepass YOUR_KEYSTORE_PASSWORD app/build/outputs/apk/release/app-release-signed.apk YOUR_KEY_ALIAS
 ```
 
+`YOUR_KEYSTORE_PATH` - path for keystore file that you created.
+
+`YOUR_KEYSTORE_PASSWORD` - password for keystore file, this will be set during genration of keystore file. after we need to use same password everytime to sign application using keystore.
+
 Step 2: 
 
 Zipaligning the apk 
+
+What is ziplingn?
+
+zipalign is an archive alignment tool that provides important optimization to Android application (APK) files. The purpose is to ensure that all uncompressed data starts with a particular alignment relative to the start of the file. Specifically, it causes all uncompressed data within the APK, such as images or raw files, to be aligned on 4-byte boundaries. This allows all portions to be accessed directly with mmap() even if they contain binary data with alignment restrictions. The benefit is a reduction in the amount of RAM consumed when running the application.
+
+This tool should always be used to align your APK file before distributing it to end-users. The Android build tools can handle this for you. Android Studio automatically aligns your APK.
 
 Type below command in terminal :
 
@@ -278,21 +311,36 @@ Type below command in terminal :
 your_android-sdk_path/android-sdk/build-tools/your_build_tools_version/zipalign -v 4 app/build/outputs/apk/release/app-release-signed.apk release.apk
 ```
 
-**Note : Please refer below links too:**
+**Note : Please refer below links in case of genration of keystore and setup too:**
 
 https://stackoverflow.com/questions/50705658/how-to-sign-an-apk-through-command-line
 
 https://developer.android.com/studio/build/building-cmdline#sign_cmdline
 
-### For replace SSL certs in application
+## For replace SSL certs in application
 
-From below location, you can change SSL certs if require please make sure while replacing keep naming convention same to avoid error and build fails :
+The SSL Certificate require to verify BASE_URL for api endpoints.
+
+You can use SSL certificate that is used in your api server, download .crt file from your certificate provider and put in application with below location to inject and use verify api endpoints.
+
+From below location, you can change SSL certs, please make sure while replacing keep naming convention same to avoid error and build fails :
 
 ```
 AndroidApp>app>src>main>res>raw>noonssl.crt
 ```
 
-### For google-services.json file in the application
+## For google-services.json file in the application
+goole-services.json file used for pushnotification and google service like firebase. interage in application.
+
+google-services.json file contains all require information about project and credentails information in it that is used in application while using any of google service.
+
+From below step you can find and download google-service.json file :
+1. Signin in to [Firebase](https://console.firebase.google.com/u/0/)
+2. Click on project if already exist 
+3. Click Setting Icon, then select Project settings.
+4. In the Your apps card, select the platform for the app you want created.
+5. Click  google-services.json, then add it to your app.
+
 
 From below location you can find the google-services.json file and you can change or replace if needed :
 
