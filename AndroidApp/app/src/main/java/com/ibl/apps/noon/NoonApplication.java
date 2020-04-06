@@ -215,7 +215,7 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
     }
 
     private boolean isNetworkAvailable() {
-        ConnectivityManager conMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager conMgr = (ConnectivityManager) context.getSystemService(CONNECTIVITY_SERVICE);
 
         if (conMgr != null) {
             if (conMgr.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED
