@@ -9,10 +9,9 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -32,11 +31,10 @@ import com.ibl.apps.Model.UploadTopicFile;
 import com.ibl.apps.Model.assignment.FileUploadResponse;
 import com.ibl.apps.Model.feedback.FillesData;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
-import com.ibl.apps.Utils.Const;
-import com.ibl.apps.Utils.PrefUtils;
-import com.ibl.apps.Utils.Validator;
+import com.ibl.apps.util.Const;
+import com.ibl.apps.util.PrefUtils;
+import com.ibl.apps.util.Validator;
 import com.ibl.apps.noon.databinding.DiscussionsAddLayoutBinding;
-import com.theartofdev.edmodo.cropper.CropImage;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -61,8 +59,7 @@ import retrofit2.Callback;
 import retrofit2.HttpException;
 import retrofit2.Response;
 
-import static com.ibl.apps.Utils.Const.GradeID;
-import static com.ibl.apps.noon.AssignmentAddActivity.getMimeType;
+import static com.ibl.apps.util.Const.GradeID;
 
 
 public class DiscussionsAddActivity extends BaseActivity implements View.OnClickListener {

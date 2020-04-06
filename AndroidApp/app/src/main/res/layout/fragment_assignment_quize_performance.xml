@@ -13,7 +13,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <android.support.design.widget.AppBarLayout
+            <com.google.android.material.appbar.AppBarLayout
                 android:id="@+id/appbarCourseChapter"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/_50sdp"
@@ -54,7 +54,7 @@
                     </LinearLayout>
                 </RelativeLayout>
 
-            </android.support.design.widget.AppBarLayout>
+            </com.google.android.material.appbar.AppBarLayout>
 
             <View
                 android:layout_width="match_parent"
@@ -65,7 +65,7 @@
 
         </LinearLayout>
 
-        <android.support.v4.widget.NestedScrollView
+        <androidx.core.widget.NestedScrollView
             android:id="@+id/nestedScrollView"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
@@ -323,6 +323,6 @@
                         android:layout_height="@dimen/_200sdp" />
                 </LinearLayout>
             </RelativeLayout>
-        </android.support.v4.widget.NestedScrollView>
+        </androidx.core.widget.NestedScrollView>
     </LinearLayout>
 </layout>

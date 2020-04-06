@@ -1,6 +1,6 @@
 package com.ibl.apps.Model;
 
-import android.arch.persistence.room.Embedded;
+import androidx.room.Embedded;
 
 import java.util.List;
 

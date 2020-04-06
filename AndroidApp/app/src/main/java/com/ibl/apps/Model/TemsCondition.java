@@ -1,6 +1,6 @@
 package com.ibl.apps.Model;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 public class TemsCondition {
     private String response_code;
