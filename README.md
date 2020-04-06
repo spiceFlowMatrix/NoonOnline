@@ -230,12 +230,12 @@ Change  Credential in strings.xml file (Replace these values) from below locatio
 app>src>staging>res>values>strings.xml
 ```
 
+Values you need to replace in string.xml file like below :
+
 1. Open string.xml file from location that provided above.
 2. Put values in front of Varible name 
 3. Save file in same location
 4. Proceed to build application in production by following below steps 
-
-Values you need to replace in string.xml file like below :
 
 Variable | Purpose | Example values
 --- | --- | ---
