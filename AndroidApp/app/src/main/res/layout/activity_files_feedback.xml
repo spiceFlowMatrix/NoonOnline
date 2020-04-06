@@ -24,7 +24,7 @@
                 android:background="@color/colorGray" />
         </LinearLayout>
 
-        <android.support.v4.widget.NestedScrollView
+        <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_above="@+id/bottom_Lay"
@@ -65,13 +65,13 @@
                     android:layout_marginEnd="@dimen/_10sdp"
                     android:orientation="vertical">
 
-                    <android.support.design.widget.TextInputLayout
+                    <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/wrraperSpinnerCourse"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:theme="@style/EditTextTheme">
 
-                        <com.ibl.apps.Utils.MaterialBetterSpinner
+                        <com.ibl.apps.util.MaterialBetterSpinner
                             android:id="@+id/courseSpinner"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -82,15 +82,15 @@
                             android:textColorHint="@color/colorGray"
                             android:textSize="@dimen/_12sdp" />
 
-                    </android.support.design.widget.TextInputLayout>
+                    </com.google.android.material.textfield.TextInputLayout>
 
-                    <android.support.design.widget.TextInputLayout
+                    <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/wrraperSpinnerLesson"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:theme="@style/EditTextTheme">
 
-                        <com.ibl.apps.Utils.MaterialBetterSpinner
+                        <com.ibl.apps.util.MaterialBetterSpinner
                             android:id="@+id/lessonSpinner"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -100,7 +100,7 @@
                             android:textColorHint="@color/colorGray"
                             android:textSize="@dimen/_12sdp" />
 
-                    </android.support.design.widget.TextInputLayout>
+                    </com.google.android.material.textfield.TextInputLayout>
 
                     <TextView
                         android:id="@+id/txtTime"
@@ -232,7 +232,7 @@
                     </LinearLayout>
 
 
-                    <android.support.design.widget.TextInputLayout
+                    <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/descrptionWrapper"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -251,7 +251,7 @@
                             android:textSize="@dimen/_12sdp"
                             app:x_disableEmoji="true" />
 
-                    </android.support.design.widget.TextInputLayout>
+                    </com.google.android.material.textfield.TextInputLayout>
 
                     <RelativeLayout
                         android:id="@+id/card_cameraroll"
@@ -309,7 +309,7 @@
 
             </LinearLayout>
 
-        </android.support.v4.widget.NestedScrollView>
+        </androidx.core.widget.NestedScrollView>
 
         <RelativeLayout
             android:id="@+id/bottom_Lay"

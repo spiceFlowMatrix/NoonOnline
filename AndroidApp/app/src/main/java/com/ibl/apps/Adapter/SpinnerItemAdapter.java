@@ -1,14 +1,13 @@
 package com.ibl.apps.Adapter;
 
 import android.content.Context;
-import android.databinding.DataBindingUtil;
+import androidx.databinding.DataBindingUtil;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
 import com.ibl.apps.Model.AllGradeObject;
-import com.ibl.apps.Model.CourseObject;
 import com.ibl.apps.noon.R;
 import com.ibl.apps.noon.databinding.SpinnerLayoutBinding;
 

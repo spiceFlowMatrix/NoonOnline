@@ -6,9 +6,9 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.MenuItem;
@@ -24,9 +24,9 @@ import com.ibl.apps.Base.BaseActivity;
 import com.ibl.apps.Model.AddDiscussionTopic;
 import com.ibl.apps.Model.UploadTopicFile;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
-import com.ibl.apps.Utils.Const;
-import com.ibl.apps.Utils.PrefUtils;
-import com.ibl.apps.Utils.Validator;
+import com.ibl.apps.util.Const;
+import com.ibl.apps.util.PrefUtils;
+import com.ibl.apps.util.Validator;
 import com.ibl.apps.noon.databinding.DiscussionsAddLayoutBinding;
 
 import org.json.JSONArray;
@@ -51,7 +51,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.HttpException;
 
-import static com.ibl.apps.Utils.Const.GradeID;
+import static com.ibl.apps.util.Const.GradeID;
 
 
 public class GeneralDiscussionsAddActivity extends BaseActivity implements View.OnClickListener {

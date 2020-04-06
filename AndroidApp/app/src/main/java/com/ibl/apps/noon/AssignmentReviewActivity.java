@@ -3,7 +3,6 @@ package com.ibl.apps.noon;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputFilter;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CompoundButton;
@@ -14,29 +13,23 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 import com.ibl.apps.Base.BaseActivity;
-import com.ibl.apps.Model.AddDiscussionTopic;
 import com.ibl.apps.Model.CoursePriviewObject;
 import com.ibl.apps.Model.RestResponse;
 import com.ibl.apps.Model.assignment.AssignmentData;
-import com.ibl.apps.Model.assignment.StudentDetailData;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
-import com.ibl.apps.Utils.Const;
-import com.ibl.apps.Utils.InputFilterMinMax;
-import com.ibl.apps.Utils.PrefUtils;
-import com.ibl.apps.Utils.Validator;
+import com.ibl.apps.util.Const;
+import com.ibl.apps.util.InputFilterMinMax;
+import com.ibl.apps.util.PrefUtils;
+import com.ibl.apps.util.Validator;
 import com.ibl.apps.noon.databinding.AssignmentReviewLayoutBinding;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
-import retrofit2.HttpException;
 
 
 public class AssignmentReviewActivity extends BaseActivity implements View.OnClickListener {

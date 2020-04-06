@@ -37,7 +37,7 @@
 
             <include
                 android:id="@+id/rcHorizontalLayout"
-                layout="@layout/recycleview_verticle_layout"></include>
+                layout="@layout/recycleview_verticle_layout" />
 
             <!-- </android.support.v7.widget.CardView>
  -->
