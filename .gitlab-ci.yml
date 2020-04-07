@@ -4,9 +4,9 @@ stages:
   - build
 
 variables:
-  ANDROID_COMPILE_SDK: "29"
-  ANDROID_BUILD_TOOLS: "29.0.2"
-  ANDROID_SDK_TOOLS:   "4333796"
+  ANDROID_COMPILE_SDK: '29'
+  ANDROID_BUILD_TOOLS: '29.0.2'
+  ANDROID_SDK_TOOLS: '4333796'
 
 before_script:
   - cd AndroidApp
@@ -38,7 +38,8 @@ lintDebug:
       - AndroidApp/android-file-chooser/lint/
       - AndroidApp/giraffeplayer2/lint/
       - AndroidApp/prdownloader/lint/
-    expire_in: 1 day
+    expire_in: 1 day # TODO: Change expiry to be permanent once script is good for operational use.
+    when: on_failure
 
 assembleDebug:
   stage: build
@@ -46,5 +47,5 @@ assembleDebug:
     - ./gradlew assembleDebug
   artifacts:
     paths:
-    - AndroidApp/app/build/outputs/
+      - AndroidApp/app/build/outputs/
     expire_in: 1 day # TODO: Change expiry to be permanent once script is good for operational use.
