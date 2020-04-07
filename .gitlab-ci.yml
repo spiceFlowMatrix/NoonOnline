@@ -25,6 +25,8 @@ before_script:
   - yes | android-sdk-linux/tools/bin/sdkmanager --licenses
   - set -o pipefail
   - touch local.properties
+  - rm app/google-services.json
+  - echo ${ANDROID_GOOGLE_SERVICES_JSON} > app/google-services.json
 
 lintDebug:
   stage: build
