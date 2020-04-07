@@ -1,5 +1,7 @@
+using Moq;
 using System;
 using Trainning24.Domain.Entity;
+using Trainning24.Repository.EF;
 using Xunit;
 
 namespace Training24Admin.UnitTest
@@ -20,6 +22,18 @@ namespace Training24Admin.UnitTest
             //};
             Chapter chapter = new Chapter();
             Assert.Throws<ArgumentException>(() => CheckIfNullOrEmpty(chapter));
+        }
+
+        [Fact]
+        public void PassingTest()
+        {
+            //var calculator = new ICalculator();  
+            //Assert.Equal(4, calculator.Add(2, 2));  
+
+            Feedback feedback = new Feedback();
+            var feedbackRepo = new Mock<EFFeedback>();
+            feedbackRepo.Setup(x => x.Insert(feedback)).Returns(1);
+            Assert.Equal(4, feedbackRepo.Object.Insert(feedback));
         }
 
         /// <summary>
