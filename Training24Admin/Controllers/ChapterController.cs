@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Training24Admin.Model;
 using Trainning24.BL.Business;
+using Trainning24.BL.ViewModels;
 using Trainning24.BL.ViewModels.Chapter;
 using Trainning24.BL.ViewModels.Users;
 using Trainning24.Domain.Entity;
@@ -19,6 +20,8 @@ namespace Training24Admin.Controllers
 
     [Route("api/v1/[controller]")]
     [ApiController]
+    [Produces("application/json")]
+    [ApiExplorerSettings(GroupName = nameof(SwaggerGrouping.Chapter))]
     //[Authorize]
     public class ChapterController : ControllerBase
     {
