@@ -27,11 +27,13 @@ before_script:
   - touch local.properties
   - rm app/google-services.json
   - echo ${ANDROID_GOOGLE_SERVICES_JSON} | base64 -d > app/google-services.json
+  - echo ${ANDROID_SSL_CRT_RAW} | base64 -d > app/src/main/res/raw/noonssl.crt
+  - echo ${ANDROID_CONFIG_STRINGS} | base64 -d > app/src/staging/res/values/strings.xml
 
-lintDebug:
+lint:
   stage: build
   script:
-    - ./gradlew -Pci --console=plain :app:lintDebug -PbuildDir=lint
+    - ./gradlew -Pci --console=plain :app:lintRelease -PbuildDir=lint
   artifacts:
     paths:
       - AndroidApp/app/lint/
@@ -41,10 +43,10 @@ lintDebug:
     expire_in: 1 day # TODO: Change expiry to be permanent once script is good for operational use.
     when: on_failure
 
-assembleDebug:
+assemble:
   stage: build
   script:
-    - ./gradlew assembleDebug
+    - ./gradlew assembleRelease
   artifacts:
     paths:
       - AndroidApp/app/build/outputs/

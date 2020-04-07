@@ -2,76 +2,96 @@
     "$schema": "https://json-schema.org/draft-07/schema#",
     "properties": {
         "image": {
-            "description": "Container image",
-            "properties": {
-                "repo": {
-                    "type": "string"
-                },
-                "tag": {
-                    "type": "string"
-                }
-            },
-            "type": "object"
+            "description": "image is the URI of the docker image that the chart will set for the noon application kubernetes workload",
+            "type": "string"
         },
         "name": {
-            "description": "Service name",
+            "description": "name is used to set the name value for the kubernetes workloads and any other objects created for this chart",
             "type": "string"
         },
         "netCoreEnvironment": {
-            "description": "The type of hosting environment the service must provide",
+            "description": "netCoreEnvironment tells the aspnetcore service which environment to serve for. Used by the chart to create a secret value that is then fed to the ASPNETCORE_ENVIRONMENT environment variable on the application workload",
             "type": "string",
             "enum": [
                 "Production",
                 "Staging",
-                "Development",
-                "Testing"
+                "Development"
             ]
         },
         "sqlDbUser": {
-            "description": "The User Id that the application will use to connect to the SQL (MySQL for this application) database",
+            "description": "sqlDbUser is the User Id that the application will use to connect to the SQL (MySQL for this application) database. Used by the chart to create a secret value that is then provided as the username for the SQL client on the application workload",
             "type": "string"
         },
         "sqlDbPassword": {
-            "description": "The password that the application will use to connect to the SQL (MySQL for this application) database",
+            "description": "sqlDbPassword is the password that the application will use to connect to the SQL (MySQL for this application) database. Used by the chart to create a secret value that is then provided as the password for the SQL client on the application workload",
+            "type": "string"
+        },
+        "sqlDbConnectionString": {
+            "description": "sqlDbConnectionString is the only credential that the aspnetcore webhost uses establish trusted connections to its required database. Used by the chart to create a secret value that is then fed to the ASPNET_DB_CONNECTIONSTRING environment variable on the application workload",
             "type": "string"
         },
         "auth0Tenant": {
-            "description": "auth0Tenant is the auth0 tenant domain name used to instantiate the DOMAINNAME_ENVIRONMENT system environment variable for all deployed instances of noon applications"
-        },
-        "auth0ManagementClientIdDari": {
-            "description": "auth0ManagementClientId is the auth0 management API client application's Client ID that will be used to instantiate the CLIENT_ID_ENVIRONMENT system environment variable for the dari version of the service",
+            "description": "auth0Tenant is the Auth0 tenant domain name required by the REST API. Used by the chart to create a secret value that is then fed to the DOMAINNAME_ENVIRONMENT environment variable on the application workload",
             "type": "string"
         },
-        "auth0ManagementClientSecretDari": {
-            "description": "auth0ManagementClientSecret is the auth0 management API client application's Client Secret that will be used to instantiate the CLIENT_SECRET_ENVIRONMENT system environment variable for the dari version of the service",
+        "auth0ManagementUrl": {
+            "description": "auth0ManagementUrl is the Auth0 management API's URL value used as the Uri for it. Used by the chart to create a secret value that is then fed to the MANAGEMENTURL_ENVIRONMENT environment variable on the application workload",
             "type": "string"
         },
-        "auth0ManagementAudienceDari": {
-            "description": "auth0ManagementAudience is the auth0 management API's Audience value that will be used to instantiate the AUDIENCE_ENVIRONMENT system environment variable for the dari version of the service",
+        "auth0ManagementClientId": {
+            "description": "auth0ManagementClientId is the Auth0 management API client application's Client ID. Used by the chart to create a secret value that is then fed to the CLIENT_ID_ENVIRONMENT environment variable on the application workload",
             "type": "string"
         },
-        "auth0ManagementClientIdPashto": {
-            "description": "auth0ManagementClientIdPashto is the auth0 management API client application's Client ID that will be used to instantiate the CLIENT_ID_ENVIRONMENT system environment variable for the pashto version of the service",
+        "auth0ManagementClientSecret": {
+            "description": "auth0ManagementClientSecret is the Auth0 management API client application's Client Secret. Used by the chart to create a secret value that is then fed to the CLIENT_SECRET_ENVIRONMENT environment variable on the application workload",
             "type": "string"
         },
-        "auth0ManagementClientSecretPashto": {
-            "description": "auth0ManagementClientSecretPashto is the auth0 management API client application's Client Secret that will be used to instantiate the CLIENT_SECRET_ENVIRONMENT system environment variable for the pashto version of the service",
+        "auth0ManagementAudience": {
+            "description": "auth0ManagementAudience is the Auth0 management API's Audience value. Used by the chart to create a secret value that is then fed to the AUDIENCE_ENVIRONMENT environment variable on the application workload",
             "type": "string"
         },
-        "auth0ManagementAudiencePashto": {
-            "description": "auth0ManagementAudiencePashto is the auth0 management API's Audience value that will be used to instantiate the AUDIENCE_ENVIRONMENT system environment variable for the pashto version of the service",
+        "smtpServerDomain": {
+            "description": "smtpServerDomain is the address (public ip or domain) of the server where the SMTP server is located. Used by the chart to create a secret value that is then fed to the PRIMARY_DOMAIN environment variable on the application workload",
+            "type": "string"
+        },
+        "smtpServerPort": {
+            "description": "smtpServerPort is the port on the SMTP server that defines where our SMTP service can be accessed on the server. Used by the chart to create a secret value that is then fed to the PRIMARY_PORT environment variable on the application workload",
             "type": "string"
         },
         "smtpServerEmailAddress": {
-            "description": "smtpServerEmailAddress is the email address from which the smtp server will send out emails",
+            "description": "smtpServerEmailAddress is the email address from which the smtp server will send out emails. Used by the chart to create a secret value that is then fed to the USERNAME_EMAIL environment variable on the application workload",
             "type": "string"
+        },
+        "smtpServerEmailPassword": {
+            "description": "smtpServerEmailPassword is the email address from which the smtp server will send out emails. Used by the chart to create a secret value that is then fed to the USERNAME_PASSWORD environment variable on the application workload",
+            "type": "string"
+        },
+        "applicationLanguage": {
+            "description": "applicationLanguage is used by the chart to create a secret value that is then fed to the LANGUAGE environment variable on the application workload",
+            "type": "string",
+            "enum": [
+                "fa",
+                "pa"
+            ]
         }
     },
     "required": [
         "image",
+        "name",
+        "netCoreEnvironment",
         "sqlDbUser",
         "sqlDbPassword",
-        "auth0ManagementClientId"
+        "sqlDbConnectionString",
+        "auth0Tenant",
+        "auth0ManagementUrl",
+        "auth0ManagementClientId",
+        "auth0ManagementClientSecret",
+        "auth0ManagementAudience",
+        "smtpServerDomain",
+        "smtpServerPort",
+        "smtpServerEmailAddress",
+        "smtpServerEmailPassword",
+        "applicationLanguage"
     ],
     "title": "Values",
     "type": "object"
