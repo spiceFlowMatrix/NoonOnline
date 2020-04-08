@@ -5,21 +5,20 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Trainning24.BL.ViewModels;
-using Trainning24.BL.ViewModels.Device;
 
 namespace Training24Admin.Controllers
 {
     /// <summary>
-    /// Everything about your devices
+    /// Everything about your device quotas
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     [Produces("application/json")]
-    [ApiExplorerSettings(GroupName = nameof(SwaggerGrouping.Device))]
-    public class DeviceController : ControllerBase
+    [ApiExplorerSettings(GroupName = nameof(SwaggerGrouping.DeviceQuotas))]
+    public class DeviceQuotasController : ControllerBase
     {
         /// <summary>
-        /// Fetch a list of all devices that have activated (or registered) the student app on it
+        /// Fetch a list of quotas for all students who have activated (or registered) the student app on it
         /// </summary>
         /// <returns></returns>
         [HttpGet()]
@@ -29,47 +28,36 @@ namespace Training24Admin.Controllers
         }
 
         /// <summary>
-        /// Get my device profile
+        /// Request a device quota exension
         /// </summary>
         /// <param name="userId">Id of user</param>
-        /// <returns></returns>
-        [HttpGet("{userId}")]
-        public IActionResult Get(int userId)
-        {
-            return StatusCode(406, ModelState);
-        }
-
-        /// <summary>
-        /// Register device quota for user and activate new device
-        /// </summary>
-        /// <param name="userId">Id of user</param>
-        /// <param name="objData">New device that I want to activate</param>
         /// <returns></returns>
         [HttpPost("{userId}")]
-        public IActionResult Post(int userId, DeviceActivate objData)
+        public IActionResult Post(int userId)
         {
             return StatusCode(406, ModelState);
         }
 
         /// <summary>
-        /// Reactivate an existing device that has been deactivated
+        /// Approve existing quota extension requests
         /// </summary>
         /// <param name="userId">Id of user</param>
-        /// <param name="deviceId">Device id</param>
+        /// <param name="extensionRequestId">Requested device extention id</param>
         /// <returns></returns>
         [HttpPut("{userId}")]
-        public IActionResult Put(int userId, int deviceId)
+        public IActionResult Put(int userId, int extensionRequestId)
         {
             return StatusCode(406, ModelState);
         }
 
         /// <summary>
-        /// Deactivate an existing device
+        /// Reject existing quota extension requests
         /// </summary>
         /// <param name="userId">Id of user</param>
+        /// <param name="extensionRequestId">Requested device extention id</param>
         /// <returns></returns>
         [HttpDelete("{userId}")]
-        public IActionResult Delete(int userId)
+        public IActionResult Delete(int userId, int extensionRequestId)
         {
             return StatusCode(406, ModelState);
         }

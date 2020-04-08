@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Threading.Tasks;
 using AutoMapper;
 using DinkToPdf;
@@ -39,6 +40,7 @@ namespace Training24Admin
     public class Startup
     {
         private FilesBusiness FilesBusiness;
+        private bool includeControllerXmlComments;
 
         public Startup(IConfiguration configuration)
         {
@@ -569,30 +571,37 @@ namespace Training24Admin
             //    c.SwaggerDoc("v1", new Info { Title = "Training24 Admin", Version = "v1" });
             //});
 
-            // swagger configuration
-            services.AddSwaggerGen(c =>
+            if (environment == "Staging")
             {
-                c.SwaggerDoc("v1", new Info { Title = "Noon Online Education v1", Version = "v1" });
+                // swagger configuration
+                services.AddSwaggerGen(c =>
+                {
+                    c.SwaggerDoc("v1", new Info { Title = "Noon Online Education v1", Version = "v1" });
+                    // swagger tags config
+                    c.DocInclusionPredicate((_, api) => !string.IsNullOrWhiteSpace(api.GroupName));
+                    c.TagActionsBy(api => api.GroupName);
 
-                // swagger tags config
-                c.DocInclusionPredicate((_, api) => !string.IsNullOrWhiteSpace(api.GroupName));
-                c.TagActionsBy(api => api.GroupName);
+                    //// Swagger 2.+ support
+                    //var security = new Dictionary<string, IEnumerable<string>>
+                    //{
+                    //    {"Bearer", new string[] { }},
+                    //};
 
-                //// Swagger 2.+ support
-                //var security = new Dictionary<string, IEnumerable<string>>
-                //{
-                //    {"Bearer", new string[] { }},
-                //};
+                    //c.AddSecurityDefinition("Bearer", new ApiKeyScheme
+                    //{
+                    //    Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+                    //    Name = "Authorization",
+                    //    In = "header",
+                    //    Type = "apiKey"
+                    //});
+                    //c.AddSecurityRequirement(security);
 
-                //c.AddSecurityDefinition("Bearer", new ApiKeyScheme
-                //{
-                //    Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
-                //    Name = "Authorization",
-                //    In = "header",
-                //    Type = "apiKey"
-                //});
-                //c.AddSecurityRequirement(security);
-            });
+
+                    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                    c.IncludeXmlComments(xmlPath, includeControllerXmlComments = true);
+                });
+            }
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -631,14 +640,17 @@ namespace Training24Admin
             //    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Training24 Admin V1");
             //});
 
-            app.UseSwagger();
-            app.UseSwaggerUI(c =>
+            if (environment == "Staging")
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Noon Online Education API v1");
-                c.DocumentTitle = "Noon Online Education";
-                c.DocExpansion(DocExpansion.None);
-                c.EnableFilter();
-            });
+                app.UseSwagger();
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Noon Online Education API v1");
+                    c.DocumentTitle = "Noon Online Education";
+                    c.DocExpansion(DocExpansion.None);
+                    c.EnableFilter();
+                });
+            }
 
             app.UseCors("AllowAnyOrigin");
             app.UseMvc();
@@ -705,7 +717,7 @@ namespace Training24Admin
                          spa.Options.DefaultPageStaticFileOptions = defaultAdminDist;
                      }
                  });
-             });           
+             });
 
             ////Feedback
             app.Map(new PathString("/web/feedback"), feedback =>

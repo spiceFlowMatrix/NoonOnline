@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Training24Admin</name>
+    </assembly>
+    <members>
+        <member name="T:Training24Admin.Controllers.DeviceController">
+            <summary>
+            Everything about your devices
+            </summary>
+        </member>
+        <member name="M:Training24Admin.Controllers.DeviceController.Get">
+            <summary>
+            Fetch a list of all devices that have activated (or registered) the student app on it
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Training24Admin.Controllers.DeviceController.Get(System.Int32)">
+            <summary>
+            Get my device profile
+            </summary>
+            <param name="userId">Id of user</param>
+            <returns></returns>
+        </member>
+        <member name="M:Training24Admin.Controllers.DeviceController.Post(System.Int32,Trainning24.BL.ViewModels.Device.DeviceActivate)">
+            <summary>
+            Register device quota for user and activate new device
+            </summary>
+            <param name="userId">Id of user</param>
+            <param name="objData">New device that I want to activate</param>
+            <returns></returns>
+        </member>
+        <member name="M:Training24Admin.Controllers.DeviceController.Put(System.Int32,System.Int32)">
+            <summary>
+            Reactivate an existing device that has been deactivated
+            </summary>
+            <param name="userId">Id of user</param>
+            <param name="deviceId">Device id</param>
+            <returns></returns>
+        </member>
+        <member name="M:Training24Admin.Controllers.DeviceController.Delete(System.Int32)">
+            <summary>
+            Deactivate an existing device
+            </summary>
+            <param name="userId">Id of user</param>
+            <returns></returns>
+        </member>
+        <member name="T:Training24Admin.Controllers.DeviceQuotasController">
+            <summary>
+            Everything about your device quotas
+            </summary>
+        </member>
+        <member name="M:Training24Admin.Controllers.DeviceQuotasController.Get">
+            <summary>
+            Fetch a list of quotas for all students who have activated (or registered) the student app on it
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Training24Admin.Controllers.DeviceQuotasController.Post(System.Int32)">
+            <summary>
+            Request a device quota exension
+            </summary>
+            <param name="userId">Id of user</param>
+            <returns></returns>
+        </member>
+        <member name="M:Training24Admin.Controllers.DeviceQuotasController.Put(System.Int32,System.Int32)">
+            <summary>
+            Approve existing quota extension requests
+            </summary>
+            <param name="userId">Id of user</param>
+            <param name="extensionRequestId">Requested device extention id</param>
+            <returns></returns>
+        </member>
+        <member name="M:Training24Admin.Controllers.DeviceQuotasController.Delete(System.Int32,System.Int32)">
+            <summary>
+            Reject existing quota extension requests
+            </summary>
+            <param name="userId">Id of user</param>
+            <param name="extensionRequestId">Requested device extention id</param>
+            <returns></returns>
+        </member>
+        <member name="M:WebAPIApplication.Controllers.ApiController.Claims">
+            <summary>
+            This is a helper action. It allows you to easily view all the claims of the token
+            </summary>
+            <returns></returns>
+        </member>
+    </members>
+</doc>
