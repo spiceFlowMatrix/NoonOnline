@@ -9,20 +9,24 @@ import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
-public interface DeviceManagementNetworking {
+/**
+* This Class defines API endpoints of Device Managements.
+* It's contains all endpoints related to device networking.
+* This interface is implemented in {@link DeviceManagementRepo}
+ * By implementing this interface you can call these API endpoints.
+* */
+public interface DeviceManagementNetworking{
     @GET("device")
-    Single<DeviceData> getAllDevice();
+    Single<UserDeviceModel> getAllDevices();
 
     @GET("device/{userId}")
-    Single<DeviceProfile> getDeviceQuotaProfile(@Path("userId") String userId);
+    Single<UserDeviceProfileModel> getDeviceQuotaProfile(@Path("userId") String userId);
 
     @POST("device/{userId}")
-    Single<DeviceData> registerDeviceQuota(@Path("userId") String userId);
-
+    Single<UserDeviceModel> registerDeviceQuota(@Path("userId") String userId);
     @PUT("device/{userId}")
     Single<DeviceActivateDeActivate> updateDeviceQuota(@Path("userId") String userId, @Query("deviceId") String deviceId);
 
     @DELETE("device/{userId}")
     Single<DeviceActivateDeActivate> deleteDeviceQuota(@Path("userId") String userId, @Query("deviceId") String deviceId);
-
 }

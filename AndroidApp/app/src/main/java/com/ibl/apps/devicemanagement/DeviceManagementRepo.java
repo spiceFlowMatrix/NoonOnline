@@ -6,25 +6,32 @@ import com.ibl.apps.noon.NoonApplication;
 import io.reactivex.Single;
 
 
-public class DeviceManagementRepository implements DeviceManagementNetworking {
-    DeviceManagementNetworking deviceManagementNetworking;
+/**
+ * This class contains API endpoints implementation of Device Managements.
+ * This class is used by {@link DeviceManagementActivity}
+ * */
+public class DeviceManagementRepo implements DeviceManagementNetworking {
+    private DeviceManagementNetworking deviceManagementNetworking;
 
-    public DeviceManagementRepository() {
+    /**
+     * This constructor initializes the retrofit client with application context for API calls.
+     */
+    public DeviceManagementRepo() {
         deviceManagementNetworking = ApiClient.getClient(NoonApplication.getContext()).create(DeviceManagementNetworking.class);
     }
 
     @Override
-    public Single<DeviceData> getAllDevice() {
-        return deviceManagementNetworking.getAllDevice();
+    public Single<UserDeviceModel> getAllDevices() {
+        return deviceManagementNetworking.getAllDevices();
     }
 
     @Override
-    public Single<DeviceProfile> getDeviceQuotaProfile(String userId) {
+    public Single<UserDeviceProfileModel> getDeviceQuotaProfile(String userId) {
         return deviceManagementNetworking.getDeviceQuotaProfile(userId);
     }
 
     @Override
-    public Single<DeviceData> registerDeviceQuota(String userId) {
+    public Single<UserDeviceModel> registerDeviceQuota(String userId) {
         return deviceManagementNetworking.registerDeviceQuota(userId);
     }
 

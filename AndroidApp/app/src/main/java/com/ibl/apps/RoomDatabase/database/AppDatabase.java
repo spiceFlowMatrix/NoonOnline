@@ -21,6 +21,8 @@ import com.ibl.apps.RoomDatabase.dao.AuthTokenDao;
 import com.ibl.apps.RoomDatabase.dao.ChapterProgressDao;
 import com.ibl.apps.RoomDatabase.dao.CourseDao;
 import com.ibl.apps.RoomDatabase.dao.CourseDetailsDao;
+import com.ibl.apps.RoomDatabase.dao.deviceManagementRepository.DeviceManagementProfileDao;
+import com.ibl.apps.RoomDatabase.dao.deviceManagementRepository.DeviceManagementDataDao;
 import com.ibl.apps.RoomDatabase.dao.FileDownloadStatusDao;
 import com.ibl.apps.RoomDatabase.dao.FileProgressDao;
 import com.ibl.apps.RoomDatabase.dao.GradeProgressDao;
@@ -51,6 +53,8 @@ import com.ibl.apps.RoomDatabase.entity.QuizProgress;
 import com.ibl.apps.RoomDatabase.entity.QuizUserResult;
 import com.ibl.apps.RoomDatabase.entity.SyncTimeTrackingObject;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
+import com.ibl.apps.devicemanagement.UserDeviceModel;
+import com.ibl.apps.devicemanagement.UserDeviceProfileModel;
 
 @Database(entities = {LessonProgress.class,
         GradeProgress.class,
@@ -75,11 +79,12 @@ import com.ibl.apps.RoomDatabase.entity.UserDetails;
         ChapterProgress.class,
         LessonNewProgress.class,
         FileProgress.class,
-        QuizProgress.class
+        QuizProgress.class,
+        UserDeviceModel.class,
+        UserDeviceProfileModel.class
 },
-        version = 4,
+        version = 5,
         exportSchema = false)
-
 @TypeConverters(DataTypeConverter.class)
 public abstract class AppDatabase extends RoomDatabase {
 
@@ -223,4 +228,8 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract FileProgressDao fileProgressDao();
 
     public abstract QuizProgressDao quizProgressDao();
+
+    public abstract DeviceManagementDataDao deviceManagementDataDao();
+
+    public abstract DeviceManagementProfileDao deviceManagementProfileDao();
 }
