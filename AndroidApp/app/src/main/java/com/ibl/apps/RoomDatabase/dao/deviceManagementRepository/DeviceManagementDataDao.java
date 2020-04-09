@@ -18,9 +18,9 @@ public interface DeviceManagementDataDao {
     void insertAll(UserDeviceModel... userDeviceData);
 
     @Query("SELECT * FROM UserDeviceModel WHERE userId=:userid")
-    ArrayList<UserDeviceModel> getDeviceData(String userid);
+    UserDeviceModel getDeviceData(String userid);
 
     @Query("SELECT * FROM UserDeviceModel ")
-    ArrayList<UserDeviceModel> getDeviceData();
+    UserDeviceModel getDeviceData();
 
 }

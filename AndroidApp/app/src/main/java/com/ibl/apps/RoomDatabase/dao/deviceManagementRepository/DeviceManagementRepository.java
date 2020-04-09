@@ -27,12 +27,12 @@ public class DeviceManagementRepository implements DeviceManagementDataDao, Devi
     }
 
     @Override
-    public ArrayList<UserDeviceModel> getDeviceData(String userid) {
+    public UserDeviceModel getDeviceData(String userid) {
         return deviceManagementDataDao.getDeviceData(userid);
     }
 
     @Override
-    public ArrayList<UserDeviceModel> getDeviceData() {
+    public UserDeviceModel getDeviceData() {
         return deviceManagementDataDao.getDeviceData();
     }
 

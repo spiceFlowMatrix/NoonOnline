@@ -1,6 +1,12 @@
 package com.ibl.apps.devicemanagement;
 
+import androidx.room.ColumnInfo;
+import androidx.room.PrimaryKey;
+
 public class User {
+    @PrimaryKey(autoGenerate = true)
+    private String no;
+
     private String firstName;
 
     private String lastName;
@@ -11,6 +17,7 @@ public class User {
 
     private String phone;
 
+    @ColumnInfo(name = "uid")
     private String id;
 
     private String email;
@@ -84,5 +91,13 @@ public class User {
     @Override
     public String toString() {
         return "ClassPojo [firstName = " + firstName + ", lastName = " + lastName + ", password = " + password + ", userStatus = " + userStatus + ", phone = " + phone + ", id = " + id + ", email = " + email + ", username = " + username + "]";
+    }
+
+    public String getNo() {
+        return no;
+    }
+
+    public void setNo(String no) {
+        this.no = no;
     }
 }

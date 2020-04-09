@@ -5,22 +5,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import androidx.databinding.DataBindingUtil;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import androidx.annotation.NonNull;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.navigation.NavigationView.OnNavigationItemSelectedListener;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.core.view.GravityCompat;
-import androidx.viewpager.widget.ViewPager;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AlertDialog;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -29,6 +18,18 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.view.GravityCompat;
+import androidx.databinding.DataBindingUtil;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.viewpager.widget.ViewPager;
+
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationView.OnNavigationItemSelectedListener;
 import com.ibl.apps.Adapter.ViewPagerAdapter;
 import com.ibl.apps.Base.BaseActivity;
 import com.ibl.apps.Fragment.ComplaintFragment;
@@ -43,11 +44,11 @@ import com.ibl.apps.RoomDatabase.database.AppDatabase;
 import com.ibl.apps.RoomDatabase.entity.SyncTimeTrackingObject;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
 import com.ibl.apps.Service.TimeOut.SyncEventReceiver;
+import com.ibl.apps.noon.databinding.LogoutPopupLayoutBinding;
+import com.ibl.apps.noon.databinding.MainDashboardLayoutBinding;
 import com.ibl.apps.util.Const;
 import com.ibl.apps.util.PrefUtils;
 import com.ibl.apps.util.SingleShotLocationProvider;
-import com.ibl.apps.noon.databinding.LogoutPopupLayoutBinding;
-import com.ibl.apps.noon.databinding.MainDashboardLayoutBinding;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -536,6 +537,7 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
         mainDashboardLayoutBinding.appBarLayout.logOutBtn.setOnClickListener(this);
         mainDashboardLayoutBinding.appBarLayout.editprofileBtn.setOnClickListener(this);
         mainDashboardLayoutBinding.appBarLayout.btnNotification.setOnClickListener(this);
+        mainDashboardLayoutBinding.appBarLayout.txtDevice.setOnClickListener(this);
     }
 
     @Override
@@ -575,6 +577,11 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
                     profileFragment.hideVisibleLay(true);
                 }
                 break;
+            case R.id.txtDevice:
+                Intent mobileIntent = new Intent(MainDashBoardActivity.this, LoginDevicesActivity.class);
+                startActivity(mobileIntent);
+                break;
+
         }
     }
 

@@ -3,6 +3,7 @@ package com.ibl.apps.devicemanagement;
 import androidx.room.ColumnInfo;
 import androidx.room.Embedded;
 import androidx.room.Entity;
+import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
 
 import com.ibl.apps.RoomDatabase.database.DataTypeConverter;
@@ -11,17 +12,23 @@ import java.util.ArrayList;
 
 @Entity
 public class UserDeviceProfileModel {
+
+    @PrimaryKey(autoGenerate = true)
+    private int id;
+
     @ColumnInfo(name = "currentDevices")
     @TypeConverters(DataTypeConverter.class)
     private ArrayList<CurrentDevices> currentDevices;
 
-    String userId;
+    String userId ;
     String deviceId;
+
     @Embedded
     private User user;
 
     @Embedded
     private QuotaStatus quotaStatus;
+
 
     public ArrayList<CurrentDevices> getCurrentDevices() {
         return currentDevices;
@@ -29,6 +36,30 @@ public class UserDeviceProfileModel {
 
     public void setCurrentDevices(ArrayList<CurrentDevices> currentDevices) {
         this.currentDevices = currentDevices;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getDeviceId() {
+        return deviceId;
+    }
+
+    public void setDeviceId(String deviceId) {
+        this.deviceId = deviceId;
     }
 
     public User getUser() {
@@ -119,30 +150,5 @@ public class UserDeviceProfileModel {
         }
     }
 
-    public class QuotaStatus {
-        private int currentConsumption;
 
-        private int currentLimit;
-
-        public int getCurrentConsumption() {
-            return currentConsumption;
-        }
-
-        public void setCurrentConsumption(int currentConsumption) {
-            this.currentConsumption = currentConsumption;
-        }
-
-        public int getCurrentLimit() {
-            return currentLimit;
-        }
-
-        public void setCurrentLimit(int currentLimit) {
-            this.currentLimit = currentLimit;
-        }
-
-        @Override
-        public String toString() {
-            return "ClassPojo [currentConsumption = " + currentConsumption + ", currentLimit = " + currentLimit + "]";
-        }
-    }
 }

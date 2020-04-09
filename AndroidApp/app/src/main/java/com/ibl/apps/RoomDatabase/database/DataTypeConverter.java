@@ -9,8 +9,11 @@ import com.ibl.apps.Model.CoursePriviewObject;
 import com.ibl.apps.Model.LibraryGradeObject;
 import com.ibl.apps.Model.LibraryObject;
 import com.ibl.apps.Model.QuizMainObject;
+import com.ibl.apps.devicemanagement.Tags;
+import com.ibl.apps.devicemanagement.UserDeviceProfileModel;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -122,6 +125,40 @@ public class DataTypeConverter {
 
     @TypeConverter
     public String ListToString6(List<LibraryGradeObject.Data> someObjects) {
+        return gson.toJson(someObjects);
+    }
+
+    @TypeConverter
+    public ArrayList<Tags> stringToList7(String data) {
+        if (data == null) {
+            return new ArrayList<Tags>();
+        }
+
+        Type listType = new TypeToken<ArrayList<Tags>>() {
+        }.getType();
+
+        return gson.fromJson(data, listType);
+    }
+
+    @TypeConverter
+    public String ListToString7(ArrayList<Tags> someObjects) {
+        return gson.toJson(someObjects);
+    }
+
+    @TypeConverter
+    public ArrayList<UserDeviceProfileModel.CurrentDevices> stringToList8(String data) {
+        if (data == null) {
+            return new ArrayList<UserDeviceProfileModel.CurrentDevices>();
+        }
+
+        Type listType = new TypeToken<ArrayList<UserDeviceProfileModel.CurrentDevices>>() {
+        }.getType();
+
+        return gson.fromJson(data, listType);
+    }
+
+    @TypeConverter
+    public String ListToString8(ArrayList<UserDeviceProfileModel.CurrentDevices> someObjects) {
         return gson.toJson(someObjects);
     }
 }

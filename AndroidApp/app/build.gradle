@@ -32,6 +32,7 @@ android {
     }
     buildTypes {
         release {
+            initWith debug
 //            buildConfigField 'String', 'BASE_URL', '"https://coreapidari.noon-online.com/api/v1/"'
             minifyEnabled true
             shrinkResources true

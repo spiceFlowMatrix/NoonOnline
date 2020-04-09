@@ -15,16 +15,26 @@ import java.util.ArrayList;
 @SuppressWarnings("unused")
 @Entity
 public class UserDeviceModel {
+
+    @PrimaryKey(autoGenerate = true)
+    private int id;
+
     @ColumnInfo(name = "macAddress")
     private String macAddress;
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
 
     private String userId = getUser().getId();
 
     @ColumnInfo(name = "ipAddress")
     private String ipAddress;
 
-    @PrimaryKey(autoGenerate = true)
-    private String id;
 
     @Embedded
      public User user;
@@ -35,6 +45,10 @@ public class UserDeviceModel {
     @ColumnInfo(name = "tags")
     @TypeConverters(DataTypeConverter.class)
     private ArrayList<Tags> tags;
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public String getMacAddress() {
         return macAddress;
@@ -52,12 +66,8 @@ public class UserDeviceModel {
         this.ipAddress = ipAddress;
     }
 
-    public String getId() {
+    public int getId() {
         return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
     public User getUser() {
