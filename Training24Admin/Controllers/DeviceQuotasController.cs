@@ -31,9 +31,10 @@ namespace Training24Admin.Controllers
         /// Request a device quota exension
         /// </summary>
         /// <param name="userId">Id of user</param>
+        /// <param name="objData">Quota extension request details</param>
         /// <returns></returns>
         [HttpPost("{userId}")]
-        public IActionResult Post(int userId)
+        public IActionResult Post(int userId, DeviceQuotas objData)
         {
             return StatusCode(406, ModelState);
         }
