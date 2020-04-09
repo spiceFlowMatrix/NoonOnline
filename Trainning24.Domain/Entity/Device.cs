@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Trainning24.Domain.Entity
 {
-    public class Device : EntityBase
+    public class Devices : EntityBase
     {
         public string MacAddress { get; set; }
         public string IpAddress { get; set; }
