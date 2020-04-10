@@ -21,7 +21,7 @@ ensureContainer:
   stage: environment_setup
   script:
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
-    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/AndroidApp/Dockerfile --destination $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-android
+    - /kaniko/executor --context $CI_PROJECT_DIR/AndroidApp --dockerfile $CI_PROJECT_DIR/AndroidApp/Dockerfile --destination $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-android
 
 .build_job:
   image: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-android
