@@ -6,7 +6,7 @@ variables:
   PASHTO_ENV_URL: https://pashto-apps.noon-online.
   # TODO: Add comment showing where this fix for dind was originally found so it can be shared with others
   DOCKER_TLS_CERTDIR: "" # required since we use dind with no tls
-  DOCKER_HOST: tcp://localhost:2375/ # required since we use dind
+  DOCKER_HOST: tcp://localhost:2375/ # required since we use dind on kubernetes runner. Remove if not using kubernetes runner
 
 stages:
   - environment_setup
@@ -22,12 +22,11 @@ stages:
   stage: environment_setup
   services:
     - docker:18.09.7-dind
-  before_script:
-    - cd AndroidApp
   script:
     - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
     - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-android || true
     - docker build --cache-from $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-android -t $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-android .
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-android
 
 updateContainer:
   extends: .updateContainerJob
