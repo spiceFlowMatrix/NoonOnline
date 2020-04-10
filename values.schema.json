@@ -17,16 +17,20 @@
                 "Development"
             ]
         },
+        "sqlDbServer": {
+            "description": "sqlDbServer is the Uri (IP Address+Port, or domain) of the SQL database instance.\n [1] Used by the chart to form the connection string (secret) that the application expects on the ASPNET_DB_CONNECTIONSTRING environment variable.\n [2] Used by the chart to create a secret that is then fed to the MYSQL_DB_HOST environment variable for Cloud SQL proxy that manages connections to production SQL database",
+            "type": "string"
+        },
+        "sqlDbName": {
+            "description": "sqlDbName is the name of the exact database on the sqlDbServer instance that the chart will connect this deployment to.\n [1] Used by the chart to form the connection string (secret) that the application expects on the ASPNET_DB_CONNECTIONSTRING environment variable.\n [2] Used by the chart to create a secret that is then fed to the MYSQL_DB_HOST environment variable for Cloud SQL proxy that manages connections to production SQL database",
+            "type": "string"
+        },
         "sqlDbUser": {
-            "description": "sqlDbUser is the User Id that the application will use to connect to the SQL (MySQL for this application) database. Used by the chart to create a secret value that is then provided as the username for the SQL client on the application workload",
+            "description": "sqlDbUser is the User Id that the application will use to connect to the SQL (MySQL for this application) database.\n [1] Used by the chart to form the connection string (secret) that the application expects on the ASPNET_DB_CONNECTIONSTRING environment variable.\n [2] Used by the chart to create a secret that is then fed to the MYSQL_DB_USER environment variable for Cloud SQL proxy that manages connections to production SQL database",
             "type": "string"
         },
         "sqlDbPassword": {
-            "description": "sqlDbPassword is the password that the application will use to connect to the SQL (MySQL for this application) database. Used by the chart to create a secret value that is then provided as the password for the SQL client on the application workload",
-            "type": "string"
-        },
-        "sqlDbConnectionString": {
-            "description": "sqlDbConnectionString is the only credential that the aspnetcore webhost uses establish trusted connections to its required database. Used by the chart to create a secret value that is then fed to the ASPNET_DB_CONNECTIONSTRING environment variable on the application workload",
+            "description": "sqlDbPassword is the password that the application will use to connect to the SQL (MySQL for this application) database.\n [1] Used by the chart to form the connection string (secret) that the application expects on the ASPNET_DB_CONNECTIONSTRING environment variable.\n [2] Used by the chart to create a secret that is then fed to the MYSQL_DB_PASSWORD environment variable for Cloud SQL proxy that manages connections to production SQL database",
             "type": "string"
         },
         "auth0Tenant": {
@@ -78,9 +82,10 @@
         "image",
         "name",
         "netCoreEnvironment",
+        "sqlDbServer",
+        "sqlDbName",
         "sqlDbUser",
         "sqlDbPassword",
-        "sqlDbConnectionString",
         "auth0Tenant",
         "auth0ManagementUrl",
         "auth0ManagementClientId",
