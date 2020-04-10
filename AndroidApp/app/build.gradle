@@ -37,6 +37,9 @@ repositories {
 android {
     compileSdkVersion 29
 
+    // Suggested by fastlane as a fix for CI job failing at https://gitlab.com/edgsolutions-engineering/noon-online/-/jobs/506456901#L518. See https://gitlab.com/edgsolutions-engineering/noon-online/-/issues/58#note_321680878 for futher details.
+    enableSeparateAnnotationProcessing = true
+
     defaultConfig {
         applicationId "com.app.training24.noon"
 
@@ -100,7 +103,6 @@ android {
     }
 
     dexOptions {
-        incremental false
         javaMaxHeapSize "4g"
         preDexLibraries true
         dexInProcess = true
