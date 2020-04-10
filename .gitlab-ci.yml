@@ -4,6 +4,8 @@ variables:
   DEV_ENV_URL: https://${CI_COMMIT_REF_SLUG}.dev-apps.noon-online.com
   DARI_ENV_URL: https://dari-apps.noon-online.com
   PASHTO_ENV_URL: https://pashto-apps.noon-online.com
+  DOCKER_TLS_CERTDIR: "" # required since we use dind with no tls
+  DOCKER_HOST: tcp://localhost:2375/ # required since we use dind
 
 stages:
   - environment_setup
@@ -15,10 +17,10 @@ stages:
   - production
 
 .updateContainerJob:
-  image: docker:stable
+  image: docker:git
   stage: environment_setup
   services:
-    - docker:dind
+    - docker:18.09.7-dind
   before_script:
     - cd AndroidApp
   script:
