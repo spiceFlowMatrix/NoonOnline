@@ -1,0 +1,15 @@
+<resources>
+    <!--This template file must be maintained by developer and project maintainer-->
+    <!--Every time the format of /app/src/release/strings.xml changes, they must ensure they reflect the updated format here too-->
+    <!--The values below that are templated within \-\-\- (the three dashes without escape) are ones that will be updated during CI/CD and then placed within the correct directory before the app is built-->
+    <string name="app_scheme" translatable="false">noon</string>
+    <string name="com_auth0_client_id" translatable="false">---com_auth0_client_id_value---</string>
+    <string name="com_auth0_domain" translatable="false">---com_auth0_domain_value---</string>
+    <string name="com_auth0_audience" translatable="false">---com_auth0_audience_value---</string>
+    <string name="com_auth0_database_connection" translatable="false">Username-Password-Authentication</string>
+    <string name="com_auth0_scope" translatable="false">openid offline_access</string>
+    <string name="BASE_URL" translatable="false">---BASE_URL_value---/api/v1/</string>
+    <!--Encrypt Decrypt API KEY for 30 days trial  [Valid until: April 30, 2020]-->
+    <!-- Refere Link http://libeasy.alwaysdata.net/libmedia/license/ -->
+    <string name="YOUR_API_KEY" translatable="false">---YOUR_API_KEY_value---</string>
+</resources>

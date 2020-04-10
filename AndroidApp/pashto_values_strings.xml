@@ -1,0 +1,418 @@
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+    <!--Application Name -->
+    <string name="app_name" translatable="false">تعلیمات آنلاین ن</string>
+    <string name="api_url" translatable="true">http://192.168.22.11:8070/api/v1/</string>
+    <string name="splash_app_name" translatable="false">تعلیمات آنلاین ن</string>
+
+    <!-- Bottom NavigationView -->
+    <string name="item_1" translatable="false">کورس</string>
+    <string name="item_2" translatable="false">فعالیت درسی</string>
+    <string name="item_3" translatable="false">حساب معلومات عامل</string>
+    <string name="item_4" translatable="false">بحث‌ها</string>
+    <string name="item_5" translatable="false">کتابخانه</string>
+
+    <!--Bottom Profile NavigationView -->
+    <string name="profile_item_1" translatable="false">پروفایل</string>
+    <string name="profile_item_2" translatable="false">آمار</string>
+
+    <!--Side NavigationView -->
+    <string name="navigation_drawer_open" translatable="false">Open navigation drawer</string>
+    <string name="navigation_drawer_close" translatable="false">Close navigation drawer</string>
+    <string name="navi_item_1" translatable="false">خانه</string>
+    <string name="navi_item_2" translatable="false">پروفایل</string>
+    <string name="navi_item_3" translatable="false">کورس</string>
+    <string name="navi_item_5" translatable="false">شکایت</string>
+    <string name="navi_item_4" translatable="false">خروج</string>
+    <string name="navi_item_6" translatable="false">شخص اختصاص داده شده</string>
+    <string name="navi_item_7" translatable="false">کتابخانه</string>
+
+    <!--Login & Registration -->
+    <string name="email" translatable="false">آدرس ایمیل</string>
+    <string name="password" translatable="false">رمز عبور</string>
+    <string name="login" translatable="false">ورود</string>
+    <string name="signup" translatable="false"> ثبت نام</string>
+
+    <!--Validation -->
+    <string name="validation_enterEmail" translatable="false">آدرس ایمیل را وارد کنید</string>
+    <string name="validation_validEmail" translatable="false">آدرس ایمیل نامعتبر</string>
+    <string name="validation_enterPassword" translatable="false">رمز عبور را وارد کنید</string>
+    <string name="validation_passwordLenght" translatable="false">رمز عبور باید حداقل 6 حرف باشد</string>
+    <string name="validation_enterNewPassword" translatable="false">رمز عبور جدید را وارد کنید</string>
+    <string name="validation_enterOldPassword" translatable="false">رمز عبور فعلی را وارد کنید</string>
+    <string name="validation_enterConfirmPassword" translatable="false">رمز عبور جدید را تائید کنید</string>
+    <string name="validation_passwordNotMatch" translatable="false">رمزهای عبور مطابقت ندارند</string>
+    <string name="validation_enterFirstName" translatable="false">نام را وارد کنید</string>
+    <string name="validation_enterLastName" translatable="false">تخلص را وارد کید</string>
+    <string name="validation_enterContact" translatable="false">شماره تلفن را وارد کنید</string>
+    <string name="validation_validContact" translatable="false">شماره تلفن نامعتبر است</string>
+    <string name="validation_quiz" translatable="false">لطفا پاسخ را انتخاب کنید</string>
+    <string name="validation_enterUserName" translatable="false">نام کاربر را وارد کنید</string>
+    <string name="validation_enterFullName" translatable="false">نام را وارد کنید</string>
+    <string name="validation_enterBio" translatable="false">بیوگرافی را وارد کنید</string>
+    <string name="validation_username_already_exist" translatable="false">این نام کاربر در حال حاضر وجود دارد</string>
+    <string name="validation_email_password_incorrect" translatable="false">آدرس ایمیل و یا هم رمز عبور اشتباه است</string>
+    <string name="validation_search_text" translatable="false">لطفا موضوع جستجو را وارد کنید</string>
+    <string name="validation_passwordStrong" translatable="false"><![CDATA[رمزعبور بسیار ضعیف است. رمزعبور تان باید متشکل از حروف کلان و خورد انگلیسی، سمبول(*@_!&%$#) و اعداد باشد، بطور مثال: Noon@123]]></string>
+    <string name="validation_logout" translatable="false">آیا مطمئن هستید که می خواهید از سیستم خارج شوید؟</string>
+    <string name="validation_warning" translatable="false">هشدار</string>
+    <string name="validation_Connect_internet" translatable="false">لطفا به اینترنت وصل شوید</string>
+    <string name="validation_maximum_download" translatable="false">لطفا صبر کنید، شما حداکثر سه فایل را در یک زمان دانلود کرده میتوانید</string>
+    <string name="validation_profile_Update" translatable="false">آپدیت پروفایل</string>
+    <string name="validation_download_permission" translatable="false">دانلود نیاز به اجازه خارجی دارد</string>
+    <string name="validation_check_internet" translatable="false">لطفا اتصال اینترنت خود را بررسی کنید.</string>
+    <string name="validation_enter_title" translatable="false">موضوع</string>
+    <string name="validation_enter_assignment_title" translatable="false">لطفا نام کارخانگی را وارد کنید</string>
+    <string name="validation_enter_comment" translatable="false">نظر</string>
+    <string name="validation_delete" translatable="false">مطمئنید که میخواهید این موضوع را حذف کنید؟</string>
+    <string name="validation_passcode" translatable="false">لطفا کد را وارد کنید</string>
+    <string name="validation_passcodelength" translatable="false">لطفا کد شش رقمی را وارد کنید</string>
+    <string name="validation_invalidpasscode" translatable="false">لطفا کد معتبر را وارد کنید</string>
+    <string name="validation_remark" translatable="false">لطفا ملاحظارت را وارد کنید</string>
+    <string name="validation_Score" translatable="false">لطفا نمره را وارد کنید</string>
+
+    <!--Error Message -->
+    <string name="error_try_again" translatable="false">پاسخ اشتباه ...! لطفا دوباره کوشش کنید</string>
+    <string name="error_unknown" translatable="false">خرابی شبکه...! لطفا دوباره کوشش کنید</string>
+    <string name="error_time_out" translatable="false">اتمام مهلت ...! لطفا دوباره کوشش کنید</string>
+    <string name="error_no_internet_connection" translatable="false">دستگاه تان به انترنت وصل نیست ...!</string>
+    <string name="error_again_to_exit" translatable="false">لطفا دوباره روی بازگشت کلیک کنید تا خارج شوید</string>
+    <string name="error_file_not_found" translatable="false">فایل پیدا نشد...! لطفا فایل را دانلود کرده، دوباره کوشش کنید</string>
+    <string name="error_reminder_login" translatable="false">دستگاه تان به انترنت وصل نیست...! لطفا برای ادامه به اینترنت متصل شوید</string>
+    <string name="error_no_space" translatable="false">فضای خالی در دستگاه موجود نیست</string>
+    <string name="error_no_found_previous_lesson" translatable="false">درس قبلی پیدا نشد</string>
+    <string name="error_no_handler_this_type_file" translatable="false">هیچ پردازنده ای برای این نوع فایل وجود ندارد.</string>
+    <string name="error_no_application" translatable="false">هیچ اپلکیشن ای برای این نوع فایل وجود ندارد.</string>
+    <string name="error_no_any_notifcation" translatable="false">هیچ اعلانی دریافت نکرده اید</string>
+    <string name="error_no_book_found" translatable="false">هیچ کتابی یافت نشد</string>
+    <string name="no_page_found" translatable="false">صفحه یافت نشد</string>
+    <string name="error_please_subscription_for_this_additional_services" translatable="false">شما برای این خدمات اشتراک نکرده‌اید</string>
+
+    <!--All -->
+    <string name="search_hint" translatable="false">جستجو کنید</string>
+    <string name="dash" translatable="false">-</string>
+    <string name="completed" translatable="false">تکمیل شده</string>
+    <string name="per" translatable="false">%تکمیل شده&#160;</string>
+    <string name="terminated" translatable="false">منقضی شده</string>
+    <string name="on_going" translatable="false">در حال جریان</string>
+    <string name="newstring" translatable="false">جدید</string>
+    <string name="gradeString" translatable="false">صنف</string>
+    <string name="none" translatable="false">ھمه صنوف</string>
+    <string name="next_button" translatable="false">بعدی</string>
+    <string name="next" translatable="false">بعدی</string>
+    <string name="previous" translatable="false">قبلی</string>
+    <string name="continues" translatable="false">ادامه</string>
+    <string name="previous_lesson" translatable="false">درس قبلی</string>
+
+    <string name="lessThen" translatable="false">صفحه قبلی</string>
+    <string name="greterThen" translatable="false">صفحه بعدی</string>
+    <string name="clear" translatable="false">پاک کنید</string>
+    <string name="question" translatable="false">سوال</string>
+    <string name="selectAnAnswer" translatable="false">یک پاسخ را انتخاب کنید</string>
+    <string name="quiz_passed" translatable="false">مبارک، شما کامیاب شده اید</string>
+    <string name="quiz_failed" translatable="false">شما کامیاب نشده اید</string>
+    <string name="try_again" translatable="false">دوباره کوشش کنید</string>
+    <string name="reset_password" translatable="false">تغییر رمز عبور</string>
+    <string name="button_ok" translatable="false">بله</string>
+    <string name="button_cancel" translatable="false">لغو</string>
+
+    <!--Textview label-->
+    <string name="new_password" translatable="false">رمز عبور جدید</string>
+    <string name="old_password" translatable="false">رمز عبور فعلی</string>
+    <string name="confirm_password" translatable="false">تائید رمز عبور جدید </string>
+    <string name="username" translatable="false">نام کاربر</string>
+    <string name="firstname" translatable="false">نام</string>
+    <string name="lastname" translatable="false">تخلص</string>
+    <string name="e_mail" translatable="false">آدرس ایمیل</string>
+    <string name="phone_number" translatable="false">شماره تلفن</string>
+    <string name="submit" translatable="false">ارسال</string>
+    <string name="complaint" translatable="false">شکایت</string>
+
+    <!--Toolbar label-->
+    <string name="my_courses" translatable="false">کورس های من</string>
+    <string name="edit" translatable="false">ویرایش</string>
+
+    <!--Statistics-->
+    <string name="unread_notifictions" translatable="false">اعلانات خوانده نشده</string>
+    <string name="average_quiz_score" translatable="false">حد اوسط نمره امتحان</string>
+    <string name="average_assignment_score" translatable="false">حد اوسط نمره فعالیت درسی</string>
+    <string name="complete_courses" translatable="false">کورس های تکمیل شده</string>
+    <string name="total_available_courses" translatable="false">مجموع کورس های قابل دسترس</string>
+    <string name="terminated_courses" translatable="false">کورس های منقضی شده</string>
+    <string name="total_courses" translatable="false">مجموع کورس های</string>
+    <string name="playvideotag_key" translatable="false">پخش ویدیو</string>
+
+    <!--Dialog Message-->
+    <string name="loading" translatable="false">در حال آماده شدن</string>
+
+    <!--Quiz Result Keyword-->
+    <string name="quiz_summary" translatable="false">نتیجه امتحان</string>
+    <string name="yourscore" translatable="false">نمره شما</string>
+    <string name="passingscore" translatable="false">نمره کامیابی</string>
+    <string name="seconds" translatable="false">ثانیه</string>
+    <string name="minutes" translatable="false">دقیقه</string>
+    <string name="hours" translatable="false">ساعت</string>
+    <string name="completed_in" translatable="false">تکمیل شده در</string>
+    <string name="Finish" translatable="false">پایان</string>
+    <string name="downloading" translatable="false">دانلود</string>
+
+    <!-- Assignment Keyword-->
+    <string name="assignment_document" translatable="false">اسناد کارخانگی</string>
+    <string name="assignment_review" translatable="false">مرور بر کارخانگی</string>
+    <string name="remarks" translatable="false">نظریات</string>
+    <string name="score" translatable="false">نمره</string>
+    <string name="pass_assignment" translatable="false">تائید کارخانگی</string>
+    <string name="complete" translatable="false">تکمیل</string>
+    <string name="assignment_topic_name" translatable="false">نام کارخانگی</string>
+    <string name="assignment_topic_description" translatable="false">توضیحات کارخانگی</string>
+
+    <!-- Discussions Keyword-->
+    <string name="discussions_topic_name" translatable="false">موضوع</string>
+    <string name="discussions_topic_description" translatable="false">توضیحات</string>
+    <string name="no_external_storage" translatable="false">ذخیره‌سازی خارجی در این دستگاه موجود نیست</string>
+    <string name="select_file" translatable="false">انتخاب فایل‌ها</string>
+    <string name="no_file_chosen" translatable="false">هیچ فایلی انتخاب نشده است</string>
+    <string name="share_with" translatable="false">خصوصی</string>
+    <string name="comment" translatable="false">نظر</string>
+    <string name="comments" translatable="false">نظریات</string>
+    <string name="post" translatable="false">اشتراک‌گذاری</string>
+    <string name="commented" translatable="false">نظر داده شد</string>
+    <string name="forgot_password" translatable="false">رمز عبور را فراموش کرده‌اید؟</string>
+    <string name="forgot_password_header" translatable="false">رمز عبور را فراموش کرده‌اید؟</string>
+    <string name="passcode" translatable="false">کد</string>
+    <string name="user_not_exiest" translatable="false">کاربر موجود نیست</string>
+    <string name="no_access_discussion" translatable="false">شما به بحث‌ها دسترسی ندارید</string>
+
+    <!--Notification Keyword-->
+
+    <string name="notifications_admin_channel_name" translatable="false">چینل عمومی</string>
+    <string name="notifications_admin_channel_description" translatable="false">اعلان از طرف ادمین ارسال شده</string>
+    <string name="all_noti" translatable="false">همه اعلانات</string>
+    <string name="notification_label" translatable="false">اعلانات</string>
+    <string name="brodcastTAG" translatable="false">سرعت بیش از حد</string>
+
+
+    <string name="alertTitleWhenFirstTimeDownload">جهت دانلود بی‌نقص فایل، لطفا تا پایان دانلود از کورس خارج نشوید و قبل از شروع دانلود، دانلودهای خارج از اپ نون را متوقف کنید.</string>
+    <string name="ok">بلی</string>
+    <string name="cancel">کنسل</string>
+    <string name="are_you_sure_delete">آیا مطمئن هستید که میخواهید این فایل را حذف کنید؟</string>
+    <string name="summary">خلاصه</string>
+    <string name="back">بازگشت</string>
+    <string name="descriptions">توضیحات</string>
+    <string name="continueApp">آیا مطئنید که ادامه میدهید؟</string>
+    <string name="submition">فرستادن</string>
+    <string name="student_name">نام شاگرد</string>
+
+
+    <!-- Free Trial Sign UP-->
+    <string name="account">حساب</string>
+    <string name="email_address">ایمیل آدرس</string>
+    <string name="free_trial_account"> حساب دسترسی موقت برای 15 روز</string>
+    <string name="personal_information">اطلاعات شخصی</string>
+    <string name="name">نام</string>
+    <string name="father_name_surname">نام پدر / تخلص</string>
+    <string name="gender">جنسیت</string>
+    <string name="birthplace_optional">محل تولد (اختیاری)</string>
+    <string name="village_area">ناحیه / قریه</string>
+    <string name="school">مکتب</string>
+    <string name="contact_information">اطلاعات تماس</string>
+    <string name="birthday">تاریخ تولد</string>
+    <string name="tazkira_number_optional">نمبر تذکره (اختیاری)</string>
+    <string name="register">ثبت نام</string>
+    <string name="already_have_an_account">قبلا حساب داشته‌اید؟</string>
+    <string name="province">ولایت</string>
+    <string name="city_district">شهر / قریه</string>
+    <string name="facebook_skypy_optional">فیسبوک / اسکایپ (اختیاری)</string>
+    <string name="create_new_account">ساخت حساب جدید</string>
+    <string name="Invalid_Birthdate">تاریخ تولد نامعتبر</string>
+    <string name="validation_enterName">نام را وارد کنید</string>
+    <string name="validation_enterFatherNameSurname">نام پدر / تخلص را وارد کنید</string>
+    <string name="validation_enterBirthPlace">محل تولد را وارد کنید</string>
+    <string name="validation_enterVillageArea">ناحیه / قریه را وارد کنید</string>
+    <string name="validation_enterSchool">مکتب را وارد کنید</string>
+    <string name="validation_enterTazkiraNumber">نمبر تذکره را وارد کنید</string>
+    <string name="ValidationContactNumber">نمبر تلفن را وارد کنید</string>
+    <string name="ValidationGender">جنس را وارد کنید</string>
+    <string name="validation_enterBirthdate">لطفن تاریخ تولد را انتخاب کنید</string>
+    <string name="grade">صنف</string>
+    <string name="how_did_you_hear_about_us">چگونه از موجودیت برنامه تعلیمات آنلاین (ن) آگاه شدید؟</string>
+    <string name="ValidationProvince">لطفا ولایت را انتخاب کنید</string>
+    <string name="ValidationCity">لطفا شهر را انتخاب کنید</string>
+    <string name="ValidationGrade">لطفا صنف را انتخاب کنید</string>
+    <string name="facebook">فیس‌بوک</string>
+    <string name="skype">اسکایپ</string>
+    <string name="male">ذکور</string>
+    <string name="female">اناث</string>
+    <string name="friend_relative">دوست/اقارب</string>
+    <string name="social_media">شبکه‌های اجتماعی</string>
+    <string name="billboard">تابلو تبلیغاتی</string>
+    <string name="sales_agent">نماینده فروشات</string>
+    <string name="ValidationAboutus">لطفا انتخاب کنید که چگونه از موجودیت تعلیمات آنلاین ن با خبر شدید</string>
+
+    <string name="grade_6">صنف 6</string>
+    <string name="grade_7">صنف 7</string>
+    <string name="grade_8">صنف 8</string>
+    <string name="grade_9">صنف 9</string>
+    <string name="grade_10">صنف 10</string>
+    <string name="grade_11">صنف 11</string>
+    <string name="grade_12">صنف 12</string>
+    <string name="Expired_Key">Invalid or expired API Key</string>
+    <string name="ValidationPhoneNumber">لطفا شماره تلفن را وارد کنید</string>
+    <string name="default_notification_channel_id">fcm_default_channel</string>
+
+    <!--For Dari Notification Translation-->
+    <string name="just_now">هم اکنون</string>
+    <string name="days">روز</string>
+    <string name="one_minute">1 دقیقه</string>
+    <string name="about_an_hour">تقریبا 1 ساعت</string>
+    <string name="one_day">1 روز</string>
+    <string name="about_a_month">تقریبا 1 ماه</string>
+    <string name="months">ماه</string>
+    <string name="about_a_year">تقریبا 1 سال</string>
+    <string name="over_a_year">بیشتر از یک سال</string>
+    <string name="almost_two_years">تقریبا 2 سال</string>
+    <string name="years">سال</string>
+    <string name="ago">پیش</string>
+    <string name="week">هفته</string>
+
+    <!--New Module-->
+    <string name="dari_school">مکتب دری</string>
+    <!--<string name="dari_school">مکتب دری</string>-->
+    <string name="pashto_school">مکتب پشتو</string>
+    <string name="search_discussion_hint">جستجو...</string>
+    <string name="text">متن</string>
+    <string name="assignment">کارخانگی</string>
+    <string name="chapter_quiz">امتحان فصل</string>
+    <string name="completed1"> % تکمیل شده</string>
+    <string name="page">صفحه</string>
+    <string name="of">از</string>
+    <string name="chapter_assignment">کارخانگی فصل</string>
+    <string name="assignmnet_documents">اسناد کارخانگی</string>
+    <string name="added_submission">کارخانگی را ارسال کرد</string>
+    <string name="commentedE">نظر داد</string>
+    <string name="submitionE">کارخانگی ارسال شده</string>
+    <string name="paas_assignment">کامیاب</string>
+    <string name="pdf_not_availble">متن موجود نیست</string>
+    <string name="no_assignment_available">کارخانگی موجود نیست</string>
+    <string name="please_select_student">لطفا شاگرد را انتخاب کنید</string>
+    <string name="percompleted" translatable="false">% تکمیل شده</string>
+    <string name="user">کابر</string>
+    <string name="after_download_complete">شما سه درس را همزمان دانلود کرده میتوانید.</string>
+
+    <!-- Student Analysis  -->
+    <string name="progress_report">گزارش فعالیت‌ها</string>
+    <string name="time_spend_in_the_app">مدت زمان استفاده از اپ</string>
+    <string name="overall_progress">فعالیت کلی</string>
+    <string name="quizzes_progress">گزارش امتحانات</string>
+    <string name="assignment_progress">گزارش کارخانگی</string>
+    <string name="gpa">معدل</string>
+    <string name="performance_in_quiz">عملکرد در امتحانات</string>
+    <string name="overall_performance_in_quiz">عملکرد کلی در امتحانات</string>
+    <string name="quizzes_progress_overtime">پیشرفت امتحانات با گذشت زمان</string>
+    <string name="performance_in_assignments">عملکرد در کارخانگی</string>
+    <string name="overall_performance_in_assignments">پیشرفت کلی در امتحانات</string>
+    <string name="assignment_progress_overtime">پیشرفت در کارخانگی با گذشت زمان</string>
+    <string name="gpa_progressovertime">پیشرفت نمرات با گذشت زمان</string>
+    <string name="current_gpa">نمره فعلی :&#160;</string>
+    <string name="no_internet">دستگاه به انترنت وصل نیست</string>
+
+    <!--    <string name="no_internet">No Internet</string>-->
+    <string name="no_data_found">اطلاعات موجود نیست</string>
+    <string name="lastonline">: آخرین وقت آنلاین</string>
+    <string name="total_quiztaken">مجموعه امتحانات گرفته شده :&#160;</string>
+    <string name="score_pie_chart">نمره :</string>
+    <string name="total_submission">مجموعه کارخانگی ارسال شده :&#160;</string>
+    <string name="all_courses">همه کورس‌ها</string>
+    <string name="all_content">همه مطالب</string>
+    <string name="chapter">فصل</string>
+    <string name="lesson">درس</string>
+    <string name="pdf">متن</string>
+    <string name="video">ویدیو</string>
+    <string name="last_one_month">یک ماه اخیر</string>
+    <string name="last_three_month">سه ماه اخیر</string>
+    <string name="last_six_month">شش ماه اخیر</string>
+    <string name="quiz">امتحان</string>
+    <string name="empty_last_online">آخرین وقت آنلایت : --</string>
+    <string name="all_users">همه کاربران&#160;</string>
+    <string name="user_selected">کابر انتحاب شده</string>
+
+    <string name="done">Done</string>
+    <string name="select_user">Select User</string>
+
+    <!--Login Text-->
+    <string name="validation_password">پسورد را اشتباه وارد کرده اید</string>
+    <string name="invalid_email_validation">ایمیل آدرس را اشتباه وارد کرده اید</string>
+
+    <!--    <string name="validation_password">wrong Password</string>-->
+    <!--    <string name="invalid_email_validation">Wrong Email</string>-->
+
+    <!--Discussion Text-->
+    <string name="private_mode">Private Mode</string>
+
+    <!--Terms & Conditions-->
+    <string name="accept_terms_conditions">I Accept the&#160;</string>
+    <string name="terms_conditions">Terms &amp; Conditions&#160;</string>
+    <string name="accept_term_condition">Please Accept Terms &amp; Conditions</string>
+    <string name="by_acknowledged">be acknowledged by you.</string>
+    <string name="by_signing_app">By signing in to this app, the&#160;&#160;</string>
+    <string name="privacy_policy">privacy policy&#160;&#160;</string>
+    <string name="or">&#160;&#160;OR&#160;&#160;</string>
+    <string name="will">will</string>
+
+    <!--Feedback-->
+    <string name="video_issue">Video Issue</string>
+    <string name="select_course">Select a Course</string>
+    <string name="cameraroll">CAMERA ROLL</string>
+    <string name="send">SEND</string>
+    <string name="time">Time</string>
+    <string name="submit_feedback">Submit a Feedback</string>
+    <string name="what_improve">Explain what you love, or what could improve.</string>
+    <string name="feedback">Feedback</string>
+    <string name="in_queue">In Queue</string>
+    <string name="in_progress">In Progress</string>
+    <string name="in_completed">Completed</string>
+    <string name="report_a_problem">Report a Problem</string>
+    <string name="something_isn_t_working_app">Something Isn\'t Working in the App</string>
+    <string name="text_issue">Text Issue</string>
+    <string name="lesson_assignment_issue">Lesson Assignment Issue</string>
+    <string name="chapter_assignment_issue">Chapter Assignment Issue</string>
+    <string name="quiz_issue">Quiz Issue</string>
+    <string name="general_feedback">General Feedback</string>
+    <string name="explain_what_happened">Explain what happened and what need to do to reproduce the app</string>
+    <string name="select_chapterHint">Select a Chapter</string>
+    <string name="select_source">Select Source</string>
+    <string name="camera">Camera</string>
+    <string name="file_manager">File Manager</string>
+    <string name="select_action">Select Action</string>
+    <string name="image">Image</string>
+    <string name="video_text">Video</string>
+    <string name="select_video">Select Video</string>
+    <string name="validation_enterDecription">Enter the Description</string>
+    <string name="select_lesson">Select a Lesson</string>
+    <string name="no_feedback_available">No Feedback Available</string>
+    <string name="validation_course_select">Please Select Course</string>
+    <string name="validation_lesson_select">Please Select Lesson</string>
+    <string name="validation_chapter_select">Please Select Chapter</string>
+    <string name="user_name">Name&#160;&#160;:&#160;&#160;</string>
+    <string name="spent_hour">Spent Hour&#160;&#160;:&#160;&#160;</string>
+    <string name="validation_limitDecription">There is limit of only 150 characters</string>
+    <string name="many_attempt">Too many attempts!! Please try later</string>
+
+    <!--<string name="pashto_school">مدرسة الباشتو</string>-->
+    <!--For Pashto Notification Translation-->
+    <!-- <string name="just_now_pashto">همدا اوس</string>
+     <string name="minute">دقیقې</string>
+     <string name="hours">ساعته</string>
+     <string name="days">ورځې</string>
+     <string name="one_minute">نږدې یو دقیقه</string>
+     <string name="about_an_hour">نږدې یو ساعت</string>
+     <string name="one_day">یوه ورځ</string>
+     <string name="about_a_month">نږدې یوه میاشت</string>
+     <string name="months">میاشتې</string>
+     <string name="about_a_year">نږدې یو کال</string>
+     <string name="over_a_year">ه یو کال څخه زیات</string>
+     <string name="almost_two_years">نږدې دوه کاله</string>
+     <string name="years">کاله</string>
+     <string name="ago">وړاندې</string>
+     <string name="week">هفته</string>-->
+
+</resources>
