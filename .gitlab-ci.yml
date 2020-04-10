@@ -17,7 +17,7 @@ stages:
   - beta
   - production
 
-.updateContainerJob:
+ensureContainer:
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
