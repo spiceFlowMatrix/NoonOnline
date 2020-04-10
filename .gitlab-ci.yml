@@ -107,6 +107,7 @@ buildRelease:
     - cp pashto_values_strings.xml app/src/main/res/values/strings.xml
     - sed -i 's/com.app.training24.noon/com.app.training24.noonpashto/' fastlane/Appfile
     - sed -i 's/applicationId "com.app.training24.noon"/applicationId "com.app.training24.noonpashto"/' app/build.gradle
+    # TODO: Use sed to update the app metadata title in fastlane for pashto
     - bundle exec fastlane buildRelease
   environment:
     name: pashto_production
