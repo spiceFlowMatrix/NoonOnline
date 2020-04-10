@@ -9,9 +9,6 @@ stages:
   - environment_setup
   - build
   - test
-  - internal
-  - alpha
-  - beta
   - production
 
 ensureContainer:
@@ -117,9 +114,9 @@ buildRelease:
   only:
     - master
 
-publishInternal:
+publishProduction:
   image: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-android
-  stage: internal
+  stage: production
   only:
     - master
   environment:
@@ -133,11 +130,11 @@ publishInternal:
   after_script:
     - rm ~/google_play_api_key.json
   script:
-    - bundle exec fastlane internal
+    - bundle exec fastlane production
 
-publishInternal:
+publishProduction:
   image: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-android
-  stage: internal
+  stage: production
   only:
     - master
   environment:
@@ -151,71 +148,4 @@ publishInternal:
   after_script:
     - rm ~/google_play_api_key.json
   script:
-    - bundle exec fastlane internal
-
-.promote_job:
-  image: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-android
-  when: manual
-  dependencies: []
-  only:
-    - master
-  before_script:
-    - echo $google_play_service_account_api_key_json > ~/google_play_api_key.json
-  after_script:
-    - rm ~/google_play_api_key.json
-
-# Dari promotions
-promoteAlpha:
-  extends: .promote_job
-  stage: alpha
-  script:
-    - bundle exec fastlane promote_internal_to_alpha
-  environment:
-    name: dari_production
-    url: $DARI_ENV_URL
-
-promoteBeta:
-  extends: .promote_job
-  stage: beta
-  script:
-    - bundle exec fastlane promote_alpha_to_beta
-  environment:
-    name: dari_production
-    url: $DARI_ENV_URL
-
-promoteProduction:
-  extends: .promote_job
-  stage: production
-  script:
-    - bundle exec fastlane promote_beta_to_production
-  environment:
-    name: dari_production
-    url: $DARI_ENV_URL
-
-# Pashto promotions
-promoteAlpha:
-  extends: .promote_job
-  stage: alpha
-  script:
-    - bundle exec fastlane promote_internal_to_alpha
-  environment:
-    name: pashto_production
-    url: $PASHTO_ENV_URL
-
-promoteBeta:
-  extends: .promote_job
-  stage: beta
-  script:
-    - bundle exec fastlane promote_alpha_to_beta
-  environment:
-    name: pashto_production
-    url: $PASHTO_ENV_URL
-
-promoteProduction:
-  extends: .promote_job
-  stage: production
-  script:
-    - bundle exec fastlane promote_beta_to_production
-  environment:
-    name: pashto_production
-    url: $PASHTO_ENV_URL
+    - bundle exec fastlane production
