@@ -27,6 +27,8 @@ ensureContainer:
   image: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-android
   stage: build
   before_script:
+    - cd AndroidApp
+    - rm app/google-services.json || true
     - echo ${ANDROID_GOOGLE_SERVICES_JSON} | base64 -d > app/google-services.json
     - echo ${ANDROID_SSL_CRT_HASH} | xxd -r -p - > app/src/main/res/raw/noonssl.crt
     # TODO: Ensure none of the configs being updated into the file by sed don't have any @ characters in them since that's what we use as delimiter. See here https://stackoverflow.com/a/584926
