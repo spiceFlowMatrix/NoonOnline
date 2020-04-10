@@ -18,39 +18,19 @@ stages:
   - production
 
 .updateContainerJob:
-  image: docker:git
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
   stage: environment_setup
-  services:
-    - docker:18.09.7-dind
   script:
-    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-    - docker pull $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-android || true
-    - docker build --cache-from $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-android -t $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-android .
-    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-android
-
-updateContainer:
-  extends: .updateContainerJob
-  only:
-    changes:
-      - Dockerfile
-
-# NOTE: Because the first pipeline on a branch can fail, the only: changes: Dockerfile syntax won't trigger for a subsequent pipeline after you fix things. This can leave your branch without a Docker image to use. So the ensureContainer job will look for an existing image and only build one if it doesn't exist. The one downside to this is that both of these jobs will run at the same time if it is a new branch.
-ensureContainer:
-  extends: .updateContainerJob
-  allow_failure: true
-  before_script:
-    - cd AndroidApp
-    - "mkdir -p ~/.docker && echo '{\"experimental\": \"enabled\"}' > ~/.docker/config.json"
-    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-    # Skip update container `script` if the container already exists
-    # via https://gitlab.com/gitlab-org/gitlab-ce/issues/26866#note_97609397 -> https://stackoverflow.com/a/52077071/79683
-    - docker manifest inspect $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-android > /dev/null && exit || true
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
+    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/AndroidApp/Dockerfile --destination $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-android
 
 .build_job:
   image: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-android
   stage: build
   before_script:
-    - rm app/google-services.json
+    - rm app/google-services.json || true
     - echo ${ANDROID_GOOGLE_SERVICES_JSON} | base64 -d > app/google-services.json
     - echo ${ANDROID_SSL_CRT_HASH} | xxd -r -p - > app/src/main/res/raw/noonssl.crt
     # TODO: Ensure none of the configs being updated into the file by sed don't have any @ characters in them since that's what we use as delimiter. See here https://stackoverflow.com/a/584926
