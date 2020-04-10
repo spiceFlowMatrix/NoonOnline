@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import androidx.core.content.res.ResourcesCompat;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
@@ -15,21 +14,23 @@ import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.SearchView;
 
+import androidx.core.content.res.ResourcesCompat;
+
 import com.google.gson.Gson;
 import com.ibl.apps.Adapter.SearchCoursesAdapter;
 import com.ibl.apps.Adapter.SearchLessonAdapter;
 import com.ibl.apps.Adapter.SpinnerItemAdapter;
 import com.ibl.apps.Base.BaseActivity;
+import com.ibl.apps.CourseManagement.CourseRepository;
 import com.ibl.apps.Model.AllGradeObject;
 import com.ibl.apps.Model.CourseObject;
 import com.ibl.apps.Model.CoursePriviewObject;
 import com.ibl.apps.Model.SearchObject;
-import com.ibl.apps.RoomDatabase.database.AppDatabase;
 import com.ibl.apps.RoomDatabase.entity.LessonProgress;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
+import com.ibl.apps.noon.databinding.SearchLayoutBinding;
 import com.ibl.apps.util.Const;
 import com.ibl.apps.util.PrefUtils;
-import com.ibl.apps.noon.databinding.SearchLayoutBinding;
 import com.mancj.slideup.SlideUp;
 import com.mancj.slideup.SlideUpBuilder;
 
@@ -66,6 +67,7 @@ public class SearchActivity extends BaseActivity implements View.OnClickListener
     public String SearchText = "", bygrade = "";
     String userId = "0";
     UserDetails userDetailsObject = new UserDetails();
+    private CourseRepository courseRepository;
 
     @Override
     protected int getContentView() {
@@ -76,6 +78,7 @@ public class SearchActivity extends BaseActivity implements View.OnClickListener
     protected void onViewReady(Bundle savedInstanceState, Intent intent) {
         super.onViewReady(savedInstanceState, intent);
         searchLayoutBinding = (SearchLayoutBinding) getBindObj();
+        courseRepository = new CourseRepository();
 
         Typeface typeface = ResourcesCompat.getFont(SearchActivity.this, R.font.bahij_helvetica_neue_bold);
         searchLayoutBinding.advanceSearchLayout.chknew.setTypeface(typeface);
@@ -172,13 +175,12 @@ public class SearchActivity extends BaseActivity implements View.OnClickListener
                     userDetailsObject = userDetails;
                     userId = userDetailsObject.getId();
 
-
                     AllGradeObject.Data allGrade = new AllGradeObject.Data();
                     allGrade.setId("0");
                     allGrade.setName(getString(R.string.none));
                     spinnerGradelist.add(allGrade);
 
-                    CourseObject courseObject = AppDatabase.getAppDatabase(getApplicationContext()).courseDao().getAllCourseObject(userId);
+                    CourseObject courseObject = courseRepository.getAllCourseObject(userId);
                     if (courseObject != null && courseObject.getData() != null) {
                         for (int i = 0; i < courseObject.getData().size(); i++) {
 
@@ -261,7 +263,7 @@ public class SearchActivity extends BaseActivity implements View.OnClickListener
 
         if (isNetworkAvailable(this)) {
             showDialog(getString(R.string.loading));
-            disposable.add(apiService.SearchDetails(0, 0, SearchText, filter, bygrade)
+            disposable.add(courseRepository.SearchDetails(0, 0, SearchText, filter, bygrade)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeWith(new DisposableSingleObserver<SearchObject>() {
@@ -337,7 +339,7 @@ public class SearchActivity extends BaseActivity implements View.OnClickListener
                 showDialog(getString(R.string.loading));
                 /*---  Search Course and lesson  ---*/
 
-                CourseObject courseObject = AppDatabase.getAppDatabase(this).courseDao().getAllCourseObject(userId);
+                CourseObject courseObject = courseRepository.getAllCourseObject(userId);
 
                 //  Log.e("lessonfileName", "DATABASE===courseObject===" + courseObject);
 
@@ -411,13 +413,13 @@ public class SearchActivity extends BaseActivity implements View.OnClickListener
                                         searchCourseObject.setName(courseName);
                                         searchCourseObject.setGradeDetails(new SearchObject.GradeDetails[]{gradeDetails});
 
-                                        byte[] bitmapImage = AppDatabase.getAppDatabase(NoonApplication.getContext()).courseDao().getCourseImage(userId, courseId);
+                                        byte[] bitmapImage = courseRepository.getCourseImage(userId, courseId);
                                         if (bitmapImage != null) {
                                             searchCourseObject.setCourseImage(bitmapImage);
                                         }
 
-                                        int totalTrueLesson = AppDatabase.getAppDatabase(NoonApplication.getContext()).lessonProgressDao().getItemgradeIdProgress(courseId, "100", userId);
-                                        String totalLEssonITEm = AppDatabase.getAppDatabase(NoonApplication.getContext()).lessonProgressDao().getStringProgress(courseId, userId);
+                                        int totalTrueLesson = courseRepository.getItemgradeIdProgress(courseId, "100", userId);
+                                        String totalLEssonITEm = courseRepository.getStringProgress(courseId, userId);
                                         if (totalLEssonITEm != null) {
                                             int totalCount = Integer.parseInt(totalLEssonITEm);
                                             if (totalCount != 0 && totalTrueLesson != 0) {
@@ -479,13 +481,13 @@ public class SearchActivity extends BaseActivity implements View.OnClickListener
                                             searchCourseObject.setName(courseName);
                                             searchCourseObject.setGradeDetails(new SearchObject.GradeDetails[]{gradeDetails});
 
-                                            byte[] bitmapImage = AppDatabase.getAppDatabase(NoonApplication.getContext()).courseDao().getCourseImage(userId, courseId);
+                                            byte[] bitmapImage = courseRepository.getCourseImage(userId, courseId);
                                             if (bitmapImage != null) {
                                                 searchCourseObject.setCourseImage(bitmapImage);
                                             }
 
-                                            int totalTrueLesson = AppDatabase.getAppDatabase(NoonApplication.getContext()).lessonProgressDao().getItemgradeIdProgress(courseId, "100", userId);
-                                            String totalLEssonITEm = AppDatabase.getAppDatabase(NoonApplication.getContext()).lessonProgressDao().getStringProgress(courseId, userId);
+                                            int totalTrueLesson = courseRepository.getItemgradeIdProgress(courseId, "100", userId);
+                                            String totalLEssonITEm = courseRepository.getStringProgress(courseId, userId);
                                             if (totalLEssonITEm != null) {
                                                 int totalCount = Integer.parseInt(totalLEssonITEm);
                                                 if (totalCount != 0 && totalTrueLesson != 0) {
@@ -536,7 +538,7 @@ public class SearchActivity extends BaseActivity implements View.OnClickListener
                                 }
 
 
-                                CoursePriviewObject coursePriviewObject = AppDatabase.getAppDatabase(this).courseDetailsDao().getAllCourseDetails(courseId, userId);
+                                CoursePriviewObject coursePriviewObject = courseRepository.getAllCourseDetails(courseId, userId);
                                 if (coursePriviewObject != null) {
 
                                     for (int k = 0; k < coursePriviewObject.getData().getChapters().size(); k++) {
@@ -571,7 +573,7 @@ public class SearchActivity extends BaseActivity implements View.OnClickListener
                                                     lessonFileTypeName = coursePriviewObject.getData().getChapters().get(k).getLessons()[l].getLessonfiles()[lessonFilePos].getFiles().getFiletypename();
                                                     lessonFileName = coursePriviewObject.getData().getChapters().get(k).getLessons()[l].getLessonfiles()[lessonFilePos].getFiles().getFilename();
 
-                                                    LessonProgress lessonProgress = AppDatabase.getAppDatabase(this).lessonProgressDao().getItemLessonProgress(lessonId, fileid, userId);
+                                                    LessonProgress lessonProgress = courseRepository.getItemLessonProgress(lessonId, fileid, userId);
                                                     if (lessonProgress != null) {
                                                         progressVal = Integer.parseInt(lessonProgress.getLessonProgress());
                                                     }
@@ -580,7 +582,7 @@ public class SearchActivity extends BaseActivity implements View.OnClickListener
                                                     lessonfileName = coursePriviewObject.getData().getChapters().get(k).getLessons()[l].getName();
                                                     lessonfileDescription = coursePriviewObject.getData().getChapters().get(k).getLessons()[l].getDescription();
 
-                                                    LessonProgress lessonProgress = AppDatabase.getAppDatabase(this).lessonProgressDao().getItemquizidProgress(quizID, userId);
+                                                    LessonProgress lessonProgress = courseRepository.getItemquizidProgress(quizID, userId);
                                                     if (lessonProgress != null) {
                                                         progressVal = Integer.parseInt(lessonProgress.getLessonProgress());
                                                     }

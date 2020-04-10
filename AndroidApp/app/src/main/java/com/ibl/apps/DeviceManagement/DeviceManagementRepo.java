@@ -1,4 +1,4 @@
-package com.ibl.apps.devicemanagement;
+package com.ibl.apps.DeviceManagement;
 
 import com.ibl.apps.Network.ApiClient;
 import com.ibl.apps.noon.NoonApplication;

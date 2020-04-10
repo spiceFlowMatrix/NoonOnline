@@ -4,7 +4,7 @@ import androidx.room.Dao;
 import androidx.room.Query;
 import androidx.room.Update;
 
-import com.ibl.apps.devicemanagement.UserDeviceProfileModel;
+import com.ibl.apps.DeviceManagement.UserDeviceProfileModel;
 /**
  * This interface contains database queries implementation of Device Managements.
  * This class is used by {@link DeviceManagementRepository}

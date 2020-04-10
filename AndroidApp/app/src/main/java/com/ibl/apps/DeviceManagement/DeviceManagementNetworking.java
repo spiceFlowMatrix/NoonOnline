@@ -1,4 +1,4 @@
-package com.ibl.apps.devicemanagement;
+package com.ibl.apps.DeviceManagement;
 
 
 import io.reactivex.Single;

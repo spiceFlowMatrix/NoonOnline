@@ -68,7 +68,6 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
     MainDashboardLayoutBinding mainDashboardLayoutBinding;
     private boolean doubleBackToExitPressedOnce = false;
     MenuItem prevMenuItem;
-    CompositeDisposable disposable = new CompositeDisposable();
     //Fragments
     GradeFragment gradeFragment;
     ProfileFragment profileFragment;

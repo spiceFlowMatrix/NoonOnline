@@ -53,8 +53,8 @@ import com.ibl.apps.RoomDatabase.entity.QuizProgress;
 import com.ibl.apps.RoomDatabase.entity.QuizUserResult;
 import com.ibl.apps.RoomDatabase.entity.SyncTimeTrackingObject;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
-import com.ibl.apps.devicemanagement.UserDeviceModel;
-import com.ibl.apps.devicemanagement.UserDeviceProfileModel;
+import com.ibl.apps.DeviceManagement.UserDeviceModel;
+import com.ibl.apps.DeviceManagement.UserDeviceProfileModel;
 
 @Database(entities = {LessonProgress.class,
         GradeProgress.class,

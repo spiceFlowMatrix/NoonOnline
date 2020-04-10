@@ -405,6 +405,11 @@
     <string name="extend_quota">EXTEND QUOTA</string>
     <string name="request_quota_extension">REQUEST QUOTA EXTENSION</string>
     <string name="devices">DEVICES</string>
+    <string name="logins">Logins</string>
+    <string name="extend_quote_request">Extend quote request</string>
+    <string name="out_of_device_quota">You are out of device quota</string>
+    <string name="device_activate_instruction">Please deactivate another device or request \na quota extension from the Device Management \ncontrol panel in order to activate this device</string>
+    <string name="go_to_device_management">GO TO DEVICE MANAGEMENT</string>
 
     <!--<string name="pashto_school">مدرسة الباشتو</string>-->
     <!--For Pashto Notification Translation-->

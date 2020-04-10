@@ -4,9 +4,7 @@ import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
 
-import com.ibl.apps.devicemanagement.UserDeviceModel;
-
-import java.util.ArrayList;
+import com.ibl.apps.DeviceManagement.UserDeviceModel;
 
 /**
  * This interface contains database queries implementation of Device Managements.

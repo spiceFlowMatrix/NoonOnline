@@ -199,6 +199,7 @@ public class ReportProblemActivity extends BaseActivity implements View.OnClickL
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         Uri resultUri = null;
         if (resultCode == RESULT_CANCELED || data == null) {
             setSendButtonEnable(true);

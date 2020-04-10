@@ -26,5 +26,12 @@ public class ExtendQuotaRequestActivity extends BaseActivity {
         super.onViewReady(savedInstanceState, intent);
         binding = (ActivityExtendQuotaRequestBinding) getBindObj();
         apiService = ApiClient.getClient(getApplicationContext()).create(ApiService.class);
+
+        setToolbar(binding.toolbarLayout.toolBar);
+        showBackArrow(getString(R.string.extend_quote_request));
+
+        binding.toolbarLayout.toolBar.setNavigationOnClickListener(view -> {
+            finish();
+        });
     }
 }

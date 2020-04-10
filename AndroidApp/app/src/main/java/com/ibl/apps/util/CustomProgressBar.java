@@ -20,7 +20,7 @@ public class CustomProgressBar extends androidx.appcompat.widget.AppCompatSeekBa
 
     public CustomProgressBar(Context context) {
         super(context);
-        mProgressItemsList = new ArrayList<ProgressItem>();
+        mProgressItemsList = new ArrayList<>();
     }
 
     public CustomProgressBar(Context context, AttributeSet attrs) {

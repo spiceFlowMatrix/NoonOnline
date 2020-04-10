@@ -9,8 +9,8 @@ import com.ibl.apps.Model.CoursePriviewObject;
 import com.ibl.apps.Model.LibraryGradeObject;
 import com.ibl.apps.Model.LibraryObject;
 import com.ibl.apps.Model.QuizMainObject;
-import com.ibl.apps.devicemanagement.Tags;
-import com.ibl.apps.devicemanagement.UserDeviceProfileModel;
+import com.ibl.apps.DeviceManagement.Tags;
+import com.ibl.apps.DeviceManagement.UserDeviceProfileModel;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;

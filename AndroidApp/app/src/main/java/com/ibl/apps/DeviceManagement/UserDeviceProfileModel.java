@@ -1,4 +1,4 @@
-package com.ibl.apps.devicemanagement;
+package com.ibl.apps.DeviceManagement;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Embedded;
@@ -20,7 +20,7 @@ public class UserDeviceProfileModel {
     @TypeConverters(DataTypeConverter.class)
     private ArrayList<CurrentDevices> currentDevices;
 
-    String userId ;
+    String userId;
     String deviceId;
 
     @Embedded

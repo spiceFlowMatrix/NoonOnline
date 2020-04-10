@@ -1,12 +1,11 @@
 package com.ibl.apps.RoomDatabase.dao.deviceManagementRepository;
 
 import com.ibl.apps.RoomDatabase.database.AppDatabase;
-import com.ibl.apps.devicemanagement.DeviceManagementActivity;
-import com.ibl.apps.devicemanagement.UserDeviceModel;
-import com.ibl.apps.devicemanagement.UserDeviceProfileModel;
+import com.ibl.apps.DeviceManagement.DeviceManagementActivity;
+import com.ibl.apps.DeviceManagement.UserDeviceModel;
+import com.ibl.apps.DeviceManagement.UserDeviceProfileModel;
 import com.ibl.apps.noon.NoonApplication;
 
-import java.util.ArrayList;
 /**
  * This class contains local database implementation of Device Managements.
  * This class is used by {@link DeviceManagementActivity}
