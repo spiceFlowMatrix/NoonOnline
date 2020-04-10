@@ -1,51 +1,50 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
 using System.Text;
 using Trainning24.Abstract.Infrastructure.IGeneric;
 using Trainning24.Domain.Entity;
 using Trainning24.Repository.EF.Generics;
 
-namespace Trainning24.Repository.EF.Device
+namespace Trainning24.Repository.EF.DeviceQuotasRepo
 {
-    public class DeviceOSRepository : IGenericRepository<DeviceOS>
+    public class EFDeviceQuotasRepository : IGenericRepository<DeviceQuotas>
     {
-        private readonly EFGenericRepository<DeviceOS> _context;
-        public DeviceOSRepository
+        private readonly EFGenericRepository<DeviceQuotas> _context;
+
+        public EFDeviceQuotasRepository
         (
-            EFGenericRepository<DeviceOS> context
+            EFGenericRepository<DeviceQuotas> context
         )
         {
             _context = context;
         }
 
-        public int Delete(DeviceOS obj)
+        public int Delete(DeviceQuotas obj)
         {
             return _context.Delete(obj);
         }
 
-        public List<DeviceOS> GetAll()
+        public List<DeviceQuotas> GetAll()
         {
             return _context.GetAll();
         }
 
-        public List<DeviceOS> GetAllActive()
+        public List<DeviceQuotas> GetAllActive()
         {
             throw new NotImplementedException();
         }
 
-        public DeviceOS GetById(Expression<Func<DeviceOS, bool>> ex)
+        public DeviceQuotas GetById(System.Linq.Expressions.Expression<Func<DeviceQuotas, bool>> ex)
         {
             return _context.GetById(ex);
         }
 
-        public int Insert(DeviceOS obj)
+        public int Insert(DeviceQuotas obj)
         {
             return _context.Insert(obj);
         }
 
-        public IQueryable<DeviceOS> ListQuery(Expression<Func<DeviceOS, bool>> where)
+        public System.Linq.IQueryable<DeviceQuotas> ListQuery(System.Linq.Expressions.Expression<Func<DeviceQuotas, bool>> where)
         {
             return _context.ListQuery(where);
         }
@@ -55,7 +54,7 @@ namespace Trainning24.Repository.EF.Device
             return _context.Save();
         }
 
-        public int Update(DeviceOS obj)
+        public int Update(DeviceQuotas obj)
         {
             return _context.Update(obj);
         }

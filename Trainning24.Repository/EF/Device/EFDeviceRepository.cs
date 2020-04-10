@@ -24,17 +24,17 @@ namespace Trainning24.Repository.EF
 
         public int Delete(Devices obj)
         {
-            throw new NotImplementedException();
+            return _context.Delete(obj);
         }
 
         public List<Devices> GetAll()
         {
-            throw new NotImplementedException();
+            return _context.GetAll();
         }
 
         public List<Devices> GetAllActive()
         {
-            throw new NotImplementedException();
+            return _context.GetAllActive();
         }
 
         public Devices GetById(Expression<Func<Devices, bool>> ex)
@@ -47,19 +47,19 @@ namespace Trainning24.Repository.EF
             return _context.Insert(obj);
         }
 
-        public IQueryable<Devices> ListQuery(Expression<Func<Devices, bool>> where)
+        public List<Devices> ListQuery(Expression<Func<Devices, bool>> where)
         {
-            throw new NotImplementedException();
+            return _context.ListQuery(where);
         }
 
         public int Save()
         {
-            throw new NotImplementedException();
+            return _context.Save();
         }
 
         public int Update(Devices obj)
         {
-            throw new NotImplementedException();
+            return _context.Update(obj);
         }
     }
 }

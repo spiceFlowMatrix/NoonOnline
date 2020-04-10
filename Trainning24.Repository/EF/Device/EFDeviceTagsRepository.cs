@@ -22,12 +22,12 @@ namespace Trainning24.Repository.EF.Device
 
         public int Delete(DeviceTags obj)
         {
-            throw new NotImplementedException();
+            return _context.Delete(obj);
         }
 
         public List<DeviceTags> GetAll()
         {
-            throw new NotImplementedException();
+            return _context.GetAll();
         }
 
         public List<DeviceTags> GetAllActive()
@@ -37,27 +37,27 @@ namespace Trainning24.Repository.EF.Device
 
         public DeviceTags GetById(Expression<Func<DeviceTags, bool>> ex)
         {
-            throw new NotImplementedException();
+            return _context.GetById(ex);
         }
 
         public int Insert(DeviceTags obj)
         {
-            throw new NotImplementedException();
+            return _context.Insert(obj);
         }
 
         public IQueryable<DeviceTags> ListQuery(Expression<Func<DeviceTags, bool>> where)
         {
-            throw new NotImplementedException();
+            return _context.ListQuery(where);
         }
 
         public int Save()
         {
-            throw new NotImplementedException();
+            return _context.Save();
         }
 
         public int Update(DeviceTags obj)
         {
-            throw new NotImplementedException();
+            return _context.Update(obj);
         }
     }
 }

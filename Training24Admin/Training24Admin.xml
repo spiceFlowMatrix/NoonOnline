@@ -56,11 +56,12 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Training24Admin.Controllers.DeviceQuotasController.Post(System.Int32)">
+        <member name="M:Training24Admin.Controllers.DeviceQuotasController.Post(System.Int32,Trainning24.BL.ViewModels.DeviceQuotas)">
             <summary>
             Request a device quota exension
             </summary>
             <param name="userId">Id of user</param>
+            <param name="objData">Quota extension request details</param>
             <returns></returns>
         </member>
         <member name="M:Training24Admin.Controllers.DeviceQuotasController.Put(System.Int32,System.Int32)">
