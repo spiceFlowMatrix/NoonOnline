@@ -49,6 +49,7 @@ ensureContainer:
     - "export VERSION_CODE=$((100 + $CI_PIPELINE_IID)) && echo $VERSION_CODE"
     - "export VERSION_SHA=`echo ${CI_COMMIT_SHORT_SHA}` && echo $VERSION_SHA"
     # TODO: Add in automated merge request creation for creating the changelog for the latest version in fastlane metadata. See Build and Test section here to learn more https://about.gitlab.com/blog/2019/01/28/android-publishing-with-gitlab-and-fastlane/
+    - chmod a+x gradlew
   after_script:
     - rm -f android-signing-keystore.jks || true
   artifacts:
