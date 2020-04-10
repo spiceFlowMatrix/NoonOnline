@@ -38,12 +38,12 @@ ensureContainer:
     - sed -i 's@---com_auth0_domain_value---@'"$ANDROID_AUTH0_DOMAIN"'@' configs_strings_template.xml
     - sed -i 's@---com_auth0_audience_value---@'"$ANDROID_AUTH0_AUDIENCE"'@' configs_strings_template.xml
     - sed -i 's@---YOUR_API_KEY_value---@'"$ANDROID_ENC_LIB_API_KEY"'@' configs_strings_template.xml
-    - cp configs_strings_template.xml devenv_strings_template.xml
-    - sed -i 's@---BASE_URL_value---@'"$DEV_ENV_URL"'@' devenv_strings_template.xml
-    - cp configs_strings_template.xml dariprod_strings_template.xml
-    - sed -i 's@---BASE_URL_value---@'"$DARI_ENV_URL"'@' dariprod_strings_template.xml
-    - cp configs_strings_template.xml pashtoprod_strings_template.xml
-    - sed -i 's@---BASE_URL_value---@'"$PASHTO_ENV_URL"'@' pashtoprod_strings_template.xml
+    - cp configs_strings_template.xml devenv_configs_strings_template.xml
+    - sed -i 's@---BASE_URL_value---@'"$DEV_ENV_URL"'@' devenv_configs_strings_template.xml
+    - cp configs_strings_template.xml dariprod_configs_strings_template.xml
+    - sed -i 's@---BASE_URL_value---@'"$DARI_ENV_URL"'@' dariprod_configs_strings_template.xml
+    - cp configs_strings_template.xml pashtoprod_configs_strings_template.xml
+    - sed -i 's@---BASE_URL_value---@'"$PASHTO_ENV_URL"'@' pashtoprod_configs_strings_template.xml
     # We store this binary file in a variable as hex with this command, `xxd -p gitter-android-app.jks`
     # Then we convert the hex back to a binary file
     - echo "$signing_jks_file_hex" | xxd -r -p - > android-signing-keystore.jks
@@ -63,7 +63,7 @@ buildDebug:
   script:
     # Copy in the config strings
     - rm app/src/debug/res/values/strings.xml
-    - cp devenv_strings_template.xml app/src/debug/res/values/strings.xml
+    - cp devenv_configs_strings_template.xml app/src/debug/res/values/strings.xml
     # Copy in the resources strings
     - rm app/src/main/res/values/strings.xml
     - cp dari_values_strings.xml app/src/main/res/values/strings.xml
@@ -83,10 +83,10 @@ testDebug:
 buildRelease:
   extends: .build_job
   script:
-    # Copy in the config strings
+    # Copy in the config strings for dari app
     - rm app/src/release/res/values/strings.xml
-    - cp dariprod_strings_template.xml app/src/release/res/values/strings.xml
-    # Copy in the resources strings
+    - cp dariprod_configs_strings_template.xml app/src/release/res/values/strings.xml
+    # Copy in the resources strings for dari app
     - rm app/src/main/res/values/strings.xml
     - cp dari_values_strings.xml app/src/main/res/values/strings.xml
     - bundle exec fastlane buildRelease
@@ -99,15 +99,17 @@ buildRelease:
 buildRelease:
   extends: .build_job
   script:
-    # Copy in the config strings
+    # Copy in the config strings for pashto app
     - rm app/src/release/res/values/strings.xml
-    - cp pashtoprod_strings_template.xml app/src/release/res/values/strings.xml
-    # Copy in the resources strings
+    - cp pashtoprod_configs_strings_template.xml app/src/release/res/values/strings.xml
+    # Copy in the resources strings for pashto app
     - rm app/src/main/res/values/strings.xml
     - cp pashto_values_strings.xml app/src/main/res/values/strings.xml
     - sed -i 's/com.app.training24.noon/com.app.training24.noonpashto/' fastlane/Appfile
     - sed -i 's/applicationId "com.app.training24.noon"/applicationId "com.app.training24.noonpashto"/' app/build.gradle
-    # TODO: Use sed to update the app metadata title in fastlane for pashto
+    # Ensure correct title is provided for pashto app in fastlane
+    - rm fastlane/metadata/android/en-US/title.txt
+    - printf 'ن زده کړې' > fastlane/metadata/android/en-US/title.txt
     - bundle exec fastlane buildRelease
   environment:
     name: pashto_production
