@@ -33,7 +33,7 @@ ensureContainer:
     - rm app/google-services.json || true
     - echo ${ANDROID_GOOGLE_SERVICES_JSON} | base64 -d > app/google-services.json
     - echo ${ANDROID_SSL_CRT_HASH} | xxd -r -p - > app/src/main/res/raw/noonssl.crt
-    # TODO: Ensure none of the configs being updated into the file by sed don't have any @ characters in them since that's what we use as delimiter. See here https://stackoverflow.com/a/584926
+    # TODO: Ensure none of the configs being updated into the file by sed have any @ characters in them since that's what we use as delimiter. See here https://stackoverflow.com/a/584926
     - sed -i 's@---com_auth0_client_id_value---@'"$ANDROID_AUTH0_CLIENT_ID"'@' configs_strings_template.xml
     - sed -i 's@---com_auth0_domain_value---@'"$ANDROID_AUTH0_DOMAIN"'@' configs_strings_template.xml
     - sed -i 's@---com_auth0_audience_value---@'"$ANDROID_AUTH0_AUDIENCE"'@' configs_strings_template.xml
