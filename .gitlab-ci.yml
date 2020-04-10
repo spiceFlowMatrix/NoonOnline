@@ -6,6 +6,7 @@ variables:
   PASHTO_ENV_URL: https://pashto-apps.noon-online.
   # TODO: Add comment showing where this fix for dind was originally found so it can be shared with others
   DOCKER_TLS_CERTDIR: "" # required since we use dind with no tls
+  DOCKER_HOST: tcp://localhost:2375/ # required since we use dind
 
 stages:
   - environment_setup
