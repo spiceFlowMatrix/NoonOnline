@@ -21,8 +21,8 @@ spec:
             labels:
                 app: {{ .Release.Name }}
         spec:
-            imagePullSecrets:
-                - name: gitlab-registry
+            # imagePullSecrets:
+                # - name: {{ .Release.Name }}-gitlab-registry
             containers:
                 -   name: {{ .Release.Name }}
                     image: {{ .Values.image }}
