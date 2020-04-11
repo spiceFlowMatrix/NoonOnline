@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+    # annotations:
+        # app.gitlab.com/app: {{ .Values.gitlabCiProjectPath }}
+        # app.gitlab.com/env: {{ .Values.gitlabCiProjectEnvironment }}
+    name: {{ .Release.Name }}-service
+    namespace: {{ .Values.deploymentNamespace }}
+    labels:
+        app: {{ .Release.Name }}
+spec:
+    ports:
+        -   name: clientapp-port
+            port: 80
+            protocol: TCP
+            targetPort: 80
+    selector:
+        app: {{ .Release.Name }}
+    type: NodePort

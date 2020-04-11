@@ -9,6 +9,18 @@
             "description": "name is used to set the name value for the kubernetes workloads and any other objects created for this chart",
             "type": "string"
         },
+        "deploymentNamespace": {
+            "description": "deploymentNamespace is used by the chart to set the exact namespace of all the templates that are produced. This is required for GitLab CI to ensure it creates our workloads and required resources in the correct namespace by supplying the KUBE_NAMESPACE environment variable to this value",
+            "type": "string"
+        },
+        "gitlabCiProjectPath": {
+            "description": "gitlabCiProjectPath is used by the chart to set the app.gitlab.com/app annotation on all workload resources so that the deployment can appear in GitLab's environments control panel",
+            "type": "string"
+        },
+        "gitlabCiProjectEnvironment": {
+            "description": "gitlabCiProjectEnvironment is used by the chart to set the app.gitlab.com/env annotation on all workload resources so that the deployment can appear in GitLab's environments control panel",
+            "type": "string"
+        },
         "netCoreEnvironment": {
             "description": "netCoreEnvironment tells the aspnetcore service which environment to serve for. Used by the chart to create a secret value that is then fed to the ASPNETCORE_ENVIRONMENT environment variable on the application workload",
             "type": "string",
@@ -16,10 +28,6 @@
                 "Production",
                 "Development"
             ]
-        },
-        "sqlDbServer": {
-            "description": "sqlDbServer is the Uri (IP Address+Port, or domain) of the SQL database instance.\n [1] Used by the chart to form the connection string (secret) that the application expects on the ASPNET_DB_CONNECTIONSTRING environment variable.\n [2] Used by the chart to create a secret that is then fed to the MYSQL_DB_HOST environment variable for Cloud SQL proxy that manages connections to production SQL database",
-            "type": "string"
         },
         "sqlDbName": {
             "description": "sqlDbName is the name of the exact database on the sqlDbServer instance that the chart will connect this deployment to.\n [1] Used by the chart to form the connection string (secret) that the application expects on the ASPNET_DB_CONNECTIONSTRING environment variable.\n [2] Used by the chart to create a secret that is then fed to the MYSQL_DB_HOST environment variable for Cloud SQL proxy that manages connections to production SQL database",
@@ -76,11 +84,16 @@
                 "fa",
                 "pa"
             ]
+        },
+        "applicationServiceAccount": {
+            "description": "applicationServiceAccount is the service account json credential file needed by production application deployments to set up Cloud SQL proxy to connect to the production SQL server via private ip address. This value is not needed on development deployments",
+            "type": "string"
         }
     },
     "required": [
         "image",
         "name",
+        "deploymentNamespace",
         "netCoreEnvironment",
         "sqlDbServer",
         "sqlDbName",

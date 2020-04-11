@@ -1,8 +1,8 @@
+## This document is to be used by system administrators to ensure they provide all the necessary configuration values for production application deployments
+
+deploymentNamespace: devenv
 netCoreEnvironment: Development # Please set to Production for production environments. Value can only be Development or Production, any other value will throw error
 
-## This value must always be provided as 127.0.0.1:3306 in production deployments.
-## TODO: Deprecate this value since we may no longer need it for development environments. This value can be directly specified within the deployment template instead.
-sqlDbServer: 127.0.0.1:3306 
 sqlDbName: noon_api_database
 sqlDbUser: noon_api_user # This is the default value that we use for test environment (ephemeral) databases. Please provide correct value for the production database user!
 sqlDbPassword: noon_api_user_password # This is the default value that we use for test environment (ephemeral) databases. Please provide correct value for the production database user!
@@ -16,8 +16,3 @@ auth0ManagementUrl: https://edgsolutions.eu.auth0.com/oauth/token # Does not cha
 # smtpServerEmailAddress: Value to be supplied in CI/CD environment variable
 # smtpServerEmailPassword: Value to be supplied in CI/CD environment variable
 applicationLanguage: fa # Value can either be fa or pa, any other value will throw an error
-
-## This will be set to true for development deployments.
-## In production, this will be false so the chart configures
-## the deployment to link to GCP hosted SQL instance
-devenv-persistence: true
