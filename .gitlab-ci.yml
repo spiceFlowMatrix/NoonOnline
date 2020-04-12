@@ -20,11 +20,12 @@ ensureContainer:
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
     - /kaniko/executor --context $CI_PROJECT_DIR/AndroidApp --dockerfile $CI_PROJECT_DIR/AndroidApp/Dockerfile --destination $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-android
 
-.build_job:
+.build_android_job:
   image: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-android
   stage: build
   before_script:
     - cd AndroidApp
+    - chmod +x ./gradlew
     # To make sure the local.properties file exists. See https://gitlab.com/edgsolutions-engineering/noon-online/-/issues/34#note_315811746
     - touch local.properties
     - rm app/google-services.json || true
@@ -48,15 +49,14 @@ ensureContainer:
     - "export VERSION_CODE=$((100 + $CI_PIPELINE_IID)) && echo $VERSION_CODE"
     - "export VERSION_SHA=`echo ${CI_COMMIT_SHORT_SHA}` && echo $VERSION_SHA"
     # TODO: Add in automated merge request creation for creating the changelog for the latest version in fastlane metadata. See Build and Test section here to learn more https://about.gitlab.com/blog/2019/01/28/android-publishing-with-gitlab-and-fastlane/
-    - chmod a+x gradlew
   after_script:
     - rm -f android-signing-keystore.jks || true
   artifacts:
     paths:
       - AndroidApp/app/build/outputs
 
-buildDebug:
-  extends: .build_job
+buildAndroidDebug:
+  extends: .build_android_job
   script:
     # Copy in the config strings
     - rm app/src/debug/res/values/strings.xml
@@ -64,7 +64,7 @@ buildDebug:
     # Copy in the resources strings
     - rm app/src/main/res/values/strings.xml
     - cp dari_values_strings.xml app/src/main/res/values/strings.xml
-    - bundle exec fastlane buildDebug
+    - bundle exec fastlane buildAndroidDebug
   environment:
     name: development/$CI_COMMIT_REF_SLUG
     url: $DEV_ENV_URL
@@ -73,12 +73,12 @@ testDebug:
   image: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-android
   stage: test
   dependencies:
-    - buildDebug
+    - buildAndroidDebug
   script:
     - build exec fastlane test
 
-buildRelease:
-  extends: .build_job
+buildAndroidRelease:
+  extends: .build_android_job
   script:
     # Copy in the config strings for dari app
     - rm app/src/release/res/values/strings.xml
@@ -86,15 +86,15 @@ buildRelease:
     # Copy in the resources strings for dari app
     - rm app/src/main/res/values/strings.xml
     - cp dari_values_strings.xml app/src/main/res/values/strings.xml
-    - bundle exec fastlane buildRelease
+    - bundle exec fastlane buildAndroidRelease
   environment:
     name: dari_production
     url: $DARI_ENV_URL
   only:
     - master
 
-buildRelease:
-  extends: .build_job
+buildAndroidRelease:
+  extends: .build_android_job
   script:
     # Copy in the config strings for pashto app
     - rm app/src/release/res/values/strings.xml
@@ -107,7 +107,7 @@ buildRelease:
     # Ensure correct title is provided for pashto app in fastlane
     - rm fastlane/metadata/android/en-US/title.txt
     - printf 'ن زده کړې' > fastlane/metadata/android/en-US/title.txt
-    - bundle exec fastlane buildRelease
+    - bundle exec fastlane buildAndroidRelease
   environment:
     name: pashto_production
     url: $PASHTO_ENV_URL
@@ -123,7 +123,7 @@ publishProduction:
     name: dari_production
     url: $DARI_ENV_URL
   dependencies:
-    - buildRelease
+    - buildAndroidRelease
   when: manual
   before_script:
     - echo $google_play_service_account_api_key_json > ~/google_play_api_key.json
@@ -141,7 +141,7 @@ publishProduction:
     name: pashto_production
     url: $PASHTO_ENV_URL
   dependencies:
-    - buildRelease
+    - buildAndroidRelease
   when: manual
   before_script:
     - echo $google_play_service_account_api_key_json > ~/google_play_api_key.json
