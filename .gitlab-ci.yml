@@ -146,7 +146,7 @@ buildAndroidDebug:
     # Copy in the resources strings
     - rm app/src/main/res/values/strings.xml
     - cp dari_values_strings.xml app/src/main/res/values/strings.xml
-    - bundle exec fastlane buildDebug
+    - bundle exec fastlane buildDebug --stacktrace
   environment:
     name: development/$CI_COMMIT_REF_SLUG
     url: $DEV_ENV_URL
