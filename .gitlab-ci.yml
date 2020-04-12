@@ -16,9 +16,9 @@ ensureContainer:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
   stage: environment_setup
-  only:
-      changes:
-        - AndroidApp/Dockerfile
+  rules:
+    - changes:
+      - AndroidApp/Dockerfile
   script:
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
     - /kaniko/executor --context $CI_PROJECT_DIR/AndroidApp --dockerfile $CI_PROJECT_DIR/AndroidApp/Dockerfile --destination $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-android
@@ -26,6 +26,9 @@ ensureContainer:
 .build_android_job:
   image: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-android
   stage: build
+  rules:
+    - changes:
+      - AndroidApp/*
   before_script:
     - cd AndroidApp
     - chmod +x ./gradlew
