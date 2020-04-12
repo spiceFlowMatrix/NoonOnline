@@ -16,6 +16,7 @@ before_script:
   - echo y | android-sdk-linux/tools/bin/sdkmanager "platform-tools" >/dev/null
   - echo y | android-sdk-linux/tools/bin/sdkmanager "build-tools;${ANDROID_BUILD_TOOLS}" >/dev/null
   - export ANDROID_HOME=$PWD/android-sdk-linux
+  - export ANDROID_SDK_HOME=$PWD/android-sdk-linux
   - export PATH=$PATH:$PWD/android-sdk-linux/platform-tools/
   - chmod +x ./gradlew
   # temporarily disable checking for EPIPE error and use yes to accept all licenses
@@ -29,6 +30,14 @@ lintDebug:
   stage: build
   script:
     - ./gradlew -Pci --console=plain :app:lintDebug -PbuildDir=lint
+  artifacts:
+    expire_in: 1 week
+    when: on_failure
+    paths:
+      - AndroidApp/app/lint/
+      - AndroidApp/android-file-chooser/lint/
+      - AndroidApp/giraffeplayer2/lint/
+      - AndroidApp/prdownloader/lint/
 
 assembleDebug:
   stage: build
@@ -36,7 +45,11 @@ assembleDebug:
     - ./gradlew assembleDebug
   artifacts:
     paths:
-      - app/build/outputs/
+      - AndroidApp/app/build/outputs/
+  cache:
+    key: "$CI_JOB_NAME-$CI_COMMIT_REF_NAME"
+    paths:
+      - $ANDROID_SDK_HOME/.android/build-cache/
 
 debugTests:
   stage: test
