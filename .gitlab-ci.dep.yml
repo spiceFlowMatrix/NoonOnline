@@ -1,0 +1,229 @@
+image: openjdk:8-jdk
+
+variables:
+  DEV_ENV_URL: https://${CI_COMMIT_SHORT_SHA}-${CI_COMMIT_REF_SLUG}.dev-apps.noon-online.com
+  DARI_ENV_URL: https://dari-apps.noon-online.com
+  PASHTO_ENV_URL: https://pashto-apps.noon-online.com
+  GKE_SERVICE_ACCOUNT: ${GKE_SERVICE_ACCOUNT}
+
+stages:
+  # - buildWeb
+  - androidEnvironmentSetup
+  - buildAndroid
+  - test
+  - production
+
+# # Build and artifact the admin web app. Cache packages downloaded in node modules to be reused for future runs of the same job on the same branch
+# buildAdminApp:
+#   image: node:latest
+#   cache:
+#     key: "$CI_JOB_NAME-$CI_COMMIT_REF_NAME"
+#     paths:
+#       - Training24Admin/Admin-noon/node_modules/
+#   before_script:
+#     - apt-get update && apt-get install -y unzip fontconfig locales gconf-service libasound2 libatk1.0-0 libc6 libcairo2 libcups2 libdbus-1-3 libexpat1 libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 libglib2.0-0 libgtk-3-0 libnspr4 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 ca-certificates fonts-liberation libappindicator1 libnss3 lsb-release xdg-utils wget
+#     - cd Training24Admin/Admin-noon/
+#     - rm src/app/environments/environment.prod.ts
+#     # We encrypt the environment.ts file in base64 by applying `base64 -w 0 FILENAME.ts` command on it and then supply it as environmet variable
+#     - echo ${ADMIN_APP_ENVIRONMENTS_BASE64} | base64 -d > src/app/environments/environment.prod.ts
+#   script:
+#     - npm run install --quiet
+#     - npm run build --prod
+#   artifacts:
+#     paths:
+#       - Training24Admin/Admin-noon/dist/
+#     expire_in: 1 week
+#   environment:
+#     name: development/$CI_COMMIT_REF_SLUG
+#     url: $DEV_ENV_URL
+
+# # Build and artifact the sales web app. Cache packages downloaded in node modules to be reused for future runs of the same job on the same branch
+# buildSalesApp:
+#   image: node:latest
+#   cache:
+#     key: "$CI_JOB_NAME-$CI_COMMIT_REF_NAME"
+#     paths:
+#       - Training24Admin/Sales-noon/node_modules/
+#   before_script:
+#     - apt-get update && apt-get install -y unzip fontconfig locales gconf-service libasound2 libatk1.0-0 libc6 libcairo2 libcups2 libdbus-1-3 libexpat1 libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 libglib2.0-0 libgtk-3-0 libnspr4 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 ca-certificates fonts-liberation libappindicator1 libnss3 lsb-release xdg-utils wget
+#     - cd Training24Admin/Sales-noon/
+#     - rm src/app/environments/environment.prod.ts
+#     # We encrypt the environment.ts file in base64 by applying `base64 -w 0 FILENAME.ts` command on it and then supply it as environmet variable
+#     - echo ${SALES_APP_ENVIRONMENTS_BASE64} | base64 -d > src/app/environments/environment.prod.ts
+#   script:
+#     - npm run install --quiet
+#     - npm run build --prod
+#   artifacts:
+#     paths:
+#       - Training24Admin/Sales-noon/dist/
+#     expire_in: 1 week
+#   environment:
+#     name: development/$CI_COMMIT_REF_SLUG
+#     url: $DEV_ENV_URL
+
+# # Build and artifact the feedback web app. Cache packages downloaded in node modules to be reused for future runs of the same job on the same branch
+# buildFeedbackApp:
+#   image: node:latest
+#   cache:
+#     key: "$CI_JOB_NAME-$CI_COMMIT_REF_NAME"
+#     paths:
+#       - Training24Admin/Feedback-noon/node_modules/
+#   before_script:
+#     - apt-get update && apt-get install -y unzip fontconfig locales gconf-service libasound2 libatk1.0-0 libc6 libcairo2 libcups2 libdbus-1-3 libexpat1 libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 libglib2.0-0 libgtk-3-0 libnspr4 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 ca-certificates fonts-liberation libappindicator1 libnss3 lsb-release xdg-utils wget
+#     - cd Training24Admin/Feedback-noon/
+#     - rm src/app/environments/environment.prod.ts
+#     # We encrypt the environment.ts file in base64 by applying `base64 -w 0 FILENAME.ts` command on it and then supply it as environmet variable
+#     - echo ${FEEDBACK_APP_ENVIRONMENTS_BASE64} | base64 -d > src/app/environments/environment.prod.ts
+#   script:
+#     - npm run install --quiet
+#     - npm run build --prod
+#   artifacts:
+#     paths:
+#       - Training24Admin/Feedback-noon/dist/
+#     expire_in: 1 week
+#   environment:
+#     name: development/$CI_COMMIT_REF_SLUG
+#     url: $DEV_ENV_URL
+
+# # Build and artifact the aspnetcore REST API app. Cache downloaded nuget packages to be reused for future runs of the same job on the same branch
+
+ensureContainer:
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+  stage: androidEnvironmentSetup
+  rules:
+    - changes:
+      - AndroidApp/Dockerfile
+  script:
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
+    - /kaniko/executor --context $CI_PROJECT_DIR/AndroidApp --dockerfile $CI_PROJECT_DIR/AndroidApp/Dockerfile --destination $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-android
+
+.build_android_job:
+  image: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-android
+  stage: buildAndroid
+  before_script:
+    - cd AndroidApp
+    - chmod +x ./gradlew
+    # To make sure the local.properties file exists. See https://gitlab.com/edgsolutions-engineering/noon-online/-/issues/34#note_315811746
+    - touch local.properties
+    - rm app/google-services.json || true
+    - echo ${ANDROID_GOOGLE_SERVICES_JSON} | base64 -d > app/google-services.json
+    - echo ${ANDROID_SSL_CRT_HASH} | xxd -r -p - > app/src/main/res/raw/noonssl.crt
+    # TODO: Ensure none of the configs being updated into the file by sed have any @ characters in them since that's what we use as delimiter. See here https://stackoverflow.com/a/584926
+    - sed -i 's@---com_auth0_client_id_value---@'"$ANDROID_AUTH0_CLIENT_ID"'@' configs_strings_template.xml
+    - sed -i 's@---com_auth0_domain_value---@'"$ANDROID_AUTH0_DOMAIN"'@' configs_strings_template.xml
+    - sed -i 's@---com_auth0_audience_value---@'"$ANDROID_AUTH0_AUDIENCE"'@' configs_strings_template.xml
+    - sed -i 's@---YOUR_API_KEY_value---@'"$ANDROID_ENC_LIB_API_KEY"'@' configs_strings_template.xml
+    - cp configs_strings_template.xml devenv_configs_strings_template.xml
+    - sed -i 's@---BASE_URL_value---@'"$DEV_ENV_URL"'@' devenv_configs_strings_template.xml
+    - cp configs_strings_template.xml dariprod_configs_strings_template.xml
+    - sed -i 's@---BASE_URL_value---@'"$DARI_ENV_URL"'@' dariprod_configs_strings_template.xml
+    - cp configs_strings_template.xml pashtoprod_configs_strings_template.xml
+    - sed -i 's@---BASE_URL_value---@'"$PASHTO_ENV_URL"'@' pashtoprod_configs_strings_template.xml
+    # We store this binary file in a variable as hex with this command, `xxd -p gitter-android-app.jks`
+    # Then we convert the hex back to a binary file
+    - echo "$signing_jks_file_hex" | xxd -r -p - > android-signing-keystore.jks
+    # We add 100 to get this high enough above current versionCodes that are published
+    - "export VERSION_CODE=$((100 + $CI_PIPELINE_IID)) && echo $VERSION_CODE"
+    - "export VERSION_SHA=`echo ${CI_COMMIT_SHORT_SHA}` && echo $VERSION_SHA"
+    # TODO: Add in automated merge request creation for creating the changelog for the latest version in fastlane metadata. See Build and Test section here to learn more https://about.gitlab.com/blog/2019/01/28/android-publishing-with-gitlab-and-fastlane/
+  after_script:
+    - rm -f android-signing-keystore.jks || true
+  artifacts:
+    paths:
+      - AndroidApp/
+      - AndroidApp/app/build/outputs
+    when: always
+    expire_in: 1 day
+
+buildAndroidDebug:
+  extends: .build_android_job
+  script:
+    # Copy in the config strings
+    - rm app/src/debug/res/values/strings.xml
+    - cp devenv_configs_strings_template.xml app/src/debug/res/values/strings.xml
+    # Copy in the resources strings
+    - rm app/src/main/res/values/strings.xml
+    - cp dari_values_strings.xml app/src/main/res/values/strings.xml
+    - bundle exec fastlane buildDebug
+  environment:
+    name: development/$CI_COMMIT_REF_SLUG
+    url: $DEV_ENV_URL
+
+testDebug:
+  image: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-android
+  stage: test
+  dependencies:
+    - buildAndroidDebug
+  script:
+    - build exec fastlane test
+
+buildAndroidRelease:
+  extends: .build_android_job
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "master"'
+  script:
+    # Copy in the config strings for dari app
+    - rm app/src/release/res/values/strings.xml
+    - cp dariprod_configs_strings_template.xml app/src/release/res/values/strings.xml
+    # Copy in the resources strings for dari app
+    - rm app/src/main/res/values/strings.xml
+    - cp dari_values_strings.xml app/src/main/res/values/strings.xml
+    - bundle exec fastlane buildRelease
+  environment:
+    name: dari_production
+    url: $DARI_ENV_URL
+
+buildAndroidRelease:
+  extends: .build_android_job
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "master"'
+  script:
+    # Copy in the config strings for pashto app
+    - rm app/src/release/res/values/strings.xml
+    - cp pashtoprod_configs_strings_template.xml app/src/release/res/values/strings.xml
+    # Copy in the resources strings for pashto app
+    - rm app/src/main/res/values/strings.xml
+    - cp pashto_values_strings.xml app/src/main/res/values/strings.xml
+    - sed -i 's/com.app.training24.noon/com.app.training24.noonpashto/' fastlane/Appfile
+    - sed -i 's/applicationId "com.app.training24.noon"/applicationId "com.app.training24.noonpashto"/' app/build.gradle
+    # Ensure correct title is provided for pashto app in fastlane
+    - rm fastlane/metadata/android/en-US/title.txt
+    - printf 'ن زده کړې' > fastlane/metadata/android/en-US/title.txt
+    - bundle exec fastlane buildRelease
+  environment:
+    name: pashto_production
+    url: $PASHTO_ENV_URL
+
+publishAndroidProduction:
+  image: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-android
+  stage: production
+  environment:
+    name: dari_production
+    url: $DARI_ENV_URL
+  dependencies:
+    - buildAndroidRelease
+  when: manual
+  before_script:
+    - echo $google_play_service_account_api_key_json > ~/google_play_api_key.json
+  after_script:
+    - rm ~/google_play_api_key.json
+  script:
+    - bundle exec fastlane production
+
+publishAndroidProduction:
+  image: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-android
+  stage: production
+  environment:
+    name: pashto_production
+    url: $PASHTO_ENV_URL
+  dependencies:
+    - buildAndroidRelease
+  when: manual
+  before_script:
+    - echo $google_play_service_account_api_key_json > ~/google_play_api_key.json
+  after_script:
+    - rm ~/google_play_api_key.json
+  script:
+    - bundle exec fastlane production
