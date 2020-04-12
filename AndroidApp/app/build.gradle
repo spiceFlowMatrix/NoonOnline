@@ -83,7 +83,6 @@ android {
         release {
             minifyEnabled true
             shrinkResources true
-            testCoverageEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
         }
@@ -113,6 +112,11 @@ android {
 }
 
 dependencies {
+    // Attempt to fix JAXB exception. See SO answer https://stackoverflow.com/a/43574427
+    // JAX-B dependencies for JDK 9+
+    implementation "jakarta.xml.bind:jakarta.xml.bind-api:2.3.2"
+    implementation "org.glassfish.jaxb:jaxb-runtime:2.3.2"
+    
     implementation fileTree(include: ['*.jar'], dir: 'libs')
 
     //noinspection GradleCompatible
