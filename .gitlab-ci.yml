@@ -64,7 +64,7 @@ buildAndroidDebug:
     # Copy in the resources strings
     - rm app/src/main/res/values/strings.xml
     - cp dari_values_strings.xml app/src/main/res/values/strings.xml
-    - bundle exec fastlane buildAndroidDebug
+    - bundle exec fastlane buildDebug
   environment:
     name: development/$CI_COMMIT_REF_SLUG
     url: $DEV_ENV_URL
@@ -86,7 +86,7 @@ buildAndroidRelease:
     # Copy in the resources strings for dari app
     - rm app/src/main/res/values/strings.xml
     - cp dari_values_strings.xml app/src/main/res/values/strings.xml
-    - bundle exec fastlane buildAndroidRelease
+    - bundle exec fastlane buildRelease
   environment:
     name: dari_production
     url: $DARI_ENV_URL
@@ -107,14 +107,14 @@ buildAndroidRelease:
     # Ensure correct title is provided for pashto app in fastlane
     - rm fastlane/metadata/android/en-US/title.txt
     - printf 'ن زده کړې' > fastlane/metadata/android/en-US/title.txt
-    - bundle exec fastlane buildAndroidRelease
+    - bundle exec fastlane buildRelease
   environment:
     name: pashto_production
     url: $PASHTO_ENV_URL
   only:
     - master
 
-publishProduction:
+publishAndroidProduction:
   image: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-android
   stage: production
   only:
@@ -132,7 +132,7 @@ publishProduction:
   script:
     - bundle exec fastlane production
 
-publishProduction:
+publishAndroidProduction:
   image: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-android
   stage: production
   only:
