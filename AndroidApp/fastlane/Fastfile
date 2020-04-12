@@ -18,7 +18,7 @@ default_platform(:android)
 platform :android do
   desc "Builds the debug code"
   lane :buildDebug do
-    gradle(task: "assembleDebug")
+    gradle(task: "assembleDebug", flags: "--stacktrace")
   end
 
   desc "Builds the release code"
