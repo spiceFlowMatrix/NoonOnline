@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { environment } from "../environments/environment";
+import { log } from 'util';
 // import Scrollbar from 'smooth-scrollbar';
 @Component({
     selector: 'app-root',
@@ -7,6 +9,12 @@ import { Component, OnInit } from '@angular/core';
 })
 export class AppComponent implements OnInit {
     constructor() {
+        const callback = window.location.href;
+        const logout = window.location.href + '?logout=true';
+
+        environment.callbackURL = callback;
+        console.log(environment.callbackURL)
+        environment.logoutcallbackURL = logout;
     }
 
     ngOnInit() {
