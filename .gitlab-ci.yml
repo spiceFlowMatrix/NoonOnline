@@ -106,8 +106,6 @@ ensureContainer:
   image: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-android
   stage: buildAndroid
   rules:
-    - changes:
-      - AndroidApp/*
   before_script:
     - cd AndroidApp
     - chmod +x ./gradlew
@@ -142,6 +140,11 @@ ensureContainer:
 
 buildAndroidDebug:
   extends: .build_android_job
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "master"'
+      when: always
+    - changes:
+      - AndroidApp/*
   script:
     # Copy in the config strings
     - rm app/src/debug/res/values/strings.xml
@@ -164,6 +167,11 @@ testDebug:
 
 buildAndroidRelease:
   extends: .build_android_job
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "master"'
+      when: always
+    - changes:
+      - AndroidApp/*
   script:
     # Copy in the config strings for dari app
     - rm app/src/release/res/values/strings.xml
@@ -175,11 +183,14 @@ buildAndroidRelease:
   environment:
     name: dari_production
     url: $DARI_ENV_URL
-  only:
-    - master
 
 buildAndroidRelease:
   extends: .build_android_job
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == "master"'
+      when: always
+    - changes:
+      - AndroidApp/*
   script:
     # Copy in the config strings for pashto app
     - rm app/src/release/res/values/strings.xml
@@ -196,14 +207,10 @@ buildAndroidRelease:
   environment:
     name: pashto_production
     url: $PASHTO_ENV_URL
-  only:
-    - master
 
 publishAndroidProduction:
   image: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-android
   stage: production
-  only:
-    - master
   environment:
     name: dari_production
     url: $DARI_ENV_URL
@@ -220,8 +227,6 @@ publishAndroidProduction:
 publishAndroidProduction:
   image: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-android
   stage: production
-  only:
-    - master
   environment:
     name: pashto_production
     url: $PASHTO_ENV_URL
