@@ -1,10 +1,8 @@
 package com.ibl.apps.Fragment;
 
 import android.content.Intent;
-import androidx.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -12,6 +10,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.databinding.DataBindingUtil;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -22,13 +23,14 @@ import com.ibl.apps.Model.UploadImageObject;
 import com.ibl.apps.Model.UserObject;
 import com.ibl.apps.RoomDatabase.database.AppDatabase;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
+import com.ibl.apps.UserProfileManagement.UserProfileRepository;
+import com.ibl.apps.noon.NoonApplication;
+import com.ibl.apps.noon.R;
+import com.ibl.apps.noon.databinding.ProfileLayoutBinding;
 import com.ibl.apps.util.Const;
 import com.ibl.apps.util.GlideApp;
 import com.ibl.apps.util.PrefUtils;
 import com.ibl.apps.util.Validator;
-import com.ibl.apps.noon.NoonApplication;
-import com.ibl.apps.noon.R;
-import com.ibl.apps.noon.databinding.ProfileLayoutBinding;
 import com.theartofdev.edmodo.cropper.CropImage;
 
 import org.json.JSONException;
@@ -51,9 +53,7 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.HttpException;
-
 import static android.app.Activity.RESULT_OK;
-import static com.ibl.apps.Base.BaseActivity.apiService;
 
 
 public class ProfileFragment extends BaseFragment implements View.OnClickListener {
@@ -71,6 +71,7 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
     List<UserDetails> userDetailsList;
     UserDetails userDetailsObject = new UserDetails();
     String userId = "0";
+    UserProfileRepository userProfileRepository;
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -102,6 +103,7 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
 
     @Override
     protected void setUp(View view) {
+        userProfileRepository = new UserProfileRepository();
         userDetailsList = AppDatabase.getAppDatabase(NoonApplication.getContext()).userDetailDao().getAllUserDetials();
         PrefUtils.MyAsyncTask asyncTask = (PrefUtils.MyAsyncTask) new PrefUtils.MyAsyncTask(new PrefUtils.MyAsyncTask.AsyncResponse() {
             @Override
@@ -243,7 +245,7 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
         RequestBody requestFile = RequestBody.create(MediaType.parse("image/jpeg"), imageFilePath);
         MultipartBody.Part body = MultipartBody.Part.createFormData(Const.uploadImagePara, "image.jpg", requestFile);
 
-        Call<UploadImageObject> call = apiService.uploadImage(body);
+        Call<UploadImageObject> call = userProfileRepository.uploadImage(body);
         showDialog(getString(R.string.loading));
         call.enqueue(new Callback<UploadImageObject>() {
             @Override
@@ -349,7 +351,7 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
     public void callApiUsernameExiest(String username) {
 
         if (isNetworkAvailable(getActivity())) {
-            disposable.add(apiService.userExiest(username)
+            disposable.add(userProfileRepository.userExiest(username)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeWith(new DisposableObserver<String>() {
@@ -406,7 +408,7 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
             JsonParser jsonParser = new JsonParser();
             gsonObject = (JsonObject) jsonParser.parse(jsonObject.toString());
 
-            disposable.add(apiService.updateProfile(gsonObject)
+            disposable.add(userProfileRepository.updateProfile(gsonObject)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeWith(new DisposableSingleObserver<UserObject>() {
@@ -456,7 +458,7 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
 
         if (isNetworkAvailable(getActivity())) {
             showDialog(getString(R.string.loading));
-            disposable.add(apiService.StatisticUser()
+            disposable.add(userProfileRepository.StatisticUser()
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeWith(new DisposableSingleObserver<StatisticsObject>() {
@@ -513,7 +515,7 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
             showDialog(getString(R.string.loading));
             try {
                 if (userId != null && !userId.isEmpty()) {
-                    disposable.add(apiService.fetchUser(userId)
+                    disposable.add(userProfileRepository.fetchUser(userId)
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribeWith(new DisposableSingleObserver<UserObject>() {

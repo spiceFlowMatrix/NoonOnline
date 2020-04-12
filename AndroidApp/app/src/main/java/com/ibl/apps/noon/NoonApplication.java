@@ -25,12 +25,14 @@ import com.droidnet.DroidNet;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
+import com.ibl.apps.CourseManagement.CourseRepository;
 import com.ibl.apps.Model.SyncTimeTracking;
 import com.ibl.apps.Network.ApiClient;
 import com.ibl.apps.Network.ApiService;
 import com.ibl.apps.RoomDatabase.database.AppDatabase;
 import com.ibl.apps.RoomDatabase.entity.SyncTimeTrackingObject;
 import com.ibl.apps.Service.NetworkChangeReceiver;
+import com.ibl.apps.UserCredentialsManagement.UserRepository;
 import com.ibl.apps.util.Const;
 
 import java.io.File;
@@ -181,9 +183,9 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
 
 
                     if (outtimrsave != null && ((syncTimeTrackingObject.getOuttime() != null && !syncTimeTrackingObject.getOuttime().isEmpty()) || !outtimrsave.isEmpty())) {
-                        ApiService apiService = ApiClient.getClient(getContext()).create(ApiService.class);
+                        UserRepository userRepository = new UserRepository();
                         CompositeDisposable disposable = new CompositeDisposable();
-                        disposable.add(apiService.getSyncTimeTracking(array).subscribeOn(Schedulers.io())
+                        disposable.add(userRepository.getSyncTimeTracking(array).subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribeWith(new DisposableSingleObserver<SyncTimeTracking>() {
                                     @Override

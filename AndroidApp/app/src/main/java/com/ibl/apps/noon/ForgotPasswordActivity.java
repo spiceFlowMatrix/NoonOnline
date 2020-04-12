@@ -15,9 +15,10 @@ import com.ibl.apps.Model.CheckForgetKey;
 import com.ibl.apps.Model.LoginObject;
 import com.ibl.apps.Model.UploadImageObject;
 import com.ibl.apps.RoomDatabase.database.AppDatabase;
+import com.ibl.apps.UserCredentialsManagement.UserRepository;
+import com.ibl.apps.noon.databinding.ForgotPasswordLayoutBinding;
 import com.ibl.apps.util.Const;
 import com.ibl.apps.util.Validator;
-import com.ibl.apps.noon.databinding.ForgotPasswordLayoutBinding;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -34,6 +35,7 @@ public class ForgotPasswordActivity extends BaseActivity implements View.OnClick
     ForgotPasswordLayoutBinding forgotPasswordLayoutBinding;
     private CompositeDisposable disposable = new CompositeDisposable();
     CheckForgetKey checkForgetKeyModel;
+    UserRepository userRepository;
 
     @Override
     protected int getContentView() {
@@ -46,6 +48,7 @@ public class ForgotPasswordActivity extends BaseActivity implements View.OnClick
         forgotPasswordLayoutBinding = (ForgotPasswordLayoutBinding) getBindObj();
         setToolbar(forgotPasswordLayoutBinding.toolbarLayout.toolBar);
         showBackArrow(getString(R.string.forgot_password_header));
+        userRepository = new UserRepository();
         forgotPasswordLayoutBinding.passcode.setMaxLength(6);
         setOnClickListener();
 
@@ -189,7 +192,7 @@ public class ForgotPasswordActivity extends BaseActivity implements View.OnClick
     public void callEmailAddressAPI(String email) {
 
         showDialog(getString(R.string.loading));
-        disposable.add(apiService.ForgotPasswordEmail(email)
+        disposable.add(userRepository.ForgotPasswordEmail(email)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<UploadImageObject>() {
@@ -219,7 +222,7 @@ public class ForgotPasswordActivity extends BaseActivity implements View.OnClick
     public void callPasscodeAPI(String passcode) {
 
         showDialog(getString(R.string.loading));
-        disposable.add(apiService.CheckForgetKey(passcode)
+        disposable.add(userRepository.CheckForgetKey(passcode)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<CheckForgetKey>() {
@@ -262,7 +265,7 @@ public class ForgotPasswordActivity extends BaseActivity implements View.OnClick
         }
         JsonParser jsonParser = new JsonParser();
         gsonObject = (JsonObject) jsonParser.parse(jsonObject.toString());
-        disposable.add(apiService.UpdatePassword(gsonObject)
+        disposable.add(userRepository.UpdatePassword(gsonObject)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<UploadImageObject>() {

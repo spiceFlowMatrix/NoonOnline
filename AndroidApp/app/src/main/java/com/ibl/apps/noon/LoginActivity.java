@@ -9,14 +9,15 @@ import android.content.pm.PackageManager;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import androidx.core.content.res.ResourcesCompat;
-import androidx.appcompat.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.res.ResourcesCompat;
 
 import com.auth0.android.Auth0;
 import com.auth0.android.authentication.AuthenticationAPIClient;
@@ -36,11 +37,12 @@ import com.ibl.apps.RoomDatabase.database.AppDatabase;
 import com.ibl.apps.RoomDatabase.entity.LessonProgress;
 import com.ibl.apps.RoomDatabase.entity.QuizUserResult;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
+import com.ibl.apps.UserCredentialsManagement.UserRepository;
+import com.ibl.apps.noon.databinding.LoginLayoutBinding;
 import com.ibl.apps.util.Const;
 import com.ibl.apps.util.JWTUtils;
 import com.ibl.apps.util.PrefUtils;
 import com.ibl.apps.util.Validator;
-import com.ibl.apps.noon.databinding.LoginLayoutBinding;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -60,6 +62,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 
     LoginLayoutBinding loginLayoutBinding;
     private CompositeDisposable disposable = new CompositeDisposable();
+    UserRepository userRepository;
 
     @Override
     protected int getContentView() {
@@ -70,6 +73,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     protected void onViewReady(Bundle savedInstanceState, Intent intent) {
         super.onViewReady(savedInstanceState, intent);
         loginLayoutBinding = (LoginLayoutBinding) getBindObj();
+        userRepository = new UserRepository();
         try {
             PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
             String version = pInfo.versionName;
@@ -107,6 +111,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                     }
                 }
                 break;
+
+            //This implementation has removed from application & it's related to old sign API.
             case R.id.cardSignup:
                 if (validateFields()) {
                     if (!Validator.checkPassword(loginLayoutBinding.loginPassword)) {
@@ -127,6 +133,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                     }
                 }
                 break;
+
             case R.id.forgotPassword:
                 openActivity(ForgotPasswordActivity.class);
                 break;
@@ -137,7 +144,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 
             case R.id.txt_privacy_policy:
                 showDialog(getResources().getString(R.string.loading));
-                disposable.add(apiService.getTerms()
+                disposable.add(userRepository.getTerms()
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribeWith(new DisposableSingleObserver<TemsCondition>() {
@@ -256,6 +263,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         }
     }
 
+    //This implementation has removed from application & it's related to old sign API.
     public void callSignupUser(String email, String password) {
 
         showDialog(getString(R.string.loading));
@@ -429,7 +437,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         JsonParser jsonParser = new JsonParser();
         gsonObject = (JsonObject) jsonParser.parse(jsonObject.toString());
 
-        disposable.add(apiService.loginUser(gsonObject)
+        disposable.add(userRepository.loginUser(gsonObject)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<LoginObject>() {
@@ -490,7 +498,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 //            String outtimrsave = sharedPreferences.getString("userrolename", "");
 
 
-            disposable.add(apiService.fetchUser(userId)
+            disposable.add(userRepository.fetchUser(userId)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeWith(new DisposableSingleObserver<UserObject>() {
@@ -575,7 +583,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 
     public void callApiGetSyncRecords(String userId) {
 
-        disposable.add(apiService.GetSyncRecords()
+        disposable.add(userRepository.GetSyncRecords()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<SyncRecords>() {

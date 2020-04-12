@@ -1,25 +1,27 @@
 package com.ibl.apps.Fragment;
 
-import androidx.databinding.DataBindingUtil;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
+
 import com.google.gson.Gson;
 import com.ibl.apps.Adapter.AssignmentListAdapter;
+import com.ibl.apps.AssignmentManagement.AssignmentRepository;
 import com.ibl.apps.Base.BaseFragment;
 import com.ibl.apps.Model.AssignmentObject;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
-import com.ibl.apps.util.Const;
-import com.ibl.apps.util.PrefUtils;
 import com.ibl.apps.noon.AssignmentAddActivity;
 import com.ibl.apps.noon.R;
 import com.ibl.apps.noon.databinding.FragmentAssignmentLayoutBinding;
+import com.ibl.apps.util.Const;
+import com.ibl.apps.util.PrefUtils;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -27,12 +29,10 @@ import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.HttpException;
 
-import static com.ibl.apps.Base.BaseActivity.apiService;
-
 
 public class AssignmentFragment extends BaseFragment implements View.OnClickListener {
 
-    FragmentAssignmentLayoutBinding fragmentAssignmentLayoutBinding;
+    private FragmentAssignmentLayoutBinding fragmentAssignmentLayoutBinding;
     private CompositeDisposable disposable = new CompositeDisposable();
 
 
@@ -48,6 +48,8 @@ public class AssignmentFragment extends BaseFragment implements View.OnClickList
     UserDetails userDetailsObject = new UserDetails();
     String userRoleName = "";
     String userId = "0";
+    AssignmentRepository assignmentRepository;
+
 
     public AssignmentFragment() {
         // Required empty public constructor
@@ -85,6 +87,7 @@ public class AssignmentFragment extends BaseFragment implements View.OnClickList
             GradeId = bundle.getString(Const.GradeID, "");
             CourseName = bundle.getString(Const.CourseName, "");
         }
+        assignmentRepository = new AssignmentRepository();
         setToolbar(fragmentAssignmentLayoutBinding.toolbarLayout.toolBar);
         showBackArrow(CourseName);
         fragmentAssignmentLayoutBinding.toolbarLayout.toolBar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -128,7 +131,7 @@ public class AssignmentFragment extends BaseFragment implements View.OnClickList
     private void CallApiAssignmentList() {
 
         showDialog(getActivity().getString(R.string.loading));
-        disposable.add(apiService.fetchAssignments(GradeId)
+        disposable.add(assignmentRepository.fetchAssignments(GradeId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<AssignmentObject>() {

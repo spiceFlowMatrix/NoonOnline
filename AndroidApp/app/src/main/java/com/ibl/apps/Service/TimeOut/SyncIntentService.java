@@ -3,10 +3,12 @@ package com.ibl.apps.Service.TimeOut;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
-import androidx.core.app.JobIntentService;
-import androidx.legacy.content.WakefulBroadcastReceiver;
 import android.text.TextUtils;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
+import androidx.core.app.JobIntentService;
+import androidx.legacy.content.WakefulBroadcastReceiver;
 
 import com.auth0.android.Auth0;
 import com.auth0.android.authentication.AuthenticationAPIClient;
@@ -19,6 +21,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.ibl.apps.LessonManament.LessonRepository;
 import com.ibl.apps.Model.AuthTokenObject;
 import com.ibl.apps.Model.CourseObject;
 import com.ibl.apps.Model.CoursePriviewObject;
@@ -31,13 +34,15 @@ import com.ibl.apps.RoomDatabase.database.AppDatabase;
 import com.ibl.apps.RoomDatabase.entity.LessonProgress;
 import com.ibl.apps.RoomDatabase.entity.QuizUserResult;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
+import com.ibl.apps.UserCredentialsManagement.UserRepository;
+import com.ibl.apps.UserProfileManagement.UserProfileRepository;
+import com.ibl.apps.noon.LoginActivity;
+import com.ibl.apps.noon.NoonApplication;
+import com.ibl.apps.noon.R;
 import com.ibl.apps.util.Const;
 import com.ibl.apps.util.JWTUtils;
 import com.ibl.apps.util.NotificationUtils;
 import com.ibl.apps.util.PrefUtils;
-import com.ibl.apps.noon.LoginActivity;
-import com.ibl.apps.noon.NoonApplication;
-import com.ibl.apps.noon.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -50,7 +55,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-import androidx.annotation.NonNull;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableSingleObserver;
@@ -84,6 +88,7 @@ public class SyncIntentService extends JobIntentService implements DroidListener
     UserDetails userDetailsObject = new UserDetails();
     DroidNet mDroidNet;
     public static boolean isNetworkConnected = false;
+    private UserProfileRepository userProfileRepository;
 
     public static void start(Context context) {
         mycontext = context;
@@ -502,8 +507,8 @@ public class SyncIntentService extends JobIntentService implements DroidListener
     }
 
     public void callApiLogoutUser() {
-
-        disposable.add(apiService.logout()
+        UserRepository userRepository = new UserRepository();
+        disposable.add(userRepository.logout()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<UserObject>() {
@@ -538,8 +543,8 @@ public class SyncIntentService extends JobIntentService implements DroidListener
             noonAppFullSyncObject.add(Const.TIMERDATA, quizResultArray);
             //Log.e(Const.LOG_NOON_TAG, "=====quizResultArray===" + quizResultArray);
             Log.e(Const.LOG_NOON_TAG, "=====noonAppFullSyncObject===" + noonAppFullSyncObject);
-
-            disposable.add(apiService.ProgessSyncAdd(noonAppFullSyncObject)
+            LessonRepository lessonRepository = new LessonRepository();
+            disposable.add(lessonRepository.ProgessSyncAdd(noonAppFullSyncObject)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeWith(new DisposableSingleObserver<LessonProgress>() {
@@ -585,7 +590,7 @@ public class SyncIntentService extends JobIntentService implements DroidListener
     }
 
     public void callApiUpdateProfile() {
-
+        userProfileRepository = new UserProfileRepository();
         if (userDetailsObject != null) {
             String username = userDetailsObject.getUsername();
             String userfullname = userDetailsObject.getFullName();
@@ -606,7 +611,7 @@ public class SyncIntentService extends JobIntentService implements DroidListener
             JsonParser jsonParser = new JsonParser();
             gsonObject = (JsonObject) jsonParser.parse(jsonObject.toString());
 
-            disposable.add(apiService.updateProfile(gsonObject)
+            disposable.add(userProfileRepository.updateProfile(gsonObject)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeWith(new DisposableSingleObserver<UserObject>() {
@@ -637,10 +642,10 @@ public class SyncIntentService extends JobIntentService implements DroidListener
         RequestBody requestFile = RequestBody.create(MediaType.parse("image/jpeg"), imageFilePath);
         MultipartBody.Part body = MultipartBody.Part.createFormData(Const.uploadImagePara, "image.jpg", requestFile);
 
-        Call<UploadImageObject> call = apiService.uploadImage(body);
+        Call<UploadImageObject> call = userProfileRepository.uploadImage(body);
         call.enqueue(new Callback<UploadImageObject>() {
             @Override
-            public void onResponse(@NonNull  Call<UploadImageObject> call, @NonNull retrofit2.Response<UploadImageObject> response) {
+            public void onResponse(@NonNull Call<UploadImageObject> call, @NonNull retrofit2.Response<UploadImageObject> response) {
 
                 if (response.isSuccessful()) {
                     UploadImageObject uploadImageObject = response.body();

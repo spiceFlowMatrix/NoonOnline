@@ -45,6 +45,7 @@ import com.droidnet.DroidNet;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.gson.Gson;
+import com.ibl.apps.FeedbackManagement.FeedbackRepository;
 import com.ibl.apps.Model.AuthTokenObject;
 import com.ibl.apps.Model.ReminderObject;
 import com.ibl.apps.Model.UserObject;
@@ -52,6 +53,7 @@ import com.ibl.apps.Network.ApiClient;
 import com.ibl.apps.Network.ApiService;
 import com.ibl.apps.RoomDatabase.database.AppDatabase;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
+import com.ibl.apps.UserCredentialsManagement.UserRepository;
 import com.ibl.apps.util.Const;
 import com.ibl.apps.util.CustomTypefaceSpan;
 import com.ibl.apps.util.JWTUtils;
@@ -97,6 +99,7 @@ public abstract class BaseActivity extends AppCompatActivity implements DroidLis
     DroidNet mDroidNet;
     public static boolean isNetworkConnected;
     private TimerTask timerTask;
+    private UserRepository userRepository;
     //LogoutPopupLayoutBinding logoutPopupLayoutBinding;
 
     @SuppressLint("NewApi")
@@ -395,7 +398,7 @@ public abstract class BaseActivity extends AppCompatActivity implements DroidLis
     }
 
     public void callApiLogoutUser() {
-        disposable.add(apiService.logout()
+        disposable.add(userRepository.logout()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<UserObject>() {
@@ -422,6 +425,7 @@ public abstract class BaseActivity extends AppCompatActivity implements DroidLis
 
     public void showLogoutAlert(Context activity) {
         try {
+            userRepository = new UserRepository();
             SpannableStringBuilder message = setTypeface(activity, getResources().getString(R.string.validation_logout));
             AlertDialog.Builder builder = new AlertDialog.Builder(activity);
             builder.setTitle(activity.getResources().getString(R.string.validation_warning));
@@ -447,49 +451,6 @@ public abstract class BaseActivity extends AppCompatActivity implements DroidLis
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    public void showLogoutDialog(Context activity) {
-
-        //before inflating the custom alert dialog layout, we will get the current activity viewgroup
-        ViewGroup viewGroup = findViewById(android.R.id.content);
-
-        //then we will inflate the custom alert dialog xml that we created
-        View dialogView = LayoutInflater.from(this).inflate(R.layout.logout_popup_layout, viewGroup, false);
-        TextView ok = dialogView.findViewById(R.id.txtLogoutOk);
-        TextView cancel = dialogView.findViewById(R.id.txtLogoutCancel);
-        //RelativeLayout relativeLayout = dialogView.findViewById(R.id.famlayout);
-
-        //Now we need an AlertDialog.Builder object
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
-        //setting the view of the builder to our custom view that we already inflated
-        builder.setView(dialogView);
-
-        //finally creating the alert dialog and displaying it
-        final AlertDialog alertDialog = builder.create();
-        //alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-        ok.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                alertDialog.dismiss();
-                if (isNetworkAvailable(activity)) {
-                    callApiLogoutUser();
-                } else {
-                    locallyLogout();
-                }
-            }
-        });
-
-        cancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                alertDialog.cancel();
-            }
-        });
-        /*alertDialog.getWindow().setFlags(WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH, WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH);
-        alertDialog.setCanceledOnTouchOutside(true);*/
-        alertDialog.show();
     }
 
     public static byte[] getByteArrayImage(String url) {

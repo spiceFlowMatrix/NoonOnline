@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <LinearLayout
+
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorWhite"
@@ -11,7 +12,10 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/_10sdp"
+            android:layout_marginStart="@dimen/_13sdp"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:layout_marginEnd="@dimen/_10sdp"
+            android:layout_marginBottom="@dimen/_10sdp"
             android:text="@string/activate_deactivate_device"
             android:textAlignment="viewStart"
             android:textSize="@dimen/_14sdp" />
@@ -19,7 +23,10 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/_10sdp"
+            android:layout_marginStart="@dimen/_13sdp"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:layout_marginEnd="@dimen/_10sdp"
+            android:layout_marginBottom="@dimen/_10sdp"
             android:text="@string/clicking_below_button"
             android:textAlignment="viewStart"
             android:textSize="@dimen/_13sdp" />
@@ -30,6 +37,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="@dimen/_20sdp"
+            android:layout_marginBottom="@dimen/_30sdp"
             android:foreground="?android:attr/selectableItemBackground"
             android:shadowColor="@color/colorDarkBlue"
             app:cardBackgroundColor="@color/colorDarkBlue"

@@ -22,6 +22,14 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:text="@string/logins"
+                    android:textColor="@color/black"
+                    android:textSize="@dimen/_16sdp" />
+
+                <TextView
+                    android:id="@+id/txtExtendQuota"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
                     android:layout_centerInParent="true"
                     android:layout_marginEnd="@dimen/_20sdp"
@@ -39,7 +47,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/_20sdp"
-            android:layout_marginTop="@dimen/_45sdp"
+            android:layout_marginTop="@dimen/_30sdp"
             android:layout_marginEnd="@dimen/_20sdp"
             android:orientation="vertical">
 
@@ -69,6 +77,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
+            android:layout_marginTop="@dimen/_20sdp"
             android:layout_marginEnd="@dimen/_20sdp"
             android:text="@string/request_quota_extension"
             android:textAlignment="viewEnd"
@@ -85,7 +94,6 @@
             layout="@layout/recycleview_verticle_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/_15sdp"
             android:visibility="visible" />
 
 

@@ -38,6 +38,7 @@ import com.ibl.apps.RoomDatabase.database.AppDatabase;
 import com.ibl.apps.RoomDatabase.entity.LessonProgress;
 import com.ibl.apps.RoomDatabase.entity.QuizUserResult;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
+import com.ibl.apps.UserCredentialsManagement.UserRepository;
 import com.ibl.apps.util.Const;
 import com.ibl.apps.util.JWTUtils;
 import com.ibl.apps.util.PrefUtils;
@@ -71,6 +72,7 @@ public class SignUpActivity extends BaseActivity implements View.OnClickListener
     ArrayList<GradeSpinner.Grade> gradeArrayList = new ArrayList<>();
     List<GradeSpinner.Grade> gradecategories = new ArrayList<GradeSpinner.Grade>();
     String gradeId;
+    UserRepository userRepository;
 
     @Override
     protected int getContentView() {
@@ -81,6 +83,7 @@ public class SignUpActivity extends BaseActivity implements View.OnClickListener
     protected void onViewReady(Bundle savedInstanceState, Intent intent) {
         super.onViewReady(savedInstanceState, intent);
         activitySignUpBinding = (ActivitySignUpBinding) getBindObj();
+        userRepository = new UserRepository();
 
         setOnClickListener();
         setupView();
@@ -477,7 +480,7 @@ public class SignUpActivity extends BaseActivity implements View.OnClickListener
 
             case R.id.txtTerms:
                 showDialog(getResources().getString(R.string.loading));
-                disposable.add(apiService.getTerms()
+                disposable.add(userRepository.getTerms()
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribeWith(new DisposableSingleObserver<TemsCondition>() {
@@ -582,7 +585,7 @@ public class SignUpActivity extends BaseActivity implements View.OnClickListener
         JsonParser jsonParser = new JsonParser();
         gsonObject = (JsonObject) jsonParser.parse(jsonObject.toString());
 
-        disposable.add(apiService.SignupTrialUser(gsonObject)
+        disposable.add(userRepository.SignupTrialUser(gsonObject)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<TrileSignupObject>() {
@@ -741,7 +744,7 @@ public class SignUpActivity extends BaseActivity implements View.OnClickListener
         JsonParser jsonParser = new JsonParser();
         gsonObject = (JsonObject) jsonParser.parse(jsonObject.toString());
 
-        disposable.add(apiService.loginUser(gsonObject)
+        disposable.add(userRepository.loginUser(gsonObject)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<LoginObject>() {
@@ -792,7 +795,7 @@ public class SignUpActivity extends BaseActivity implements View.OnClickListener
     private void callApiUserDetails(String userId, String sub, String email, String password) {
         try {
 
-            disposable.add(apiService.fetchUser(userId)
+            disposable.add(userRepository.fetchUser(userId)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeWith(new DisposableSingleObserver<UserObject>() {
@@ -871,7 +874,7 @@ public class SignUpActivity extends BaseActivity implements View.OnClickListener
 
     public void callApiGetSyncRecords(String userId) {
 
-        disposable.add(apiService.GetSyncRecords()
+        disposable.add(userRepository.GetSyncRecords()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<SyncRecords>() {

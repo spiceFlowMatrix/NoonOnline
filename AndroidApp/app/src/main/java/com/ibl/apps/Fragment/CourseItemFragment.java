@@ -6,12 +6,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import androidx.databinding.DataBindingUtil;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
@@ -27,6 +24,10 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.downloader.Error;
 import com.downloader.OnDownloadListener;
@@ -53,13 +54,13 @@ import com.ibl.apps.Interface.IOnBackPressed;
 import com.ibl.apps.Interface.QuizItemClickInterface;
 import com.ibl.apps.Interface.QuizQuestionItemClickInterface;
 import com.ibl.apps.Interface.ToolbarHideInterface;
+import com.ibl.apps.LessonManament.LessonRepository;
 import com.ibl.apps.Model.CoursePriviewObject;
 import com.ibl.apps.Model.DownloadQueueObject;
 import com.ibl.apps.Model.ProgressItem;
 import com.ibl.apps.Model.QuizMainObject;
 import com.ibl.apps.Model.RestResponse;
-import com.ibl.apps.Network.ApiClient;
-import com.ibl.apps.Network.ApiService;
+import com.ibl.apps.QuizManament.QuizRepository;
 import com.ibl.apps.RoomDatabase.database.AppDatabase;
 import com.ibl.apps.RoomDatabase.entity.ChapterProgress;
 import com.ibl.apps.RoomDatabase.entity.FileProgress;
@@ -68,15 +69,15 @@ import com.ibl.apps.RoomDatabase.entity.LessonProgress;
 import com.ibl.apps.RoomDatabase.entity.QuizProgress;
 import com.ibl.apps.RoomDatabase.entity.QuizUserResult;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
-import com.ibl.apps.util.Const;
-import com.ibl.apps.util.GlideApp;
-import com.ibl.apps.util.PrefUtils;
-import com.ibl.apps.util.WrapContentLinearLayoutManager;
 import com.ibl.apps.noon.AssignmentDetailActivity;
 import com.ibl.apps.noon.NoonApplication;
 import com.ibl.apps.noon.R;
 import com.ibl.apps.noon.databinding.CourselessonLayoutBinding;
 import com.ibl.apps.noon.databinding.DialogViewerItemLayoutBinding;
+import com.ibl.apps.util.Const;
+import com.ibl.apps.util.GlideApp;
+import com.ibl.apps.util.PrefUtils;
+import com.ibl.apps.util.WrapContentLinearLayoutManager;
 
 import java.io.File;
 import java.security.spec.AlgorithmParameterSpec;
@@ -116,7 +117,6 @@ import static com.ibl.apps.Adapter.CourseItemInnerListAdapter.chapterProgressLis
 import static com.ibl.apps.Adapter.CourseItemInnerListAdapter.fileProgressList;
 import static com.ibl.apps.Adapter.CourseItemInnerListAdapter.lessonProgressList;
 import static com.ibl.apps.Adapter.CourseItemInnerListAdapter.quizProgressList;
-import static com.ibl.apps.Base.BaseActivity.apiService;
 import static com.ibl.apps.Base.BaseActivity.freeMemory;
 
 
@@ -173,6 +173,8 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
     static boolean oneTime = true;
 
     UserDetails userDetailsarr = null;
+    private LessonRepository lessonRepository;
+    private QuizRepository quizRepository;
 
     public CourseItemFragment() {
         // Required empty public constructor
@@ -218,7 +220,8 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
 
     @Override
     protected void setUp(View view) {
-
+        lessonRepository = new LessonRepository();
+        quizRepository = new QuizRepository();
         queueArray.clear();
         hashMap.clear();
         fileidarray.clear();
@@ -508,7 +511,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
         try {
 
             showDialog(getString(R.string.loading));
-            disposable.add(apiService.fetchCoursePriview(GradeId, userId)
+            disposable.add(lessonRepository.fetchCoursePriview(GradeId, userId)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeWith(new DisposableSingleObserver<CoursePriviewObject>() {
@@ -603,13 +606,13 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                 JsonObject jsonObject = new JsonObject();
 
                 try {
-                   // if (!lessonNewProgress.get(i).getProgress().equals("0")) {
-                        jsonObject.addProperty("chapterid", Integer.parseInt(lessonNewProgress.get(i).getChapterId()));
-                        jsonObject.addProperty("lessonid", Integer.parseInt(lessonNewProgress.get(i).getLessonId()));
-                        jsonObject.addProperty("userid", Integer.parseInt(lessonNewProgress.get(i).getUserId()));
-                        jsonObject.addProperty("progress", Integer.parseInt(lessonNewProgress.get(i).getProgress()));
-                        array.add(jsonObject);
-                   // }
+                    // if (!lessonNewProgress.get(i).getProgress().equals("0")) {
+                    jsonObject.addProperty("chapterid", Integer.parseInt(lessonNewProgress.get(i).getChapterId()));
+                    jsonObject.addProperty("lessonid", Integer.parseInt(lessonNewProgress.get(i).getLessonId()));
+                    jsonObject.addProperty("userid", Integer.parseInt(lessonNewProgress.get(i).getUserId()));
+                    jsonObject.addProperty("progress", Integer.parseInt(lessonNewProgress.get(i).getProgress()));
+                    array.add(jsonObject);
+                    // }
                 } catch (JsonSyntaxException e) {
                     e.printStackTrace();
                 }
@@ -622,7 +625,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
         }
 
 
-        disposable.add(apiService.getLessonProgressSync(array).subscribeOn(Schedulers.io())
+        disposable.add(lessonRepository.getLessonProgressSync(array).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<RestResponse>() {
                     @Override
@@ -657,7 +660,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
 
         }
 
-        disposable.add(apiService.getChapterProgressSync(array).subscribeOn(Schedulers.io())
+        disposable.add(lessonRepository.getChapterProgressSync(array).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<RestResponse>() {
                     @Override
@@ -693,7 +696,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
             }
         }
 
-        disposable.add(apiService.getFileProgressSync(array).subscribeOn(Schedulers.io())
+        disposable.add(lessonRepository.getFileProgressSync(array).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<RestResponse>() {
                     @Override
@@ -728,7 +731,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
             }
         }
 
-        disposable.add(apiService.getQuizProgressSync(array).subscribeOn(Schedulers.io())
+        disposable.add(quizRepository.getQuizProgressSync(array).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<RestResponse>() {
                     @Override
@@ -1636,7 +1639,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
             }.execute();
 
             if (isNetworkAvailable(ctx)) {
-                disposable.add(apiService.fetchQuizData(quizID)
+                disposable.add(quizRepository.fetchQuizData(quizID)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribeWith(new DisposableSingleObserver<QuizMainObject>() {
@@ -1987,9 +1990,8 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                                         }
 
 
-                                        ApiService apiService = ApiClient.getClient(getContext()).create(ApiService.class);
                                         CompositeDisposable disposable = new CompositeDisposable();
-                                        disposable.add(apiService.getUserQuizResultSync(array).subscribeOn(Schedulers.io())
+                                        disposable.add(quizRepository.getUserQuizResultSync(array).subscribeOn(Schedulers.io())
                                                 .observeOn(AndroidSchedulers.mainThread())
                                                 .subscribeWith(new DisposableSingleObserver<RestResponse>() {
                                                     @Override
@@ -2035,9 +2037,8 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                                     }
 
 
-                                    ApiService apiService = ApiClient.getClient(getContext()).create(ApiService.class);
                                     CompositeDisposable disposable = new CompositeDisposable();
-                                    disposable.add(apiService.getUserQuizResultSync(array).subscribeOn(Schedulers.io())
+                                    disposable.add(quizRepository.getUserQuizResultSync(array).subscribeOn(Schedulers.io())
                                             .observeOn(AndroidSchedulers.mainThread())
                                             .subscribeWith(new DisposableSingleObserver<RestResponse>() {
                                                 @Override
@@ -2089,9 +2090,8 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
 
                                         }
 
-                                        ApiService apiService = ApiClient.getClient(getContext()).create(ApiService.class);
                                         CompositeDisposable disposable = new CompositeDisposable();
-                                        disposable.add(apiService.getUserQuizResultSync(array).subscribeOn(Schedulers.io())
+                                        disposable.add(quizRepository.getUserQuizResultSync(array).subscribeOn(Schedulers.io())
                                                 .observeOn(AndroidSchedulers.mainThread())
                                                 .subscribeWith(new DisposableSingleObserver<RestResponse>() {
                                                     @Override
@@ -2137,9 +2137,8 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                                     }
 
 
-                                    ApiService apiService = ApiClient.getClient(getContext()).create(ApiService.class);
                                     CompositeDisposable disposable = new CompositeDisposable();
-                                    disposable.add(apiService.getUserQuizResultSync(array).subscribeOn(Schedulers.io())
+                                    disposable.add(quizRepository.getUserQuizResultSync(array).subscribeOn(Schedulers.io())
                                             .observeOn(AndroidSchedulers.mainThread())
                                             .subscribeWith(new DisposableSingleObserver<RestResponse>() {
                                                 @Override

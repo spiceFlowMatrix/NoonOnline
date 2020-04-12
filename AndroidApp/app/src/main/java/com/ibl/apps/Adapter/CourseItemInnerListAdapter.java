@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import androidx.databinding.DataBindingUtil;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
@@ -17,12 +16,6 @@ import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
-import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.res.ResourcesCompat;
-import androidx.appcompat.app.AlertDialog;
-import androidx.recyclerview.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextUtils;
@@ -31,6 +24,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
+import androidx.databinding.DataBindingUtil;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.auth0.android.Auth0;
 import com.auth0.android.authentication.AuthenticationAPIClient;
@@ -50,6 +51,7 @@ import com.droidnet.DroidListener;
 import com.droidnet.DroidNet;
 import com.google.gson.Gson;
 import com.ibl.apps.Base.BaseActivity;
+import com.ibl.apps.DownloadFileManagement.DownloadFileRepository;
 import com.ibl.apps.Fragment.CourseItemFragment;
 import com.ibl.apps.Interface.CourseHideResponse;
 import com.ibl.apps.Interface.CourseInnerItemInterface;
@@ -72,11 +74,6 @@ import com.ibl.apps.RoomDatabase.entity.LessonNewProgress;
 import com.ibl.apps.RoomDatabase.entity.LessonProgress;
 import com.ibl.apps.RoomDatabase.entity.QuizProgress;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
-import com.ibl.apps.util.Const;
-import com.ibl.apps.util.CustomTypefaceSpan;
-import com.ibl.apps.util.JWTUtils;
-import com.ibl.apps.util.PrefUtils;
-import com.ibl.apps.util.VideoEncryptDecrypt.EncrypterDecryptAlgo;
 import com.ibl.apps.noon.AssignmentDetailActivity;
 import com.ibl.apps.noon.MainDashBoardActivity;
 import com.ibl.apps.noon.NoonApplication;
@@ -84,6 +81,11 @@ import com.ibl.apps.noon.R;
 import com.ibl.apps.noon.databinding.CourseInnerItemLayoutBinding;
 import com.ibl.apps.noon.databinding.DeletePopupLayoutBinding;
 import com.ibl.apps.noon.databinding.DownloadPopupLayoutBinding;
+import com.ibl.apps.util.Const;
+import com.ibl.apps.util.CustomTypefaceSpan;
+import com.ibl.apps.util.JWTUtils;
+import com.ibl.apps.util.PrefUtils;
+import com.ibl.apps.util.VideoEncryptDecrypt.EncrypterDecryptAlgo;
 
 import org.json.JSONObject;
 
@@ -171,6 +173,7 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
     public static ArrayList<QuizProgress> quizProgressList = new ArrayList<>();
     public static ArrayList<LessonNewProgress> lessonProgressList = new ArrayList<>();
     public static ArrayList<ChapterProgress> chapterProgressList = new ArrayList<>();
+    private DownloadFileRepository downloadFileRepository;
 
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
@@ -184,6 +187,7 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
     }
 
     public CourseItemInnerListAdapter(Context ctx, ArrayList<CoursePriviewObject.Lessons> list, CourseInnerItemInterface courseInnerItemInterface, boolean isisLastItemViewed, boolean isPlayFirstItem, String chapterid, UserDetails userDetailsObject, String activityFlag, String lessonID, String QuizID, Boolean isNotification, CourseHideResponse courseHideResponse, ArrayList<CoursePriviewObject.Assignment> assignments, String Coursename, String gradeId) {
+        downloadFileRepository = new DownloadFileRepository();
         this.list = list;
         this.ctx = ctx;
         this.isisLastItemViewed = isisLastItemViewed;
@@ -1052,7 +1056,7 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
 
         for (int i = 0; i < downloadQueueObjects.size(); i++) {
             int finalI = i;
-            disposable.add(apiService.fetchSignedUrl(downloadQueueObjects.get(i).getFileid(), downloadQueueObjects.get(i).getLessonID())
+            disposable.add(downloadFileRepository.fetchSignedUrl(downloadQueueObjects.get(i).getFileid(), downloadQueueObjects.get(i).getLessonID())
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeWith(new DisposableSingleObserver<SignedUrlObject>() {
@@ -1098,7 +1102,7 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
         CoursePriviewObject.Lessonfiles lessonsModel = downloadQueueObject.getLessonsModel();
         CoursePriviewObject.Lessons model = downloadQueueObject.getLemodel();
 
-        disposable.add(apiService.fetchSignedUrl(fileID, lessionID)
+        disposable.add(downloadFileRepository.fetchSignedUrl(fileID, lessionID)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<SignedUrlObject>() {
@@ -1138,7 +1142,7 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
             CoursePriviewObject.Lessonfiles lessonsModel = download.getLessonsModel();
             CoursePriviewObject.Lessons model = download.getLemodel();
 
-            disposable.add(apiService.fetchSignedUrl(fileID, lessionID)
+            disposable.add(downloadFileRepository.fetchSignedUrl(fileID, lessionID)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeWith(new DisposableSingleObserver<SignedUrlObject>() {

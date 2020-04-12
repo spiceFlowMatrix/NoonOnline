@@ -1,14 +1,9 @@
 package com.ibl.apps.Fragment;
 
 import android.annotation.SuppressLint;
-import androidx.databinding.DataBindingUtil;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -17,22 +12,29 @@ import android.view.ViewGroup;
 import android.widget.SearchView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+
 import com.google.gson.Gson;
 import com.ibl.apps.Adapter.LibraryGradeListAdapter;
 import com.ibl.apps.Adapter.LibraryListAdapter;
 import com.ibl.apps.Base.BaseFragment;
 import com.ibl.apps.Interface.BackInterface;
+import com.ibl.apps.LibraryManagement.LibraryRepository;
 import com.ibl.apps.Model.LibraryGradeObject;
 import com.ibl.apps.Model.LibraryObject;
 import com.ibl.apps.RoomDatabase.database.AppDatabase;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
 import com.ibl.apps.Service.BookImageManager;
-import com.ibl.apps.util.Const;
-import com.ibl.apps.util.LoadMoreData.RecyclerViewLoadMoreScroll;
-import com.ibl.apps.util.PrefUtils;
 import com.ibl.apps.noon.NoonApplication;
 import com.ibl.apps.noon.R;
 import com.ibl.apps.noon.databinding.LibraryLayoutBinding;
+import com.ibl.apps.util.Const;
+import com.ibl.apps.util.LoadMoreData.RecyclerViewLoadMoreScroll;
+import com.ibl.apps.util.PrefUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,8 +44,6 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.HttpException;
-
-import static com.ibl.apps.Base.BaseActivity.apiService;
 
 
 public class LibraryFragment extends BaseFragment implements View.OnClickListener {
@@ -76,6 +76,7 @@ public class LibraryFragment extends BaseFragment implements View.OnClickListene
     String AddtionalLibrary, AddtionalDiscussions, AddtionalAssignment = "";
     boolean AddtionalLibraryBoolean = true;
     BackInterface backInterface;
+    LibraryRepository libraryRepository;
 
     public LibraryFragment() {
         // Required empty public constructor
@@ -107,6 +108,7 @@ public class LibraryFragment extends BaseFragment implements View.OnClickListene
 
     @Override
     protected void setUp(View view) {
+        libraryRepository = new LibraryRepository();
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT) {
             libraryLayoutBinding.libraryText.setTextSize(35);
         }
@@ -245,7 +247,7 @@ public class LibraryFragment extends BaseFragment implements View.OnClickListene
         try {
 
             showDialog(getString(R.string.loading));
-            disposable.add(apiService.fetchBookList("")
+            disposable.add(libraryRepository.fetchBookList("")
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeWith(new DisposableSingleObserver<LibraryObject>() {
@@ -405,7 +407,7 @@ public class LibraryFragment extends BaseFragment implements View.OnClickListene
         try {
 
             showDialog(getString(R.string.loading));
-            disposable.add(apiService.fetchBooksGradevise("")
+            disposable.add(libraryRepository.fetchBooksGradevise("")
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeWith(new DisposableSingleObserver<LibraryGradeObject>() {
@@ -585,7 +587,7 @@ public class LibraryFragment extends BaseFragment implements View.OnClickListene
                 showDialog(getString(R.string.loading));
 
                 if (isNetworkAvailable(getActivity())) {
-                    disposable.add(apiService.fetchBooksGradevise(query)
+                    disposable.add(libraryRepository.fetchBooksGradevise(query)
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribeWith(new DisposableSingleObserver<LibraryGradeObject>() {
@@ -639,7 +641,7 @@ public class LibraryFragment extends BaseFragment implements View.OnClickListene
                 showDialog(getString(R.string.loading));
 
                 if (isNetworkAvailable(getActivity())) {
-                    disposable.add(apiService.fetchBookList(query)
+                    disposable.add(libraryRepository.fetchBookList(query)
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribeWith(new DisposableSingleObserver<LibraryObject>() {

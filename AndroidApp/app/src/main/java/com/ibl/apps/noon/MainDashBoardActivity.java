@@ -584,44 +584,6 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
         }
     }
 
-
-    public void showLogoutDialog() {
-
-        //before inflating the custom alert dialog layout, we will get the current activity viewgroup
-        //ViewGroup viewGroup = findViewById(android.R.id.content);
-
-        logoutPopupLayoutBinding = DataBindingUtil.inflate(LayoutInflater.from(this), R.layout.logout_popup_layout, null, false);
-
-        //Now we need an AlertDialog.Builder object
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
-        //setting the view of the builder to our custom view that we already inflated
-        builder.setView(logoutPopupLayoutBinding.getRoot());
-
-        //finally creating the alert dialog and displaying it
-        final AlertDialog alertDialog = builder.create();
-        //alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-        logoutPopupLayoutBinding.txtLogoutOk.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                alertDialog.dismiss();
-                if (isNetworkAvailable(MainDashBoardActivity.this)) {
-                    callApiLogoutUser();
-                } else {
-                    locallyLogout();
-                }
-            }
-        });
-
-        logoutPopupLayoutBinding.txtLogoutCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                alertDialog.cancel();
-            }
-        });
-        alertDialog.show();
-    }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
