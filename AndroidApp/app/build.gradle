@@ -35,15 +35,15 @@ repositories {
 }
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 28
 
     defaultConfig {
         applicationId "com.app.training24.noon"
 
         // SDK configuration
         minSdkVersion 17
-        targetSdkVersion 29
-        buildToolsVersion "29.0.2"
+        targetSdkVersion 28
+        buildToolsVersion "28.0.3"
 
         // Application versioning
         versionCode Integer.valueOf(System.env.VERSION_CODE ?: 0)
@@ -112,11 +112,6 @@ android {
 }
 
 dependencies {
-    // Attempt to fix JAXB exception. See SO answer https://stackoverflow.com/a/43574427
-    // JAX-B dependencies for JDK 9+
-    implementation "jakarta.xml.bind:jakarta.xml.bind-api:2.3.2"
-    implementation "org.glassfish.jaxb:jaxb-runtime:2.3.2"
-    
     implementation fileTree(include: ['*.jar'], dir: 'libs')
 
     //noinspection GradleCompatible
