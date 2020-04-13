@@ -4,11 +4,10 @@ import { URLSearchParams } from '@angular/http';
 import { Observable, of, throwError } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import * as _ from 'lodash';
-import { environment } from '../../../environments/environment';
 
 @Injectable()
 export class CommonAPIService {
-
+    apiEndpoint = '/api/'
     private _adminHeaders = new HttpHeaders({
         'Accept': 'application/json',
         'Content-Type': 'application/json'
@@ -20,7 +19,7 @@ export class CommonAPIService {
 
     public getAdminHeaders(): HttpHeaders {
         this._adminHeaders = new HttpHeaders(
-            { 
+            {
                 'Authorization': 'Bearer ' + localStorage.getItem('access_token'),
                 'id_token': 'Bearer ' + localStorage.getItem('id_token'),
             });
@@ -49,7 +48,7 @@ export class CommonAPIService {
             }
             delete params.pfields;
         }
-        return this.http.get<any>(environment.apiEndpoint + url + (urlSearchParams.toString() ? "?" + urlSearchParams.toString() : ''), { headers: this.getAdminHeaders() })
+        return this.http.get<any>(this.apiEndpoint + url + (urlSearchParams.toString() ? "?" + urlSearchParams.toString() : ''), { headers: this.getAdminHeaders() })
             .pipe(
                 map(response => response),
                 catchError(error => {
@@ -80,7 +79,7 @@ export class CommonAPIService {
     };
 
     getById(url: string, id: any): Observable<any> {
-        return this.http.get<any>(environment.apiEndpoint + url + id, { headers: this.getAdminHeaders() })
+        return this.http.get<any>(this.apiEndpoint + url + id, { headers: this.getAdminHeaders() })
             .pipe(
                 map(response => response),
                 catchError(error => {
@@ -90,7 +89,7 @@ export class CommonAPIService {
     };
 
     post(url: string, data: any): Observable<any> {
-        return this.http.post<any>(environment.apiEndpoint + url, data, { headers: this.getAdminHeaders() })
+        return this.http.post<any>(this.apiEndpoint + url, data, { headers: this.getAdminHeaders() })
             .pipe(
                 map(response => response),
                 catchError(error => {
@@ -106,7 +105,7 @@ export class CommonAPIService {
             'Authorization': 'Bearer ' + localStorage.getItem('access_token'),
             'id_token': 'Bearer ' + localStorage.getItem('id_token')
         })
-        return this.http.post<any>(environment.apiEndpoint + url, data, { headers: hdrs })
+        return this.http.post<any>(this.apiEndpoint + url, data, { headers: hdrs })
             .pipe(
                 map(response => response),
                 catchError(error => {
@@ -121,7 +120,7 @@ export class CommonAPIService {
         }
 
         if (id) {
-            return this.http.put<any>(environment.apiEndpoint + url + '/' + id, data, { headers: this.getAdminHeaders() })
+            return this.http.put<any>(this.apiEndpoint + url + '/' + id, data, { headers: this.getAdminHeaders() })
                 .pipe(
                     map(response => response),
                     catchError(error => {
@@ -129,7 +128,7 @@ export class CommonAPIService {
                     })
                 );
         } else {
-            return this.http.put<any>(environment.apiEndpoint + url, data, { headers: this.getAdminHeaders() })
+            return this.http.put<any>(this.apiEndpoint + url, data, { headers: this.getAdminHeaders() })
                 .pipe(
                     map(response => response),
                     catchError(error => {
@@ -142,7 +141,7 @@ export class CommonAPIService {
     putWithFormData(url: string, data?: FormData): Observable<any> {
         let userHeaders = _.clone(this._adminHeaders);
         userHeaders.delete('Content-Type')
-        return this.http.put<any>(environment.apiEndpoint + url, data, { headers: userHeaders })
+        return this.http.put<any>(this.apiEndpoint + url, data, { headers: userHeaders })
             .pipe(
                 map(response => response),
                 catchError(error => {
@@ -152,7 +151,7 @@ export class CommonAPIService {
     };
 
     delete(url: string): Observable<object> {
-        return this.http.delete<any>(environment.apiEndpoint + url, { headers: this.getAdminHeaders() })
+        return this.http.delete<any>(this.apiEndpoint + url, { headers: this.getAdminHeaders() })
             .pipe(
                 map(response => response),
                 catchError(error => {
@@ -164,13 +163,13 @@ export class CommonAPIService {
     getImage(imageUrl: string) {
         // imageUrl = imageUrl.replace(/^https:\/\//i, 'http://');
         return this.http.get(imageUrl, { observe: 'response', responseType: 'blob' })
-        .pipe(
-            map(response => response),
-        ); 
-  
+            .pipe(
+                map(response => response),
+            );
+
     }
-    getAudio(audioUrl : string){
-        return this.http.get(audioUrl, {observe: 'response' , responseType: 'blob'}).pipe(
+    getAudio(audioUrl: string) {
+        return this.http.get(audioUrl, { observe: 'response', responseType: 'blob' }).pipe(
             map(response => response),
             catchError(error => {
                 return throwError(error);

@@ -80,7 +80,8 @@ export class AuthService {
     domain: AUTH_CONFIG.domain,
     audience: AUTH_CONFIG.audience + "api/v2/",
     responseType: 'token id_token',
-    redirectUri: AUTH_CONFIG.callbackURL,
+    redirectUri: localStorage.getItem('callback-sales'),
+      // redirectUri: AUTH_CONFIG.callbackURL,
     scope: 'openid profile'
   });
 
