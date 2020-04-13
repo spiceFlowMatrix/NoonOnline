@@ -95,7 +95,6 @@
         "name",
         "deploymentNamespace",
         "netCoreEnvironment",
-        "sqlDbServer",
         "sqlDbName",
         "sqlDbUser",
         "sqlDbPassword",
