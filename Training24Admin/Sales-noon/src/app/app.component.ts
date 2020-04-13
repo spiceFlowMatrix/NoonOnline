@@ -8,7 +8,10 @@ import { log } from 'util';
     styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-    constructor() {}
+    constructor() {
+        const callback = window.location.origin + "/web/sales/login";
+        localStorage.setItem('callback-sales', callback);
+    }
 
     ngOnInit() {
         // Scrollbar.init(document.querySelector('html'));

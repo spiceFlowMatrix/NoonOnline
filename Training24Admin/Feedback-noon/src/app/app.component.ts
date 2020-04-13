@@ -10,6 +10,8 @@ import { environment } from "../environments/environment";
 export class AppComponent implements OnInit {
 
     constructor() {
+        const callback = window.location.origin + "/web/feedback/login";
+        localStorage.setItem('callback-feed', callback);
     }
 
     ngOnInit() {
