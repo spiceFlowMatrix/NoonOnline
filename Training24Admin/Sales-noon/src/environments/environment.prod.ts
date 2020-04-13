@@ -16,8 +16,5 @@ export const environment = {
     clientID: 'ptpzrLrRrMRlRYi0GqOOsb-3YnXbWDoJ',
     authDomain: 'satyamdev.auth0.com',
     audience: 'https://satyamdev.auth0.com/',
-    apiEndpoint: '/api/',
-    callbackURL: '',
-    logoutcallbackURL: '',
     receiptTitle: 'دوامداره انلاین زده کړه'
 };
