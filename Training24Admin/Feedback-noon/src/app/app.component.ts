@@ -10,10 +10,6 @@ import { environment } from "../environments/environment";
 export class AppComponent implements OnInit {
 
     constructor() {
-        const callback = window.location.href + 'web/feedback/login/';
-        const logout = window.location.href + 'web/feedback/login?logout=true';
-        environment.callbackURL = callback;
-        environment.logoutcallbackURL = logout;
     }
 
     ngOnInit() {

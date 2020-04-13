@@ -8,14 +8,7 @@ import { log } from 'util';
     styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-    constructor() {
-        const callback = window.location.href;
-        const logout = window.location.href + '?logout=true';
-
-        environment.callbackURL = callback;
-        console.log(environment.callbackURL)
-        environment.logoutcallbackURL = logout;
-    }
+    constructor() {}
 
     ngOnInit() {
         // Scrollbar.init(document.querySelector('html'));

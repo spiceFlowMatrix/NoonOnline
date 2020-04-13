@@ -12,11 +12,6 @@ export class AppComponent implements OnInit {
     shouldDisplayOverlay: boolean = true;
 
     constructor(public auth: AuthService) {
-        const callback = window.location.href;
-        console.log(callback);
-        const logout = window.location.href + '?logout=true';
-        environment.callbackURL = callback;
-        environment.logoutcallbackURL = logout;
         // Attempt single sign-on authentication
         // if not authenticated
         // if (auth.isAuthenticated()) {
