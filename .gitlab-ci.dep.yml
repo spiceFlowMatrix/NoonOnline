@@ -4,7 +4,6 @@ variables:
   DEV_ENV_URL: https://${CI_COMMIT_SHORT_SHA}-${CI_COMMIT_REF_SLUG}.dev-apps.noon-online.com
   DARI_ENV_URL: https://dari-apps.noon-online.com
   PASHTO_ENV_URL: https://pashto-apps.noon-online.com
-  GKE_SERVICE_ACCOUNT: ${GKE_SERVICE_ACCOUNT}
 
 stages:
   # - buildWeb
