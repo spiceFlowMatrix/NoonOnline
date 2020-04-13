@@ -41,7 +41,6 @@
     "i": "^0.3.6",
     "lodash": "^4.17.10",
     "moment": "^2.22.2",
-    "ngx-bootstrap-slider": "^1.6.0",
     "ngx-file-drop": "^4.0.6",
     "ngx-select-dropdown": "^0.7.2",
     "ngx-toastr": "^9.0.2",
