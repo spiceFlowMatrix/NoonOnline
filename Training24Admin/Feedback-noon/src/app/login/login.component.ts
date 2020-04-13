@@ -79,7 +79,8 @@ export class LoginComponent implements OnInit {
 
     logout() {
         localStorage.setItem("data", JSON.stringify(this.loginModel));
-        window.location.href = AUTH_CONFIG.audience + 'v2/logout?returnTo=' + environment.logoutcallbackURL;
+        const logoutcallbackURL = window.location.href + '?logout=true';
+        window.location.href = AUTH_CONFIG.audience + 'v2/logout?returnTo=' + logoutcallbackURL;
     }
 
     proceedAuthorization(data) {
@@ -108,7 +109,7 @@ export class LoginComponent implements OnInit {
                 this._utilService.showErrorToast("Unauthorized", "You are not authorized person to access");
                 localStorage.removeItem('isLoggedin');
                 localStorage.removeItem('access_token');
-                localStorage.removeItem('token');                
+                localStorage.removeItem('token');
             }
         }, err => {
             this.isLoading = false;
@@ -131,7 +132,7 @@ export class LoginComponent implements OnInit {
         // }));
     }
 
-    
+
 
     ngOnDestroy() {
         this.allSubscribers.map(value => value.unsubscribe());
