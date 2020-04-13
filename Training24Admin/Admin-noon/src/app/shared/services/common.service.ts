@@ -4,13 +4,13 @@ import { URLSearchParams } from "@angular/http";
 import { Observable, of, throwError } from "rxjs";
 import { map, catchError } from "rxjs/operators";
 import * as _ from "lodash";
-import { environment } from "../../../environments/environment";
 
 @Injectable()
 export class CommonAPIService {
     erpurl: any;
     erpusername: any;
     erpPassword: any;
+    apiEndpoint = "/api/"
     private _adminHeaders = new HttpHeaders({
         Accept: "application/json",
         "Content-Type": "application/json"
@@ -74,7 +74,7 @@ export class CommonAPIService {
     getWithoutHeader(url) {
         return this.http
             .get<any>(
-                environment.apiEndpoint +
+                this.apiEndpoint +
                 url
             )
             .pipe(
@@ -87,7 +87,7 @@ export class CommonAPIService {
 
     putWithoutHeader(url, data) {
         return this.http
-            .put<any>(environment.apiEndpoint + url, data)
+            .put<any>(this.apiEndpoint + url, data)
             .pipe(
                 map(response => response),
                 catchError(error => {
@@ -111,7 +111,7 @@ export class CommonAPIService {
 
         return this.http
             .get<any>(
-                environment.apiEndpoint +
+                this.apiEndpoint +
                 url +
                 (urlSearchParams.toString()
                     ? "?" + urlSearchParams.toString()
@@ -150,7 +150,7 @@ export class CommonAPIService {
 
     getById(url: string, id: any): Observable<any> {
         return this.http
-            .get<any>(environment.apiEndpoint + url + id, {
+            .get<any>(this.apiEndpoint + url + id, {
                 headers: this.getAdminHeaders()
             })
             .pipe(
@@ -169,7 +169,7 @@ export class CommonAPIService {
         //     headers = this.getAdminHeaders();
         // }
         return this.http
-            .post<any>(environment.apiEndpoint + url, data, {
+            .post<any>(this.apiEndpoint + url, data, {
                 headers: this.getAdminHeaders()
             })
             .pipe(
@@ -188,7 +188,7 @@ export class CommonAPIService {
             id_token: "Bearer " + localStorage.getItem("id_token")
         });
         return this.http
-            .post<any>(environment.apiEndpoint + url, data, { headers: hdrs })
+            .post<any>(this.apiEndpoint + url, data, { headers: hdrs })
             .pipe(
                 map(response => response),
                 catchError(error => {
@@ -208,7 +208,7 @@ export class CommonAPIService {
 
         if (id) {
             return this.http
-                .put<any>(environment.apiEndpoint + url + "/" + id, data, {
+                .put<any>(this.apiEndpoint + url + "/" + id, data, {
                     headers: this.getAdminHeaders()
                 })
                 .pipe(
@@ -219,7 +219,7 @@ export class CommonAPIService {
                 );
         } else {
             return this.http
-                .put<any>(environment.apiEndpoint + url, data, {
+                .put<any>(this.apiEndpoint + url, data, {
                     headers: this.getAdminHeaders()
                 })
                 .pipe(
@@ -235,7 +235,7 @@ export class CommonAPIService {
         let userHeaders = _.clone(this._adminHeaders);
         userHeaders.delete("Content-Type");
         return this.http
-            .put<any>(environment.apiEndpoint + url, data, {
+            .put<any>(this.apiEndpoint + url, data, {
                 headers: userHeaders
             })
             .pipe(
@@ -249,7 +249,7 @@ export class CommonAPIService {
     putWithProgress(url: string, data?: FormData) {
         let userHeaders = _.clone(this._adminHeaders);
         userHeaders.delete("Content-Type");
-        return this.http.put(environment.apiEndpoint + url, data, {
+        return this.http.put(this.apiEndpoint + url, data, {
             headers: userHeaders,
             observe: "events",
             reportProgress: true
@@ -259,7 +259,7 @@ export class CommonAPIService {
     postWithProgress(url: string, data?: FormData) {
         let userHeaders = _.clone(this._adminHeaders);
         userHeaders.delete("Content-Type");
-        return this.http.post(environment.apiEndpoint + url, data, {
+        return this.http.post(this.apiEndpoint + url, data, {
             headers: userHeaders,
             observe: "events",
             reportProgress: true
@@ -268,7 +268,7 @@ export class CommonAPIService {
 
     delete(url: string): Observable<object> {
         return this.http
-            .delete<any>(environment.apiEndpoint + url, {
+            .delete<any>(this.apiEndpoint + url, {
                 headers: this.getAdminHeaders()
             })
             .pipe(
