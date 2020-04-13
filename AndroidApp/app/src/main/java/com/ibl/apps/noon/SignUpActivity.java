@@ -6,8 +6,6 @@ import android.content.res.ColorStateList;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import androidx.core.content.res.ResourcesCompat;
-import androidx.appcompat.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -17,6 +15,9 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.res.ResourcesCompat;
 
 import com.auth0.android.Auth0;
 import com.auth0.android.authentication.AuthenticationAPIClient;
@@ -34,16 +35,18 @@ import com.ibl.apps.Model.SyncRecords;
 import com.ibl.apps.Model.TemsCondition;
 import com.ibl.apps.Model.TrileSignupObject;
 import com.ibl.apps.Model.UserObject;
+import com.ibl.apps.RoomDatabase.dao.quizManagementDatabase.QuizDatabaseRepository;
+import com.ibl.apps.RoomDatabase.dao.userManagementDatabse.UserDatabaseRepository;
 import com.ibl.apps.RoomDatabase.database.AppDatabase;
 import com.ibl.apps.RoomDatabase.entity.LessonProgress;
 import com.ibl.apps.RoomDatabase.entity.QuizUserResult;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
 import com.ibl.apps.UserCredentialsManagement.UserRepository;
+import com.ibl.apps.noon.databinding.ActivitySignUpBinding;
 import com.ibl.apps.util.Const;
 import com.ibl.apps.util.JWTUtils;
 import com.ibl.apps.util.PrefUtils;
 import com.ibl.apps.util.Validator;
-import com.ibl.apps.noon.databinding.ActivitySignUpBinding;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -72,7 +75,9 @@ public class SignUpActivity extends BaseActivity implements View.OnClickListener
     ArrayList<GradeSpinner.Grade> gradeArrayList = new ArrayList<>();
     List<GradeSpinner.Grade> gradecategories = new ArrayList<GradeSpinner.Grade>();
     String gradeId;
-    UserRepository userRepository;
+    private UserRepository userRepository;
+    private UserDatabaseRepository userDatabaseRepository;
+
 
     @Override
     protected int getContentView() {
@@ -84,6 +89,7 @@ public class SignUpActivity extends BaseActivity implements View.OnClickListener
         super.onViewReady(savedInstanceState, intent);
         activitySignUpBinding = (ActivitySignUpBinding) getBindObj();
         userRepository = new UserRepository();
+        userDatabaseRepository = new UserDatabaseRepository();
 
         setOnClickListener();
         setupView();
@@ -486,7 +492,7 @@ public class SignUpActivity extends BaseActivity implements View.OnClickListener
                         .subscribeWith(new DisposableSingleObserver<TemsCondition>() {
                             @Override
                             public void onSuccess(TemsCondition temsCondition) {
-                                if (temsCondition != null && temsCondition.getData()!=null && temsCondition.getData().getTerms()!=null) {
+                                if (temsCondition != null && temsCondition.getData() != null && temsCondition.getData().getTerms() != null) {
                                     if (temsCondition.getResponse_code().equals("0")) {
 
                                         privarcyPolicyDialog(temsCondition.getData().getTerms());
@@ -683,7 +689,7 @@ public class SignUpActivity extends BaseActivity implements View.OnClickListener
                             authTokenObject.setExpiresIn(payload.getExpiresIn());
                             authTokenObject.setScope(payload.getScope());
                             authTokenObject.setExpiresAt(String.valueOf(payload.getExpiresAt()));
-                            AppDatabase.getAppDatabase(getApplicationContext()).authTokenDao().insertAll(authTokenObject);
+                            userDatabaseRepository.insertAuthTokenData(authTokenObject);
                             PrefUtils.storeAuthid(SignUpActivity.this, sub);
 
                             callApiUserLogin(email, password, sub);
@@ -763,7 +769,7 @@ public class SignUpActivity extends BaseActivity implements View.OnClickListener
                             loginUser1.setUserid(loginUser.getUserid());
                             loginUser1.setSub(sub);
 
-                            AppDatabase.getAppDatabase(getApplicationContext()).loginDao().insertAll(loginUser1);
+                            userDatabaseRepository.insertLoginData(loginUser1);
                             callApiUserDetails(loginUser.getUserid(), sub, email, password);
 
                         } catch (Exception e) {
@@ -832,8 +838,8 @@ public class SignUpActivity extends BaseActivity implements View.OnClickListener
                                     userDetails.setIs_discussion_authorized(userObject.getData().getIs_discussion_authorized());
                                     userDetails.setIs_library_authorized(userObject.getData().getIs_library_authorized());
                                     userDetails.setIs_assignment_authorized(userObject.getData().getIs_assignment_authorized());
-                                    AppDatabase.getAppDatabase(getApplicationContext()).userDetailDao().deleteByUserId(sub);
-                                    AppDatabase.getAppDatabase(getApplicationContext()).userDetailDao().insertAll(userDetails);
+                                    userDatabaseRepository.deleteByUserId(sub);
+                                    userDatabaseRepository.insertUserDetails(userDetails);
 
                                     return null;
                                 }
@@ -919,6 +925,7 @@ public class SignUpActivity extends BaseActivity implements View.OnClickListener
                                         }
                                     }
 
+                                    QuizDatabaseRepository quizDatabaseRepository = new QuizDatabaseRepository();
                                     if (syncData.getTimerdata() != null && syncData.getTimerdata().size() != 0) {
                                         for (int i = 0; i < syncData.getTimerdata().size(); i++) {
                                             QuizUserResult quizUserResult = new QuizUserResult();
@@ -928,7 +935,7 @@ public class SignUpActivity extends BaseActivity implements View.OnClickListener
                                             quizUserResult.setPassingScore(syncData.getTimerdata().get(i).getPassingScore());
                                             quizUserResult.setQuizTime(syncData.getTimerdata().get(i).getQuizTime());
                                             quizUserResult.setQuizId(syncData.getTimerdata().get(i).getQuizId());
-                                            AppDatabase.getAppDatabase(NoonApplication.getContext()).quizUserResultDao().insertAll(quizUserResult);
+                                            quizDatabaseRepository.insertAllQuizUserResult(quizUserResult);
                                         }
                                     }
                                 }
@@ -962,7 +969,7 @@ public class SignUpActivity extends BaseActivity implements View.OnClickListener
     public void LocalLogin(String email, String password, Throwable e) {
         Log.e("LOGIN", "---3---");
         showDialog(getString(R.string.loading));
-        LoginObject loginObject = AppDatabase.getAppDatabase(getApplicationContext()).loginDao().getLogin(email, password);
+        LoginObject loginObject = userDatabaseRepository.getLoginDetail(email, password);
         if (loginObject != null) {
             PrefUtils.clearSharedPreferences(getApplicationContext());
             PrefUtils.storeAuthid(getApplicationContext(), loginObject.getSub());

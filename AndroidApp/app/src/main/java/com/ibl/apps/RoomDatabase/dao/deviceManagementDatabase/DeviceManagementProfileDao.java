@@ -1,4 +1,4 @@
-package com.ibl.apps.RoomDatabase.dao.deviceManagementRepository;
+package com.ibl.apps.RoomDatabase.dao.deviceManagementDatabase;
 
 import androidx.room.Dao;
 import androidx.room.Query;

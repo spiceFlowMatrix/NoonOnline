@@ -9,6 +9,7 @@ import io.reactivex.Single;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
 
+//Here is API endpoints
 public interface CourseApiService {
     // CoursePriviewGradeWise
     @GET("Course/CoursePriviewGradeWise")

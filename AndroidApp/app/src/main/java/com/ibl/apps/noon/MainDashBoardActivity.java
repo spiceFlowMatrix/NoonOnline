@@ -12,7 +12,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -22,7 +21,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.view.GravityCompat;
-import androidx.databinding.DataBindingUtil;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
@@ -39,8 +37,7 @@ import com.ibl.apps.Fragment.LibraryFragment;
 import com.ibl.apps.Fragment.ProfileFragment;
 import com.ibl.apps.Fragment.ReportFragment;
 import com.ibl.apps.Interface.BackInterface;
-import com.ibl.apps.RoomDatabase.dao.SyncTimeTrackingDao;
-import com.ibl.apps.RoomDatabase.database.AppDatabase;
+import com.ibl.apps.RoomDatabase.dao.courseManagementDatabase.CourseDatabaseRepository;
 import com.ibl.apps.RoomDatabase.entity.SyncTimeTrackingObject;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
 import com.ibl.apps.Service.TimeOut.SyncEventReceiver;
@@ -56,8 +53,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
-
-import io.reactivex.disposables.CompositeDisposable;
 
 /**
  * Created by iblinfotech on 10/09/18.
@@ -82,6 +77,7 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
     private String userId;
     private String userRoleName;
     private UserDetails userDetail;
+    CourseDatabaseRepository courseDatabaseRepository;
 
     @Override
     protected int getContentView() {
@@ -95,6 +91,7 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
         mainDashboardLayoutBinding = (MainDashboardLayoutBinding) getBindObj();
         setSupportActionBar(mainDashboardLayoutBinding.appBarLayout.toolBar);
         //callApiForInterval();
+        courseDatabaseRepository = new CourseDatabaseRepository();
 
         sharedPreferences = getSharedPreferences("rolename", MODE_PRIVATE);
         userRoleName = sharedPreferences.getString("userrolename", "");
@@ -321,7 +318,7 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
 
                 assert userId != null;
                 if (!userId.equals("")) {
-                    SyncTimeTrackingObject syncTimeTrackingObject = AppDatabase.getAppDatabase(NoonApplication.getContext()).syncTimeTrackingDao().getSyncTimeTrack(Integer.parseInt(userId));
+                    SyncTimeTrackingObject syncTimeTrackingObject = courseDatabaseRepository.getSyncTimeTrackById(Integer.parseInt(userId));
                     if (syncTimeTrackingObject != null) {
                         syncTimeTrackingObject.setLatitude("");
                         syncTimeTrackingObject.setLongitude("");
@@ -330,7 +327,7 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
                         syncTimeTrackingObject.setServiceprovider(getCarierName());
                         syncTimeTrackingObject.setVersion(Build.VERSION.RELEASE);
                         syncTimeTrackingObject.setUserid(Integer.parseInt(userId));
-                        AppDatabase.getAppDatabase(NoonApplication.getContext()).syncTimeTrackingDao().updateSyncTimeTracking(syncTimeTrackingObject);
+                        courseDatabaseRepository.updateSyncTimeTracking(syncTimeTrackingObject);
                     } else {
                         SyncTimeTrackingObject syncTimeTrackingObjectinsert = new SyncTimeTrackingObject();
                         syncTimeTrackingObjectinsert.setLatitude("");
@@ -341,7 +338,7 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
                         syncTimeTrackingObjectinsert.setVersion(Build.VERSION.RELEASE);
                         syncTimeTrackingObjectinsert.setActivitytime(getUTCTime());
                         syncTimeTrackingObjectinsert.setUserid(Integer.parseInt(userId));
-                        AppDatabase.getAppDatabase(NoonApplication.getContext()).syncTimeTrackingDao().insertAll(syncTimeTrackingObjectinsert);
+                       courseDatabaseRepository.insertSyncTimeTrackingData(syncTimeTrackingObjectinsert);
                     }
                 }
                 return null;
@@ -428,7 +425,7 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
 
                     assert userId != null;
                     if (!userId.equals("")) {
-                        SyncTimeTrackingObject syncTimeTrackingObject = AppDatabase.getAppDatabase(this).syncTimeTrackingDao().getSyncTimeTrack(Integer.parseInt(userId));
+                        SyncTimeTrackingObject syncTimeTrackingObject = courseDatabaseRepository.getSyncTimeTrackById(Integer.parseInt(userId));
                         if (syncTimeTrackingObject != null) {
                             syncTimeTrackingObject.setLatitude("");
                             syncTimeTrackingObject.setLongitude("");
@@ -437,7 +434,7 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
                             syncTimeTrackingObject.setServiceprovider(getCarierName());
                             syncTimeTrackingObject.setVersion(Build.VERSION.RELEASE);
                             syncTimeTrackingObject.setUserid(Integer.parseInt(userId));
-                            AppDatabase.getAppDatabase(NoonApplication.getContext()).syncTimeTrackingDao().updateSyncTimeTracking(syncTimeTrackingObject);
+                            courseDatabaseRepository.updateSyncTimeTracking(syncTimeTrackingObject);
                         } else {
                             SyncTimeTrackingObject syncTimeTrackingObjectinsert = new SyncTimeTrackingObject();
                             syncTimeTrackingObjectinsert.setLatitude("");
@@ -448,7 +445,7 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
                             syncTimeTrackingObjectinsert.setVersion(Build.VERSION.RELEASE);
                             syncTimeTrackingObjectinsert.setActivitytime(getUTCTime());
                             syncTimeTrackingObjectinsert.setUserid(Integer.parseInt(userId));
-                            AppDatabase.getAppDatabase(NoonApplication.getContext()).syncTimeTrackingDao().insertAll(syncTimeTrackingObjectinsert);
+                            courseDatabaseRepository.insertSyncTimeTrackingData(syncTimeTrackingObjectinsert);
                         }
                     }
                 }
@@ -662,13 +659,12 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
     }
 
     private void getLocation(SingleShotLocationProvider.GPSCoordinates location) {
-        SyncTimeTrackingDao syncTimeTrackingDao = AppDatabase.getAppDatabase(this).syncTimeTrackingDao();
         SharedPreferences sharedPreferences = getSharedPreferences("user", MODE_PRIVATE);
         userId = sharedPreferences.getString("uid", "");
 
         assert userId != null;
         if (!userId.equals("")) {
-            SyncTimeTrackingObject syncTimeTrackingObject = syncTimeTrackingDao.getSyncTimeTrack(Integer.parseInt(userId));
+            SyncTimeTrackingObject syncTimeTrackingObject = courseDatabaseRepository.getSyncTimeTrackById(Integer.parseInt(userId));
             if (syncTimeTrackingObject != null) {
                 syncTimeTrackingObject.setLatitude(String.valueOf(location.latitude));
                 syncTimeTrackingObject.setLongitude(String.valueOf(location.longitude));
@@ -677,7 +673,7 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
                 syncTimeTrackingObject.setServiceprovider(getCarierName());
                 syncTimeTrackingObject.setVersion(Build.VERSION.RELEASE);
                 syncTimeTrackingObject.setUserid(Integer.parseInt(userId));
-                syncTimeTrackingDao.updateSyncTimeTracking(syncTimeTrackingObject);
+                courseDatabaseRepository.updateSyncTimeTracking(syncTimeTrackingObject);
             } else {
                 SyncTimeTrackingObject syncTimeTrackingObjectinsert = new SyncTimeTrackingObject();
                 syncTimeTrackingObjectinsert.setLatitude(String.valueOf(location.latitude));
@@ -688,7 +684,7 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
                 syncTimeTrackingObjectinsert.setVersion(Build.VERSION.RELEASE);
                 syncTimeTrackingObjectinsert.setActivitytime(getUTCTime());
                 syncTimeTrackingObjectinsert.setUserid(Integer.parseInt(userId));
-                syncTimeTrackingDao.insertAll(syncTimeTrackingObjectinsert);
+                courseDatabaseRepository.insertSyncTimeTrackingData(syncTimeTrackingObjectinsert);
             }
         }
 

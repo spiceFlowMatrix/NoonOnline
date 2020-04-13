@@ -1,4 +1,4 @@
-package com.ibl.apps.RoomDatabase.dao;
+package com.ibl.apps.RoomDatabase.dao.libraryManagementDatabase;
 
 import androidx.room.Dao;
 import androidx.room.Insert;

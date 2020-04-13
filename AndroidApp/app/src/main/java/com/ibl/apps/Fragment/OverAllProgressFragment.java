@@ -21,9 +21,8 @@ import com.ibl.apps.Model.parent.CourseSpinnerData;
 import com.ibl.apps.Model.parent.LastOnline;
 import com.ibl.apps.Model.parent.ParentSpinnerModel;
 import com.ibl.apps.Model.parent.ProgressReport;
-import com.ibl.apps.Network.ApiClient;
-import com.ibl.apps.Network.ApiService;
 import com.ibl.apps.ParentControlManagement.ParentControlRepository;
+import com.ibl.apps.RoomDatabase.dao.userManagementDatabse.UserDatabaseRepository;
 import com.ibl.apps.RoomDatabase.database.AppDatabase;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
 import com.ibl.apps.noon.NoonApplication;
@@ -49,7 +48,6 @@ import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 
 import static android.view.View.GONE;
-import static com.ibl.apps.Base.BaseActivity.apiService;
 import static com.ibl.apps.Fragment.ProgressReportFragment.selectedIdsForCallback;
 
 public class OverAllProgressFragment extends BaseFragment implements View.OnClickListener {
@@ -65,6 +63,7 @@ public class OverAllProgressFragment extends BaseFragment implements View.OnClic
     private List<ParentSpinnerModel.Data> studentNamecategories;
     private ParentSpinnerModel parentSpinner = new ParentSpinnerModel();
     private ParentControlRepository parentControlRepository;
+    private UserDatabaseRepository userDatabaseRepository;
 
 
     public OverAllProgressFragment() {
@@ -84,6 +83,7 @@ public class OverAllProgressFragment extends BaseFragment implements View.OnClic
         showDialog(Objects.requireNonNull(getActivity()).getResources().getString(R.string.loading));
         //setUpProgress();
         parentControlRepository = new ParentControlRepository();
+        userDatabaseRepository = new UserDatabaseRepository();
         callApiForStudentSpinner();
         setonClickListner();
     }
@@ -451,13 +451,13 @@ public class OverAllProgressFragment extends BaseFragment implements View.OnClic
     private void callApiForStudentSpinner() {
         String authid = PrefUtils.getAuthid(NoonApplication.getContext());
         if (!TextUtils.isEmpty(authid)) {
-            AuthTokenObject authTokenObject = AppDatabase.getAppDatabase(NoonApplication.getContext()).authTokenDao().getauthTokenData(authid);
+            AuthTokenObject authTokenObject = userDatabaseRepository.getAuthTokenData(authid);
 
             if (authTokenObject != null) {
                 String sub = "";
                 if (authTokenObject.getSub() != null) {
                     sub = authTokenObject.getSub();
-                    userDetails = AppDatabase.getAppDatabase(NoonApplication.getContext()).userDetailDao().getUserDetials(sub);
+                    userDetails = userDatabaseRepository.getUserDetails(sub);
                 }
             }
         }

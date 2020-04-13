@@ -54,13 +54,15 @@ import com.ibl.apps.Interface.IOnBackPressed;
 import com.ibl.apps.Interface.QuizItemClickInterface;
 import com.ibl.apps.Interface.QuizQuestionItemClickInterface;
 import com.ibl.apps.Interface.ToolbarHideInterface;
-import com.ibl.apps.LessonManament.LessonRepository;
+import com.ibl.apps.LessonManagement.LessonRepository;
 import com.ibl.apps.Model.CoursePriviewObject;
 import com.ibl.apps.Model.DownloadQueueObject;
 import com.ibl.apps.Model.ProgressItem;
 import com.ibl.apps.Model.QuizMainObject;
 import com.ibl.apps.Model.RestResponse;
 import com.ibl.apps.QuizManament.QuizRepository;
+import com.ibl.apps.RoomDatabase.dao.courseManagementDatabase.CourseDatabaseRepository;
+import com.ibl.apps.RoomDatabase.dao.quizManagementDatabase.QuizDatabaseRepository;
 import com.ibl.apps.RoomDatabase.database.AppDatabase;
 import com.ibl.apps.RoomDatabase.entity.ChapterProgress;
 import com.ibl.apps.RoomDatabase.entity.FileProgress;
@@ -175,6 +177,8 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
     UserDetails userDetailsarr = null;
     private LessonRepository lessonRepository;
     private QuizRepository quizRepository;
+    private QuizDatabaseRepository quizDatabaseRepository;
+    private CourseDatabaseRepository courseDatabaseRepository;
 
     public CourseItemFragment() {
         // Required empty public constructor
@@ -222,6 +226,8 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
     protected void setUp(View view) {
         lessonRepository = new LessonRepository();
         quizRepository = new QuizRepository();
+        quizDatabaseRepository = new QuizDatabaseRepository();
+        courseDatabaseRepository = new CourseDatabaseRepository();
         queueArray.clear();
         hashMap.clear();
         fileidarray.clear();
@@ -538,7 +544,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                                             callApiSyncChapter(chapterProgressList);
                                         }
 
-                                        AppDatabase.getAppDatabase(getActivity()).courseDetailsDao().insertAll(coursePriviewObject);
+                                        courseDatabaseRepository.insertCoursePreviewObjectData(coursePriviewObject);
                                     } else {
                                         showNetworkAlert(getActivity());
                                     }
@@ -1633,7 +1639,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
             new AsyncTask<Void, Void, String>() {
                 @Override
                 protected String doInBackground(Void... voids) {
-                    AppDatabase.getAppDatabase(ctx).quizAnswerDao().deleteSelectedAnswer();
+                    quizDatabaseRepository.deleteSelectedAnswer();
                     return null;
                 }
             }.execute();
@@ -1649,7 +1655,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                                     setQuizMainView(dialogViewerItemLayoutBinding, ctx, quizMainObject);
                                     quizMainObject.setNewquizId(quizID);
                                     quizMainObject.setUserId(userId);
-                                    AppDatabase.getAppDatabase(ctx).quizAnswerDao().insertAll(quizMainObject);
+                                    quizDatabaseRepository.insertQuizAnswerData(quizMainObject);
                                     dialogViewerItemLayoutBinding.quizViewLayout.progressDialogLay.progressBar.setVisibility(View.GONE);
                                 }
 
@@ -1664,7 +1670,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                                     //QuizMainObject quizMainObject = new Gson().fromJson(error.response().errorBody().string(), QuizMainObject.class);
                                     //showSnackBar(fragmentCourseItemLayoutBinding.mainFragmentCourseLayout, quizMainObject.getMessage());
                                     if (userId != null && !userId.isEmpty()) {
-                                        QuizMainObject quizMainObject = AppDatabase.getAppDatabase(ctx).quizAnswerDao().getquizData(userId, quizID);
+                                        QuizMainObject quizMainObject = quizDatabaseRepository.getQuizByUserId(userId, quizID);
                                         if (quizMainObject != null) {
                                             setQuizMainView(dialogViewerItemLayoutBinding, ctx, quizMainObject);
                                             dialogViewerItemLayoutBinding.quizViewLayout.progressDialogLay.progressBar.setVisibility(View.GONE);
@@ -1674,7 +1680,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                                     }
 
                                 } catch (Exception e1) {
-                                    QuizMainObject quizMainObject = AppDatabase.getAppDatabase(ctx).quizAnswerDao().getquizData(userId, quizID);
+                                    QuizMainObject quizMainObject = quizDatabaseRepository.getQuizByUserId(userId, quizID);
                                     if (quizMainObject != null) {
                                         setQuizMainView(dialogViewerItemLayoutBinding, ctx, quizMainObject);
                                         dialogViewerItemLayoutBinding.quizViewLayout.progressDialogLay.progressBar.setVisibility(View.GONE);
@@ -1685,7 +1691,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                             }
                         }));
             } else {
-                QuizMainObject quizMainObject = AppDatabase.getAppDatabase(ctx).quizAnswerDao().getquizData(userId, quizID);
+                QuizMainObject quizMainObject = quizDatabaseRepository.getQuizByUserId(userId, quizID);
                 setQuizMainView(dialogViewerItemLayoutBinding, ctx, quizMainObject);
                 dialogViewerItemLayoutBinding.quizViewLayout.progressDialogLay.progressBar.setVisibility(View.GONE);
             }
@@ -1816,7 +1822,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
             protected String doInBackground(Void... voids) {
                 int viewpagerSize = getItemofviewpager(+1);
                 int arraylistSIze = quizQuestionsObjectList.size();
-                int answerStatus = AppDatabase.getAppDatabase(ctx).quizAnswerDao().getTrueAnswer(answerID, questionID, "true");
+                int answerStatus = quizDatabaseRepository.getTrueAnswer(answerID, questionID, "true");
                 getActivity().runOnUiThread(new Runnable() {
                     public void run() {
                         int pagepos = fragmentCourseItemLayoutBinding.quizViewLayout.fragmentquesionViewpager.getCurrentItem();
@@ -1836,7 +1842,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
 
                 if (viewpagerSize == arraylistSIze) {
                     Disposabletimer.dispose();
-                    int aTrueCount = AppDatabase.getAppDatabase(ctx).quizAnswerDao().getCountTrueAnswerSelect(quizID, "true");
+                    int aTrueCount = quizDatabaseRepository.getCountTrueAnswerSelect(quizID, "true");
                     getActivity().runOnUiThread(new Runnable() {
                         public void run() {
                             dialogViewerItemLayoutBinding.quizViewLayout.resultLayout.trueProgressTextLay.removeAllViews();
@@ -1964,12 +1970,12 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                                 String totalQuesions = String.valueOf(quizQuestionsObjectList.size());
                                 String totalAnswers = String.valueOf(aTrueCount);
                                 String date = getUTCTime();
-                                QuizUserResult getquizUserResult = AppDatabase.getAppDatabase(ctx).quizUserResultDao().getQuizuserResult(userId, quizID);
+                                QuizUserResult getquizUserResult = quizDatabaseRepository.getQuizuserResult(userId, quizID);
                                 if (getquizUserResult != null) {
                                     String quizTime = dialogViewerItemLayoutBinding.quizViewLayout.resultLayout.compliteMIn.getText().toString();
                                     String yourScore = String.valueOf(aTrueProgress);
                                     String passingScore = passingMarks;
-                                    AppDatabase.getAppDatabase(ctx).quizUserResultDao()
+                                    quizDatabaseRepository
                                             .updateQuizUserResult(userId, quizID, quizTime, yourScore, passingScore, totalQuesions, totalAnswers, date);
                                     JsonArray array = new JsonArray();
                                     JsonObject jsonObject = new JsonObject();
@@ -2018,7 +2024,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                                     quizUserResult.setQuizDate(date);
                                     quizUserResult.setTotalAnswers(totalAnswers);
                                     quizUserResult.setTotalQuitions(totalQuesions);
-                                    AppDatabase.getAppDatabase(ctx).quizUserResultDao().insertAll(quizUserResult);
+                                    quizDatabaseRepository.insertAllQuizUserResult(quizUserResult);
 
                                     JsonArray array = new JsonArray();
                                     JsonObject jsonObject = new JsonObject();
@@ -2065,13 +2071,12 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                                 String totalQuesions = String.valueOf(quizQuestionsObjectList.size());
                                 String totalAnswers = String.valueOf(aTrueCount);
                                 String date = getUTCTime();
-                                QuizUserResult getquizUserResult = AppDatabase.getAppDatabase(ctx).quizUserResultDao().getQuizuserResult(userId, quizID);
+                                QuizUserResult getquizUserResult = quizDatabaseRepository.getQuizuserResult(userId, quizID);
                                 if (getquizUserResult != null) {
                                     String quizTime = dialogViewerItemLayoutBinding.quizViewLayout.resultLayout.compliteMIn.getText().toString();
                                     String yourScore = String.valueOf(aTrueProgress);
                                     String passingScore = passingMarks;
-                                    AppDatabase.getAppDatabase(ctx).quizUserResultDao()
-                                            .updateQuizUserResult(userId, quizID, quizTime, yourScore, passingScore, totalQuesions, totalAnswers, date);
+                                    quizDatabaseRepository.updateQuizUserResult(userId, quizID, quizTime, yourScore, passingScore, totalQuesions, totalAnswers, date);
                                     JsonArray array = new JsonArray();
                                     JsonObject jsonObject = new JsonObject();
                                     if (getquizUserResult != null && getquizUserResult.getTotalQuitions() != null && getquizUserResult.getTotalAnswers() != null) {
@@ -2118,7 +2123,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                                     quizUserResult.setQuizDate(date);
                                     quizUserResult.setTotalAnswers(totalAnswers);
                                     quizUserResult.setTotalQuitions(totalQuesions);
-                                    AppDatabase.getAppDatabase(ctx).quizUserResultDao().insertAll(quizUserResult);
+                                    quizDatabaseRepository.insertAllQuizUserResult(quizUserResult);
 
                                     JsonArray array = new JsonArray();
                                     JsonObject jsonObject = new JsonObject();
@@ -2646,7 +2651,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
         protected CoursePriviewObject doInBackground(Void... params) {
 
             if (!network) {
-                coursePriviewObject = AppDatabase.getAppDatabase(getActivity()).courseDetailsDao().getAllCourseDetails(GradeId, userId);
+                coursePriviewObject = courseDatabaseRepository.getAllCourseDetailsById(GradeId, userId);
                 if (coursePriviewObject != null) {
 
                     coursePriviewArrayList.clear();

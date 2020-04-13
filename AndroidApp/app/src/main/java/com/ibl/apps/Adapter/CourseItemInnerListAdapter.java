@@ -66,6 +66,9 @@ import com.ibl.apps.Model.QuizMainObject;
 import com.ibl.apps.Model.SignedUrlObject;
 import com.ibl.apps.Network.ApiClient;
 import com.ibl.apps.Network.ApiService;
+import com.ibl.apps.RoomDatabase.dao.courseManagementDatabase.CourseDatabaseRepository;
+import com.ibl.apps.RoomDatabase.dao.quizManagementDatabase.QuizDatabaseRepository;
+import com.ibl.apps.RoomDatabase.dao.userManagementDatabse.UserDatabaseRepository;
 import com.ibl.apps.RoomDatabase.database.AppDatabase;
 import com.ibl.apps.RoomDatabase.entity.ChapterProgress;
 import com.ibl.apps.RoomDatabase.entity.FileDownloadStatus;
@@ -129,6 +132,7 @@ import static android.view.View.VISIBLE;
 
 public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemInnerListAdapter.MyViewHolder> implements View.OnClickListener, DroidListener {
 
+
     ArrayList<CoursePriviewObject.Lessons> list;
     int lessonProg = 0;
     CourseInnerItemInterface courseInnerItemInterface;
@@ -174,6 +178,9 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
     public static ArrayList<LessonNewProgress> lessonProgressList = new ArrayList<>();
     public static ArrayList<ChapterProgress> chapterProgressList = new ArrayList<>();
     private DownloadFileRepository downloadFileRepository;
+    private QuizDatabaseRepository quizDatabaseRepository;
+    private CourseDatabaseRepository courseDatabaseRepository;
+    private UserDatabaseRepository userDatabaseRepository;
 
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
@@ -188,6 +195,9 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
 
     public CourseItemInnerListAdapter(Context ctx, ArrayList<CoursePriviewObject.Lessons> list, CourseInnerItemInterface courseInnerItemInterface, boolean isisLastItemViewed, boolean isPlayFirstItem, String chapterid, UserDetails userDetailsObject, String activityFlag, String lessonID, String QuizID, Boolean isNotification, CourseHideResponse courseHideResponse, ArrayList<CoursePriviewObject.Assignment> assignments, String Coursename, String gradeId) {
         downloadFileRepository = new DownloadFileRepository();
+        quizDatabaseRepository = new QuizDatabaseRepository();
+        courseDatabaseRepository = new CourseDatabaseRepository();
+        userDatabaseRepository = new UserDatabaseRepository();
         this.list = list;
         this.ctx = ctx;
         this.isisLastItemViewed = isisLastItemViewed;
@@ -485,7 +495,7 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
             holder.courseInnerItemLayoutBinding.txtFileName.setText(model.getName());
             holder.courseInnerItemLayoutBinding.txtfileType.setText("Quiz");
             holder.courseInnerItemLayoutBinding.txtLanguagemin.setText(model.getNumquestions() + " " + "Questions");
-            QuizProgress progress = AppDatabase.getAppDatabase(ctx).quizProgressDao().getQuizProgress(model.getId(), chapterid);
+            QuizProgress progress = quizDatabaseRepository.getQuizProgress(model.getId(), chapterid);
             if (progress != null && progress.getQuizId().equals(model.getId()) && progress.getChapterId().equals(chapterid)) {
                 QuizProgress quizProgress = new QuizProgress();
                 quizProgress.setUserId(userId);
@@ -493,7 +503,7 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
                 quizProgress.setChapterId(chapterid);
                 quizProgress.setProgress(String.valueOf(model.getProgressVal()));
                 holder.courseInnerItemLayoutBinding.tvProgress.setText(String.valueOf(model.getProgressVal()).concat(" ").concat(holder.itemView.getContext().getString(R.string.completed1)));
-                AppDatabase.getAppDatabase(ctx).quizProgressDao().updateQuizProgress(quizProgress);
+                quizDatabaseRepository.updateQuizProgress(quizProgress);
                 quizProgressList.add(quizProgress);
             } else {
                 QuizProgress quizProgress = new QuizProgress();
@@ -501,12 +511,12 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
                 quizProgress.setQuizId(model.getId());
                 quizProgress.setChapterId(chapterid);
                 quizProgress.setProgress(String.valueOf(model.getProgressVal()));
-                AppDatabase.getAppDatabase(ctx).quizProgressDao().insertAll(quizProgress);
+                quizDatabaseRepository.insertAllQuizProgress(quizProgress);
                 holder.courseInnerItemLayoutBinding.tvProgress.setText(String.valueOf(0).concat(" ").concat(holder.itemView.getContext().getString(R.string.completed1)));
                 quizProgressList.add(quizProgress);
             }
 
-            QuizMainObject quizMainObject = AppDatabase.getAppDatabase(ctx).quizAnswerDao().getquizData(userId, model.getId());
+            QuizMainObject quizMainObject = quizDatabaseRepository.getQuizByUserId(userId, model.getId());
 
             if (quizMainObject != null) {
                 holder.courseInnerItemLayoutBinding.disableLay.setVisibility(GONE);
@@ -598,7 +608,7 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
                 holder.courseInnerItemLayoutBinding.imgdownloadContent.setEnabled(false);
                 // Log.e("INTERVALLLLLL", "=====11==");
                 long milliseconds = System.currentTimeMillis();
-                IntervalTableObject myintervalobject = AppDatabase.getAppDatabase(ctx).intervalDao().getAllInterval();
+                IntervalTableObject myintervalobject = courseDatabaseRepository.getAllInterval();
                 if (myintervalobject != null) {
                     // Log.e("INTERVALLLLLL", "=====22==");
 
@@ -617,7 +627,7 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
                             //Log.e("INTERVALLLLLL", "=====66==");
                             showDialogcancle(position, holder);
                             //showCustomDialogcancle(position, holder);
-                            AppDatabase.getAppDatabase(ctx).intervalDao().updateItem(String.valueOf(milliseconds), myintervalobject.getIntervalTableID());
+                            courseDatabaseRepository.updateItemIntervalId(String.valueOf(milliseconds), myintervalobject.getIntervalTableID());
                         } else {
                             //Log.e("INTERVALLLLLL", "=====77==");
                             startDownload(position, holder);
@@ -626,7 +636,7 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
                         // Log.e("INTERVALLLLLL", "=====55==");
                         showDialogcancle(position, holder);
                         //showCustomDialogcancle(position, holder);
-                        AppDatabase.getAppDatabase(ctx).intervalDao().updateItem(String.valueOf(milliseconds), myintervalobject.getIntervalTableID());
+                        courseDatabaseRepository.updateItemIntervalId(String.valueOf(milliseconds), myintervalobject.getIntervalTableID());
                     }
                 } else {
                     //Log.e("INTERVALLLLLL", "=====33==");
@@ -2168,7 +2178,7 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
 
         String authid = PrefUtils.getAuthid(ctx);
         if (!TextUtils.isEmpty(authid)) {
-            AuthTokenObject authTokenObject = AppDatabase.getAppDatabase(ctx).authTokenDao().getauthTokenData(authid);
+            AuthTokenObject authTokenObject = userDatabaseRepository.getAuthTokenData(authid);
             if (authTokenObject != null) {
 
                 String accessToken = "";
@@ -2225,7 +2235,7 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
                                                 String exp = jsonObj.get(Const.LOG_NOON_EXP).toString();
                                                 String sub = jsonObj.get(Const.LOG_NOON_SUB).toString();
 
-                                                AppDatabase.getAppDatabase(ctx).authTokenDao().updateToken(sub,
+                                                userDatabaseRepository.updateAuthToken(sub,
                                                         credentials.getAccessToken(),
                                                         credentials.getIdToken(),
                                                         credentials.getExpiresIn(),

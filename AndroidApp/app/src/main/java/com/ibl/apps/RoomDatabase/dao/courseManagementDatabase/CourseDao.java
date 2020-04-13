@@ -1,4 +1,4 @@
-package com.ibl.apps.RoomDatabase.dao;
+package com.ibl.apps.RoomDatabase.dao.courseManagementDatabase;
 
 import androidx.room.Dao;
 import androidx.room.Insert;
@@ -13,6 +13,8 @@ import java.util.List;
 /**
  * Created by lukegjpotter on 25/11/2017.
  */
+
+//Here is DAO of course
 @Dao
 public interface CourseDao {
 

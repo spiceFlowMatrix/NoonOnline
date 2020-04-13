@@ -1,41 +1,25 @@
 package com.ibl.apps.CourseManagement;
 
 import com.ibl.apps.Model.CourseObject;
-import com.ibl.apps.Model.CoursePriviewObject;
 import com.ibl.apps.Model.IntervalObject;
-import com.ibl.apps.Model.IntervalTableObject;
 import com.ibl.apps.Model.SearchObject;
 import com.ibl.apps.Network.ApiClient;
-import com.ibl.apps.RoomDatabase.dao.CourseDao;
-import com.ibl.apps.RoomDatabase.dao.CourseDetailsDao;
-import com.ibl.apps.RoomDatabase.dao.IntervalDao;
 import com.ibl.apps.RoomDatabase.dao.LessonProgressDao;
-import com.ibl.apps.RoomDatabase.dao.SyncTimeTrackingDao;
 import com.ibl.apps.RoomDatabase.database.AppDatabase;
-import com.ibl.apps.RoomDatabase.entity.CourseImageTable;
 import com.ibl.apps.RoomDatabase.entity.LessonProgress;
-import com.ibl.apps.RoomDatabase.entity.SyncTimeTrackingObject;
 import com.ibl.apps.noon.NoonApplication;
 
 import java.util.List;
 
 import io.reactivex.Single;
 
-public class CourseRepository implements CourseApiService, CourseDao, IntervalDao, LessonProgressDao, SyncTimeTrackingDao, CourseDetailsDao {
+public class CourseRepository implements CourseApiService, LessonProgressDao {
     private CourseApiService courseApiService;
-    private CourseDao courseDao;
-    private IntervalDao intervalDao;
     private LessonProgressDao lessonProgressDao;
-    private SyncTimeTrackingDao syncTimeTrackingDao;
-    private CourseDetailsDao courseDetailsDao;
 
     public CourseRepository() {
         courseApiService = ApiClient.getClient(NoonApplication.getContext()).create(CourseApiService.class);
-        courseDao = AppDatabase.getAppDatabase(NoonApplication.getContext()).courseDao();
-        intervalDao = AppDatabase.getAppDatabase(NoonApplication.getContext()).intervalDao();
         lessonProgressDao = AppDatabase.getAppDatabase(NoonApplication.getContext()).lessonProgressDao();
-        syncTimeTrackingDao = AppDatabase.getAppDatabase(NoonApplication.getContext()).syncTimeTrackingDao();
-        courseDetailsDao = AppDatabase.getAppDatabase(NoonApplication.getContext()).courseDetailsDao();
     }
 
     @Override
@@ -54,66 +38,6 @@ public class CourseRepository implements CourseApiService, CourseDao, IntervalDa
     }
 
     @Override
-    public void insertAll(CourseObject... courseObjects) {
-        courseDao.insertAll(courseObjects);
-    }
-
-    @Override
-    public List<CourseObject> getAllCourse(String userId) {
-        return courseDao.getAllCourse(userId);
-    }
-
-    @Override
-    public CourseObject getAllCourseObject(String userId) {
-        return courseDao.getAllCourseObject(userId);
-    }
-
-    @Override
-    public void insertAll(CourseImageTable... courseImageTables) {
-        courseDao.insertAll(courseImageTables);
-    }
-
-    @Override
-    public byte[] getCourseImage(String userId, String gradeId) {
-        return courseDao.getCourseImage(userId, gradeId);
-    }
-
-    @Override
-    public List<CourseImageTable> getImage() {
-        return courseDao.getImage();
-    }
-
-    @Override
-    public void updateAll(List<CourseObject.Data> ListData, String userId) {
-        courseDao.updateAll(ListData, userId);
-    }
-
-    @Override
-    public void insertAll(IntervalTableObject... IntervalTableObject) {
-        intervalDao.insertAll(IntervalTableObject);
-    }
-
-    @Override
-    public IntervalTableObject getAllInterval() {
-        return intervalDao.getAllInterval();
-    }
-
-    @Override
-    public void deleteInterval() {
-        intervalDao.deleteInterval();
-    }
-
-    @Override
-    public void updateItem(String localinterval, int IntervalTableID) {
-        intervalDao.updateItem(localinterval, IntervalTableID);
-    }
-
-    @Override
-    public void updateINterval(String interval, int IntervalTableID) {
-        intervalDao.updateINterval(interval, IntervalTableID);
-    }
-
-    @Override
     public void insertAll(LessonProgress... lessonProgresses) {
         lessonProgressDao.insertAll(lessonProgresses);
     }
@@ -124,7 +48,7 @@ public class CourseRepository implements CourseApiService, CourseDao, IntervalDa
     }
 
     @Override
-    public int getItemgradeIdProgress(String gradeId, String lessonProgress, String userId) {
+    public int  getItemgradeIdProgress(String gradeId, String lessonProgress, String userId) {
         return lessonProgressDao.getItemgradeIdProgress(gradeId, lessonProgress, userId);
     }
 
@@ -183,38 +107,4 @@ public class CourseRepository implements CourseApiService, CourseDao, IntervalDa
         lessonProgressDao.updateLessonIDWise(lessonId, lessonProgress, gradeId, userId, totalRecords, quizId, isStatus, fileId, lessonProgressId);
     }
 
-    @Override
-    public void insertAll(SyncTimeTrackingObject... syncTimeTrackingObjects) {
-        syncTimeTrackingDao.insertAll(syncTimeTrackingObjects);
-    }
-
-    @Override
-    public SyncTimeTrackingObject getSyncTimeTracking() {
-        return syncTimeTrackingDao.getSyncTimeTracking();
-    }
-
-    @Override
-    public void updateSyncTimeTracking(SyncTimeTrackingObject... syncTimeTrackingObjects) {
-        syncTimeTrackingDao.updateSyncTimeTracking(syncTimeTrackingObjects);
-    }
-
-    @Override
-    public void deleteAll() {
-        syncTimeTrackingDao.deleteAll();
-    }
-
-    @Override
-    public SyncTimeTrackingObject getSyncTimeTrack(int userid) {
-        return syncTimeTrackingDao.getSyncTimeTrack(userid);
-    }
-
-    @Override
-    public void insertAll(CoursePriviewObject... coursePriviewObjects) {
-        courseDetailsDao.insertAll(coursePriviewObjects);
-    }
-
-    @Override
-    public CoursePriviewObject getAllCourseDetails(String GradeId, String userId) {
-        return courseDetailsDao.getAllCourseDetails(GradeId, userId);
-    }
 }

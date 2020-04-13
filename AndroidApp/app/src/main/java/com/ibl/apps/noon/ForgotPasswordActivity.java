@@ -14,7 +14,7 @@ import com.ibl.apps.Base.BaseActivity;
 import com.ibl.apps.Model.CheckForgetKey;
 import com.ibl.apps.Model.LoginObject;
 import com.ibl.apps.Model.UploadImageObject;
-import com.ibl.apps.RoomDatabase.database.AppDatabase;
+import com.ibl.apps.RoomDatabase.dao.userManagementDatabse.UserDatabaseRepository;
 import com.ibl.apps.UserCredentialsManagement.UserRepository;
 import com.ibl.apps.noon.databinding.ForgotPasswordLayoutBinding;
 import com.ibl.apps.util.Const;
@@ -35,7 +35,8 @@ public class ForgotPasswordActivity extends BaseActivity implements View.OnClick
     ForgotPasswordLayoutBinding forgotPasswordLayoutBinding;
     private CompositeDisposable disposable = new CompositeDisposable();
     CheckForgetKey checkForgetKeyModel;
-    UserRepository userRepository;
+    private UserRepository userRepository;
+    private UserDatabaseRepository userDatabaseRepository;
 
     @Override
     protected int getContentView() {
@@ -49,6 +50,7 @@ public class ForgotPasswordActivity extends BaseActivity implements View.OnClick
         setToolbar(forgotPasswordLayoutBinding.toolbarLayout.toolBar);
         showBackArrow(getString(R.string.forgot_password_header));
         userRepository = new UserRepository();
+        userDatabaseRepository = new UserDatabaseRepository();
         forgotPasswordLayoutBinding.passcode.setMaxLength(6);
         setOnClickListener();
 
@@ -276,10 +278,10 @@ public class ForgotPasswordActivity extends BaseActivity implements View.OnClick
                         SharedPreferences sharedPreferencesuser = getSharedPreferences("user", MODE_PRIVATE);
                         String userId = sharedPreferencesuser.getString("uid", "");
 
-                        LoginObject loginObject = AppDatabase.getAppDatabase(getApplicationContext()).loginDao().getLoginModelById(userId);
+                        LoginObject loginObject = userDatabaseRepository.getUserLoginModelById(userId);
                         if (loginObject != null) {
                             loginObject.setPassword(newPassword);
-                            AppDatabase.getAppDatabase(getApplicationContext()).loginDao().updateModel(loginObject);
+                            userDatabaseRepository.updateLoginModel(loginObject);
                         }
                         Toast.makeText(getApplicationContext(), uploadImageObject.getMessage(), Toast.LENGTH_LONG).show();
                         finish();

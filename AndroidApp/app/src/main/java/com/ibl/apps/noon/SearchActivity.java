@@ -26,6 +26,7 @@ import com.ibl.apps.Model.AllGradeObject;
 import com.ibl.apps.Model.CourseObject;
 import com.ibl.apps.Model.CoursePriviewObject;
 import com.ibl.apps.Model.SearchObject;
+import com.ibl.apps.RoomDatabase.dao.courseManagementDatabase.CourseDatabaseRepository;
 import com.ibl.apps.RoomDatabase.entity.LessonProgress;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
 import com.ibl.apps.noon.databinding.SearchLayoutBinding;
@@ -67,7 +68,8 @@ public class SearchActivity extends BaseActivity implements View.OnClickListener
     public String SearchText = "", bygrade = "";
     String userId = "0";
     UserDetails userDetailsObject = new UserDetails();
-    private CourseRepository courseRepository;
+    private CourseRepository courseRepository; //13 usage
+    private CourseDatabaseRepository courseDatabaseRepository;
 
     @Override
     protected int getContentView() {
@@ -79,6 +81,7 @@ public class SearchActivity extends BaseActivity implements View.OnClickListener
         super.onViewReady(savedInstanceState, intent);
         searchLayoutBinding = (SearchLayoutBinding) getBindObj();
         courseRepository = new CourseRepository();
+        courseDatabaseRepository = new CourseDatabaseRepository();
 
         Typeface typeface = ResourcesCompat.getFont(SearchActivity.this, R.font.bahij_helvetica_neue_bold);
         searchLayoutBinding.advanceSearchLayout.chknew.setTypeface(typeface);
@@ -180,7 +183,7 @@ public class SearchActivity extends BaseActivity implements View.OnClickListener
                     allGrade.setName(getString(R.string.none));
                     spinnerGradelist.add(allGrade);
 
-                    CourseObject courseObject = courseRepository.getAllCourseObject(userId);
+                    CourseObject courseObject = courseDatabaseRepository.getAllCourseObject(userId);
                     if (courseObject != null && courseObject.getData() != null) {
                         for (int i = 0; i < courseObject.getData().size(); i++) {
 
@@ -339,7 +342,7 @@ public class SearchActivity extends BaseActivity implements View.OnClickListener
                 showDialog(getString(R.string.loading));
                 /*---  Search Course and lesson  ---*/
 
-                CourseObject courseObject = courseRepository.getAllCourseObject(userId);
+                CourseObject courseObject = courseDatabaseRepository.getAllCourseObject(userId);
 
                 //  Log.e("lessonfileName", "DATABASE===courseObject===" + courseObject);
 
@@ -413,7 +416,7 @@ public class SearchActivity extends BaseActivity implements View.OnClickListener
                                         searchCourseObject.setName(courseName);
                                         searchCourseObject.setGradeDetails(new SearchObject.GradeDetails[]{gradeDetails});
 
-                                        byte[] bitmapImage = courseRepository.getCourseImage(userId, courseId);
+                                        byte[] bitmapImage = courseDatabaseRepository.getCourseImage(userId, courseId);
                                         if (bitmapImage != null) {
                                             searchCourseObject.setCourseImage(bitmapImage);
                                         }
@@ -481,7 +484,7 @@ public class SearchActivity extends BaseActivity implements View.OnClickListener
                                             searchCourseObject.setName(courseName);
                                             searchCourseObject.setGradeDetails(new SearchObject.GradeDetails[]{gradeDetails});
 
-                                            byte[] bitmapImage = courseRepository.getCourseImage(userId, courseId);
+                                            byte[] bitmapImage = courseDatabaseRepository.getCourseImage(userId, courseId);
                                             if (bitmapImage != null) {
                                                 searchCourseObject.setCourseImage(bitmapImage);
                                             }
@@ -538,7 +541,7 @@ public class SearchActivity extends BaseActivity implements View.OnClickListener
                                 }
 
 
-                                CoursePriviewObject coursePriviewObject = courseRepository.getAllCourseDetails(courseId, userId);
+                                CoursePriviewObject coursePriviewObject = courseDatabaseRepository.getAllCourseDetailsById(courseId, userId);
                                 if (coursePriviewObject != null) {
 
                                     for (int k = 0; k < coursePriviewObject.getData().getChapters().size(); k++) {

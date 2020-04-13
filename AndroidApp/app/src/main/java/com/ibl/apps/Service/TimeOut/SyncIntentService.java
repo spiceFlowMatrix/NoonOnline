@@ -21,7 +21,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.ibl.apps.LessonManament.LessonRepository;
+import com.ibl.apps.LessonManagement.LessonRepository;
 import com.ibl.apps.Model.AuthTokenObject;
 import com.ibl.apps.Model.CourseObject;
 import com.ibl.apps.Model.CoursePriviewObject;
@@ -30,6 +30,9 @@ import com.ibl.apps.Model.UploadImageObject;
 import com.ibl.apps.Model.UserObject;
 import com.ibl.apps.Network.ApiClient;
 import com.ibl.apps.Network.ApiService;
+import com.ibl.apps.RoomDatabase.dao.courseManagementDatabase.CourseDatabaseRepository;
+import com.ibl.apps.RoomDatabase.dao.quizManagementDatabase.QuizDatabaseRepository;
+import com.ibl.apps.RoomDatabase.dao.userManagementDatabse.UserDatabaseRepository;
 import com.ibl.apps.RoomDatabase.database.AppDatabase;
 import com.ibl.apps.RoomDatabase.entity.LessonProgress;
 import com.ibl.apps.RoomDatabase.entity.QuizUserResult;
@@ -89,10 +92,12 @@ public class SyncIntentService extends JobIntentService implements DroidListener
     DroidNet mDroidNet;
     public static boolean isNetworkConnected = false;
     private UserProfileRepository userProfileRepository;
+    private QuizDatabaseRepository quizDatabaseRepository;
 
     public static void start(Context context) {
         mycontext = context;
         apiService = ApiClient.getClient(context).create(ApiService.class);
+
 
         Intent starter = new Intent(context, SyncIntentService.class);
         SyncIntentService.enqueueWork(context, starter);
@@ -164,7 +169,8 @@ public class SyncIntentService extends JobIntentService implements DroidListener
                             callApiUpdateProfile();
 
                             /*---------------------------FOR Quiz Timer--------------------------------*/
-                            List<QuizUserResult> quizUserResults = AppDatabase.getAppDatabase(mycontext).quizUserResultDao().getAllQuizuserResult(false, userId);
+                            quizDatabaseRepository = new QuizDatabaseRepository();
+                            List<QuizUserResult> quizUserResults = quizDatabaseRepository.getAllQuizuserResult(false, userId);
 
                             /*---------------------------FOR Lesson Progress--------------------------------*/
                             List<LessonProgress> lessonProgressList = AppDatabase.getAppDatabase(mycontext).lessonProgressDao().getAllLessonProgress(false, userId);
@@ -181,8 +187,8 @@ public class SyncIntentService extends JobIntentService implements DroidListener
                         if (userRoleName.equals("Student")) {
 
                             //Log.e("ROLEEEE", "==equale==");
-
-                            CourseObject courseObject = AppDatabase.getAppDatabase(mycontext).courseDao().getAllCourseObject(userId);
+                            CourseDatabaseRepository courseDatabaseRepository = new CourseDatabaseRepository();
+                            CourseObject courseObject = courseDatabaseRepository.getAllCourseObject(userId);
 
                             if (courseObject != null && courseObject.getData() != null) {
                                 for (int i = 0; i < courseObject.getData().size(); i++) {
@@ -218,7 +224,7 @@ public class SyncIntentService extends JobIntentService implements DroidListener
                                                     if (courseObject.getUserId().equals(userId)) {
                                                         courseObject.getData().get(i).getCourses().get(j).setDeleted(true);
 
-                                                        CoursePriviewObject coursePriviewObject = AppDatabase.getAppDatabase(mycontext).courseDetailsDao().getAllCourseDetails(GradeId, userId);
+                                                        CoursePriviewObject coursePriviewObject = courseDatabaseRepository.getAllCourseDetailsById(GradeId, userId);
                                                         if (coursePriviewObject != null) {
                                                             for (int k = 0; k < coursePriviewObject.getData().getChapters().size(); k++) {
                                                                 if (coursePriviewObject.getData().getChapters().get(k).getLessons() != null) {
@@ -254,7 +260,7 @@ public class SyncIntentService extends JobIntentService implements DroidListener
                                                                 }
                                                             }
                                                         }
-                                                        AppDatabase.getAppDatabase(mycontext).courseDao().updateAll(courseObject.getData(), userId);
+                                                        courseDatabaseRepository.updateAll(courseObject.getData(), userId);
                                                     }
                                                 } else {
                                                     //Log.e(Const.LOG_NOON_TAG, "CONST====NOT EXPIRE==");
@@ -351,10 +357,10 @@ public class SyncIntentService extends JobIntentService implements DroidListener
     }
 
     public void refreshToken() {
-
+        UserDatabaseRepository userDatabaseRepository = new UserDatabaseRepository();
         String authid = PrefUtils.getAuthid(this);
         if (!TextUtils.isEmpty(authid)) {
-            AuthTokenObject authTokenObject = AppDatabase.getAppDatabase(this).authTokenDao().getauthTokenData(authid);
+            AuthTokenObject authTokenObject = userDatabaseRepository.getAuthTokenData(authid);
             if (authTokenObject != null) {
 
                 String accessToken = "";
@@ -411,7 +417,7 @@ public class SyncIntentService extends JobIntentService implements DroidListener
                                                 String exp = jsonObj.get(Const.LOG_NOON_EXP).toString();
                                                 String sub = jsonObj.get(Const.LOG_NOON_SUB).toString();
 
-                                                AppDatabase.getAppDatabase(getApplicationContext()).authTokenDao().updateToken(sub,
+                                                userDatabaseRepository.updateAuthToken(sub,
                                                         credentials.getAccessToken(),
                                                         credentials.getIdToken(),
                                                         credentials.getExpiresIn(),
@@ -480,8 +486,9 @@ public class SyncIntentService extends JobIntentService implements DroidListener
         String accessToken = "";
         String idToken = "";
         String authid = PrefUtils.getAuthid(NoonApplication.getContext());
+        UserDatabaseRepository userDatabaseRepository = new UserDatabaseRepository();
         if (!TextUtils.isEmpty(authid)) {
-            AuthTokenObject authTokenObject = AppDatabase.getAppDatabase(NoonApplication.getContext()).authTokenDao().getauthTokenData(authid);
+            AuthTokenObject authTokenObject = userDatabaseRepository.getAuthTokenData(authid);
             if (authTokenObject != null) {
                 if (authTokenObject.getAccessToken() != null) {
                     accessToken = authTokenObject.getAccessToken();
@@ -562,10 +569,11 @@ public class SyncIntentService extends JobIntentService implements DroidListener
                                     }
                                 }
                             }
+                            quizDatabaseRepository = new QuizDatabaseRepository();
                             if (quizUserResults != null && quizUserResults.size() != 0) {
                                 for (int i = 0; i < quizUserResults.size(); i++) {
                                     String quizID = quizUserResults.get(i).getQuizId();
-                                    AppDatabase.getAppDatabase(NoonApplication.getContext()).quizUserResultDao().updatelQuizUserResultStatus(true, quizID, userId);
+                                    quizDatabaseRepository.updatelQuizUserResultStatus(true, quizID, userId);
                                 }
                             }
                         }

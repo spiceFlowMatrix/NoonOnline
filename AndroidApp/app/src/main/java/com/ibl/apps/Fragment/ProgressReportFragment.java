@@ -64,6 +64,7 @@ import com.ibl.apps.Model.parent.ParentSpinnerModel;
 import com.ibl.apps.Network.ApiClient;
 import com.ibl.apps.Network.ApiService;
 import com.ibl.apps.ParentControlManagement.ParentControlRepository;
+import com.ibl.apps.RoomDatabase.dao.userManagementDatabse.UserDatabaseRepository;
 import com.ibl.apps.RoomDatabase.database.AppDatabase;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
 import com.ibl.apps.util.CustomView.MultiSelectSpinner;
@@ -124,6 +125,7 @@ public class ProgressReportFragment extends BaseFragment implements View.OnClick
     int perpagerecord = 20;
     List<ParentGraphPoints.Data> paretnData = new ArrayList<>();
     private ParentControlRepository parentControlRepository;
+    private UserDatabaseRepository userDatabaseRepository;
 
 
     public static ProgressReportFragment newInstance(String param1, String param2) {
@@ -140,6 +142,7 @@ public class ProgressReportFragment extends BaseFragment implements View.OnClick
     protected void setUp(View view) {
         showDialog(Objects.requireNonNull(getActivity()).getResources().getString(R.string.loading));
         parentControlRepository = new ParentControlRepository();
+        userDatabaseRepository = new UserDatabaseRepository();
 //        callApiLocationData();
         setUpAllSpinners();
         setonclicklistner();
@@ -158,13 +161,13 @@ public class ProgressReportFragment extends BaseFragment implements View.OnClick
     private void callApiForStudentSpinner() {
         String authid = PrefUtils.getAuthid(NoonApplication.getContext());
         if (!TextUtils.isEmpty(authid)) {
-            AuthTokenObject authTokenObject = AppDatabase.getAppDatabase(NoonApplication.getContext()).authTokenDao().getauthTokenData(authid);
+            AuthTokenObject authTokenObject = userDatabaseRepository.getAuthTokenData(authid);
 
             if (authTokenObject != null) {
                 String sub = "";
                 if (authTokenObject.getSub() != null) {
                     sub = authTokenObject.getSub();
-                    userDetails = AppDatabase.getAppDatabase(NoonApplication.getContext()).userDetailDao().getUserDetials(sub);
+                    userDetails = userDatabaseRepository.getUserDetails(sub);
                 }
             }
         }

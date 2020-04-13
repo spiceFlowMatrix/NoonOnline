@@ -26,10 +26,9 @@ import com.ibl.apps.Interface.BackInterface;
 import com.ibl.apps.LibraryManagement.LibraryRepository;
 import com.ibl.apps.Model.LibraryGradeObject;
 import com.ibl.apps.Model.LibraryObject;
-import com.ibl.apps.RoomDatabase.database.AppDatabase;
+import com.ibl.apps.RoomDatabase.dao.libraryManagementDatabase.LibraryDatabaseRepository;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
 import com.ibl.apps.Service.BookImageManager;
-import com.ibl.apps.noon.NoonApplication;
 import com.ibl.apps.noon.R;
 import com.ibl.apps.noon.databinding.LibraryLayoutBinding;
 import com.ibl.apps.util.Const;
@@ -48,7 +47,7 @@ import retrofit2.HttpException;
 
 public class LibraryFragment extends BaseFragment implements View.OnClickListener {
 
-    LibraryLayoutBinding libraryLayoutBinding;
+    private LibraryLayoutBinding libraryLayoutBinding;
     private CompositeDisposable disposable = new CompositeDisposable();
 
     private static final String ARG_PARAM1 = "param1";
@@ -76,7 +75,8 @@ public class LibraryFragment extends BaseFragment implements View.OnClickListene
     String AddtionalLibrary, AddtionalDiscussions, AddtionalAssignment = "";
     boolean AddtionalLibraryBoolean = true;
     BackInterface backInterface;
-    LibraryRepository libraryRepository;
+    private LibraryRepository libraryRepository;
+    private LibraryDatabaseRepository libraryDatabaseRepository;
 
     public LibraryFragment() {
         // Required empty public constructor
@@ -109,6 +109,7 @@ public class LibraryFragment extends BaseFragment implements View.OnClickListene
     @Override
     protected void setUp(View view) {
         libraryRepository = new LibraryRepository();
+        libraryDatabaseRepository = new LibraryDatabaseRepository();
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT) {
             libraryLayoutBinding.libraryText.setTextSize(35);
         }
@@ -333,11 +334,11 @@ public class LibraryFragment extends BaseFragment implements View.OnClickListene
                 libraryObject.setUserId(userDetailsObject.getId());
                 dataList.add(libraryObject);
 
-                LibraryObject exiestlibraryObject = AppDatabase.getAppDatabase(getActivity()).libraryDao().getAllLibraryObject(userId);
+                LibraryObject exiestlibraryObject = libraryDatabaseRepository.getAllLibraryObjectByUserId(userId);
                 if (exiestlibraryObject != null) {
-                    AppDatabase.getAppDatabase(getActivity()).libraryDao().updateAll(libraryObject.getData(), userId);
+                    libraryDatabaseRepository.updateAll(libraryObject.getData(), userId);
                 } else {
-                    AppDatabase.getAppDatabase(getActivity()).libraryDao().insertAll(libraryObject);
+                    libraryDatabaseRepository.insertLibraryData(libraryObject);
                 }
                 BookImageManager.start(getActivity(), libraryObject, userId);
 
@@ -373,14 +374,14 @@ public class LibraryFragment extends BaseFragment implements View.OnClickListene
         @Override
         protected List<LibraryObject> doInBackground(Void... params) {
             try {
-                if (AppDatabase.getAppDatabase(getActivity()).libraryDao().getAlllibraryBook(userId) != null) {
-                    if (AppDatabase.getAppDatabase(getActivity()).libraryDao().getAlllibraryBook(userId).size() != 0) {
-                        libraryObjects = AppDatabase.getAppDatabase(getActivity()).libraryDao().getAlllibraryBook(userId);
+                if (libraryDatabaseRepository.getLibraryBookByUserId(userId) != null) {
+                    if (libraryDatabaseRepository.getLibraryBookByUserId(userId).size() != 0) {
+                        libraryObjects = libraryDatabaseRepository.getLibraryBookByUserId(userId);
                         for (int i = 0; i < libraryObjects.size(); i++) {
                             libraryDataObjects = libraryObjects.get(i).getData();
                             if (libraryDataObjects != null && libraryDataObjects.size() != 0) {
                                 for (int j = 0; j < libraryDataObjects.size(); j++) {
-                                    byte[] bitmapImage = AppDatabase.getAppDatabase(NoonApplication.getContext()).libraryDao().getBookImage(userId, libraryDataObjects.get(j).getId());
+                                    byte[] bitmapImage = libraryDatabaseRepository.getLibraryBookImage(userId, libraryDataObjects.get(j).getId());
                                     if (bitmapImage != null) {
                                         libraryDataObjects.get(j).setBookcoverImageBitmap(bitmapImage);
                                     }
@@ -508,11 +509,11 @@ public class LibraryFragment extends BaseFragment implements View.OnClickListene
                 libraryObject.setUserId(userDetailsObject.getId());
                 dataList.add(libraryObject);
 
-                LibraryGradeObject exiestlibraryObject = AppDatabase.getAppDatabase(getActivity()).libraryGradeDao().getAllLibraryGradeObject(userId);
+                LibraryGradeObject exiestlibraryObject = libraryDatabaseRepository.getAllLibraryGradeByUserId(userId);
                 if (exiestlibraryObject != null) {
-                    AppDatabase.getAppDatabase(getActivity()).libraryGradeDao().updateGradeBookAll(libraryObject.getData(), userId);
+                    libraryDatabaseRepository.updateLibraryGradeBook(libraryObject.getData(), userId);
                 } else {
-                    AppDatabase.getAppDatabase(getActivity()).libraryGradeDao().insertAll(libraryObject);
+                    libraryDatabaseRepository.insertLibraryGradeData(libraryObject);
                 }
 
             } catch (Exception e) {
@@ -547,9 +548,9 @@ public class LibraryFragment extends BaseFragment implements View.OnClickListene
         @Override
         protected List<LibraryGradeObject> doInBackground(Void... params) {
             try {
-                if (AppDatabase.getAppDatabase(getActivity()).libraryGradeDao().getAlllibraryGradeBook(userId) != null) {
-                    if (AppDatabase.getAppDatabase(getActivity()).libraryDao().getAlllibraryBook(userId).size() != 0) {
-                        libraryObjects = AppDatabase.getAppDatabase(getActivity()).libraryGradeDao().getAlllibraryGradeBook(userId);
+                if (libraryDatabaseRepository.getAllLibraryGradeBook(userId) != null) {
+                    if (libraryDatabaseRepository.getLibraryBookByUserId(userId).size() != 0) {
+                        libraryObjects = libraryDatabaseRepository.getAllLibraryGradeBook(userId);
                         for (int i = 0; i < libraryObjects.size(); i++) {
                             libraryDataObjects = libraryObjects.get(i).getData();
                             if (libraryDataObjects != null && libraryDataObjects.size() != 0) {
@@ -557,7 +558,7 @@ public class LibraryFragment extends BaseFragment implements View.OnClickListene
 
                                     ArrayList<LibraryGradeObject.Books> booksArrayList = new ArrayList<>();
                                     for (int k = 0; k < booksArrayList.size(); k++) {
-                                        byte[] bitmapImage = AppDatabase.getAppDatabase(NoonApplication.getContext()).libraryGradeDao().getBookImage(userId, libraryDataObjects.get(j).getId());
+                                        byte[] bitmapImage = libraryDatabaseRepository.getLibraryGradeBookImage(userId, libraryDataObjects.get(j).getId());
                                         if (bitmapImage != null) {
                                             libraryDataObjects.get(j).getBooks().get(k).setBookGradecoverImageBitmap(bitmapImage);
                                         }

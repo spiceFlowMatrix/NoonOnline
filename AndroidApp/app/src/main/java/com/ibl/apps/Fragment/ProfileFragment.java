@@ -21,6 +21,7 @@ import com.ibl.apps.Base.BaseFragment;
 import com.ibl.apps.Model.StatisticsObject;
 import com.ibl.apps.Model.UploadImageObject;
 import com.ibl.apps.Model.UserObject;
+import com.ibl.apps.RoomDatabase.dao.userManagementDatabse.UserDatabaseRepository;
 import com.ibl.apps.RoomDatabase.database.AppDatabase;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
 import com.ibl.apps.UserProfileManagement.UserProfileRepository;
@@ -53,6 +54,7 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.HttpException;
+
 import static android.app.Activity.RESULT_OK;
 
 
@@ -71,7 +73,8 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
     List<UserDetails> userDetailsList;
     UserDetails userDetailsObject = new UserDetails();
     String userId = "0";
-    UserProfileRepository userProfileRepository;
+    private UserProfileRepository userProfileRepository;
+    private UserDatabaseRepository userDatabaseRepository;
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -104,7 +107,8 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
     @Override
     protected void setUp(View view) {
         userProfileRepository = new UserProfileRepository();
-        userDetailsList = AppDatabase.getAppDatabase(NoonApplication.getContext()).userDetailDao().getAllUserDetials();
+        userDatabaseRepository = new UserDatabaseRepository();
+        userDetailsList = userDatabaseRepository.getAllUserDetails();
         PrefUtils.MyAsyncTask asyncTask = (PrefUtils.MyAsyncTask) new PrefUtils.MyAsyncTask(new PrefUtils.MyAsyncTask.AsyncResponse() {
             @Override
             public UserDetails getLocalUserDetails(UserDetails userDetails) {
@@ -267,7 +271,7 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
                         @Override
                         public UserDetails getLocalUserDetails(UserDetails userDetails) {
                             if (userDetails != null) {
-                                AppDatabase.getAppDatabase(getActivity()).userDetailDao().updateUserPhoto(userDetails.getId(), uploadImageObject.getData(), imageFilePath);
+                                userDatabaseRepository.updateUserPhoto(userDetails.getId(), uploadImageObject.getData(), imageFilePath);
                             }
                             return null;
                         }
@@ -317,7 +321,7 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
                                                 .error(R.drawable.ic_account_circle_black_24dp)
                                                 .into(profileLayoutBinding.profileImage);
 
-                                        AppDatabase.getAppDatabase(getActivity()).userDetailDao().updateUserPhoto(userDetails.getId(), "", bitmapImage);
+                                        userDatabaseRepository.updateUserPhoto(userDetails.getId(), "", bitmapImage);
                                     }
 
                                     return null;
@@ -418,7 +422,7 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
                             showSnackBar(profileLayoutBinding.mainChangeProfileLayout, userObject.getMessage());
                             for (int i = 0; i < userDetailsList.size(); i++) {
                                 if (userDetailsList.get(i).getId().equals(userId)) {
-                                    AppDatabase.getAppDatabase(NoonApplication.getContext()).userDetailDao().updateUserDetails(userId, username, userfullname, phonenumber);
+                                    userDatabaseRepository.updateUserDetails(userId, username, userfullname, phonenumber);
                                 }
                             }
                         }
@@ -445,7 +449,7 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
                     //Log.e(Const.LOG_NOON_TAG, "==userfullname==" + userfullname);
                     //Log.e(Const.LOG_NOON_TAG, "==phonenumber==" + phonenumber);
 
-                    AppDatabase.getAppDatabase(NoonApplication.getContext()).userDetailDao().updateUserDetails(userId, username, userfullname, phonenumber);
+                    userDatabaseRepository.updateUserDetails(userId, username, userfullname, phonenumber);
                 }
             }
             Toast.makeText(getActivity(), getString(R.string.validation_profile_Update), Toast.LENGTH_LONG).show();

@@ -1,10 +1,9 @@
-package com.ibl.apps.LessonManament;
+package com.ibl.apps.LessonManagement;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.ibl.apps.Model.CoursePriviewObject;
 import com.ibl.apps.Model.RestResponse;
-import com.ibl.apps.Model.SignedUrlObject;
 import com.ibl.apps.Network.ApiClient;
 import com.ibl.apps.RoomDatabase.entity.LessonProgress;
 import com.ibl.apps.noon.NoonApplication;

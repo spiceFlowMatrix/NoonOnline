@@ -45,8 +45,7 @@ import com.ibl.apps.Interface.CourseAsyncResponse;
 import com.ibl.apps.Model.CourseObject;
 import com.ibl.apps.Model.IntervalObject;
 import com.ibl.apps.Model.IntervalTableObject;
-import com.ibl.apps.RoomDatabase.dao.SyncTimeTrackingDao;
-import com.ibl.apps.RoomDatabase.database.AppDatabase;
+import com.ibl.apps.RoomDatabase.dao.courseManagementDatabase.CourseDatabaseRepository;
 import com.ibl.apps.RoomDatabase.entity.SyncTimeTrackingObject;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
 import com.ibl.apps.Service.CourseImageManager;
@@ -97,7 +96,8 @@ public class GradeFragment extends BaseFragment implements View.OnClickListener,
     String userId = "0";
     private static LocationManager manager;
     boolean isAgree = false;
-    private CourseRepository courseRepository;
+    private CourseRepository courseRepository; //22 use
+    private CourseDatabaseRepository courseDatabaseRepository;
 
     public GradeFragment() {
         // Required empty public constructor
@@ -120,6 +120,7 @@ public class GradeFragment extends BaseFragment implements View.OnClickListener,
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
         courseRepository = new CourseRepository();
+        courseDatabaseRepository = new CourseDatabaseRepository();
     }
 
     @Override
@@ -299,14 +300,14 @@ public class GradeFragment extends BaseFragment implements View.OnClickListener,
 
     private void getLocation(SingleShotLocationProvider.GPSCoordinates location) {
         if (location != null) {
-           // SyncTimeTrackingDao syncTimeTrackingDao = AppDatabase.getAppDatabase(getActivity()).syncTimeTrackingDao();
+            // SyncTimeTrackingDao syncTimeTrackingDao = AppDatabase.getAppDatabase(getActivity()).syncTimeTrackingDao();
             SharedPreferences sharedPreferences = NoonApplication.getContext().getSharedPreferences("user", Context.MODE_PRIVATE);
             if (sharedPreferences != null) {
                 userId = sharedPreferences.getString("uid", "");
                 assert userId != null;
 
                 if (!userId.equals("")) {
-                    SyncTimeTrackingObject syncTimeTrackingObject = courseRepository.getSyncTimeTrack(Integer.parseInt(userId));
+                    SyncTimeTrackingObject syncTimeTrackingObject = courseDatabaseRepository.getSyncTimeTrackById(Integer.parseInt(userId));
                     if (syncTimeTrackingObject != null) {
                         //SyncTimeTrackingObject syncTimeTrackingObject = new SyncTimeTrackingObject();
                         syncTimeTrackingObject.setLatitude(String.valueOf(location.latitude));
@@ -316,7 +317,7 @@ public class GradeFragment extends BaseFragment implements View.OnClickListener,
                         syncTimeTrackingObject.setServiceprovider(getCarierName());
                         syncTimeTrackingObject.setVersion(Build.VERSION.RELEASE);
                         syncTimeTrackingObject.setUserid(Integer.parseInt(userId));
-                        courseRepository.updateSyncTimeTracking(syncTimeTrackingObject);
+                        courseDatabaseRepository.updateSyncTimeTracking(syncTimeTrackingObject);
                     } else {
                         SyncTimeTrackingObject syncTimeTrackingObjectinsert = new SyncTimeTrackingObject();
                         syncTimeTrackingObjectinsert.setLatitude(String.valueOf(location.latitude));
@@ -327,7 +328,7 @@ public class GradeFragment extends BaseFragment implements View.OnClickListener,
                         syncTimeTrackingObjectinsert.setVersion(Build.VERSION.RELEASE);
                         syncTimeTrackingObjectinsert.setActivitytime(getUTCTime());
                         syncTimeTrackingObjectinsert.setUserid(Integer.parseInt(userId));
-                        courseRepository.insertAll(syncTimeTrackingObjectinsert);
+                        courseDatabaseRepository.insertSyncTimeTrackingData(syncTimeTrackingObjectinsert);
                     }
                 }
             }
@@ -444,13 +445,13 @@ public class GradeFragment extends BaseFragment implements View.OnClickListener,
                     .subscribeWith(new DisposableSingleObserver<IntervalObject>() {
                         @Override
                         public void onSuccess(IntervalObject intervalObject) {
-                            IntervalTableObject intervalTableObject = courseRepository.getAllInterval();
+                            IntervalTableObject intervalTableObject = courseDatabaseRepository.getAllInterval();
                             if (intervalTableObject != null) {
-                                courseRepository.updateINterval(intervalObject.getData().getInterval(), intervalTableObject.getIntervalTableID());
+                                courseDatabaseRepository.updateIntervalById(intervalObject.getData().getInterval(), intervalTableObject.getIntervalTableID());
                             } else {
                                 intervalTableObject = new IntervalTableObject();
                                 intervalTableObject.setInterval(intervalObject.getData().getInterval());
-                                courseRepository.insertAll(intervalTableObject);
+                                courseDatabaseRepository.insertIntervalTableObject(intervalTableObject);
                             }
 
                             hideDialog();
@@ -522,9 +523,9 @@ public class GradeFragment extends BaseFragment implements View.OnClickListener,
                 Courselist.clear();
                 CourselistData.clear();
 
-                if (courseRepository.getAllCourse(userId) != null) {
-                    if (courseRepository.getAllCourse(userId).size() != 0) {
-                        Courselist = courseRepository.getAllCourse(userId);
+                if (courseDatabaseRepository.getAllCourseByUserId(userId) != null) {
+                    if (courseDatabaseRepository.getAllCourseByUserId(userId).size() != 0) {
+                        Courselist = courseDatabaseRepository.getAllCourseByUserId(userId);
                         for (int i = 0; i < Courselist.size(); i++) {
                             CourselistData = Courselist.get(i).getData();
                             if (CourselistData != null && CourselistData.size() != 0) {
@@ -536,7 +537,7 @@ public class GradeFragment extends BaseFragment implements View.OnClickListener,
                                             if (!CourselistData.get(j).getCourses().get(k).isDeleted()) {
 
 
-                                                byte[] bitmapImage = courseRepository.getCourseImage(userId, CourselistData.get(j).getCourses().get(k).getId());
+                                                byte[] bitmapImage = courseDatabaseRepository.getCourseImage(userId, CourselistData.get(j).getCourses().get(k).getId());
                                                 Log.e(Const.LOG_NOON_TAG, "=====GRADE FRAGMENT=bitmapImage==" + bitmapImage);
 
                                                 if (bitmapImage != null) {
@@ -595,11 +596,11 @@ public class GradeFragment extends BaseFragment implements View.OnClickListener,
                 apiCourseObject.setUserId(userDetailsObject.getId());
                 Courselist.add(apiCourseObject);
 
-                CourseObject exiestCourseObject = courseRepository.getAllCourseObject(userId);
+                CourseObject exiestCourseObject = courseDatabaseRepository.getAllCourseObject(userId);
                 if (exiestCourseObject != null) {
-                    courseRepository.updateAll(apiCourseObject.getData(), userId);
+                    courseDatabaseRepository.updateAll(apiCourseObject.getData(), userId);
                 } else {
-                    courseRepository.insertAll(apiCourseObject);
+                    courseDatabaseRepository.insertCourseObjectData(apiCourseObject);
                 }
 
                 for (int i = 0; i < Courselist.size(); i++) {

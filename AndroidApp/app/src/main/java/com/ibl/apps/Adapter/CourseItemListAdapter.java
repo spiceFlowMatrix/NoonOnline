@@ -1,23 +1,24 @@
 package com.ibl.apps.Adapter;
 
 import android.content.Context;
-import androidx.databinding.DataBindingUtil;
 import android.os.AsyncTask;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
+
+import androidx.databinding.DataBindingUtil;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.ibl.apps.Interface.CourseHideResponse;
 import com.ibl.apps.Interface.CourseInnerItemInterface;
 import com.ibl.apps.Model.CoursePriviewObject;
-import com.ibl.apps.RoomDatabase.database.AppDatabase;
+import com.ibl.apps.RoomDatabase.dao.courseManagementDatabase.CourseDatabaseRepository;
 import com.ibl.apps.RoomDatabase.entity.GradeProgress;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
-import com.ibl.apps.util.WrapContentLinearLayoutManager;
 import com.ibl.apps.noon.NoonApplication;
 import com.ibl.apps.noon.R;
 import com.ibl.apps.noon.databinding.CourseItemLayoutBinding;
+import com.ibl.apps.util.WrapContentLinearLayoutManager;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -102,7 +103,7 @@ public class CourseItemListAdapter extends RecyclerView.Adapter<CourseItemListAd
             for (int i = 0; i < model.getLessons().length; i++) {
                 if (model.getLessons() != null && model.getLessons()[i].getLessonfiles() != null && model.getLessons()[i].getLessonfiles().length != 0) {
                     listProg.add(model.getLessons()[i]);
-                } else if (model.getLessons()[i].getNumquestions()!=null) {
+                } else if (model.getLessons()[i].getNumquestions() != null) {
                     listProg.add(model.getLessons()[i]);
                 }
             }
@@ -218,16 +219,17 @@ public class CourseItemListAdapter extends RecyclerView.Adapter<CourseItemListAd
             if (tokenObject.getId() != null) {
                 userID = tokenObject.getId();
             }*/
-            GradeProgress gradeProgress = AppDatabase.getAppDatabase(ctx).gradeProgressDao().getItemGradeProgress(gradeID);
+            CourseDatabaseRepository courseDatabaseRepository = new CourseDatabaseRepository();
+            GradeProgress gradeProgress = courseDatabaseRepository.getItemGradeProgress(gradeID);
             if (gradeProgress != null) {
-                AppDatabase.getAppDatabase(ctx).gradeProgressDao().updateItemGradeProgress(gradeID, progressval);
+                courseDatabaseRepository.updateItemGradeProgress(gradeID, progressval);
             } else {
                 GradeProgress gradeProgress1 = new GradeProgress();
                 gradeProgress1.setUserid(userId);
                 gradeProgress1.setGradeid(gradeID);
                 gradeProgress1.setGradeprogress(progressval);
                 gradeProgress1.setIsStatus("0");
-                AppDatabase.getAppDatabase(ctx).gradeProgressDao().insertAll(gradeProgress1);
+                courseDatabaseRepository.insertGradeProgress(gradeProgress1);
                 //Log.e(Const.LOG_NOON_TAG, "===INSERT DATA===" + gradeProgress1.toString());
             }
             return null;

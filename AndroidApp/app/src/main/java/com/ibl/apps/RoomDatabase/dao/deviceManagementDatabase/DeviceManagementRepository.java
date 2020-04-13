@@ -1,4 +1,4 @@
-package com.ibl.apps.RoomDatabase.dao.deviceManagementRepository;
+package com.ibl.apps.RoomDatabase.dao.deviceManagementDatabase;
 
 import com.ibl.apps.RoomDatabase.database.AppDatabase;
 import com.ibl.apps.DeviceManagement.DeviceManagementActivity;

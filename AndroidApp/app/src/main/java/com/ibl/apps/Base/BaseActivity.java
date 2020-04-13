@@ -51,6 +51,7 @@ import com.ibl.apps.Model.ReminderObject;
 import com.ibl.apps.Model.UserObject;
 import com.ibl.apps.Network.ApiClient;
 import com.ibl.apps.Network.ApiService;
+import com.ibl.apps.RoomDatabase.dao.userManagementDatabse.UserDatabaseRepository;
 import com.ibl.apps.RoomDatabase.database.AppDatabase;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
 import com.ibl.apps.UserCredentialsManagement.UserRepository;
@@ -100,6 +101,7 @@ public abstract class BaseActivity extends AppCompatActivity implements DroidLis
     public static boolean isNetworkConnected;
     private TimerTask timerTask;
     private UserRepository userRepository;
+    private UserDatabaseRepository userDatabaseRepository;
     //LogoutPopupLayoutBinding logoutPopupLayoutBinding;
 
     @SuppressLint("NewApi")
@@ -110,6 +112,7 @@ public abstract class BaseActivity extends AppCompatActivity implements DroidLis
         onViewReady(savedInstanceState, getIntent());
         FirebaseApp.initializeApp(this);
 //        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+        userDatabaseRepository = new UserDatabaseRepository();
         apiService = ApiClient.getClient(getApplicationContext()).create(ApiService.class);
         Fabric.with(this, new Crashlytics());
 //        try {
@@ -356,7 +359,7 @@ public abstract class BaseActivity extends AppCompatActivity implements DroidLis
         String authid = PrefUtils.getAuthid(NoonApplication.getContext());
         if (!TextUtils.isEmpty(authid)) {
 
-            AuthTokenObject authTokenObject = AppDatabase.getAppDatabase(NoonApplication.getContext()).authTokenDao().getauthTokenData(authid);
+            AuthTokenObject authTokenObject = userDatabaseRepository.getAuthTokenData(authid);
             if (authTokenObject != null) {
                 if (authTokenObject.getAccessToken() != null) {
                     accessToken = authTokenObject.getAccessToken();
@@ -398,6 +401,7 @@ public abstract class BaseActivity extends AppCompatActivity implements DroidLis
     }
 
     public void callApiLogoutUser() {
+        userRepository = new UserRepository();
         disposable.add(userRepository.logout()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -425,7 +429,7 @@ public abstract class BaseActivity extends AppCompatActivity implements DroidLis
 
     public void showLogoutAlert(Context activity) {
         try {
-            userRepository = new UserRepository();
+
             SpannableStringBuilder message = setTypeface(activity, getResources().getString(R.string.validation_logout));
             AlertDialog.Builder builder = new AlertDialog.Builder(activity);
             builder.setTitle(activity.getResources().getString(R.string.validation_warning));
@@ -478,7 +482,7 @@ public abstract class BaseActivity extends AppCompatActivity implements DroidLis
 
         String authid = PrefUtils.getAuthid(this);
         if (!TextUtils.isEmpty(authid)) {
-            AuthTokenObject authTokenObject = AppDatabase.getAppDatabase(this).authTokenDao().getauthTokenData(authid);
+            AuthTokenObject authTokenObject = userDatabaseRepository.getAuthTokenData(authid);
             if (authTokenObject != null) {
 
                 String accessToken = "";
@@ -535,7 +539,7 @@ public abstract class BaseActivity extends AppCompatActivity implements DroidLis
                                                 String exp = jsonObj.get(Const.LOG_NOON_EXP).toString();
                                                 String sub = jsonObj.get(Const.LOG_NOON_SUB).toString();
 
-                                                AppDatabase.getAppDatabase(getApplicationContext()).authTokenDao().updateToken(sub,
+                                                userDatabaseRepository.updateAuthToken(sub,
                                                         credentials.getAccessToken(),
                                                         credentials.getIdToken(),
                                                         credentials.getExpiresIn(),

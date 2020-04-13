@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.ibl.apps.Base.BaseActivity;
-import com.ibl.apps.RoomDatabase.dao.deviceManagementRepository.DeviceManagementRepository;
+import com.ibl.apps.RoomDatabase.dao.deviceManagementDatabase.DeviceManagementRepository;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;

@@ -44,6 +44,7 @@ import com.ibl.apps.Model.parent.ProgressReport;
 import com.ibl.apps.Network.ApiClient;
 import com.ibl.apps.Network.ApiService;
 import com.ibl.apps.ParentControlManagement.ParentControlRepository;
+import com.ibl.apps.RoomDatabase.dao.userManagementDatabse.UserDatabaseRepository;
 import com.ibl.apps.RoomDatabase.database.AppDatabase;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
 import com.ibl.apps.noon.NoonApplication;
@@ -85,6 +86,7 @@ public class AssignmentQuizePerformanceFragment extends BaseFragment implements 
     private ArrayList<Integer> userIdArray = new ArrayList<>();
     private ParentSpinnerModel parentSpinner = new ParentSpinnerModel();
     private ParentControlRepository parentControlRepository;
+    private UserDatabaseRepository userDatabaseRepository;
 
     public static AssignmentQuizePerformanceFragment newInstance(String param1, String param2) {
         AssignmentQuizePerformanceFragment fragment = new AssignmentQuizePerformanceFragment();
@@ -115,6 +117,7 @@ public class AssignmentQuizePerformanceFragment extends BaseFragment implements 
     protected void setUp(View view) {
         showDialog(Objects.requireNonNull(getActivity()).getResources().getString(R.string.loading));
         parentControlRepository = new ParentControlRepository();
+        userDatabaseRepository = new UserDatabaseRepository();
         apiService = ApiClient.getClient(getContext()).create(ApiService.class);
         getflag();
         //getQuizProgressPieChartApi();
@@ -130,13 +133,13 @@ public class AssignmentQuizePerformanceFragment extends BaseFragment implements 
     private void callApiForStudentSpinner() {
         String authid = PrefUtils.getAuthid(NoonApplication.getContext());
         if (!TextUtils.isEmpty(authid)) {
-            AuthTokenObject authTokenObject = AppDatabase.getAppDatabase(NoonApplication.getContext()).authTokenDao().getauthTokenData(authid);
+            AuthTokenObject authTokenObject = userDatabaseRepository.getAuthTokenData(authid);
 
             if (authTokenObject != null) {
                 String sub = "";
                 if (authTokenObject.getSub() != null) {
                     sub = authTokenObject.getSub();
-                    userDetails = AppDatabase.getAppDatabase(NoonApplication.getContext()).userDetailDao().getUserDetials(sub);
+                    userDetails = userDatabaseRepository.getUserDetails(sub);
                 }
             }
         }

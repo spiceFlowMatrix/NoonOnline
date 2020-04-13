@@ -1,4 +1,4 @@
-package com.ibl.apps.LessonManament;
+package com.ibl.apps.LessonManagement;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;

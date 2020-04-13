@@ -16,7 +16,7 @@ import com.droidnet.DroidListener;
 import com.droidnet.DroidNet;
 import com.ibl.apps.Model.QuizMainObject;
 import com.ibl.apps.Model.SearchObject;
-import com.ibl.apps.RoomDatabase.database.AppDatabase;
+import com.ibl.apps.RoomDatabase.dao.quizManagementDatabase.QuizDatabaseRepository;
 import com.ibl.apps.util.Const;
 import com.ibl.apps.noon.ChapterActivity;
 import com.ibl.apps.noon.R;
@@ -117,7 +117,8 @@ public class SearchLessonAdapter extends RecyclerView.Adapter<SearchLessonAdapte
                 holder.courseInnerItemLayoutBinding.txtfileType.setText("Quiz");
                 holder.courseInnerItemLayoutBinding.imgdownloadContentLayout.setVisibility(GONE);
 
-                QuizMainObject quizMainObject = AppDatabase.getAppDatabase(ctx).quizAnswerDao().getquizData(userIdWithoutSlash, model.getId());
+                QuizDatabaseRepository quizDatabaseRepository = new QuizDatabaseRepository();
+                QuizMainObject quizMainObject = quizDatabaseRepository.getQuizByUserId(userIdWithoutSlash, model.getId());
                 if (quizMainObject != null) {
                     holder.courseInnerItemLayoutBinding.disableLay.setVisibility(GONE);
                 } else {

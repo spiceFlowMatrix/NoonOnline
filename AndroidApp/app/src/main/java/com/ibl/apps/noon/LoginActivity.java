@@ -33,6 +33,8 @@ import com.ibl.apps.Model.LoginObject;
 import com.ibl.apps.Model.SyncRecords;
 import com.ibl.apps.Model.TemsCondition;
 import com.ibl.apps.Model.UserObject;
+import com.ibl.apps.RoomDatabase.dao.quizManagementDatabase.QuizDatabaseRepository;
+import com.ibl.apps.RoomDatabase.dao.userManagementDatabse.UserDatabaseRepository;
 import com.ibl.apps.RoomDatabase.database.AppDatabase;
 import com.ibl.apps.RoomDatabase.entity.LessonProgress;
 import com.ibl.apps.RoomDatabase.entity.QuizUserResult;
@@ -63,6 +65,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     LoginLayoutBinding loginLayoutBinding;
     private CompositeDisposable disposable = new CompositeDisposable();
     UserRepository userRepository;
+    UserDatabaseRepository userDatabaseRepository;
 
     @Override
     protected int getContentView() {
@@ -74,6 +77,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         super.onViewReady(savedInstanceState, intent);
         loginLayoutBinding = (LoginLayoutBinding) getBindObj();
         userRepository = new UserRepository();
+        userDatabaseRepository = new UserDatabaseRepository();
         try {
             PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
             String version = pInfo.versionName;
@@ -223,11 +227,11 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     public void LocalLogin(String email, String password, Throwable e) {
         Log.e("LOGIN", "---3---");
         showDialog(getString(R.string.loading));
-        LoginObject loginModel = AppDatabase.getAppDatabase(getApplicationContext()).loginDao().getLoginModel();
+        LoginObject loginModel = userDatabaseRepository.getUserLoginModel();
         if (loginModel != null) {
-            LoginObject loginObject = AppDatabase.getAppDatabase(getApplicationContext()).loginDao().getLogin(email, password);
-            LoginObject loginEmail = AppDatabase.getAppDatabase(getApplicationContext()).loginDao().getLoginEmail(email);
-            LoginObject loginPassword = AppDatabase.getAppDatabase(getApplicationContext()).loginDao().getLoginPassword(password);
+            LoginObject loginObject = userDatabaseRepository.getLoginDetail(email, password);
+            LoginObject loginEmail = userDatabaseRepository.getLoginEmailDetail(email);
+            LoginObject loginPassword = userDatabaseRepository.getLoginPasswordDetail(password);
             if (loginObject != null && loginEmail != null && loginPassword != null) {
                 PrefUtils.clearSharedPreferences(getApplicationContext());
                 PrefUtils.storeAuthid(getApplicationContext(), loginObject.getSub());
@@ -373,7 +377,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                             authTokenObject.setExpiresIn(payload.getExpiresIn());
                             authTokenObject.setScope(payload.getScope());
                             authTokenObject.setExpiresAt(String.valueOf(payload.getExpiresAt()));
-                            AppDatabase.getAppDatabase(getApplicationContext()).authTokenDao().insertAll(authTokenObject);
+                            userDatabaseRepository.insertAuthTokenData(authTokenObject);
                             Log.e("storeAuthid", "onSuccess: " + sub);
                             PrefUtils.storeAuthid(LoginActivity.this, sub);
 
@@ -462,7 +466,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                                 editor.putString("uid", loginUser.getUserid());
                                 editor.apply();
                             }
-                            AppDatabase.getAppDatabase(getApplicationContext()).loginDao().insertAll(loginUser1);
+                            userDatabaseRepository.insertLoginData(loginUser1);
 
                             callApiUserDetails(loginUser.getUserid(), sub, email, password);
 
@@ -543,8 +547,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                                     userDetails.setIs_discussion_authorized(userObject.getData().getIs_discussion_authorized());
                                     userDetails.setIs_library_authorized(userObject.getData().getIs_library_authorized());
                                     userDetails.setIs_assignment_authorized(userObject.getData().getIs_assignment_authorized());
-                                    AppDatabase.getAppDatabase(getApplicationContext()).userDetailDao().deleteByUserId(sub);
-                                    AppDatabase.getAppDatabase(getApplicationContext()).userDetailDao().insertAll(userDetails);
+                                    userDatabaseRepository.deleteByUserId(sub);
+                                    userDatabaseRepository.insertUserDetails(userDetails);
 
                                     return null;
                                 }
@@ -627,7 +631,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                                             }
                                         }
                                     }
-
+                                    QuizDatabaseRepository quizDatabaseRepository = new QuizDatabaseRepository();
                                     if (syncData.getTimerdata() != null && syncData.getTimerdata().size() != 0) {
                                         for (int i = 0; i < syncData.getTimerdata().size(); i++) {
                                             QuizUserResult quizUserResult = new QuizUserResult();
@@ -637,7 +641,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                                             quizUserResult.setPassingScore(syncData.getTimerdata().get(i).getPassingScore());
                                             quizUserResult.setQuizTime(syncData.getTimerdata().get(i).getQuizTime());
                                             quizUserResult.setQuizId(syncData.getTimerdata().get(i).getQuizId());
-                                            AppDatabase.getAppDatabase(NoonApplication.getContext()).quizUserResultDao().insertAll(quizUserResult);
+                                            quizDatabaseRepository.insertAllQuizUserResult(quizUserResult);
                                         }
                                     }
                                 }

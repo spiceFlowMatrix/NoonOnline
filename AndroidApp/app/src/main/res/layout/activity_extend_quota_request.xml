@@ -60,11 +60,11 @@
 
                     <RelativeLayout
                         android:id="@+id/firstRvLay"
-                        android:layout_width="@dimen/_90sdp"
+                        android:layout_width="@dimen/_70sdp"
                         android:layout_height="@dimen/_40sdp">
 
                         <TextView
-                            android:id="@+id/tv_hour"
+                            android:id="@+id/tv_quota_limit"
                             android:layout_width="@dimen/_60sdp"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/_5sdp"
@@ -74,9 +74,9 @@
 
                         <View
                             android:id="@+id/viewHour"
-                            android:layout_width="@dimen/_60sdp"
+                            android:layout_width="@dimen/_70sdp"
                             android:layout_height="@dimen/_1sdp"
-                            android:layout_below="@+id/tv_hour"
+                            android:layout_below="@+id/tv_quota_limit"
                             android:background="@color/colorPrimary" />
 
                         <ImageView
