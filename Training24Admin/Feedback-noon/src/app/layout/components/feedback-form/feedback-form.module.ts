@@ -6,7 +6,6 @@ import { FileDropModule } from 'ngx-file-drop';
 import { PublicFeedbackFormComponent } from './feedback-form.component';
 import { SharedModule, GradeService, FeedbackService } from './../../../shared';
 import { TranslateModule } from '@ngx-translate/core';
-import { NgxBootstrapSliderModule } from 'ngx-bootstrap-slider';
 @NgModule({
   imports: [
     CommonModule,
@@ -16,8 +15,7 @@ import { NgxBootstrapSliderModule } from 'ngx-bootstrap-slider';
     SharedModule.forRoot(),
     NgbTimepickerModule.forRoot(),
     NgbModalModule.forRoot(),
-    NgbAccordionModule.forRoot(),
-    NgxBootstrapSliderModule,
+    NgbAccordionModule.forRoot()
   ],
   declarations: [PublicFeedbackFormComponent],
   exports: [PublicFeedbackFormComponent],
