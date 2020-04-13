@@ -32,7 +32,8 @@ export class AuthenticationService {
     }
 
     public refreshStorage() {
-        this.router.navigateByUrl('/admin', { replaceUrl: true });
+        //this.router.navigateByUrl('/web/manage/', { replaceUrl: true });
+        this.router.navigate(['login']);
         localStorage.removeItem('access_token');
         localStorage.removeItem('token');
         localStorage.removeItem('isLoggedin');
