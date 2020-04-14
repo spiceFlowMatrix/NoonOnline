@@ -6,10 +6,11 @@
             "type": "string"
         },
         "gitlabDockerConfigJson": {
-            "description": "gitlabDockerConfigJson is the .dockerConfigJson required by the kubernetes workload to fetch the docker image for the application.\n [1] Please see this snippet to learn how to obtain this value https://gitlab.com/edgsolutions-engineering/bridge-trunk/snippets/1966385. \n [2] Please ensure you encode the json object using `base64 -w 0` before providing it as a value here, non-base64 encoded versions of the file will throw an error"
+            "description": "gitlabDockerConfigJson is the .dockerConfigJson required by the kubernetes workload to fetch the docker image for the application.\n [1] Please see this snippet to learn how to obtain this value https://gitlab.com/edgsolutions-engineering/bridge-trunk/snippets/1966385. \n [2] Please ensure you encode the json object using `base64 -w 0` before providing it as a value here, non-base64 encoded versions of the file will throw an error",
+            "type": "string"
         },
         "name": {
-            "description": "name is used to set the name value for the kubernetes workloads and any other objects created for this chart",
+            "description": "name is used to set the name value for the kubernetes workloads and any other objects created for this chart.\n [1] This value is supplied automatically by CI/CD scripts and administrator input is not required",
             "type": "string"
         },
         "webHostingUrl": {
@@ -57,7 +58,7 @@
             "type": "string"
         },
         "appDbConnectionString": {
-            "description": "appDbConnectionString is the connection string that the application will use to create connections to the SQL database.\n [1] Used by the chart to create a secret value that is then fed to the ASPNET_DB_CONNECTIONSTRING environment variable on the application workload.\n [2] Please the server and port segments of the connection string are set to 127.0.0.1 and 3306 respectively, the SQL proxy requires that we access it from the local sidecar container, see here to learn more https://cloud.google.com/sql/docs/mysql/connect-kubernetes-engine#connection_overview_2. You only need to change the user id, password, and database segments of the connection string.\n [3] Administrators must ensure they supply ONLY the base64 encoded version of this value by running `base64 -w 0` on it",
+            "description": "appDbConnectionString is the connection string that the application will use to create connections to the SQL database.\n [1] Used by the chart to create a secret value that is then fed to the ASPNET_DB_CONNECTIONSTRING environment variable on the application workload.\n [2] Please ensure the server and port segments of the connection string are set to 127.0.0.1 and 3306 respectively, the SQL proxy requires that we access it from the local sidecar container, see here to learn more https://cloud.google.com/sql/docs/mysql/connect-kubernetes-engine#connection_overview_2. You only need to change the user id, password, and database segments of the connection string.\n [3] Administrators must ensure they supply ONLY the base64 encoded version of this value by running `base64 -w 0` on it",
             "type": "string"
         },
         "auth0Tenant": {

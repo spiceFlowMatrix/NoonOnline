@@ -4,10 +4,10 @@ metadata:
     annotations:
         app.gitlab.com/app: {{ .Values.gitlabCiProjectPath }}
         app.gitlab.com/env: {{ .Values.gitlabCiProjectEnvironment }}
-    name: {{ .Release.Name }}-service
+    name: {{ .Values.name }}-service
     namespace: {{ .Values.deploymentNamespace }}
     labels:
-        app: {{ .Release.Name }}
+        app: {{ .Values.name }}
 spec:
     ports:
         -   name: clientapp-port
@@ -15,5 +15,5 @@ spec:
             protocol: TCP
             targetPort: 80
     selector:
-        app: {{ .Release.Name }}
+        app: {{ .Values.name }}
     type: NodePort

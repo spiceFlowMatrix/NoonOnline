@@ -4,27 +4,27 @@ metadata:
     annotations:
         app.gitlab.com/app: {{ .Values.gitlabCiProjectPath }}
         app.gitlab.com/env: {{ .Values.gitlabCiProjectEnvironment }}
-    name: {{ .Release.Name }}
+    name: {{ .Values.name }}
     namespace: {{ .Values.deploymentNamespace }}
     labels:
-        app: {{ .Release.Name }}
+        app: {{ .Values.name }}
 spec:
     replicas: {{ .Values.replicas }}
     selector:
         matchLabels:
-            app: {{ .Release.Name }}
+            app: {{ .Values.name }}
     template:
         metadata:
             annotations:
                 app.gitlab.com/app: {{ .Values.gitlabCiProjectPath }}
                 app.gitlab.com/env: {{ .Values.gitlabCiProjectEnvironment }}
             labels:
-                app: {{ .Release.Name }}
+                app: {{ .Values.name }}
         spec:
             imagePullSecrets:
-                - name: {{ .Release.Name }}-gitlab-registry-secret
+                - name: {{ .Values.name }}-gitlab-registry-secret
             containers:
-                -   name: {{ .Release.Name }}
+                -   name: {{ .Values.name }}
                     image: {{ .Values.image }}
                     imagePullPolicy: Always
                     ports:
@@ -35,69 +35,69 @@ spec:
                     -   name: ASPNET_DB_CONNECTIONSTRING
                         valueFrom:
                             secretKeyRef:
-                                name: {{ .Release.Name }}-secrets
+                                name: {{ .Values.name }}-secrets
                                 key: appDbConnectionString
                     -   name: MYSQL_DB_HOST
                         value: 127.0.0.1:3306
                     -   name: MYSQL_DB_NAME
                         valueFrom:
                             secretKeyRef:
-                                name: {{ .Release.Name }}-secrets
+                                name: {{ .Values.name }}-secrets
                                 key: sqlDbName
                     -   name: MYSQL_DB_USER
                         valueFrom:
                             secretKeyRef:
-                                name: {{ .Release.Name }}-secrets
+                                name: {{ .Values.name }}-secrets
                                 key: sqlDbUser
                     -   name: MYSQL_DB_PASSWORD
                         valueFrom:
                             secretKeyRef:
-                                name: {{ .Release.Name }}-secrets
+                                name: {{ .Values.name }}-secrets
                                 key: sqlDbPassword
                     -   name: MANAGEMENTURL_ENVIRONMENT
                         valueFrom:
                             secretKeyRef:
-                                name: {{ .Release.Name }}-secrets
+                                name: {{ .Values.name }}-secrets
                                 key: auth0ManagementUrl
                     -   name: CLIENT_ID_ENVIRONMENT
                         valueFrom:
                             secretKeyRef:
-                                name: {{ .Release.Name }}-secrets
+                                name: {{ .Values.name }}-secrets
                                 key: auth0ManagementClientId
                     -   name: CLIENT_SECRET_ENVIRONMENT
                         valueFrom:
                             secretKeyRef:
-                                name: {{ .Release.Name }}-secrets
+                                name: {{ .Values.name }}-secrets
                                 key: auth0ManagementClientSecret
                     -   name: AUDIENCE_ENVIRONMENT
                         valueFrom:
                             secretKeyRef:
-                                name: {{ .Release.Name }}-secrets
+                                name: {{ .Values.name }}-secrets
                                 key: auth0ManagementAudience
                     -   name: DOMAINNAME_ENVIRONMENT
                         valueFrom:
                             secretKeyRef:
-                                name: {{ .Release.Name }}-secrets
+                                name: {{ .Values.name }}-secrets
                                 key: auth0Tenant
                     -   name: PRIMARY_DOMAIN
                         valueFrom:
                             secretKeyRef:
-                                name: {{ .Release.Name }}-secrets
+                                name: {{ .Values.name }}-secrets
                                 key: smtpServerDomain
                     -   name: PRIMARY_PORT
                         valueFrom:
                             secretKeyRef:
-                                name: {{ .Release.Name }}-secrets
+                                name: {{ .Values.name }}-secrets
                                 key: smtpServerPort
                     -   name: USERNAME_EMAIL
                         valueFrom:
                             secretKeyRef:
-                                name: {{ .Release.Name }}-secrets
+                                name: {{ .Values.name }}-secrets
                                 key: smtpServerEmailAddress
                     -   name: USERNAME_PASSWORD
                         valueFrom:
                             secretKeyRef:
-                                name: {{ .Release.Name }}-secrets
+                                name: {{ .Values.name }}-secrets
                                 key: smtpServerEmailPassword
                     -   name: LANGUAGE
                         value: {{ .Values.applicationLanguage }}
@@ -115,7 +115,7 @@ spec:
             volumes:
             -   name: application-gcp-serviceaccount
                 secret:
-                    secretName: {{ .Release.Name }}-secrets
+                    secretName: {{ .Values.name }}-secrets
                     items:
                     -   key: appServiceAccount
                         path: gcp/credentials.json
