@@ -32,7 +32,7 @@ buildAdminApp:
     # # We encrypt the environment.ts file in base64 by applying `base64 -w 0 FILENAME.ts` command on it and then supply it as environmet variable
     # - echo ${ADMIN_APP_ENVIRONMENTS_BASE64} | base64 -d > src/app/environments/environment.prod.ts
   script:
-    - npm run install --quiet
+    - npm install --quiet
     - npm run build --prod
   artifacts:
     paths:
