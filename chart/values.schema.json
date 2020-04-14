@@ -50,7 +50,7 @@
             "type": "string"
         },
         "sqlDbUser": {
-            "description": "sqlDbUser is the User Id that the application will use to connect to the SQL (MySQL for this application) database.\n [1] Used by the chart to create a secret that is then fed to the MYSQL_DB_USER environment variable for Cloud SQL proxy that manages connections to production SQL database.\n [2] Administrators must ensure they supply ONLY the base64 encoded version of this value by running `base64 -w 0` on it",
+            "description": "sqlDbUser is the User Id that the application will use to connect to the SQL (MySQL for this application) database.\n [1] Used by the chart to create a secret that is then fed to the MYSQL_DB_USER environment variable for Cloud SQL proxy that manages connections to production SQL database.\n [2] Administrators must ensure they create a non-root user as recommended in GCP documentation here https://cloud.google.com/sql/docs/mysql/connect-kubernetes-engine#connection_overview_2. \n [3] Administrators must ensure they supply ONLY the base64 encoded version of this value by running `base64 -w 0` on it",
             "type": "string"
         },
         "sqlDbPassword": {
