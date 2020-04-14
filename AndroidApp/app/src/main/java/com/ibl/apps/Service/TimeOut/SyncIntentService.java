@@ -31,9 +31,9 @@ import com.ibl.apps.Model.UserObject;
 import com.ibl.apps.Network.ApiClient;
 import com.ibl.apps.Network.ApiService;
 import com.ibl.apps.RoomDatabase.dao.courseManagementDatabase.CourseDatabaseRepository;
+import com.ibl.apps.RoomDatabase.dao.lessonManagementDatabase.LessonDatabaseRepository;
 import com.ibl.apps.RoomDatabase.dao.quizManagementDatabase.QuizDatabaseRepository;
 import com.ibl.apps.RoomDatabase.dao.userManagementDatabse.UserDatabaseRepository;
-import com.ibl.apps.RoomDatabase.database.AppDatabase;
 import com.ibl.apps.RoomDatabase.entity.LessonProgress;
 import com.ibl.apps.RoomDatabase.entity.QuizUserResult;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
@@ -173,7 +173,8 @@ public class SyncIntentService extends JobIntentService implements DroidListener
                             List<QuizUserResult> quizUserResults = quizDatabaseRepository.getAllQuizuserResult(false, userId);
 
                             /*---------------------------FOR Lesson Progress--------------------------------*/
-                            List<LessonProgress> lessonProgressList = AppDatabase.getAppDatabase(mycontext).lessonProgressDao().getAllLessonProgress(false, userId);
+                            LessonDatabaseRepository lessonDatabaseRepository = new LessonDatabaseRepository();
+                            List<LessonProgress> lessonProgressList = lessonDatabaseRepository.getAllLessonProgressData(false, userId);
 
                             callApiProgessSyncAdd(lessonProgressList, quizUserResults);
                         }
@@ -540,7 +541,7 @@ public class SyncIntentService extends JobIntentService implements DroidListener
     public void callApiProgessSyncAdd(List<LessonProgress> lessonProgressList, List<QuizUserResult> quizUserResults) {
 
         try {
-
+LessonDatabaseRepository lessonDatabaseRepository = new LessonDatabaseRepository();
             JsonObject noonAppFullSyncObject = new JsonObject();
             JsonArray lessonProgressArray = PrefUtils.convertToJsonArray(lessonProgressList);
             noonAppFullSyncObject.add(Const.PROGRESSDATA, lessonProgressArray);
@@ -563,9 +564,9 @@ public class SyncIntentService extends JobIntentService implements DroidListener
                                     String quizID = lessonProgressList.get(i).getQuizId();
                                     String lessonID = lessonProgressList.get(i).getLessonId();
                                     if (quizID != null && !TextUtils.isEmpty(quizID)) {
-                                        AppDatabase.getAppDatabase(NoonApplication.getContext()).lessonProgressDao().updatequizIdisStatus(quizID, true, userId);
+                                        lessonDatabaseRepository.updateQuizIdisStatus(quizID, true, userId);
                                     } else {
-                                        AppDatabase.getAppDatabase(NoonApplication.getContext()).lessonProgressDao().updatelessonIdisStatus(lessonID, true, userId);
+                                        lessonDatabaseRepository.updateLessonIdisStatus(lessonID, true, userId);
                                     }
                                 }
                             }

@@ -46,6 +46,7 @@ import com.ibl.apps.Model.CourseObject;
 import com.ibl.apps.Model.IntervalObject;
 import com.ibl.apps.Model.IntervalTableObject;
 import com.ibl.apps.RoomDatabase.dao.courseManagementDatabase.CourseDatabaseRepository;
+import com.ibl.apps.RoomDatabase.dao.lessonManagementDatabase.LessonDatabaseRepository;
 import com.ibl.apps.RoomDatabase.entity.SyncTimeTrackingObject;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
 import com.ibl.apps.Service.CourseImageManager;
@@ -98,6 +99,7 @@ public class GradeFragment extends BaseFragment implements View.OnClickListener,
     boolean isAgree = false;
     private CourseRepository courseRepository; //22 use
     private CourseDatabaseRepository courseDatabaseRepository;
+    private LessonDatabaseRepository lessonDatabaseRepository;
 
     public GradeFragment() {
         // Required empty public constructor
@@ -121,6 +123,7 @@ public class GradeFragment extends BaseFragment implements View.OnClickListener,
         }
         courseRepository = new CourseRepository();
         courseDatabaseRepository = new CourseDatabaseRepository();
+        lessonDatabaseRepository = new LessonDatabaseRepository();
     }
 
     @Override
@@ -544,8 +547,8 @@ public class GradeFragment extends BaseFragment implements View.OnClickListener,
                                                     CourselistData.get(j).getCourses().get(k).setCourseImage(bitmapImage);
                                                 }
 
-                                                int totalTrueLesson = courseRepository.getItemgradeIdProgress(CourselistData.get(j).getCourses().get(k).getId(), "100", userId);
-                                                String totalLEssonITEm = courseRepository.getStringProgress(CourselistData.get(j).getCourses().get(k).getId(), userId);
+                                                int totalTrueLesson = lessonDatabaseRepository.getItemGradeIdProgress(CourselistData.get(j).getCourses().get(k).getId(), "100", userId);
+                                                String totalLEssonITEm = lessonDatabaseRepository.getLessonStringProgress(CourselistData.get(j).getCourses().get(k).getId(), userId);
 
                                                 if (totalLEssonITEm != null) {
                                                     int totalCount = Integer.parseInt(totalLEssonITEm);
@@ -608,8 +611,8 @@ public class GradeFragment extends BaseFragment implements View.OnClickListener,
                     for (int j = 0; j < CourselistData.size(); j++) {
                         for (int k = 0; k < CourselistData.get(j).getCourses().size(); k++) {
 
-                            int totalTrueLesson = courseRepository.getItemgradeIdProgress(CourselistData.get(j).getCourses().get(k).getId(), "100", userId);
-                            String totalLEssonITEm = courseRepository.getStringProgress(CourselistData.get(j).getCourses().get(k).getId(), userId);
+                            int totalTrueLesson = lessonDatabaseRepository.getItemGradeIdProgress(CourselistData.get(j).getCourses().get(k).getId(), "100", userId);
+                            String totalLEssonITEm = lessonDatabaseRepository.getLessonStringProgress(CourselistData.get(j).getCourses().get(k).getId(), userId);
 
                             if (totalLEssonITEm != null) {
                                 int totalCount = Integer.parseInt(totalLEssonITEm);
@@ -667,8 +670,8 @@ public class GradeFragment extends BaseFragment implements View.OnClickListener,
                         if (CourselistData != null && CourselistData.size() != 0) {
                             for (int j = 0; j < CourselistData.size(); j++) {
                                 for (int k = 0; k < CourselistData.get(j).getCourses().size(); k++) {
-                                    int totalTrueLesson = courseRepository.getItemgradeIdProgress(CourselistData.get(j).getCourses().get(k).getId(), "100", userId);
-                                    String totalLEssonITEm = courseRepository.getStringProgress(CourselistData.get(j).getCourses().get(k).getId(), userId);
+                                    int totalTrueLesson = lessonDatabaseRepository.getItemGradeIdProgress(CourselistData.get(j).getCourses().get(k).getId(), "100", userId);
+                                    String totalLEssonITEm = lessonDatabaseRepository.getLessonStringProgress(CourselistData.get(j).getCourses().get(k).getId(), userId);
 
                                     if (totalLEssonITEm != null) {
                                         int totalCount = Integer.parseInt(totalLEssonITEm);

@@ -2,6 +2,7 @@ package com.ibl.apps.RoomDatabase.dao.userManagementDatabse;
 
 import com.ibl.apps.Model.AuthTokenObject;
 import com.ibl.apps.Model.LoginObject;
+import com.ibl.apps.Model.StatisticsObject;
 import com.ibl.apps.RoomDatabase.database.AppDatabase;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
 import com.ibl.apps.noon.NoonApplication;
@@ -78,5 +79,13 @@ public class UserDatabaseRepository {
 
     public void deleteByUserId(String sub) {
         database.userDetailDao().deleteByUserId(sub);
+    }
+
+    public void insertStatisticData(StatisticsObject... statisticsObjects) {
+        database.statisticsDao().insertAll(statisticsObjects);
+    }
+
+    public StatisticsObject getStatisticsObjectData(String userId) {
+        return database.statisticsDao().getStatisticsObject(userId);
     }
 }

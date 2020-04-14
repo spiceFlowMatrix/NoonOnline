@@ -22,7 +22,6 @@ import com.ibl.apps.Model.StatisticsObject;
 import com.ibl.apps.Model.UploadImageObject;
 import com.ibl.apps.Model.UserObject;
 import com.ibl.apps.RoomDatabase.dao.userManagementDatabse.UserDatabaseRepository;
-import com.ibl.apps.RoomDatabase.database.AppDatabase;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
 import com.ibl.apps.UserProfileManagement.UserProfileRepository;
 import com.ibl.apps.noon.NoonApplication;
@@ -479,7 +478,7 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
                                 profileLayoutBinding.txtTotalCourse.setText(statisticsobject.getData().getTotalcourse());
 
                                 statisticsobject.setUserId(userId);
-                                AppDatabase.getAppDatabase(getActivity()).statisticsDao().insertAll(statisticsobject);
+                                userDatabaseRepository.insertStatisticData(statisticsobject);
                             }
                             hideDialog();
                         }
@@ -495,7 +494,7 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
                     }));
         } else {
             if (userId != null && !userId.isEmpty()) {
-                StatisticsObject statisticsobject = AppDatabase.getAppDatabase(getActivity()).statisticsDao().getStatisticsObject(userId);
+                StatisticsObject statisticsobject = userDatabaseRepository.getStatisticsObjectData(userId);
                 if (statisticsobject != null) {
 
                     if (statisticsobject.getData() != null) {

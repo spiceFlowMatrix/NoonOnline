@@ -33,9 +33,9 @@ import com.ibl.apps.Model.LoginObject;
 import com.ibl.apps.Model.SyncRecords;
 import com.ibl.apps.Model.TemsCondition;
 import com.ibl.apps.Model.UserObject;
+import com.ibl.apps.RoomDatabase.dao.lessonManagementDatabase.LessonDatabaseRepository;
 import com.ibl.apps.RoomDatabase.dao.quizManagementDatabase.QuizDatabaseRepository;
 import com.ibl.apps.RoomDatabase.dao.userManagementDatabse.UserDatabaseRepository;
-import com.ibl.apps.RoomDatabase.database.AppDatabase;
 import com.ibl.apps.RoomDatabase.entity.LessonProgress;
 import com.ibl.apps.RoomDatabase.entity.QuizUserResult;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
@@ -66,6 +66,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     private CompositeDisposable disposable = new CompositeDisposable();
     UserRepository userRepository;
     UserDatabaseRepository userDatabaseRepository;
+    LessonDatabaseRepository lessonDatabaseRepository;
 
     @Override
     protected int getContentView() {
@@ -78,6 +79,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         loginLayoutBinding = (LoginLayoutBinding) getBindObj();
         userRepository = new UserRepository();
         userDatabaseRepository = new UserDatabaseRepository();
+        lessonDatabaseRepository = new LessonDatabaseRepository();
+
         try {
             PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
             String version = pInfo.versionName;
@@ -604,10 +607,9 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 
                                     if (syncData.getProgressdata() != null && syncData.getProgressdata().size() != 0) {
                                         for (int i = 0; i < syncData.getProgressdata().size(); i++) {
-                                            LessonProgress lessonProgress = AppDatabase.getAppDatabase(NoonApplication.getContext()).lessonProgressDao().getItemProgress(syncData.getProgressdata().get(i).getLessonProgressId(), userId);
+                                            LessonProgress lessonProgress = lessonDatabaseRepository.getItemProgressData(syncData.getProgressdata().get(i).getLessonProgressId(), userId);
                                             if (lessonProgress != null) {
-                                                AppDatabase.getAppDatabase(NoonApplication.getContext()).lessonProgressDao().
-                                                        updateLessonIDWise(syncData.getProgressdata().get(i).getLessonId(),
+                                                lessonDatabaseRepository.updateLessonUserIdWise(syncData.getProgressdata().get(i).getLessonId(),
                                                                 syncData.getProgressdata().get(i).getLessonProgress().split("\\.")[0],
                                                                 syncData.getProgressdata().get(i).getGradeId(),
                                                                 syncData.getProgressdata().get(i).getUserId(),
@@ -627,7 +629,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                                                 lessonProgress.setGradeId(syncData.getProgressdata().get(i).getGradeId());
                                                 lessonProgress.setTotalRecords(syncData.getProgressdata().get(i).getTotalRecords());
                                                 lessonProgress.setFileId(syncData.getProgressdata().get(i).getFileId());
-                                                AppDatabase.getAppDatabase(NoonApplication.getContext()).lessonProgressDao().insertAll(lessonProgress);
+                                                lessonDatabaseRepository.insertLessonProgressData(lessonProgress);
                                             }
                                         }
                                     }

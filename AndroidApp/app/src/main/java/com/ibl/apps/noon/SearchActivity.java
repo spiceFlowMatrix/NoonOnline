@@ -27,6 +27,7 @@ import com.ibl.apps.Model.CourseObject;
 import com.ibl.apps.Model.CoursePriviewObject;
 import com.ibl.apps.Model.SearchObject;
 import com.ibl.apps.RoomDatabase.dao.courseManagementDatabase.CourseDatabaseRepository;
+import com.ibl.apps.RoomDatabase.dao.lessonManagementDatabase.LessonDatabaseRepository;
 import com.ibl.apps.RoomDatabase.entity.LessonProgress;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
 import com.ibl.apps.noon.databinding.SearchLayoutBinding;
@@ -70,6 +71,7 @@ public class SearchActivity extends BaseActivity implements View.OnClickListener
     UserDetails userDetailsObject = new UserDetails();
     private CourseRepository courseRepository; //13 usage
     private CourseDatabaseRepository courseDatabaseRepository;
+    private LessonDatabaseRepository lessonDatabaseRepository;
 
     @Override
     protected int getContentView() {
@@ -82,6 +84,7 @@ public class SearchActivity extends BaseActivity implements View.OnClickListener
         searchLayoutBinding = (SearchLayoutBinding) getBindObj();
         courseRepository = new CourseRepository();
         courseDatabaseRepository = new CourseDatabaseRepository();
+        lessonDatabaseRepository = new LessonDatabaseRepository();
 
         Typeface typeface = ResourcesCompat.getFont(SearchActivity.this, R.font.bahij_helvetica_neue_bold);
         searchLayoutBinding.advanceSearchLayout.chknew.setTypeface(typeface);
@@ -421,8 +424,8 @@ public class SearchActivity extends BaseActivity implements View.OnClickListener
                                             searchCourseObject.setCourseImage(bitmapImage);
                                         }
 
-                                        int totalTrueLesson = courseRepository.getItemgradeIdProgress(courseId, "100", userId);
-                                        String totalLEssonITEm = courseRepository.getStringProgress(courseId, userId);
+                                        int totalTrueLesson = lessonDatabaseRepository.getItemGradeIdProgress(courseId, "100", userId);
+                                        String totalLEssonITEm = lessonDatabaseRepository.getLessonStringProgress(courseId, userId);
                                         if (totalLEssonITEm != null) {
                                             int totalCount = Integer.parseInt(totalLEssonITEm);
                                             if (totalCount != 0 && totalTrueLesson != 0) {
@@ -489,8 +492,8 @@ public class SearchActivity extends BaseActivity implements View.OnClickListener
                                                 searchCourseObject.setCourseImage(bitmapImage);
                                             }
 
-                                            int totalTrueLesson = courseRepository.getItemgradeIdProgress(courseId, "100", userId);
-                                            String totalLEssonITEm = courseRepository.getStringProgress(courseId, userId);
+                                            int totalTrueLesson = lessonDatabaseRepository.getItemGradeIdProgress(courseId, "100", userId);
+                                            String totalLEssonITEm = lessonDatabaseRepository.getLessonStringProgress(courseId, userId);
                                             if (totalLEssonITEm != null) {
                                                 int totalCount = Integer.parseInt(totalLEssonITEm);
                                                 if (totalCount != 0 && totalTrueLesson != 0) {
@@ -576,7 +579,7 @@ public class SearchActivity extends BaseActivity implements View.OnClickListener
                                                     lessonFileTypeName = coursePriviewObject.getData().getChapters().get(k).getLessons()[l].getLessonfiles()[lessonFilePos].getFiles().getFiletypename();
                                                     lessonFileName = coursePriviewObject.getData().getChapters().get(k).getLessons()[l].getLessonfiles()[lessonFilePos].getFiles().getFilename();
 
-                                                    LessonProgress lessonProgress = courseRepository.getItemLessonProgress(lessonId, fileid, userId);
+                                                    LessonProgress lessonProgress = lessonDatabaseRepository.getItemLessonProgressData(lessonId, fileid, userId);
                                                     if (lessonProgress != null) {
                                                         progressVal = Integer.parseInt(lessonProgress.getLessonProgress());
                                                     }
@@ -585,7 +588,7 @@ public class SearchActivity extends BaseActivity implements View.OnClickListener
                                                     lessonfileName = coursePriviewObject.getData().getChapters().get(k).getLessons()[l].getName();
                                                     lessonfileDescription = coursePriviewObject.getData().getChapters().get(k).getLessons()[l].getDescription();
 
-                                                    LessonProgress lessonProgress = courseRepository.getItemquizidProgress(quizID, userId);
+                                                    LessonProgress lessonProgress = lessonDatabaseRepository.getItemQuizIdProgress(quizID, userId);
                                                     if (lessonProgress != null) {
                                                         progressVal = Integer.parseInt(lessonProgress.getLessonProgress());
                                                     }

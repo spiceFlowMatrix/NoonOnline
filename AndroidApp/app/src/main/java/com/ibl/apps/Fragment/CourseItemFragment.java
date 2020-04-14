@@ -62,8 +62,8 @@ import com.ibl.apps.Model.QuizMainObject;
 import com.ibl.apps.Model.RestResponse;
 import com.ibl.apps.QuizManament.QuizRepository;
 import com.ibl.apps.RoomDatabase.dao.courseManagementDatabase.CourseDatabaseRepository;
+import com.ibl.apps.RoomDatabase.dao.lessonManagementDatabase.LessonDatabaseRepository;
 import com.ibl.apps.RoomDatabase.dao.quizManagementDatabase.QuizDatabaseRepository;
-import com.ibl.apps.RoomDatabase.database.AppDatabase;
 import com.ibl.apps.RoomDatabase.entity.ChapterProgress;
 import com.ibl.apps.RoomDatabase.entity.FileProgress;
 import com.ibl.apps.RoomDatabase.entity.LessonNewProgress;
@@ -179,6 +179,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
     private QuizRepository quizRepository;
     private QuizDatabaseRepository quizDatabaseRepository;
     private CourseDatabaseRepository courseDatabaseRepository;
+    private LessonDatabaseRepository lessonDatabaseRepository;
 
     public CourseItemFragment() {
         // Required empty public constructor
@@ -228,6 +229,8 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
         quizRepository = new QuizRepository();
         quizDatabaseRepository = new QuizDatabaseRepository();
         courseDatabaseRepository = new CourseDatabaseRepository();
+        lessonDatabaseRepository = new LessonDatabaseRepository();
+
         queueArray.clear();
         hashMap.clear();
         fileidarray.clear();
@@ -2504,9 +2507,9 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
             try {
 
                 if (!TextUtils.isEmpty(quizID)) {
-                    LessonProgress lessonProgressPrv = AppDatabase.getAppDatabase(NoonApplication.getContext()).lessonProgressDao().getItemquizidProgress(quizID, userId);
+                    LessonProgress lessonProgressPrv = lessonDatabaseRepository.getItemQuizIdProgress(quizID, userId);
                     if (lessonProgressPrv != null) {
-                        AppDatabase.getAppDatabase(NoonApplication.getContext()).lessonProgressDao().updateItemquizidProgress(quizID, progressval, false, userId);
+                        lessonDatabaseRepository.updateItemQuizIdProgress(quizID, progressval, false, userId);
                     } else {
                         LessonProgress lessonProgress = new LessonProgress();
                         lessonProgress.setUserId(userId);
@@ -2517,12 +2520,12 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                         lessonProgress.setGradeId(GradeId);
                         lessonProgress.setFileId(fileid);
                         lessonProgress.setTotalRecords(String.valueOf(lessonsArrayList.size()));
-                        AppDatabase.getAppDatabase(NoonApplication.getContext()).lessonProgressDao().insertAll(lessonProgress);
+                        lessonDatabaseRepository.insertLessonProgressData(lessonProgress);
                     }
                 } else {
-                    LessonProgress lessonProgressPrv = AppDatabase.getAppDatabase(NoonApplication.getContext()).lessonProgressDao().getItemLessonProgress(lessonID, fileid, userId);
+                    LessonProgress lessonProgressPrv = lessonDatabaseRepository.getItemLessonProgressData(lessonID, fileid, userId);
                     if (lessonProgressPrv != null) {
-                        AppDatabase.getAppDatabase(NoonApplication.getContext()).lessonProgressDao().updateItemLessonProgress(lessonID, progressval, false, fileid, userId);
+                        lessonDatabaseRepository.updateItemLessonProgressData(lessonID, progressval, false, fileid, userId);
                     } else {
                         LessonProgress lessonProgress = new LessonProgress();
                         lessonProgress.setUserId(userId);
@@ -2533,7 +2536,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                         lessonProgress.setGradeId(GradeId);
                         lessonProgress.setFileId(fileid);
                         lessonProgress.setTotalRecords(String.valueOf(lessonsArrayList.size()));
-                        AppDatabase.getAppDatabase(NoonApplication.getContext()).lessonProgressDao().insertAll(lessonProgress);
+                        lessonDatabaseRepository.insertLessonProgressData(lessonProgress);
                     }
                 }
 
@@ -2689,14 +2692,14 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                                         }
                                     }
 
-                                    LessonProgress lessonProgress = AppDatabase.getAppDatabase(getActivity()).lessonProgressDao().getItemLessonProgress(lessonId, fileid, userId);
+                                    LessonProgress lessonProgress = lessonDatabaseRepository.getItemLessonProgressData(lessonId, fileid, userId);
                                     if (lessonProgress != null) {
                                         lessonsArrayList.get(j).setProgressVal(Integer.parseInt(lessonProgress.getLessonProgress()));
                                     }
                                 } else {
 
                                     String quizID = lessonsArrayList.get(j).getId();
-                                    LessonProgress lessonProgress = AppDatabase.getAppDatabase(getActivity()).lessonProgressDao().getItemquizidProgress(quizID, userId);
+                                    LessonProgress lessonProgress = lessonDatabaseRepository.getItemQuizIdProgress(quizID, userId);
                                     if (lessonProgress != null) {
                                         lessonsArrayList.get(j).setProgressVal(Integer.parseInt(lessonProgress.getLessonProgress()));
                                     }
@@ -2748,14 +2751,14 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                                         }
                                     }
 
-                                    LessonProgress lessonProgress = AppDatabase.getAppDatabase(getActivity()).lessonProgressDao().getItemLessonProgress(lessonId, fileid, userId);
+                                    LessonProgress lessonProgress = lessonDatabaseRepository.getItemLessonProgressData(lessonId, fileid, userId);
                                     if (lessonProgress != null) {
                                         lessonsArrayList.get(j).setProgressVal(Integer.parseInt(lessonProgress.getLessonProgress()));
                                     }
                                 } else {
 
                                     String quizID = lessonsArrayList.get(j).getId();
-                                    LessonProgress lessonProgress = AppDatabase.getAppDatabase(getActivity()).lessonProgressDao().getItemquizidProgress(quizID, userId);
+                                    LessonProgress lessonProgress = lessonDatabaseRepository.getItemQuizIdProgress(quizID, userId);
                                     if (lessonProgress != null) {
                                         lessonsArrayList.get(j).setProgressVal(Integer.parseInt(lessonProgress.getLessonProgress()));
                                     }

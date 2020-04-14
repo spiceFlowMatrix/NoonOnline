@@ -20,12 +20,7 @@ import com.ibl.apps.Model.LibraryObject;
 import com.ibl.apps.Model.LoginObject;
 import com.ibl.apps.Model.QuizMainObject;
 import com.ibl.apps.Model.StatisticsObject;
-import com.ibl.apps.RoomDatabase.dao.ChapterProgressDao;
-import com.ibl.apps.RoomDatabase.dao.FileDownloadStatusDao;
-import com.ibl.apps.RoomDatabase.dao.FileProgressDao;
-import com.ibl.apps.RoomDatabase.dao.LessonNewProgressDao;
-import com.ibl.apps.RoomDatabase.dao.LessonProgressDao;
-import com.ibl.apps.RoomDatabase.dao.StatisticsDao;
+import com.ibl.apps.RoomDatabase.dao.chapterManagementDatabase.ChapterProgressDao;
 import com.ibl.apps.RoomDatabase.dao.courseManagementDatabase.CourseDao;
 import com.ibl.apps.RoomDatabase.dao.courseManagementDatabase.CourseDetailsDao;
 import com.ibl.apps.RoomDatabase.dao.courseManagementDatabase.GradeProgressDao;
@@ -33,6 +28,10 @@ import com.ibl.apps.RoomDatabase.dao.courseManagementDatabase.IntervalDao;
 import com.ibl.apps.RoomDatabase.dao.courseManagementDatabase.SyncTimeTrackingDao;
 import com.ibl.apps.RoomDatabase.dao.deviceManagementDatabase.DeviceManagementDataDao;
 import com.ibl.apps.RoomDatabase.dao.deviceManagementDatabase.DeviceManagementProfileDao;
+import com.ibl.apps.RoomDatabase.dao.lessonManagementDatabase.FileDownloadStatusDao;
+import com.ibl.apps.RoomDatabase.dao.lessonManagementDatabase.FileProgressDao;
+import com.ibl.apps.RoomDatabase.dao.lessonManagementDatabase.LessonNewProgressDao;
+import com.ibl.apps.RoomDatabase.dao.lessonManagementDatabase.LessonProgressDao;
 import com.ibl.apps.RoomDatabase.dao.libraryManagementDatabase.LibraryDao;
 import com.ibl.apps.RoomDatabase.dao.libraryManagementDatabase.LibraryGradeDao;
 import com.ibl.apps.RoomDatabase.dao.quizManagementDatabase.QuizAnswerDao;
@@ -40,6 +39,7 @@ import com.ibl.apps.RoomDatabase.dao.quizManagementDatabase.QuizProgressDao;
 import com.ibl.apps.RoomDatabase.dao.quizManagementDatabase.QuizUserResultDao;
 import com.ibl.apps.RoomDatabase.dao.userManagementDatabse.AuthTokenDao;
 import com.ibl.apps.RoomDatabase.dao.userManagementDatabse.LoginDao;
+import com.ibl.apps.RoomDatabase.dao.userManagementDatabse.StatisticsDao;
 import com.ibl.apps.RoomDatabase.dao.userManagementDatabse.UserDetailDao;
 import com.ibl.apps.RoomDatabase.entity.BookImageTable;
 import com.ibl.apps.RoomDatabase.entity.ChapterProgress;
@@ -192,11 +192,13 @@ public abstract class AppDatabase extends RoomDatabase {
         INSTANCE = null;
     }
 
+    //DONE
     public abstract LessonProgressDao lessonProgressDao();
 
     //DONE
     public abstract GradeProgressDao gradeProgressDao();
 
+    //DONE
     public abstract FileDownloadStatusDao fileDownloadStatusDao();
 
     //DONE
@@ -214,6 +216,7 @@ public abstract class AppDatabase extends RoomDatabase {
     //DONE
     public abstract UserDetailDao userDetailDao();
 
+    //DONE
     public abstract StatisticsDao statisticsDao();
 
     //DONE
@@ -234,10 +237,13 @@ public abstract class AppDatabase extends RoomDatabase {
     //DONE
     public abstract SyncTimeTrackingDao syncTimeTrackingDao();
 
+    //DONE
     public abstract ChapterProgressDao chapterProgressDao();
 
+    //DONE
     public abstract LessonNewProgressDao lessonnewProgressDao();
 
+    //DONE
     public abstract FileProgressDao fileProgressDao();
 
     //DONE
