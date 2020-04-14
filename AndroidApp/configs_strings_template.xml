@@ -7,7 +7,7 @@
     <string name="com_auth0_audience" translatable="false"><!-- To be filled by administrator --></string>
     <string name="com_auth0_database_connection" translatable="false">Username-Password-Authentication</string>
     <string name="com_auth0_scope" translatable="false">openid offline_access</string>
-    <string name="BASE_URL" translatable="false">---BASE_URL_value_from_ci---/api/v1/</string>
+    <string name="BASE_URL" translatable="false">https://---BASE_URL_value_from_ci---/api/v1/</string>
     
     <!--Encrypt Decrypt API KEY for 30 days trial  [Valid until: April 30, 2020]-->
     <!-- Refere Link http://libeasy.alwaysdata.net/libmedia/license/ -->

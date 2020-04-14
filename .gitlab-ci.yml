@@ -211,73 +211,90 @@ deployPashtoReview:
     refs:
       - master
 
-# .buildAndroidJob:
-#   before_script:
-#     - cd AndroidApp/
-#     - touch local.properties
-#     # We encrypt the google-services.json file in base64 by applying `base64 -w 0 FILENAME.ts` command on it and then supply it as ANDROID_GOOGLE_SERVICES_JSON environmet variable
-#     - rm app/google-services.json || true
-#     - echo ${ANDROID_GOOGLE_SERVICES_JSON} | base64 -d > app/google-services.json
-#     # We store this binary file in a variable as hex with this command, `xxd -p FILENAME.crt`, and then supply it as ANDROID_SSL_CRT_HASH
-#     # Then we convert the hex back to a binary file
-#     - echo ${ANDROID_SSL_CRT_HASH} | xxd -r -p - > app/src/main/res/raw/noonssl.crt
-#     ## We encrypt the configs_strings_template.xml file in base64 by applying `base64 -w 0 FILENAME.ts` command on it and then supply it as ANDROID_CONFIGS_STRINGS_BASE64 environmet variable
-#     - rm configs_strings_template.xml
-#     - echo ${ANDROID_CONFIGS_STRINGS_BASE64} | base64 -d > configs_strings_template.xml
-#     - cp configs_strings_template.xml devenv_configs_strings_template.xml
-#     - sed -i 's@---BASE_URL_value_from_ci---@'"$DEV_ENV_URL"'@' devenv_configs_strings_template.xml
-#     # Install and set up Android SDK
-#     - apt-get --quiet update --yes
-#     - apt-get --quiet install --yes wget tar unzip lib32stdc++6 lib32z1
-#     - wget --quiet --output-document=android-sdk.zip https://dl.google.com/android/repository/sdk-tools-linux-${ANDROID_SDK_TOOLS}.zip
-#     - unzip -d android-sdk-linux android-sdk.zip
-#     - echo y | android-sdk-linux/tools/bin/sdkmanager "platforms;android-${ANDROID_COMPILE_SDK}" >/dev/null
-#     - echo y | android-sdk-linux/tools/bin/sdkmanager "platform-tools" >/dev/null
-#     - echo y | android-sdk-linux/tools/bin/sdkmanager "build-tools;${ANDROID_BUILD_TOOLS}" >/dev/null
-#     - export ANDROID_HOME=$PWD/android-sdk-linux
-#     - export PATH=$PATH:$PWD/android-sdk-linux/platform-tools/
-#     - chmod +x ./gradlew
-#     # temporarily disable checking for EPIPE error and use yes to accept all licenses
-#     - set +o pipefail
-#     - yes | android-sdk-linux/tools/bin/sdkmanager --licenses
-#     - set -o pipefail
-#     - "export VERSION_CODE=$((100 + $CI_PIPELINE_IID)) && echo $VERSION_CODE"
-#     - "export VERSION_SHA=`echo ${CI_COMMIT_SHORT_SHA}` && echo $VERSION_SHA"
+.buildAndroidJob:
+  before_script:
+    - cd AndroidApp/
+    - touch local.properties
+    # Install and set up Android SDK
+    - apt-get --quiet update --yes
+    - apt-get --quiet install --yes wget tar unzip lib32stdc++6 lib32z1
+    - wget --quiet --output-document=android-sdk.zip https://dl.google.com/android/repository/sdk-tools-linux-${ANDROID_SDK_TOOLS}.zip
+    - unzip -d android-sdk-linux android-sdk.zip
+    - echo y | android-sdk-linux/tools/bin/sdkmanager "platforms;android-${ANDROID_COMPILE_SDK}" >/dev/null
+    - echo y | android-sdk-linux/tools/bin/sdkmanager "platform-tools" >/dev/null
+    - echo y | android-sdk-linux/tools/bin/sdkmanager "build-tools;${ANDROID_BUILD_TOOLS}" >/dev/null
+    - export ANDROID_HOME=$PWD/android-sdk-linux
+    - export PATH=$PATH:$PWD/android-sdk-linux/platform-tools/
+    - chmod +x ./gradlew
+    # temporarily disable checking for EPIPE error and use yes to accept all licenses
+    - set +o pipefail
+    - yes | android-sdk-linux/tools/bin/sdkmanager --licenses
+    - set -o pipefail
+    - 'export VERSION_CODE=$((100 + $CI_PIPELINE_IID)) && echo $VERSION_CODE'
+    - 'export VERSION_SHA=`echo ${CI_COMMIT_SHORT_SHA}` && echo $VERSION_SHA'
 
-# lintDebug:
-#   extends: .buildAndroidJob
-#   stage: buildAndroid
-#   script:
-#     # Copy in the config strings
-#     - rm app/src/debug/res/values/strings.xml
-#     - cp devenv_configs_strings_template.xml app/src/debug/res/values/strings.xml
-#     # Copy in the resources strings
-#     - rm app/src/main/res/values/strings.xml
-#     - cp dari_values_strings.xml app/src/main/res/values/strings.xml
-#     - ./gradlew -Pci --console=plain :app:lintDebug -PbuildDir=lint
-#   artifacts:
-#     expire_in: 1 week
-#     when: on_failure
-#     paths:
-#       - AndroidApp/app/lint/
-#       - AndroidApp/android-file-chooser/lint/
-#       - AndroidApp/giraffeplayer2/lint/
-#       - AndroidApp/prdownloader/lint/
+lintDebug:
+  extends: .buildAndroidJob
+  stage: buildAndroid
+  script:
+    # Copy in the config strings
+    - rm app/src/debug/res/values/strings.xml
+    - cp devenv_configs_strings_template.xml app/src/debug/res/values/strings.xml
+    # Copy in the resources strings
+    - rm app/src/main/res/values/strings.xml
+    - cp dari_values_strings.xml app/src/main/res/values/strings.xml
+    - ./gradlew -Pci --console=plain :app:lintDebug -PbuildDir=lint
+  artifacts:
+    expire_in: 1 week
+    when: on_failure
+    paths:
+      - AndroidApp/app/lint/
+      - AndroidApp/android-file-chooser/lint/
+      - AndroidApp/giraffeplayer2/lint/
+      - AndroidApp/prdownloader/lint/
 
-# assembleDebug:
-#   extends: .buildAndroidJob
-#   stage: buildAndroid
-#   script:
-#     # Copy in the config strings
-#     - rm app/src/debug/res/values/strings.xml
-#     - cp devenv_configs_strings_template.xml app/src/debug/res/values/strings.xml
-#     # Copy in the resources strings
-#     - rm app/src/main/res/values/strings.xml
-#     - cp dari_values_strings.xml app/src/main/res/values/strings.xml
-#     - ./gradlew assembleDebug
-#   artifacts:
-#     paths:
-#       - AndroidApp/app/build/outputs/
-#   environment:
-#     name: development/$CI_COMMIT_REF_SLUG
-#     url: $DEV_ENV_URL
+assembleDebug:
+  extends: .buildAndroidJob
+  stage: buildAndroid
+  script:
+    # We store this binary file in a variable as hex with this command, `xxd -p FILENAME.crt`, and then supply it as ANDROID_SSL_CRT_HASH
+    # Then we convert the hex back to a binary file
+    - echo ${ANDROID_SSL_CRT_HASH} | xxd -r -p - > app/src/main/res/raw/noonssl.crt
+    ## Begin script for dari version
+    # We encrypt the google-services.json file in base64 by applying `base64 -w 0 FILENAME.ts` command on it and then supply it as ANDROID_GOOGLE_SERVICES_JSON environmet variable
+    - rm -f app/google-services.json
+    - echo ${DARI_ANDROID_GOOGLE_SERVICES_JSON} | base64 -d > app/google-services.json
+    # We encrypt the configs_strings_template.xml file in base64 by applying `base64 -w 0 FILENAME.ts` command on it and then supply it as DARI_ANDROID_APP_CONFIG_VALUES environmet variable
+    - rm configs_strings_template.xml
+    - echo ${DARI_ANDROID_APP_CONFIG_VALUES} | base64 -d > configs_strings_template.xml
+    - sed -i 's@---BASE_URL_value_from_ci---@'"$DARI_REVIEW_ENV_URL"'@' configs_strings_template.xml
+    # Copy in the config strings
+    - rm app/src/debug/res/values/strings.xml
+    - cp configs_strings_template.xml app/src/debug/res/values/strings.xml
+    # Copy in the resources strings
+    - rm app/src/main/res/values/strings.xml
+    - cp dari_values_strings.xml app/src/main/res/values/strings.xml
+    - ./gradlew assembleDebug
+    - cp -r app/build/outputs/ dariBuildOutputs
+    - rm -rf app/build/outputs/
+    ## Begin script for dari version
+    # We encrypt the google-services.json file in base64 by applying `base64 -w 0 FILENAME.ts` command on it and then supply it as ANDROID_GOOGLE_SERVICES_JSON environmet variable
+    - rm -f app/google-services.json
+    - echo ${PASHTO_ANDROID_GOOGLE_SERVICES_JSON} | base64 -d > app/google-services.json
+    # We encrypt the configs_strings_template.xml file in base64 by applying `base64 -w 0 FILENAME.ts` command on it and then supply it as PASHTO_ANDROID_APP_CONFIG_VALUES environmet variable
+    - rm configs_strings_template.xml
+    - echo ${PASHTO_ANDROID_APP_CONFIG_VALUES} | base64 -d > configs_strings_template.xml
+    - sed -i 's@---BASE_URL_value_from_ci---@'"$PASHTO_REVIEW_ENV_URL"'@' configs_strings_template.xml
+    # Copy in the config strings
+    - rm app/src/debug/res/values/strings.xml
+    - cp configs_strings_template.xml app/src/debug/res/values/strings.xml
+    # Copy in the resources strings
+    - rm app/src/main/res/values/strings.xml
+    - cp pashto_values_strings.xml app/src/main/res/values/strings.xml
+    - ./gradlew assembleDebug
+    - cp -r app/build/outputs/ pashtoBuildOutputs
+    - rm -rf app/build/outputs/
+  artifacts:
+    paths:
+      - AndroidApp/dariBuildOutputs/
+      - AndroidApp/pashtoBuildOutputs/
