@@ -1,0 +1,136 @@
+{
+    "$schema": "https://json-schema.org/draft-07/schema#",
+    "properties": {
+        "image": {
+            "description": "image is the URI of the docker image that the chart will set for the noon application kubernetes workload.\n [1] This value is supplied automatically by CI/CD scripts and administrator input is not required",
+            "type": "string"
+        },
+        "gitlabDockerConfigJson": {
+            "description": "gitlabDockerConfigJson is the .dockerConfigJson required by the kubernetes workload to fetch the docker image for the application.\n [1] Please see this snippet to learn how to obtain this value https://gitlab.com/edgsolutions-engineering/bridge-trunk/snippets/1966385. \n [2] Please ensure you encode the json object using `base64 -w 0` before providing it as a value here, non-base64 encoded versions of the file will throw an error"
+        },
+        "name": {
+            "description": "name is used to set the name value for the kubernetes workloads and any other objects created for this chart",
+            "type": "string"
+        },
+        "webHostingUrl": {
+            "description": "webHostingUrl is the base url under which all the applications will be hosted by Ingress service.\n [1] This value is supplied automatically by CI/CD scripts and administrator input is not required",
+            "type": "string"
+        },
+        "applicationServiceAccount": {
+            "description": "applicationServiceAccount is the service account json credential file needed by application deployments to set up Cloud SQL proxy to connect to the production SQL server via private ip address.\n [1] Administrators must ensure they supply ONLY the base64 encoded version of this value by running `base64 -w 0` on it.\n [2] The service account that this credential was created for MUST have the `Cloud SQL Client` and `Cloud SQL Viewer` roles assigned to them, otherwise connections to the database will not work",
+            "type": "string"
+        },
+        "deploymentNamespace": {
+            "description": "deploymentNamespace is used by the chart to set the exact namespace of all the templates that are produced. This is required for GitLab CI to ensure it creates our workloads and required resources in the correct namespace by supplying the KUBE_NAMESPACE environment variable to this value.\n [1] This value is supplied automatically by CI/CD scripts and administrator input is not required",
+            "type": "string"
+        },
+        "gitlabCiProjectPath": {
+            "description": "gitlabCiProjectPath is used by the chart to set the app.gitlab.com/app annotation on all workload resources so that the deployment can appear in GitLab's environments control panel.\n [1] This value is supplied automatically by CI/CD scripts and administrator input is not required.",
+            "type": "string"
+        },
+        "gitlabCiProjectEnvironment": {
+            "description": "gitlabCiProjectEnvironment is used by the chart to set the app.gitlab.com/env annotation on all workload resources so that the deployment can appear in GitLab's environments control panel\n [1] This value is supplied automatically by CI/CD scripts and administrator input is not required",
+            "type": "string"
+        },
+        "netCoreEnvironment": {
+            "description": "netCoreEnvironment tells the aspnetcore service which environment to serve for. Used by the chart to create a secret value that is then fed to the ASPNETCORE_ENVIRONMENT environment variable on the application workload.\n [1] This value is supplied automatically by CI/CD scripts and administrator input is not required",
+            "type": "string",
+            "enum": [
+                "Production",
+                "Development"
+            ]
+        },
+        "sqlInstanceConnectionName": {
+            "description": "sqlInstanceConnectionName is the `Instance connection name` value on the Google Cloud SQL instance where the database for the application is hosted.\n [1] Used by the chart to configure the Cloud SQL proxy service in the deployment so that the application can connect to the database by private IP.\n [2] You can find this in the Overview page of the Google Cloud SQL instance under the 'Connect to this instance' section.",
+            "type": "string"
+        },
+        "sqlDbName": {
+            "description": "sqlDbName is the name of the exact database on the sqlDbServer instance that the chart will connect this deployment to.\n [1] Used by the chart to create a secret that is then fed to the MYSQL_DB_HOST environment variable for Cloud SQL proxy that manages connections to production SQL database.\n [2] Administrators must ensure they supply ONLY the base64 encoded version of this value by running `base64 -w 0` on it",
+            "type": "string"
+        },
+        "sqlDbUser": {
+            "description": "sqlDbUser is the User Id that the application will use to connect to the SQL (MySQL for this application) database.\n [1] Used by the chart to create a secret that is then fed to the MYSQL_DB_USER environment variable for Cloud SQL proxy that manages connections to production SQL database.\n [2] Administrators must ensure they supply ONLY the base64 encoded version of this value by running `base64 -w 0` on it",
+            "type": "string"
+        },
+        "sqlDbPassword": {
+            "description": "sqlDbPassword is the password that the application will use to connect to the SQL (MySQL for this application) database.\n [1] Used by the chart to create a secret that is then fed to the MYSQL_DB_PASSWORD environment variable for Cloud SQL proxy that manages connections to production SQL database.\n [2] Administrators must ensure they supply ONLY the base64 encoded version of this value by running `base64 -w 0` on it",
+            "type": "string"
+        },
+        "appDbConnectionString": {
+            "description": "appDbConnectionString is the connection string that the application will use to create connections to the SQL database.\n [1] Used by the chart to create a secret value that is then fed to the ASPNET_DB_CONNECTIONSTRING environment variable on the application workload.\n [2] Please the server and port segments of the connection string are set to 127.0.0.1 and 3306 respectively, the SQL proxy requires that we access it from the local sidecar container, see here to learn more https://cloud.google.com/sql/docs/mysql/connect-kubernetes-engine#connection_overview_2. You only need to change the user id, password, and database segments of the connection string.\n [3] Administrators must ensure they supply ONLY the base64 encoded version of this value by running `base64 -w 0` on it",
+            "type": "string"
+        },
+        "auth0Tenant": {
+            "description": "auth0Tenant is the Auth0 tenant domain name required by the REST API. Used by the chart to create a secret value that is then fed to the DOMAINNAME_ENVIRONMENT environment variable on the application workload.\n [1] Administrators must ensure they supply ONLY the base64 encoded version of this value by running `base64 -w 0` on it",
+            "type": "string"
+        },
+        "auth0ManagementUrl": {
+            "description": "auth0ManagementUrl is the Auth0 management API's URL value used as the Uri for it. Used by the chart to create a secret value that is then fed to the MANAGEMENTURL_ENVIRONMENT environment variable on the application workload.\n [1] Administrators must ensure they supply ONLY the base64 encoded version of this value by running `base64 -w 0` on it",
+            "type": "string"
+        },
+        "auth0ManagementClientId": {
+            "description": "auth0ManagementClientId is the Auth0 management API client application's Client ID. Used by the chart to create a secret value that is then fed to the CLIENT_ID_ENVIRONMENT environment variable on the application workload.\n [1] Administrators must ensure they supply ONLY the base64 encoded version of this value by running `base64 -w 0` on it",
+            "type": "string"
+        },
+        "auth0ManagementClientSecret": {
+            "description": "auth0ManagementClientSecret is the Auth0 management API client application's Client Secret. Used by the chart to create a secret value that is then fed to the CLIENT_SECRET_ENVIRONMENT environment variable on the application workload.\n [1] Administrators must ensure they supply ONLY the base64 encoded version of this value by running `base64 -w 0` on it",
+            "type": "string"
+        },
+        "auth0ManagementAudience": {
+            "description": "auth0ManagementAudience is the Auth0 management API's Audience value. Used by the chart to create a secret value that is then fed to the AUDIENCE_ENVIRONMENT environment variable on the application workload.\n [1] Administrators must ensure they supply ONLY the base64 encoded version of this value by running `base64 -w 0` on it",
+            "type": "string"
+        },
+        "smtpServerDomain": {
+            "description": "smtpServerDomain is the address (public ip or domain) of the server where the SMTP server is located. Used by the chart to create a secret value that is then fed to the PRIMARY_DOMAIN environment variable on the application workload.\n [1] Administrators must ensure they supply ONLY the base64 encoded version of this value by running `base64 -w 0` on it",
+            "type": "string"
+        },
+        "smtpServerPort": {
+            "description": "smtpServerPort is the port on the SMTP server that defines where our SMTP service can be accessed on the server. Used by the chart to create a secret value that is then fed to the PRIMARY_PORT environment variable on the application workload.\n [1] Administrators must ensure they supply ONLY the base64 encoded version of this value by running `base64 -w 0` on it",
+            "type": "string"
+        },
+        "smtpServerEmailAddress": {
+            "description": "smtpServerEmailAddress is the email address from which the smtp server will send out emails. Used by the chart to create a secret value that is then fed to the USERNAME_EMAIL environment variable on the application workload.\n [1] Administrators must ensure they supply ONLY the base64 encoded version of this value by running `base64 -w 0` on it",
+            "type": "string"
+        },
+        "smtpServerEmailPassword": {
+            "description": "smtpServerEmailPassword is the email address from which the smtp server will send out emails. Used by the chart to create a secret value that is then fed to the USERNAME_PASSWORD environment variable on the application workload.\n [1] Administrators must ensure they supply ONLY the base64 encoded version of this value by running `base64 -w 0` on it",
+            "type": "string"
+        },
+        "applicationLanguage": {
+            "description": "applicationLanguage is used by the chart to create a secret value that is then fed to the LANGUAGE environment variable on the application workload",
+            "type": "string",
+            "enum": [
+                "fa",
+                "pa"
+            ]
+        }
+    },
+    "required": [
+        "image",
+        "name",
+        "gitlabDockerConfigJson",
+        "webHostingUrl",
+        "applicationServiceAccount",
+        "deploymentNamespace",
+        "netCoreEnvironment",
+        "gitlabCiProjectPath",
+        "gitlabCiProjectEnvironment",
+        "sqlInstanceConnectionName",
+        "sqlDbName",
+        "sqlDbUser",
+        "sqlDbPassword",
+        "appDbConnectionString",
+        "auth0Tenant",
+        "auth0ManagementUrl",
+        "auth0ManagementClientId",
+        "auth0ManagementClientSecret",
+        "auth0ManagementAudience",
+        "smtpServerDomain",
+        "smtpServerPort",
+        "smtpServerEmailAddress",
+        "smtpServerEmailPassword",
+        "applicationLanguage"
+    ],
+    "title": "Values",
+    "type": "object"
+}

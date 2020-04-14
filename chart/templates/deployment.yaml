@@ -1,9 +1,9 @@
-apiVersion: v1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
-    # annotations:
-        # app.gitlab.com/app: {{ .Values.gitlabCiProjectPath }}
-        # app.gitlab.com/env: {{ .Values.gitlabCiProjectEnvironment }}
+    annotations:
+        app.gitlab.com/app: {{ .Values.gitlabCiProjectPath }}
+        app.gitlab.com/env: {{ .Values.gitlabCiProjectEnvironment }}
     name: {{ .Release.Name }}
     namespace: {{ .Values.deploymentNamespace }}
     labels:
@@ -21,8 +21,8 @@ spec:
             labels:
                 app: {{ .Release.Name }}
         spec:
-            # imagePullSecrets:
-                # - name: {{ .Release.Name }}-gitlab-registry
+            imagePullSecrets:
+                - name: {{ .Release.Name }}-gitlab-registry-secret
             containers:
                 -   name: {{ .Release.Name }}
                     image: {{ .Values.image }}
@@ -100,30 +100,22 @@ spec:
                                 name: {{ .Release.Name }}-secrets
                                 key: smtpServerEmailPassword
                     -   name: LANGUAGE
-                        valueFrom:
-                            secretKeyRef:
-                                name: {{ .Release.Name }}-secrets
-                                key: applicationLanguage
-            -   name: devenv-mysql
-                image: mysql:5.6
-                env:
-                -   name: MYSQL_DATABASE
-                    valueFrom:
-                        secretKeyRef:
-                            name: {{ .Release.Name }}-secrets
-                            key: sqlDbName
-                -   name: MYSQL_ROOT_PASSWORD
-                    valueFrom:
-                        secretKeyRef:
-                            name: {{ .Release.Name }}-secrets
-                            key: sqlDbPassword
-                -   name: MYSQL_USER
-                    valueFrom:
-                        secretKeyRef:
-                            name: {{ .Release.Name }}-secrets
-                            key: sqlDbUser
-                -   name: MYSQL_PASSWORD
-                    valueFrom:
-                        secretKeyRef:
-                            name: {{ .Release.Name }}-secrets
-                            key: sqlDbPassword
+                        value: {{ .Values.applicationLanguage }}
+                -   name: cloudsql-proxy
+                    image: gcr.io/cloudsql-docker/gce-proxy:1.16
+                    imagePullPolicy: IfNotPresent
+                    command: {{- printf "[\"cloud_sql_proxy\", \"-instances=%s=tcp:3306\", \"-credential_file=/secrets/gcp/credentials.json\"]" .Values.sqlInstanceConnectionName }}
+                    securityContext:
+                        runAsUser: {{ .Values.sqlDbUser }} # non-root user
+                        allowPrivilegeEscalation: false
+                    volumeMounts:
+                        -   name: application-gcp-serviceaccount
+                            mountPath: /secrets
+                            readOnly: true
+            volumes:
+            -   name: application-gcp-serviceaccount
+                secret:
+                    secretName: {{ .Release.Name }}-secrets
+                    items:
+                    -   key: appServiceAccount
+                        path: gcp/credentials.json
