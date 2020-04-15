@@ -236,6 +236,7 @@ deployPashtoReview:
   before_script:
     - cd AndroidApp/
     - touch local.properties
+    - rm -f app/src/main/res/raw/noonssl.crt
     # Install and set up Android SDK
     - apt-get --quiet update --yes
     - apt-get --quiet install --yes wget tar unzip lib32stdc++6 lib32z1
