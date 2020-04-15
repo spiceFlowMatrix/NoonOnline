@@ -28,7 +28,8 @@ export class AuthenticationService {
     }
 
     public refreshStorage() {
-        this.router.navigateByUrl('/feed', { replaceUrl: true });
+        // this.router.navigateByUrl('/feed', { replaceUrl: true });
+        this.router.navigate(['login']);
         localStorage.removeItem('access_token');
         localStorage.removeItem('token');
         localStorage.removeItem('isLoggedin');
