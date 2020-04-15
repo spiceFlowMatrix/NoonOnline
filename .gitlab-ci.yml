@@ -316,6 +316,8 @@ assembleDebug:
     - ./gradlew assembleDebug
     - cp -r app/build/outputs/ pashtoBuildOutputs
     - rm -rf app/build/outputs/
+  after_script:
+    - rm -f app/src/main/res/raw/noonssl.crt
   artifacts:
     paths:
       - AndroidApp/dariBuildOutputs/
