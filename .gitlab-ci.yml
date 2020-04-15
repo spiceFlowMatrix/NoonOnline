@@ -40,17 +40,21 @@ buildAdminApp:
   script:
     # Begin script for dari version
     ## We encrypt the environment.ts file in base64 by applying `base64 -w 0 FILENAME.ts` command on it and then supply it as environmet variable
+    - echo ${DARI_ADMIN_APP_CONFIG_VALUES} | base64 -d > src/environments/environment.ts
     - echo ${DARI_ADMIN_APP_CONFIG_VALUES} | base64 -d > src/environments/environment.prod.ts
     - npm run build --prod
     - cp -r dist/ distDari
     - rm -r dist/
+    - rm src/environments/environment.ts
     - rm src/environments/environment.prod.ts
     # Begin script for Pashto version
+    - echo ${PASHTO_ADMIN_APP_CONFIG_VALUES} | base64 -d > src/environments/environment.ts
     - echo ${PASHTO_ADMIN_APP_CONFIG_VALUES} | base64 -d > src/environments/environment.prod.ts
     - npm run build --prod
     - cp -r dist/ distPashto
   after_script:
     - rm -rf dist/
+    - rm -rf src/environments/environment.ts
     - rm -rf src/environments/environment.prod.ts
   artifacts:
     paths:
@@ -77,12 +81,15 @@ buildSalesApp:
   script:
     # Begin script for dari version
     ## We encrypt the environment.ts file in base64 by applying `base64 -w 0 FILENAME.ts` command on it and then supply it as environmet variable
+    - echo ${DARI_SALES_APP_CONFIG_VALUES} | base64 -d > src/environments/environment.ts
     - echo ${DARI_SALES_APP_CONFIG_VALUES} | base64 -d > src/environments/environment.prod.ts
     - npm run build --prod
     - cp -r dist/ distDari
     - rm -r dist/
+    - rm src/environments/environment.ts
     - rm src/environments/environment.prod.ts
     # Begin script for Pashto version
+    - echo ${PASHTO_SALES_APP_CONFIG_VALUES} | base64 -d > src/environments/environment.ts
     - echo ${PASHTO_SALES_APP_CONFIG_VALUES} | base64 -d > src/environments/environment.prod.ts
     - npm run build --prod
     - cp -r dist/ distPashto
@@ -114,17 +121,21 @@ buildFeedbackApp:
   script:
     # Begin script for dari version
     ## We encrypt the environment.ts file in base64 by applying `base64 -w 0 FILENAME.ts` command on it and then supply it as environmet variable
+    - echo ${DARI_FEEDBACK_APP_CONFIG_VALUES} | base64 -d > src/environments/environment.ts
     - echo ${DARI_FEEDBACK_APP_CONFIG_VALUES} | base64 -d > src/environments/environment.prod.ts
     - npm run build --prod
     - cp -r dist/ distDari
     - rm -r dist/
+    - rm src/environments/environment.ts
     - rm src/environments/environment.prod.ts
     # Begin script for Pashto version
+    - echo ${PASHTO_FEEDBACK_APP_CONFIG_VALUES} | base64 -d > src/environments/environment.ts
     - echo ${PASHTO_FEEDBACK_APP_CONFIG_VALUES} | base64 -d > src/environments/environment.prod.ts
     - npm run build --prod
     - cp -r dist/ distPashto
   after_script:
     - rm -rf dist/
+    - rm -rf src/environments/environment.ts
     - rm -rf src/environments/environment.prod.ts
   artifacts:
     paths:
