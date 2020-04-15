@@ -25,6 +25,8 @@ stages:
 buildAdminApp:
   image: node:latest
   stage: buildWebApps
+  environment:
+    name: review
   cache:
     key: '$CI_JOB_NAME-$CI_COMMIT_REF_NAME'
     paths:
@@ -60,6 +62,8 @@ buildAdminApp:
 buildSalesApp:
   image: node:latest
   stage: buildWebApps
+  environment:
+    name: review
   cache:
     key: '$CI_JOB_NAME-$CI_COMMIT_REF_NAME'
     paths:
@@ -95,6 +99,8 @@ buildSalesApp:
 buildFeedbackApp:
   image: node:latest
   stage: buildWebApps
+  environment:
+    name: review
   cache:
     key: '$CI_JOB_NAME-$CI_COMMIT_REF_NAME'
     paths:
@@ -130,6 +136,8 @@ buildFeedbackApp:
 buildBackend:
   image: mcr.microsoft.com/dotnet/core/sdk:2.1
   stage: buildPackageBackendHost
+  environment:
+    name: review
   dependencies:
     - buildAdminApp
     - buildSalesApp
@@ -168,6 +176,8 @@ publishWebHostableContainer:
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: ['']
+  environment:
+    name: review
   stage: containerizeWeb
   script:
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
@@ -236,13 +246,9 @@ deployPashtoReview:
 lintDebug:
   extends: .buildAndroidJob
   stage: buildAndroid
+  environment:
+    name: review
   script:
-    # Copy in the config strings
-    - rm app/src/debug/res/values/strings.xml
-    - cp devenv_configs_strings_template.xml app/src/debug/res/values/strings.xml
-    # Copy in the resources strings
-    - rm app/src/main/res/values/strings.xml
-    - cp dari_values_strings.xml app/src/main/res/values/strings.xml
     - ./gradlew -Pci --console=plain :app:lintDebug -PbuildDir=lint
   artifacts:
     expire_in: 1 week
@@ -256,6 +262,8 @@ lintDebug:
 assembleDebug:
   extends: .buildAndroidJob
   stage: buildAndroid
+  environment:
+    name: review
   script:
     # We store this binary file in a variable as hex with this command, `xxd -p FILENAME.crt`, and then supply it as ANDROID_SSL_CRT_HASH
     # Then we convert the hex back to a binary file
