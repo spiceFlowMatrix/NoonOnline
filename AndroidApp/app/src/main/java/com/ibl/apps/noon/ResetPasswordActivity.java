@@ -3,8 +3,8 @@ package com.ibl.apps.noon;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.support.v4.content.res.ResourcesCompat;
-import android.text.method.PasswordTransformationMethod;
+import androidx.core.content.res.ResourcesCompat;
+
 import android.view.MenuItem;
 import android.view.View;
 
@@ -13,8 +13,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.ibl.apps.Base.BaseActivity;
 import com.ibl.apps.Model.UserObject;
-import com.ibl.apps.Utils.Const;
-import com.ibl.apps.Utils.Validator;
+import com.ibl.apps.util.Const;
+import com.ibl.apps.util.Validator;
 import com.ibl.apps.noon.databinding.ResetPasswordLayoutBinding;
 
 import org.json.JSONException;

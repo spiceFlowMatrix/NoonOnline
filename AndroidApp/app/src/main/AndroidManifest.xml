@@ -94,7 +94,7 @@
             android:value="@string/default_notification_channel_id" />
 
         <provider
-            android:name="com.ibl.apps.Utils.GenericFileProvider"
+            android:name="com.ibl.apps.util.GenericFileProvider"
             android:authorities="${applicationId}.provider"
             android:exported="false"
             android:grantUriPermissions="true">

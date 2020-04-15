@@ -41,7 +41,7 @@
                         android:textSize="@dimen/_12sdp"
                         android:textStyle="bold" />
 
-                    <android.support.v7.widget.CardView
+                    <androidx.cardview.widget.CardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:cardBackgroundColor="@color/colorWhite"
@@ -65,13 +65,13 @@
                                     android:layout_height="@dimen/_40sdp"
                                     android:layout_marginEnd="@dimen/_10sdp">
 
-                                    <android.support.v4.view.ViewPager
+                                    <androidx.viewpager.widget.ViewPager
                                         android:id="@+id/questionImagePager"
                                         android:layout_width="match_parent"
                                         android:layout_height="match_parent"
                                         android:layout_gravity="center">
 
-                                    </android.support.v4.view.ViewPager>
+                                    </androidx.viewpager.widget.ViewPager>
 
                                     <!-- <me.relex.circleindicator.CircleIndicator
                                          android:id="@+id/indicator"
@@ -95,7 +95,7 @@
 
                         </ScrollView>
 
-                    </android.support.v7.widget.CardView>
+                    </androidx.cardview.widget.CardView>
 
                 </LinearLayout>
 
@@ -118,7 +118,7 @@
                     android:textSize="@dimen/_12sdp"
                     android:textStyle="bold" />
 
-                <android.support.v7.widget.RecyclerView
+                <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/rcVertical"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/_200sdp"
@@ -126,7 +126,7 @@
                     android:clipToPadding="false"
                     android:orientation="vertical"
                     android:padding="@dimen/_5sdp"
-                    app:layoutManager="android.support.v7.widget.LinearLayoutManager" />
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
             </LinearLayout>
 

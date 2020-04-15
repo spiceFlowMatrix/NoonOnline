@@ -11,17 +11,17 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.databinding.DataBindingUtil;
+import androidx.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.FileProvider;
-import android.support.v7.widget.LinearLayoutManager;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.util.Log;
@@ -68,11 +68,11 @@ import com.ibl.apps.Model.assignment.CommentResponse;
 import com.ibl.apps.Model.assignment.StudentDetailData;
 import com.ibl.apps.Model.assignment.SubmissionFiles;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
-import com.ibl.apps.Utils.Const;
-import com.ibl.apps.Utils.GlideApp;
-import com.ibl.apps.Utils.LoadMoreData.RecyclerViewLoadMoreScroll;
-import com.ibl.apps.Utils.PrefUtils;
-import com.ibl.apps.Utils.VideoEncryptDecrypt.EncrypterDecryptAlgo;
+import com.ibl.apps.util.Const;
+import com.ibl.apps.util.GlideApp;
+import com.ibl.apps.util.LoadMoreData.RecyclerViewLoadMoreScroll;
+import com.ibl.apps.util.PrefUtils;
+import com.ibl.apps.util.VideoEncryptDecrypt.EncrypterDecryptAlgo;
 import com.ibl.apps.noon.databinding.AssignmentDetailLayoutBinding;
 import com.ibl.apps.noon.databinding.AssignmentfilesItemLayoutBinding;
 import com.ibl.apps.noon.databinding.DialogViewerItemLayoutBinding;
@@ -159,7 +159,7 @@ public class AssignmentDetailActivity extends BaseActivity implements View.OnCli
             public void run() {
                 try {
                     SpannableStringBuilder message = setTypeface(activity, activity.getResources().getString(R.string.error_no_space));
-                    android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(activity);
+                    androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(activity);
                     builder.setTitle(activity.getResources().getString(R.string.validation_warning));
                     builder.setMessage(message)
                             .setPositiveButton("Ok", new DialogInterface.OnClickListener() {

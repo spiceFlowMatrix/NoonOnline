@@ -7,14 +7,14 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.res.ResourcesCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.core.content.res.ResourcesCompat;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextUtils;
@@ -25,7 +25,7 @@ import android.widget.Toast;
 
 import com.droidnet.DroidListener;
 import com.droidnet.DroidNet;
-import com.ibl.apps.Utils.CustomTypefaceSpan;
+import com.ibl.apps.util.CustomTypefaceSpan;
 import com.ibl.apps.noon.R;
 
 import org.json.JSONException;
@@ -33,7 +33,6 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
-import java.util.AbstractCollection;
 import java.util.ArrayList;
 
 import retrofit2.HttpException;
@@ -170,7 +169,7 @@ public abstract class BaseFragment extends Fragment implements DroidListener {
     public static void showNetworkAlert(Context activity) {
         try {
             SpannableStringBuilder message = setTypeface(activity, activity.getResources().getString(R.string.validation_check_internet));
-            android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(activity);
+            androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(activity);
             builder.setTitle(R.string.validation_warning);
             builder.setMessage(message)
                     .setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {

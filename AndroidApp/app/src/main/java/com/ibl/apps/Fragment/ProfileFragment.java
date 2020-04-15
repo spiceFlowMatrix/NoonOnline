@@ -1,10 +1,10 @@
 package com.ibl.apps.Fragment;
 
 import android.content.Intent;
-import android.databinding.DataBindingUtil;
+import androidx.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -22,10 +22,10 @@ import com.ibl.apps.Model.UploadImageObject;
 import com.ibl.apps.Model.UserObject;
 import com.ibl.apps.RoomDatabase.database.AppDatabase;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
-import com.ibl.apps.Utils.Const;
-import com.ibl.apps.Utils.GlideApp;
-import com.ibl.apps.Utils.PrefUtils;
-import com.ibl.apps.Utils.Validator;
+import com.ibl.apps.util.Const;
+import com.ibl.apps.util.GlideApp;
+import com.ibl.apps.util.PrefUtils;
+import com.ibl.apps.util.Validator;
 import com.ibl.apps.noon.NoonApplication;
 import com.ibl.apps.noon.R;
 import com.ibl.apps.noon.databinding.ProfileLayoutBinding;
@@ -37,7 +37,6 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
 import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;

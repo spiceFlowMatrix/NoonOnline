@@ -3,8 +3,8 @@ package com.ibl.apps.Service.TimeOut;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
-import android.support.v4.app.JobIntentService;
-import android.support.v4.content.WakefulBroadcastReceiver;
+import androidx.core.app.JobIntentService;
+import androidx.legacy.content.WakefulBroadcastReceiver;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -31,10 +31,10 @@ import com.ibl.apps.RoomDatabase.database.AppDatabase;
 import com.ibl.apps.RoomDatabase.entity.LessonProgress;
 import com.ibl.apps.RoomDatabase.entity.QuizUserResult;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
-import com.ibl.apps.Utils.Const;
-import com.ibl.apps.Utils.JWTUtils;
-import com.ibl.apps.Utils.NotificationUtils;
-import com.ibl.apps.Utils.PrefUtils;
+import com.ibl.apps.util.Const;
+import com.ibl.apps.util.JWTUtils;
+import com.ibl.apps.util.NotificationUtils;
+import com.ibl.apps.util.PrefUtils;
 import com.ibl.apps.noon.LoginActivity;
 import com.ibl.apps.noon.NoonApplication;
 import com.ibl.apps.noon.R;
@@ -99,7 +99,7 @@ public class SyncIntentService extends JobIntentService implements DroidListener
     }
 
     @Override
-    protected void onHandleWork(@android.support.annotation.NonNull Intent intent) {
+    protected void onHandleWork(@androidx.annotation.NonNull Intent intent) {
         try {
             String action = intent.getAction();
             if (ACTION_START.equals(action)) {

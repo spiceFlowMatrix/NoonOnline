@@ -1,22 +1,18 @@
 package com.ibl.apps.noon;
 
 import android.app.DatePickerDialog;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.content.res.ResourcesCompat;
-import android.support.v7.app.AlertDialog;
+import androidx.core.content.res.ResourcesCompat;
+import androidx.appcompat.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
@@ -42,11 +38,10 @@ import com.ibl.apps.RoomDatabase.database.AppDatabase;
 import com.ibl.apps.RoomDatabase.entity.LessonProgress;
 import com.ibl.apps.RoomDatabase.entity.QuizUserResult;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
-import com.ibl.apps.Utils.Const;
-import com.ibl.apps.Utils.JWTUtils;
-import com.ibl.apps.Utils.MaterialBetterSpinner;
-import com.ibl.apps.Utils.PrefUtils;
-import com.ibl.apps.Utils.Validator;
+import com.ibl.apps.util.Const;
+import com.ibl.apps.util.JWTUtils;
+import com.ibl.apps.util.PrefUtils;
+import com.ibl.apps.util.Validator;
 import com.ibl.apps.noon.databinding.ActivitySignUpBinding;
 
 import org.json.JSONArray;
@@ -60,7 +55,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;

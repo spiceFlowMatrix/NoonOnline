@@ -1,14 +1,11 @@
 package com.ibl.apps.RoomDatabase.dao;
 
-import android.arch.persistence.room.Dao;
-import android.arch.persistence.room.Insert;
-import android.arch.persistence.room.Query;
-import android.arch.persistence.room.Update;
+import androidx.room.Dao;
+import androidx.room.Insert;
+import androidx.room.Query;
+import androidx.room.Update;
 
-import com.ibl.apps.RoomDatabase.entity.ChapterProgress;
 import com.ibl.apps.RoomDatabase.entity.QuizProgress;
-
-import java.util.ArrayList;
 
 @Dao
 public interface QuizProgressDao {

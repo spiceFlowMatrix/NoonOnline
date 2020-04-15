@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthService } from './shared';
+import { AuthService, DataService } from './shared';
+import { environment } from "../environments/environment";
 
 // import Scrollbar from 'smooth-scrollbar';
 @Component({
@@ -10,7 +11,9 @@ import { AuthService } from './shared';
 export class AppComponent implements OnInit {
     shouldDisplayOverlay: boolean = true;
 
-    constructor(public auth: AuthService) {
+    constructor(public auth: AuthService, public dataService: DataService) {
+        const callback = window.location.origin +"/web/manage/login";
+        localStorage.setItem('callback-admin', callback);
         // Attempt single sign-on authentication
         // if not authenticated
         // if (auth.isAuthenticated()) {

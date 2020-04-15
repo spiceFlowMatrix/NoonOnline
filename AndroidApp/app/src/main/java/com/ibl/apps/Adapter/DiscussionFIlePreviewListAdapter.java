@@ -5,12 +5,12 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.databinding.DataBindingUtil;
+import androidx.databinding.DataBindingUtil;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.support.v4.content.res.ResourcesCompat;
-import android.support.v7.widget.RecyclerView;
+import androidx.core.content.res.ResourcesCompat;
+import androidx.recyclerview.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.util.Log;
@@ -31,8 +31,8 @@ import com.ibl.apps.Model.SignedUrlObject;
 import com.ibl.apps.Network.ApiClient;
 import com.ibl.apps.Network.ApiService;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
-import com.ibl.apps.Utils.CustomTypefaceSpan;
-import com.ibl.apps.Utils.VideoEncryptDecrypt.EncrypterDecryptAlgo;
+import com.ibl.apps.util.CustomTypefaceSpan;
+import com.ibl.apps.util.VideoEncryptDecrypt.EncrypterDecryptAlgo;
 import com.ibl.apps.noon.R;
 import com.ibl.apps.noon.databinding.AssignmentfilesItemLayoutBinding;
 import com.ibl.apps.noon.databinding.DiscussionsFilePreviewItemLayoutBinding;
@@ -277,7 +277,7 @@ public class DiscussionFIlePreviewListAdapter extends RecyclerView.Adapter<Discu
     public static void showNetworkAlert(Context activity) {
         try {
             SpannableStringBuilder message = setTypeface(activity, activity.getResources().getString(R.string.validation_Connect_internet));
-            android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(activity);
+            androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(activity);
             builder.setTitle(activity.getResources().getString(R.string.validation_warning));
             builder.setMessage(message)
                     .setPositiveButton(activity.getResources().getString(R.string.button_ok), new DialogInterface.OnClickListener() {
