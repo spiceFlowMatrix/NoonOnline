@@ -277,14 +277,13 @@ assembleDebug:
   environment:
     name: review
   script:
-    # We store this binary file in a variable as hex with this command, `xxd -p FILENAME.crt`, and then supply it as ANDROID_SSL_CRT_HASH
-    # Then we convert the hex back to a binary file
-    - echo "${ANDROID_SSL_CRT_HASH}" | xxd -r -p - > app/src/main/res/raw/noonssl.crt
+    # We encode the noonssl.crt file in base64 by applying `base64 -w 0 FILENAME.ts` command on it and then supply it as ANDROID_SSL_CRT_BASE64 environmet variable
+    - echo ${ANDROID_SSL_CRT_BASE64} | base64 -d > app/src/main/res/raw/noonssl.crt
     ## Begin script for dari version
-    # We encrypt the google-services.json file in base64 by applying `base64 -w 0 FILENAME.ts` command on it and then supply it as ANDROID_GOOGLE_SERVICES_JSON environmet variable
+    # We encode the google-services.json file in base64 by applying `base64 -w 0 FILENAME.ts` command on it and then supply it as ANDROID_GOOGLE_SERVICES_JSON environmet variable
     - rm -f app/google-services.json
     - echo ${DARI_ANDROID_GOOGLE_SERVICES_JSON} | base64 -d > app/google-services.json
-    # We encrypt the configs_strings_template.xml file in base64 by applying `base64 -w 0 FILENAME.ts` command on it and then supply it as DARI_ANDROID_APP_CONFIG_VALUES environmet variable
+    # We encode the configs_strings_template.xml file in base64 by applying `base64 -w 0 FILENAME.ts` command on it and then supply it as DARI_ANDROID_APP_CONFIG_VALUES environmet variable
     - rm configs_strings_template.xml
     - echo ${DARI_ANDROID_APP_CONFIG_VALUES} | base64 -d > configs_strings_template.xml
     - sed -i 's@---BASE_URL_value_from_ci---@'"$DARI_REVIEW_ENV_URL"'@' configs_strings_template.xml
@@ -297,11 +296,11 @@ assembleDebug:
     - ./gradlew assembleDebug
     - cp -r app/build/outputs/ dariBuildOutputs
     - rm -rf app/build/outputs/
-    ## Begin script for dari version
-    # We encrypt the google-services.json file in base64 by applying `base64 -w 0 FILENAME.ts` command on it and then supply it as ANDROID_GOOGLE_SERVICES_JSON environmet variable
+    ## Begin script for pashto version
+    # We encode the google-services.json file in base64 by applying `base64 -w 0 FILENAME.ts` command on it and then supply it as ANDROID_GOOGLE_SERVICES_JSON environmet variable
     - rm -f app/google-services.json
     - echo ${PASHTO_ANDROID_GOOGLE_SERVICES_JSON} | base64 -d > app/google-services.json
-    # We encrypt the configs_strings_template.xml file in base64 by applying `base64 -w 0 FILENAME.ts` command on it and then supply it as PASHTO_ANDROID_APP_CONFIG_VALUES environmet variable
+    # We encode the configs_strings_template.xml file in base64 by applying `base64 -w 0 FILENAME.ts` command on it and then supply it as PASHTO_ANDROID_APP_CONFIG_VALUES environmet variable
     - rm configs_strings_template.xml
     - echo ${PASHTO_ANDROID_APP_CONFIG_VALUES} | base64 -d > configs_strings_template.xml
     - sed -i 's@---BASE_URL_value_from_ci---@'"$PASHTO_REVIEW_ENV_URL"'@' configs_strings_template.xml
