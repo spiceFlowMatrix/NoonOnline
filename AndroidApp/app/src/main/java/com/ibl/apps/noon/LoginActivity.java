@@ -9,8 +9,6 @@ import android.content.pm.PackageManager;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import androidx.core.content.res.ResourcesCompat;
-import androidx.appcompat.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -18,11 +16,19 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.res.ResourcesCompat;
+
 import com.auth0.android.Auth0;
 import com.auth0.android.authentication.AuthenticationAPIClient;
 import com.auth0.android.authentication.AuthenticationException;
 import com.auth0.android.callback.BaseCallback;
 import com.auth0.android.result.Credentials;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -36,11 +42,11 @@ import com.ibl.apps.RoomDatabase.database.AppDatabase;
 import com.ibl.apps.RoomDatabase.entity.LessonProgress;
 import com.ibl.apps.RoomDatabase.entity.QuizUserResult;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
+import com.ibl.apps.noon.databinding.LoginLayoutBinding;
 import com.ibl.apps.util.Const;
 import com.ibl.apps.util.JWTUtils;
 import com.ibl.apps.util.PrefUtils;
 import com.ibl.apps.util.Validator;
-import com.ibl.apps.noon.databinding.LoginLayoutBinding;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -60,6 +66,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 
     LoginLayoutBinding loginLayoutBinding;
     private CompositeDisposable disposable = new CompositeDisposable();
+    private FirebaseAuth mAuth;
 
     @Override
     protected int getContentView() {
@@ -70,6 +77,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     protected void onViewReady(Bundle savedInstanceState, Intent intent) {
         super.onViewReady(savedInstanceState, intent);
         loginLayoutBinding = (LoginLayoutBinding) getBindObj();
+        mAuth = FirebaseAuth.getInstance();
         try {
             PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
             String version = pInfo.versionName;
@@ -89,6 +97,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         loginLayoutBinding.forgotPassword.setOnClickListener(this);
         loginLayoutBinding.createNewAccount.setOnClickListener(this);
         loginLayoutBinding.txtPrivacyPolicy.setOnClickListener(this);
+        loginLayoutBinding.signupTial.setOnClickListener(this);
+        loginLayoutBinding.cardLoginTrial.setOnClickListener(this);
     }
 
     @Override
@@ -156,6 +166,44 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                                 hideDialog();
                             }
                         }));
+                break;
+
+            case R.id.signupTial:
+                openActivity(SignUpTrialActivity.class);
+                break;
+
+            case R.id.cardLoginTrial:
+
+                if (validateFields()) {
+                    String email = loginLayoutBinding.loginEmail.getText().toString().trim();
+                    String password = loginLayoutBinding.loginPassword.getText().toString().trim();
+                    Intent intent = new Intent(LoginActivity.this, MainDashBoardTrialActivity.class);
+                    startActivity(intent);
+                    /*showDialog(getString(R.string.loading));
+                    if (isNetworkAvailable(this)) {
+                        mAuth.signInWithEmailAndPassword(email, password)
+                                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<AuthResult> task) {
+                                        if (task.isSuccessful()) {
+                                            Toast.makeText(getApplicationContext(), "Login successful!", Toast.LENGTH_LONG).show();
+                                            hideDialog();
+
+                                            Intent intent = new Intent(LoginActivity.this, MainDashBoardTrialActivity.class);
+                                            startActivity(intent);
+                                        } else {
+                                            Log.e("TAG", "onComplete: " + task.getException().getMessage());
+                                            Toast.makeText(getApplicationContext(), "Login failed! Please try again later", Toast.LENGTH_LONG).show();
+                                            hideDialog();
+                                        }
+                                    }
+                                });
+                    } else {
+                        Toast.makeText(getApplicationContext(), "No Internet! Please try again later", Toast.LENGTH_LONG).show();
+//                        LocalLogin(email, password, null);
+                    }*/
+                }
+
                 break;
         }
     }
