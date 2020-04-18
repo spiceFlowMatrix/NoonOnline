@@ -219,7 +219,7 @@ deployDariReview:
     - gcloud container clusters get-credentials ${GKE_CLUSTER_NAME} --zone=${GKE_ZONE} --project=${GKE_PROJECT}
     - echo "${DARI_WEB_DEPLOYMENT_CONFIG_VALUES}" > chart/values.yaml
   script: 
-    - helm upgrade --install --namespace ${KUBE_NAMESPACE} --set image=${NOON_WEB_IMAGE_DARI} --set webHostingUrl=${DARI_REVIEW_ENV_URL} --set deploymentNamespace=${KUBE_NAMESPACE} --set netCoreEnvironment=Production --set gitlabCiProjectPath=${CI_PROJECT_PATH_SLUG} --set gitlabCiProjectEnvironment=${CI_ENVIRONMENT_SLUG} --set name=noonweb-dari-review --wait --debug noonweb-dari ./chart
+    - helm upgrade --install --namespace ${KUBE_NAMESPACE} --set image=${NOON_WEB_IMAGE_DARI} --set webHostingUrl=${DARI_REVIEW_ENV_URL} --set deploymentNamespace=${KUBE_NAMESPACE} --set netCoreEnvironment=Production --set gitlabCiProjectPath=${CI_PROJECT_PATH_SLUG} --set gitlabCiProjectEnvironment=${CI_ENVIRONMENT_SLUG} --set name=noonweb-dari-review --wait noonweb-dari ./chart
   only:
     refs:
       - master
@@ -237,7 +237,7 @@ deployPashtoReview:
     - gcloud container clusters get-credentials ${GKE_CLUSTER_NAME} --zone=${GKE_ZONE} --project=${GKE_PROJECT}
     - echo "${PASHTO_WEB_DEPLOYMENT_CONFIG_VALUES}" > chart/values.yaml
   script: 
-    - helm upgrade --install --namespace ${KUBE_NAMESPACE} --set image=${NOON_WEB_IMAGE_PASHTO} --set webHostingUrl=${PASHTO_REVIEW_ENV_URL} --set deploymentNamespace=${KUBE_NAMESPACE} --set netCoreEnvironment=Production --set gitlabCiProjectPath=${CI_PROJECT_PATH_SLUG} --set gitlabCiProjectEnvironment=${CI_ENVIRONMENT_SLUG} --set name=noonweb-pashto-review --wait --debug noonweb-pashto ./chart
+    - helm upgrade --install --namespace ${KUBE_NAMESPACE} --set image=${NOON_WEB_IMAGE_PASHTO} --set webHostingUrl=${PASHTO_REVIEW_ENV_URL} --set deploymentNamespace=${KUBE_NAMESPACE} --set netCoreEnvironment=Production --set gitlabCiProjectPath=${CI_PROJECT_PATH_SLUG} --set gitlabCiProjectEnvironment=${CI_ENVIRONMENT_SLUG} --set name=noonweb-pashto-review --wait noonweb-pashto ./chart
   only:
     refs:
       - master
