@@ -117,5 +117,5 @@ spec:
                 secret:
                     secretName: {{ .Values.name }}-secrets
                     items:
-                    -   key: appServiceAccount
+                    -   key: applicationServiceAccount
                         path: gcp/credentials.json
