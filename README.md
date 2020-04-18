@@ -136,6 +136,7 @@ Enviroment Variable name| Porpose | Example Values
 `USERNAME_EMAIL` | your support email account | ex `yourmail@mail.com`
 `USERNAME_PASSWORD` | support email account password | ex `test@test`
 `LANGUAGE` | use fa for dari and pa for pashto if null then it consider as English | ex `fa`
+`URLS` | use for listing application on port that we specified you need to mention both http and https url | ex `http://*:80;https://*:443`
 `CLIENT_ID` | this one is for angular app, optional because it's already set in above named with `CLIENT_ID_ENVIRONMENT` | ex`Provide your auth0 client id`
 `AUTH_DOMAIN` | this one is for angular app, optional because it's already set in above named with `DOMAINNAME_ENVIRONMENT` | ex `yourdomain.auth0.com`
 `AUDIENCE` | this one is for angular app, optional because it's already set in above named with `AUDIENCE_ENVIRONMENT` | ex `https://yourdomain.auth0.com/api/v2/`
@@ -156,6 +157,7 @@ Enviroment Variable name| Porpose | Example Values
 `USERNAME_EMAIL` | your support email account | ex `yourmail@mail.com`
 `USERNAME_PASSWORD` | support email account password | ex `test@test`
 `LANGUAGE` | use fa for dari and pa for pashto if null then it consider as English | ex `fa`
+`URLS` | use for listing application on port that we specified you need to mention both http and https url | http://*:80;https://*:443
 `CLIENT_ID` | this one is for angular app, optional because it's already set in above named with `CLIENT_ID_ENVIRONMENT` | ex`Provide your auth0 client id`
 `AUTH_DOMAIN` | this one is for angular app, optional because it's already set in above named with `DOMAINNAME_ENVIRONMENT` | ex `yourdomain.auth0.com`
 `AUDIENCE` | this one is for angular app, optional because it's already set in above named with `AUDIENCE_ENVIRONMENT` | ex `https://yourdomain.auth0.com/api/v2/`
