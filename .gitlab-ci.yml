@@ -171,12 +171,20 @@ buildBackend:
   script:
     - dotnet publish -c Release -o ${DARI_RELEASE_OBJECTS_DIRECTORY} --no-restore
     - dotnet publish -c Release -o ${PASHTO_RELEASE_OBJECTS_DIRECTORY} --no-restore
-    - cp -r ${SOURCE_CODE_PATH}Admin-noon/distDari/ ${SOURCE_CODE_PATH}${DARI_RELEASE_OBJECTS_DIRECTORY}Admin-noon
-    - cp -r ${SOURCE_CODE_PATH}Sales-noon/distDari/ ${SOURCE_CODE_PATH}${DARI_RELEASE_OBJECTS_DIRECTORY}Sales-noon
-    - cp -r ${SOURCE_CODE_PATH}Feedback-noon/distDari/ ${SOURCE_CODE_PATH}${DARI_RELEASE_OBJECTS_DIRECTORY}Feedback-noon
-    - cp -r ${SOURCE_CODE_PATH}Admin-noon/distPashto/ ${SOURCE_CODE_PATH}${PASHTO_RELEASE_OBJECTS_DIRECTORY}Admin-noon
-    - cp -r ${SOURCE_CODE_PATH}Sales-noon/distPashto/ ${SOURCE_CODE_PATH}${PASHTO_RELEASE_OBJECTS_DIRECTORY}Sales-noon
-    - cp -r ${SOURCE_CODE_PATH}Feedback-noon/distPashto/ ${SOURCE_CODE_PATH}${PASHTO_RELEASE_OBJECTS_DIRECTORY}Feedback-noon
+    # Package in dari web apps
+    - rm -rf ${SOURCE_CODE_PATH}${DARI_RELEASE_OBJECTS_DIRECTORY}Admin-noon/dist/
+    - rm -rf ${SOURCE_CODE_PATH}${DARI_RELEASE_OBJECTS_DIRECTORY}Sales-noon/dist/
+    - rm -rf ${SOURCE_CODE_PATH}${DARI_RELEASE_OBJECTS_DIRECTORY}Feedback-noon/dist/
+    - cp -a ${SOURCE_CODE_PATH}Admin-noon/distDari/. ${SOURCE_CODE_PATH}${DARI_RELEASE_OBJECTS_DIRECTORY}Admin-noon/dist/
+    - cp -a ${SOURCE_CODE_PATH}Sales-noon/distDari/. ${SOURCE_CODE_PATH}${DARI_RELEASE_OBJECTS_DIRECTORY}Sales-noon/dist/
+    - cp -a ${SOURCE_CODE_PATH}Feedback-noon/distDari/. ${SOURCE_CODE_PATH}${DARI_RELEASE_OBJECTS_DIRECTORY}Feedback-noon/dist/
+    # Package in pashto web apps
+    - rm -rf ${SOURCE_CODE_PATH}${PASHTO_RELEASE_OBJECTS_DIRECTORY}Admin-noon/dist/
+    - rm -rf ${SOURCE_CODE_PATH}${PASHTO_RELEASE_OBJECTS_DIRECTORY}Sales-noon/dist/
+    - rm -rf ${SOURCE_CODE_PATH}${PASHTO_RELEASE_OBJECTS_DIRECTORY}Feedback-noon/dist/
+    - cp -a ${SOURCE_CODE_PATH}Admin-noon/distPashto/. ${SOURCE_CODE_PATH}${PASHTO_RELEASE_OBJECTS_DIRECTORY}Admin-noon/dist/
+    - cp -a ${SOURCE_CODE_PATH}Sales-noon/distPashto/. ${SOURCE_CODE_PATH}${PASHTO_RELEASE_OBJECTS_DIRECTORY}Sales-noon/dist/
+    - cp -a ${SOURCE_CODE_PATH}Feedback-noon/distPashto/. ${SOURCE_CODE_PATH}${PASHTO_RELEASE_OBJECTS_DIRECTORY}Feedback-noon/dist/
   artifacts:
     paths:
       - ${SOURCE_CODE_PATH}${DARI_RELEASE_OBJECTS_DIRECTORY}
