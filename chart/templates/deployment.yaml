@@ -104,7 +104,7 @@ spec:
                 -   name: cloudsql-proxy
                     image: gcr.io/cloudsql-docker/gce-proxy:1.16
                     imagePullPolicy: IfNotPresent
-                    command: {{ printf "[\"cloud_sql_proxy\", \"-instances=%s=tcp:3306\", \"-credential_file=/secrets/gcp/credentials.json\"]" .Values.sqlInstanceConnectionName }}
+                    command: {{ printf "[\"/cloud_sql_proxy\", \"-instances=%s=tcp:3306\", \"-credential_file=/secrets/gcp/credentials.json\"]" .Values.sqlInstanceConnectionName }}
                     securityContext:
                         runAsUser: 2 # non-root user
                         allowPrivilegeEscalation: false
