@@ -4,7 +4,7 @@ metadata:
     annotations:
         app.gitlab.com/app: {{ .Values.gitlabCiProjectPath }}
         app.gitlab.com/env: {{ .Values.gitlabCiProjectEnvironment }}
-        cert-manager.io/cluster-issuer: letsencrypt-prod
+        cert-manager.io/cluster-issuer: letsencrypt-staging
         kubernetes.io/tls-acme: "true"
     name: {{ .Values.name }}-ingress
     namespace: {{ .Values.deploymentNamespace }}
