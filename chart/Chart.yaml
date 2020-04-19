@@ -1,4 +1,8 @@
 apiVersion: v2
 name: Noon online web
-version: 0.0.1
+version: 0.1.0
 appVersion: 1.0.0
+maintainers:
+  - name: Hamza Rahimy
+    email: rahimy.hamza@gmail.com
+    url: https://gitlab.com/rahimy.hamza

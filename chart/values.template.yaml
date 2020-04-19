@@ -4,6 +4,7 @@ image: noononline:weblatest
 gitlabDockerConfigJson: base64 encoded value of .dockerConfigJson object for gitlab registry
 name: noon-web
 webHostingUrl: dari-staging-apps.noon-online.com
+applicationListenUri: http://*:80
 applicationServiceAccount: base64 encoded value
 
 deploymentNamespace: devenv
