@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { environment } from "../environments/environment";
 
 // import Scrollbar from 'smooth-scrollbar';
 @Component({
@@ -8,7 +9,9 @@ import { Component, OnInit } from '@angular/core';
 })
 export class AppComponent implements OnInit {
 
-    constructor() {        
+    constructor() {
+        const callback = window.location.origin + "/web/feedback/login";
+        localStorage.setItem('callback-feed', callback);
     }
 
     ngOnInit() {

@@ -1,3 +1,5 @@
+import java.nio.file.Files
+
 buildscript {
     repositories {
         maven { url 'https://maven.fabric.io/public' }
@@ -10,6 +12,24 @@ buildscript {
 apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
 
+// Try reading secrets from file
+def secretsPropertiesFile = rootProject.file("secrets.properties")
+def secretProperties = new Properties()
+if (secretsPropertiesFile.exists()) {
+    secretProperties.load(new FileInputStream(secretsPropertiesFile))
+}
+// Otherwise read from environment variables, this happens in CI
+else {
+    // TODO: R&D on configuring auth0 integration with application through here instead of strings.xml
+    // secretProperties.setProperty("oauth_client_id", "\"${System.getenv('oauth_client_id')}\"")
+    // secretProperties.setProperty("oauth_client_secret", "\"${System.getenv('oauth_client_secret')}\"")
+    // secretProperties.setProperty("oauth_redirect_uri", "\"${System.getenv('oauth_redirect_uri')}\"")
+    secretProperties.setProperty("google_project_id", "\"${System.getenv('google_project_id') ?: "null"}\"")
+    secretProperties.setProperty("signing_keystore_password", "${System.getenv('signing_keystore_password')}")
+    secretProperties.setProperty("signing_key_password", "${System.getenv('signing_key_password')}")
+    secretProperties.setProperty("signing_key_alias", "${System.getenv('signing_key_alias')}")
+}
+
 repositories {
     maven { url 'https://maven.fabric.io/public' }
 }
@@ -19,36 +39,61 @@ android {
 
     defaultConfig {
         applicationId "com.app.training24.noon"
+
+        // SDK configuration
         minSdkVersion 17
         targetSdkVersion 29
-        versionCode 1
+        buildToolsVersion "29.0.2"
+
+        // Application versioning
+        versionCode Integer.valueOf(System.env.VERSION_CODE ?: 0)
+        // Project maintainer must manually bump the semver version part of the string before approving merge requests to master
+        versionName "1.0.2-${System.env.VERSION_SHA}"
+
+        // Misc configurations
         flavorDimensions "default"
-        //versionName "2.7"
-        versionName "1.0.2"
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         manifestPlaceholders = [auth0Domain: "@string/com_auth0_domain", auth0Scheme: "@string/app_scheme"]
+
+        // Build configurations
+        buildConfigField("String", "oauth_client_id", "${secretProperties['oauth_client_id']}")
+        buildConfigField("String", "oauth_client_secret", "${secretProperties['oauth_client_secret']}")
+        buildConfigField("String", "oauth_redirect_uri", "${secretProperties['oauth_redirect_uri']}")
+        buildConfigField("String", "google_project_id", "${secretProperties['google_project_id']}" ?: "null")
     }
-    buildTypes {
+    signingConfigs {
         release {
+        
             initWith debug
-//            buildConfigField 'String', 'BASE_URL', '"https://coreapidari.noon-online.com/api/v1/"'
+            // buildConfigField 'String', 'BASE_URL', '"https://coreapidari.noon-online.com/api/v1/"'
             minifyEnabled true
             shrinkResources true
             testCoverageEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            
+            // You need to specify either an absolute path or include the
+            // keystore file in the same directory as the build.gradle file.
+            storeFile file("../android-signing-keystore.jks")
+            storePassword "${secretProperties['signing_keystore_password']}"
+            keyAlias "${secretProperties['signing_key_alias']}"
+            keyPassword "${secretProperties['signing_key_password']}"
+            
         }
+    }
+    buildTypes {
         debug {
-//            buildConfigField 'String', 'BASE_URL', '"http://192.168.22.11:8070/api/v1/"'
+            minifyEnabled true
             testCoverageEnabled true
             debuggable true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
-        staging {
-            initWith debug
-//            buildConfigField 'String', 'BASE_URL', '"https://coreapistaging.noon-online.com/api/v1/"'
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
         }
     }
     repositories {
@@ -64,7 +109,6 @@ android {
     }
 
     dexOptions {
-//        incremental true
         javaMaxHeapSize "4g"
         preDexLibraries true
         dexInProcess = true

@@ -56,7 +56,8 @@ export class LoginComponent implements OnInit {
 
     logout() {
         localStorage.setItem("data", JSON.stringify(this.loginModel));
-        window.location.href = AUTH_CONFIG.audience + 'v2/logout?returnTo=' + environment.logoutcallbackURL;
+        const logoutcallbackURL = window.location.href + '?logout=true';
+        window.location.href = AUTH_CONFIG.audience + 'v2/logout?returnTo=' + logoutcallbackURL;
     }
 
     proceedAuthorization(data) {
