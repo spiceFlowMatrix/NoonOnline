@@ -1,12 +1,9 @@
 package com.ibl.apps.Fragment;
 
 
-import androidx.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,6 +11,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+
+import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
+import androidx.databinding.DataBindingUtil;
 
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
@@ -30,16 +31,16 @@ import com.ibl.apps.Model.parent.GPAProgress;
 import com.ibl.apps.Model.parent.LastOnline;
 import com.ibl.apps.Model.parent.MChart;
 import com.ibl.apps.Model.parent.ParentSpinnerModel;
-import com.ibl.apps.Network.ApiClient;
-import com.ibl.apps.Network.ApiService;
+import com.ibl.apps.ParentControlManagement.ParentControlRepository;
+import com.ibl.apps.RoomDatabase.dao.userManagementDatabse.UserDatabaseRepository;
 import com.ibl.apps.RoomDatabase.database.AppDatabase;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
-import com.ibl.apps.util.CustomView.MultiSelectSpinner;
-import com.ibl.apps.util.PrefUtils;
-import com.ibl.apps.util.TimeAgoLastOnlineClass;
 import com.ibl.apps.noon.NoonApplication;
 import com.ibl.apps.noon.R;
 import com.ibl.apps.noon.databinding.FragmentGpaBinding;
+import com.ibl.apps.util.CustomView.MultiSelectSpinner;
+import com.ibl.apps.util.PrefUtils;
+import com.ibl.apps.util.TimeAgoLastOnlineClass;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -55,7 +56,6 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 
-import static com.ibl.apps.Base.BaseActivity.apiService;
 import static com.ibl.apps.Fragment.ProgressReportFragment.selectedIdsForCallback;
 
 public class GpaFragment extends BaseFragment implements View.OnClickListener {
@@ -67,6 +67,8 @@ public class GpaFragment extends BaseFragment implements View.OnClickListener {
     private int month = 0;
     private List<ParentSpinnerModel.Data> studentNamecategories;
     private ParentSpinnerModel parentSpinner = new ParentSpinnerModel();
+    private ParentControlRepository parentControlRepository;
+    private UserDatabaseRepository userDatabaseRepository;
 
     public GpaFragment() {
         // Required empty public constructor
@@ -83,7 +85,8 @@ public class GpaFragment extends BaseFragment implements View.OnClickListener {
 
     @Override
     protected void setUp(View view) {
-
+        parentControlRepository = new ParentControlRepository();
+        userDatabaseRepository = new UserDatabaseRepository();
         //drawAChart();
         if (isNetworkAvailable(NoonApplication.getContext())) {
             fragmentGpaBinding.noInternetLay.setVisibility(View.GONE);
@@ -99,7 +102,6 @@ public class GpaFragment extends BaseFragment implements View.OnClickListener {
     }
 
     private void callApiforCurrentGpa(ArrayList<Integer> userId) {
-        ApiService apiService = ApiClient.getClient(getContext()).create(ApiService.class);
         JsonObject jsonObject = new JsonObject();
         try {
             JsonArray array = new JsonArray();
@@ -113,7 +115,7 @@ public class GpaFragment extends BaseFragment implements View.OnClickListener {
         } catch (JsonSyntaxException e) {
             e.printStackTrace();
         }
-        disposable.add(apiService.getCurrentGPA(jsonObject)
+        disposable.add(parentControlRepository.getCurrentGPA(jsonObject)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<GPAProgress>() {
@@ -147,7 +149,7 @@ public class GpaFragment extends BaseFragment implements View.OnClickListener {
             } catch (JsonSyntaxException e) {
                 e.printStackTrace();
             }
-            disposable.add(apiService.getLastOnline(jsonobject)
+            disposable.add(parentControlRepository.getLastOnline(jsonobject)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeWith(new DisposableSingleObserver<LastOnline>() {
@@ -186,18 +188,17 @@ public class GpaFragment extends BaseFragment implements View.OnClickListener {
     private void callApiForStudentSpinner() {
         String authid = PrefUtils.getAuthid(NoonApplication.getContext());
         if (!TextUtils.isEmpty(authid)) {
-            AuthTokenObject authTokenObject = AppDatabase.getAppDatabase(NoonApplication.getContext()).authTokenDao().getauthTokenData(authid);
+            AuthTokenObject authTokenObject = userDatabaseRepository.getAuthTokenData(authid);
 
             if (authTokenObject != null) {
                 String sub = "";
                 if (authTokenObject.getSub() != null) {
                     sub = authTokenObject.getSub();
-                    userDetails = AppDatabase.getAppDatabase(NoonApplication.getContext()).userDetailDao().getUserDetials(sub);
+                    userDetails = userDatabaseRepository.getUserDetails(sub);
                 }
             }
         }
-        ApiService apiService = ApiClient.getClient(getContext()).create(ApiService.class);
-        disposable.add(apiService.getUserSpinnerData(Integer.parseInt(userDetails.getId()))
+        disposable.add(parentControlRepository.getUserSpinnerData(Integer.parseInt(userDetails.getId()))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<ParentSpinnerModel>() {
@@ -377,7 +378,7 @@ public class GpaFragment extends BaseFragment implements View.OnClickListener {
         } catch (JsonSyntaxException e) {
             e.printStackTrace();
         }
-        disposable.add(apiService.getCurrentPoints(jsonObject)
+        disposable.add(parentControlRepository.getCurrentPoints(jsonObject)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<MChart>() {

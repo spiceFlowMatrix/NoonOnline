@@ -10,6 +10,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.ibl.apps.Model.AuthTokenObject;
 import com.ibl.apps.Model.ReminderObject;
+import com.ibl.apps.RoomDatabase.dao.userManagementDatabse.UserDatabaseRepository;
 import com.ibl.apps.RoomDatabase.database.AppDatabase;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
 import com.ibl.apps.noon.NoonApplication;
@@ -105,16 +106,16 @@ public class PrefUtils {
         protected UserDetails doInBackground(Void... voids) {
             UserDetails userDetails = null;
             try {
-
+                UserDatabaseRepository userDatabaseRepository = new UserDatabaseRepository();
                 String authid = PrefUtils.getAuthid(NoonApplication.getContext());
                 if (!TextUtils.isEmpty(authid)) {
-                    AuthTokenObject authTokenObject = AppDatabase.getAppDatabase(NoonApplication.getContext()).authTokenDao().getauthTokenData(authid);
+                    AuthTokenObject authTokenObject = userDatabaseRepository.getAuthTokenData(authid);
 
                     if (authTokenObject != null) {
                         String sub = "";
                         if (authTokenObject.getSub() != null) {
                             sub = authTokenObject.getSub();
-                            userDetails = AppDatabase.getAppDatabase(NoonApplication.getContext()).userDetailDao().getUserDetials(sub);
+                            userDetails = userDatabaseRepository.getUserDetails(sub);
                             //Log.e(Const.LOG_NOON_TAG, "===userDetails==" + userDetails);
                         }
                     }

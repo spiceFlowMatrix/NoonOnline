@@ -25,12 +25,15 @@ import com.droidnet.DroidNet;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
+import com.ibl.apps.CourseManagement.CourseRepository;
 import com.ibl.apps.Model.SyncTimeTracking;
 import com.ibl.apps.Network.ApiClient;
 import com.ibl.apps.Network.ApiService;
+import com.ibl.apps.RoomDatabase.dao.courseManagementDatabase.CourseDatabaseRepository;
 import com.ibl.apps.RoomDatabase.database.AppDatabase;
 import com.ibl.apps.RoomDatabase.entity.SyncTimeTrackingObject;
 import com.ibl.apps.Service.NetworkChangeReceiver;
+import com.ibl.apps.UserCredentialsManagement.UserRepository;
 import com.ibl.apps.util.Const;
 
 import java.io.File;
@@ -38,6 +41,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.TimeZone;
 
 import io.fabric.sdk.android.Fabric;
@@ -124,6 +128,7 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
     }
 
     private void saveDataOffline() {
+        CourseDatabaseRepository courseDatabaseRepository= new CourseDatabaseRepository();
         SharedPreferences sharedPreferences = getSharedPreferences("spendtime", MODE_PRIVATE);
         if (sharedPreferences != null) {
             SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -134,11 +139,11 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
         String userId = sharedPreferencesuser.getString("uid", "");
         SyncTimeTrackingObject syncTimeTrackingObject = null;
         if (userId != null) {
-            syncTimeTrackingObject = AppDatabase.getAppDatabase(getContext()).syncTimeTrackingDao().getSyncTimeTrack(Integer.parseInt(userId));
+            syncTimeTrackingObject = courseDatabaseRepository.getSyncTimeTrackById(Integer.parseInt(userId));
         }
         if (syncTimeTrackingObject != null) {
             syncTimeTrackingObject.setOuttime(getUTCTime());
-            AppDatabase.getAppDatabase(getContext()).syncTimeTrackingDao().updateSyncTimeTracking(syncTimeTrackingObject);
+            courseDatabaseRepository.updateSyncTimeTracking(syncTimeTrackingObject);
         }
     }
 
@@ -153,8 +158,10 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
             SharedPreferences sharedPreferencesuser = getSharedPreferences("user", MODE_PRIVATE);
             String userId = sharedPreferencesuser.getString("uid", "");
 
+            CourseDatabaseRepository courseDatabaseRepository = new CourseDatabaseRepository();
+
             if (userId != null && !userId.isEmpty()) {
-                SyncTimeTrackingObject syncTimeTrackingObject = AppDatabase.getAppDatabase(getContext()).syncTimeTrackingDao().getSyncTimeTrack(Integer.parseInt(userId));
+                SyncTimeTrackingObject syncTimeTrackingObject = courseDatabaseRepository.getSyncTimeTrackById(Integer.parseInt(userId));
                 if (syncTimeTrackingObject != null) {
                     JsonArray array = new JsonArray();
                     JsonObject jsonObject = new JsonObject();
@@ -181,9 +188,9 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
 
 
                     if (outtimrsave != null && ((syncTimeTrackingObject.getOuttime() != null && !syncTimeTrackingObject.getOuttime().isEmpty()) || !outtimrsave.isEmpty())) {
-                        ApiService apiService = ApiClient.getClient(getContext()).create(ApiService.class);
+                        UserRepository userRepository = new UserRepository();
                         CompositeDisposable disposable = new CompositeDisposable();
-                        disposable.add(apiService.getSyncTimeTracking(array).subscribeOn(Schedulers.io())
+                        disposable.add(userRepository.getSyncTimeTracking(array).subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribeWith(new DisposableSingleObserver<SyncTimeTracking>() {
                                     @Override
@@ -197,7 +204,7 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
                                                 editor.clear();
                                                 editor.apply();
                                             }
-                                            AppDatabase.getAppDatabase(getContext()).syncTimeTrackingDao().updateSyncTimeTracking(syncTimeTrackingObject);
+                                            courseDatabaseRepository.updateSyncTimeTracking(syncTimeTrackingObject);
                                         }
                                     }
 
@@ -215,19 +222,23 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
     }
 
     private boolean isNetworkAvailable() {
-        ConnectivityManager conMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        try {
+            ConnectivityManager conMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 
-        if (conMgr != null) {
-            if (conMgr.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED
-                    || conMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED) {
+            if (conMgr != null) {
+                if (Objects.requireNonNull(conMgr.getNetworkInfo(ConnectivityManager.TYPE_MOBILE)).getState() == NetworkInfo.State.CONNECTED
+                        || Objects.requireNonNull(conMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI)).getState() == NetworkInfo.State.CONNECTED) {
 
-                return true;
+                    return true;
 
-            } else if (conMgr.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.DISCONNECTED
-                    || conMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.DISCONNECTED) {
+                } else if (Objects.requireNonNull(conMgr.getNetworkInfo(ConnectivityManager.TYPE_MOBILE)).getState() == NetworkInfo.State.DISCONNECTED
+                        || Objects.requireNonNull(conMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI)).getState() == NetworkInfo.State.DISCONNECTED) {
 
-                return false;
+                    return false;
+                }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return false;
     }

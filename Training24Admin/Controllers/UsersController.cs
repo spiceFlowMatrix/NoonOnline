@@ -13,6 +13,7 @@ using Newtonsoft.Json;
 using RestSharp;
 using Training24Admin.Model;
 using Trainning24.BL.Business;
+using Trainning24.BL.ViewModels;
 using Trainning24.BL.ViewModels.Terms;
 using Trainning24.BL.ViewModels.UserRole;
 using Trainning24.BL.ViewModels.Users;
@@ -23,6 +24,8 @@ namespace Training24Admin.Controllers
 
     [Route("api/v1/[controller]")]
     [ApiController]
+    [Produces("application/json")]
+    [ApiExplorerSettings(GroupName = nameof(SwaggerGrouping.Users))]
     //[Authorize]
     public class UsersController : ControllerBase
     {

@@ -6,9 +6,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -17,11 +14,16 @@ import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 import com.ibl.apps.Adapter.AssignmentFileUploadListAdapter;
+import com.ibl.apps.AssignmentManagement.AssignmentRepository;
 import com.ibl.apps.Base.BaseActivity;
 import com.ibl.apps.Model.CoursePriviewObject;
 import com.ibl.apps.Model.RestResponse;
@@ -29,10 +31,10 @@ import com.ibl.apps.Model.UploadTopicFile;
 import com.ibl.apps.Model.assignment.AssignmentData;
 import com.ibl.apps.Model.assignment.FileUploadResponse;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
+import com.ibl.apps.noon.databinding.AssignmentAddLayoutBinding;
 import com.ibl.apps.util.Const;
 import com.ibl.apps.util.PrefUtils;
 import com.ibl.apps.util.Validator;
-import com.ibl.apps.noon.databinding.AssignmentAddLayoutBinding;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -68,6 +70,7 @@ public class AssignmentAddActivity extends BaseActivity implements View.OnClickL
     AssignmentFileUploadListAdapter fileUploadAdapter;
     CoursePriviewObject.Assignment assignment;
     int flag;
+    private AssignmentRepository assignmentRepository;
 
     @Override
     protected int getContentView() {
@@ -85,6 +88,7 @@ public class AssignmentAddActivity extends BaseActivity implements View.OnClickL
         super.onViewReady(savedInstanceState, intent);
         assignmentAddLayoutBinding = (AssignmentAddLayoutBinding) getBindObj();
 
+        assignmentRepository = new AssignmentRepository();
         flag = getIntent().getIntExtra(Const.Flag, 0);
         assignment = new Gson().fromJson(getIntent().getStringExtra(Const.Assignment), new TypeToken<CoursePriviewObject.Assignment>() {
         }.getType());
@@ -223,7 +227,7 @@ public class AssignmentAddActivity extends BaseActivity implements View.OnClickL
             RequestBody filesize = RequestBody.create(MediaType.parse("text/plain"), "");
             RequestBody totalpages = RequestBody.create(MediaType.parse("text/plain"), "0");
 
-            Call<RestResponse<FileUploadResponse>> call = apiService.uploadAssignmentFile(body, fileTypeId, duration, filesize, totalpages);
+            Call<RestResponse<FileUploadResponse>> call = assignmentRepository.uploadAssignmentFile(body, fileTypeId, duration, filesize, totalpages);
             call.enqueue(new Callback<RestResponse<FileUploadResponse>>() {
                 @Override
                 public void onResponse(@NonNull Call<RestResponse<FileUploadResponse>> call, @NonNull Response<RestResponse<FileUploadResponse>> response) {
@@ -332,7 +336,7 @@ public class AssignmentAddActivity extends BaseActivity implements View.OnClickL
         } else {
             finish();
         }*/
-       PrivousScreen();
+        PrivousScreen();
     }
 
     @Override
@@ -356,7 +360,7 @@ public class AssignmentAddActivity extends BaseActivity implements View.OnClickL
         hashMap.put(Const.files, fileUploadList);
 
         showDialog(getString(R.string.loading));
-        disposable.add(apiService.submitAssignmentLession((JsonObject) parser.parse(gson.toJson(hashMap)))
+        disposable.add(assignmentRepository.submitAssignmentLession((JsonObject) parser.parse(gson.toJson(hashMap)))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<RestResponse<AssignmentData>>() {
@@ -385,7 +389,7 @@ public class AssignmentAddActivity extends BaseActivity implements View.OnClickL
         hashMap.put(Const.files, fileUploadList);
 
         showDialog(getString(R.string.loading));
-        disposable.add(apiService.submitAssignment((JsonObject) parser.parse(gson.toJson(hashMap)))
+        disposable.add(assignmentRepository.submitAssignment((JsonObject) parser.parse(gson.toJson(hashMap)))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<RestResponse<AssignmentData>>() {
@@ -465,7 +469,7 @@ public class AssignmentAddActivity extends BaseActivity implements View.OnClickL
                         RequestBody duration = RequestBody.create(MediaType.parse("text/plain"), "");
                         RequestBody filesize = RequestBody.create(MediaType.parse("text/plain"), "");
 
-                        Call<UploadTopicFile> call = apiService.UploadTopicFile(body, fileTypeId, duration, filesize);
+                        Call<UploadTopicFile> call = assignmentRepository.UploadTopicFile(body, fileTypeId, duration, filesize);
                         call.enqueue(new Callback<UploadTopicFile>() {
                             @Override
                             public void onResponse(@NonNull Call<UploadTopicFile> call, @NonNull retrofit2.Response<UploadTopicFile> response) {

@@ -13,6 +13,8 @@ import android.view.ViewGroup;
 
 import com.ibl.apps.Adapter.QueueListAdapter;
 import com.ibl.apps.Base.BaseFragment;
+import com.ibl.apps.FeedbackManagement.FeedbackApiService;
+import com.ibl.apps.FeedbackManagement.FeedbackRepository;
 import com.ibl.apps.Model.feedback.FeebBackTask;
 import com.ibl.apps.Network.ApiClient;
 import com.ibl.apps.Network.ApiService;
@@ -45,6 +47,7 @@ public class ProgressFragment extends BaseFragment {
     private RecyclerViewLoadMoreScroll scrollListener;
     private boolean isLoad = true;
     private List<FeebBackTask.Data> feebBackTaskdata = new ArrayList<>();
+    private FeedbackRepository feedbackRepository;
 
     public ProgressFragment() {
         // Required empty public constructor
@@ -60,7 +63,7 @@ public class ProgressFragment extends BaseFragment {
 
     @Override
     protected void setUp(View view) {
-        apiService = ApiClient.getClient(NoonApplication.getContext()).create(ApiService.class);
+        feedbackRepository = new FeedbackRepository();
         if (feebBackTaskdata != null && feebBackTaskdata.size() != 0) {
             feebBackTaskdata.clear();
             pagenumber = 1;
@@ -87,7 +90,7 @@ public class ProgressFragment extends BaseFragment {
     }
 
     private void callApiForprogressList() {
-        disposable.add(apiService.getProcessListApp(pagenumber, perpagerecord)
+        disposable.add(feedbackRepository.getProcessListApp(pagenumber, perpagerecord)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<FeebBackTask>() {

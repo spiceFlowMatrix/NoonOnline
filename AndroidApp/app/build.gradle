@@ -46,7 +46,7 @@ android {
         buildToolsVersion "29.0.2"
 
         // Application versioning
-        versionCode Integer.valueOf(System.env.VERSION_CODE ?: 0)
+        versionCode Integer.valueOf(System.env.VERSION_CODE ?: 1)
         // Project maintainer must manually bump the semver version part of the string before approving merge requests to master
         versionName "1.0.2-${System.env.VERSION_SHA}"
 
@@ -65,12 +65,21 @@ android {
     }
     signingConfigs {
         release {
+        
+            initWith debug
+            // buildConfigField 'String', 'BASE_URL', '"https://coreapidari.noon-online.com/api/v1/"'
+            minifyEnabled true
+            shrinkResources true
+            testCoverageEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            
             // You need to specify either an absolute path or include the
             // keystore file in the same directory as the build.gradle file.
             storeFile file("../android-signing-keystore.jks")
             storePassword "${secretProperties['signing_keystore_password']}"
             keyAlias "${secretProperties['signing_key_alias']}"
             keyPassword "${secretProperties['signing_key_password']}"
+            
         }
     }
     buildTypes {
@@ -177,6 +186,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-core:16.0.7'
     implementation "com.google.firebase:firebase-messaging:17.3.4"
     implementation 'com.firebase:firebase-jobdispatcher:0.8.5'
+    implementation 'com.google.firebase:firebase-analytics:16.0.7'
 
     // For PDFViewer
     implementation 'com.github.barteksc:android-pdf-viewer:3.0.0-beta.5'
@@ -226,6 +236,7 @@ dependencies {
 
     //For MutiselectitemSpinner
     implementation 'com.github.abumoallim:Android-Multi-Select-Dialog:v1.9'
+    implementation 'com.google.firebase:firebase-auth:19.3.0'
 
 }
 
