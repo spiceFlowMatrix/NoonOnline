@@ -4,11 +4,6 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <TypeScriptToolsVersion>3.0</TypeScriptToolsVersion>
   </PropertyGroup>
-
-  <!-- <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'"> -->
-    <!-- <DocumentationFile>G:\Noon_core_api\noon-online\Training24Admin\Training24Admin.xml</DocumentationFile> -->
-    <!-- <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies> -->
-  <!-- </PropertyGroup> -->
   
   <PropertyGroup>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
