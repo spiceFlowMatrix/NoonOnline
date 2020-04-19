@@ -54,6 +54,7 @@
                             android:background="@drawable/underline_bg"
                             android:visibility="gone" />
 
+
                         <ImageView
                             android:id="@+id/feedbackbtn"
                             android:layout_width="@dimen/_20sdp"
@@ -83,6 +84,14 @@
                         android:layout_height="match_parent"
                         android:orientation="horizontal"
                         android:visibility="gone">
+
+                        <TextView
+                            android:id="@+id/txtDevice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="@dimen/_7sdp"
+                            android:text="@string/devices"
+                            android:textColor="@color/black" />
 
                         <ImageView
                             android:id="@+id/logOutBtn"

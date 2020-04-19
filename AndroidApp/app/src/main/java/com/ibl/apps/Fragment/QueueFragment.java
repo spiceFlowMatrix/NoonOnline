@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 
 import com.ibl.apps.Adapter.QueueListAdapter;
 import com.ibl.apps.Base.BaseFragment;
+import com.ibl.apps.FeedbackManagement.FeedbackRepository;
 import com.ibl.apps.Model.feedback.FeebBackTask;
 import com.ibl.apps.Network.ApiClient;
 import com.ibl.apps.Network.ApiService;
@@ -44,6 +45,7 @@ public class QueueFragment extends BaseFragment {
     private RecyclerViewLoadMoreScroll scrollListener;
     private boolean isLoad = true;
     List<FeebBackTask.Data> feebBackTaskdata = new ArrayList<>();
+    private FeedbackRepository feedbackRepository;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -55,7 +57,7 @@ public class QueueFragment extends BaseFragment {
     @Override
     protected void setUp(View view) {
         showDialog(NoonApplication.getContext().getResources().getString(R.string.loading));
-        apiService = ApiClient.getClient(NoonApplication.getContext()).create(ApiService.class);
+        feedbackRepository = new FeedbackRepository();
         if (feebBackTaskdata != null && feebBackTaskdata.size() != 0) {
             feebBackTaskdata.clear();
             pagenumber = 1;
@@ -82,7 +84,7 @@ public class QueueFragment extends BaseFragment {
     }
 
     private void callApiForQueueList() {
-        disposable.add(apiService.getInQueueListApp(pagenumber, perpagerecord)
+        disposable.add(feedbackRepository.getInQueueListApp(pagenumber, perpagerecord)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<FeebBackTask>() {

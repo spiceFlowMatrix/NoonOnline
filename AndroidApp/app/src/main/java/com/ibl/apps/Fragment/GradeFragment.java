@@ -40,12 +40,13 @@ import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.ibl.apps.Adapter.CourseListAdapter;
 import com.ibl.apps.Base.BaseFragment;
+import com.ibl.apps.CourseManagement.CourseRepository;
 import com.ibl.apps.Interface.CourseAsyncResponse;
 import com.ibl.apps.Model.CourseObject;
 import com.ibl.apps.Model.IntervalObject;
 import com.ibl.apps.Model.IntervalTableObject;
-import com.ibl.apps.RoomDatabase.dao.SyncTimeTrackingDao;
-import com.ibl.apps.RoomDatabase.database.AppDatabase;
+import com.ibl.apps.RoomDatabase.dao.courseManagementDatabase.CourseDatabaseRepository;
+import com.ibl.apps.RoomDatabase.dao.lessonManagementDatabase.LessonDatabaseRepository;
 import com.ibl.apps.RoomDatabase.entity.SyncTimeTrackingObject;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
 import com.ibl.apps.Service.CourseImageManager;
@@ -72,7 +73,6 @@ import pub.devrel.easypermissions.EasyPermissions;
 import tcking.github.com.giraffeplayer2.LazyLoadManager;
 import tcking.github.com.giraffeplayer2.VideoInfo;
 
-import static com.ibl.apps.Base.BaseActivity.apiService;
 import static tcking.github.com.giraffeplayer2.GiraffePlayer.MSG_CTRL_PLAYING;
 
 
@@ -97,6 +97,9 @@ public class GradeFragment extends BaseFragment implements View.OnClickListener,
     String userId = "0";
     private static LocationManager manager;
     boolean isAgree = false;
+    private CourseRepository courseRepository; //22 use
+    private CourseDatabaseRepository courseDatabaseRepository;
+    private LessonDatabaseRepository lessonDatabaseRepository;
 
     public GradeFragment() {
         // Required empty public constructor
@@ -118,6 +121,9 @@ public class GradeFragment extends BaseFragment implements View.OnClickListener,
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        courseRepository = new CourseRepository();
+        courseDatabaseRepository = new CourseDatabaseRepository();
+        lessonDatabaseRepository = new LessonDatabaseRepository();
     }
 
     @Override
@@ -297,14 +303,14 @@ public class GradeFragment extends BaseFragment implements View.OnClickListener,
 
     private void getLocation(SingleShotLocationProvider.GPSCoordinates location) {
         if (location != null) {
-            SyncTimeTrackingDao syncTimeTrackingDao = AppDatabase.getAppDatabase(getActivity()).syncTimeTrackingDao();
+            // SyncTimeTrackingDao syncTimeTrackingDao = AppDatabase.getAppDatabase(getActivity()).syncTimeTrackingDao();
             SharedPreferences sharedPreferences = NoonApplication.getContext().getSharedPreferences("user", Context.MODE_PRIVATE);
             if (sharedPreferences != null) {
                 userId = sharedPreferences.getString("uid", "");
                 assert userId != null;
 
                 if (!userId.equals("")) {
-                    SyncTimeTrackingObject syncTimeTrackingObject = syncTimeTrackingDao.getSyncTimeTrack(Integer.parseInt(userId));
+                    SyncTimeTrackingObject syncTimeTrackingObject = courseDatabaseRepository.getSyncTimeTrackById(Integer.parseInt(userId));
                     if (syncTimeTrackingObject != null) {
                         //SyncTimeTrackingObject syncTimeTrackingObject = new SyncTimeTrackingObject();
                         syncTimeTrackingObject.setLatitude(String.valueOf(location.latitude));
@@ -314,7 +320,7 @@ public class GradeFragment extends BaseFragment implements View.OnClickListener,
                         syncTimeTrackingObject.setServiceprovider(getCarierName());
                         syncTimeTrackingObject.setVersion(Build.VERSION.RELEASE);
                         syncTimeTrackingObject.setUserid(Integer.parseInt(userId));
-                        syncTimeTrackingDao.updateSyncTimeTracking(syncTimeTrackingObject);
+                        courseDatabaseRepository.updateSyncTimeTracking(syncTimeTrackingObject);
                     } else {
                         SyncTimeTrackingObject syncTimeTrackingObjectinsert = new SyncTimeTrackingObject();
                         syncTimeTrackingObjectinsert.setLatitude(String.valueOf(location.latitude));
@@ -325,7 +331,7 @@ public class GradeFragment extends BaseFragment implements View.OnClickListener,
                         syncTimeTrackingObjectinsert.setVersion(Build.VERSION.RELEASE);
                         syncTimeTrackingObjectinsert.setActivitytime(getUTCTime());
                         syncTimeTrackingObjectinsert.setUserid(Integer.parseInt(userId));
-                        syncTimeTrackingDao.insertAll(syncTimeTrackingObjectinsert);
+                        courseDatabaseRepository.insertSyncTimeTrackingData(syncTimeTrackingObjectinsert);
                     }
                 }
             }
@@ -361,7 +367,7 @@ public class GradeFragment extends BaseFragment implements View.OnClickListener,
     private void loadData(String searchKeyword, int SpinnerGradeId) {
         try {
             showDialog(NoonApplication.getContext().getResources().getString(R.string.loading));
-            disposable.add(apiService.fetchCourseList(0, 0, searchKeyword, SpinnerGradeId)
+            disposable.add(courseRepository.fetchCourseList(0, 0, searchKeyword, SpinnerGradeId)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeWith(new DisposableSingleObserver<CourseObject>() {
@@ -436,20 +442,19 @@ public class GradeFragment extends BaseFragment implements View.OnClickListener,
 
     private void fetchIntervalAPI() {
         try {
-            disposable.add(apiService.fetchinterval()
+            disposable.add(courseRepository.fetchinterval()
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeWith(new DisposableSingleObserver<IntervalObject>() {
                         @Override
                         public void onSuccess(IntervalObject intervalObject) {
-
-                            IntervalTableObject intervalTableObject = AppDatabase.getAppDatabase(getActivity()).intervalDao().getAllInterval();
+                            IntervalTableObject intervalTableObject = courseDatabaseRepository.getAllInterval();
                             if (intervalTableObject != null) {
-                                AppDatabase.getAppDatabase(getActivity()).intervalDao().updateINterval(intervalObject.getData().getInterval(), intervalTableObject.getIntervalTableID());
+                                courseDatabaseRepository.updateIntervalById(intervalObject.getData().getInterval(), intervalTableObject.getIntervalTableID());
                             } else {
                                 intervalTableObject = new IntervalTableObject();
                                 intervalTableObject.setInterval(intervalObject.getData().getInterval());
-                                AppDatabase.getAppDatabase(getActivity()).intervalDao().insertAll(intervalTableObject);
+                                courseDatabaseRepository.insertIntervalTableObject(intervalTableObject);
                             }
 
                             hideDialog();
@@ -521,9 +526,9 @@ public class GradeFragment extends BaseFragment implements View.OnClickListener,
                 Courselist.clear();
                 CourselistData.clear();
 
-                if (AppDatabase.getAppDatabase(getActivity()).courseDao().getAllCourse(userId) != null) {
-                    if (AppDatabase.getAppDatabase(getActivity()).courseDao().getAllCourse(userId).size() != 0) {
-                        Courselist = AppDatabase.getAppDatabase(getActivity()).courseDao().getAllCourse(userId);
+                if (courseDatabaseRepository.getAllCourseByUserId(userId) != null) {
+                    if (courseDatabaseRepository.getAllCourseByUserId(userId).size() != 0) {
+                        Courselist = courseDatabaseRepository.getAllCourseByUserId(userId);
                         for (int i = 0; i < Courselist.size(); i++) {
                             CourselistData = Courselist.get(i).getData();
                             if (CourselistData != null && CourselistData.size() != 0) {
@@ -535,15 +540,15 @@ public class GradeFragment extends BaseFragment implements View.OnClickListener,
                                             if (!CourselistData.get(j).getCourses().get(k).isDeleted()) {
 
 
-                                                byte[] bitmapImage = AppDatabase.getAppDatabase(NoonApplication.getContext()).courseDao().getCourseImage(userId, CourselistData.get(j).getCourses().get(k).getId());
+                                                byte[] bitmapImage = courseDatabaseRepository.getCourseImage(userId, CourselistData.get(j).getCourses().get(k).getId());
                                                 Log.e(Const.LOG_NOON_TAG, "=====GRADE FRAGMENT=bitmapImage==" + bitmapImage);
 
                                                 if (bitmapImage != null) {
                                                     CourselistData.get(j).getCourses().get(k).setCourseImage(bitmapImage);
                                                 }
 
-                                                int totalTrueLesson = AppDatabase.getAppDatabase(NoonApplication.getContext()).lessonProgressDao().getItemgradeIdProgress(CourselistData.get(j).getCourses().get(k).getId(), "100", userId);
-                                                String totalLEssonITEm = AppDatabase.getAppDatabase(NoonApplication.getContext()).lessonProgressDao().getStringProgress(CourselistData.get(j).getCourses().get(k).getId(), userId);
+                                                int totalTrueLesson = lessonDatabaseRepository.getItemGradeIdProgress(CourselistData.get(j).getCourses().get(k).getId(), "100", userId);
+                                                String totalLEssonITEm = lessonDatabaseRepository.getLessonStringProgress(CourselistData.get(j).getCourses().get(k).getId(), userId);
 
                                                 if (totalLEssonITEm != null) {
                                                     int totalCount = Integer.parseInt(totalLEssonITEm);
@@ -594,11 +599,11 @@ public class GradeFragment extends BaseFragment implements View.OnClickListener,
                 apiCourseObject.setUserId(userDetailsObject.getId());
                 Courselist.add(apiCourseObject);
 
-                CourseObject exiestCourseObject = AppDatabase.getAppDatabase(getActivity()).courseDao().getAllCourseObject(userId);
+                CourseObject exiestCourseObject = courseDatabaseRepository.getAllCourseObject(userId);
                 if (exiestCourseObject != null) {
-                    AppDatabase.getAppDatabase(getActivity()).courseDao().updateAll(apiCourseObject.getData(), userId);
+                    courseDatabaseRepository.updateAll(apiCourseObject.getData(), userId);
                 } else {
-                    AppDatabase.getAppDatabase(getActivity()).courseDao().insertAll(apiCourseObject);
+                    courseDatabaseRepository.insertCourseObjectData(apiCourseObject);
                 }
 
                 for (int i = 0; i < Courselist.size(); i++) {
@@ -606,8 +611,8 @@ public class GradeFragment extends BaseFragment implements View.OnClickListener,
                     for (int j = 0; j < CourselistData.size(); j++) {
                         for (int k = 0; k < CourselistData.get(j).getCourses().size(); k++) {
 
-                            int totalTrueLesson = AppDatabase.getAppDatabase(NoonApplication.getContext()).lessonProgressDao().getItemgradeIdProgress(CourselistData.get(j).getCourses().get(k).getId(), "100", userId);
-                            String totalLEssonITEm = AppDatabase.getAppDatabase(NoonApplication.getContext()).lessonProgressDao().getStringProgress(CourselistData.get(j).getCourses().get(k).getId(), userId);
+                            int totalTrueLesson = lessonDatabaseRepository.getItemGradeIdProgress(CourselistData.get(j).getCourses().get(k).getId(), "100", userId);
+                            String totalLEssonITEm = lessonDatabaseRepository.getLessonStringProgress(CourselistData.get(j).getCourses().get(k).getId(), userId);
 
                             if (totalLEssonITEm != null) {
                                 int totalCount = Integer.parseInt(totalLEssonITEm);
@@ -665,8 +670,8 @@ public class GradeFragment extends BaseFragment implements View.OnClickListener,
                         if (CourselistData != null && CourselistData.size() != 0) {
                             for (int j = 0; j < CourselistData.size(); j++) {
                                 for (int k = 0; k < CourselistData.get(j).getCourses().size(); k++) {
-                                    int totalTrueLesson = AppDatabase.getAppDatabase(NoonApplication.getContext()).lessonProgressDao().getItemgradeIdProgress(CourselistData.get(j).getCourses().get(k).getId(), "100", userId);
-                                    String totalLEssonITEm = AppDatabase.getAppDatabase(NoonApplication.getContext()).lessonProgressDao().getStringProgress(CourselistData.get(j).getCourses().get(k).getId(), userId);
+                                    int totalTrueLesson = lessonDatabaseRepository.getItemGradeIdProgress(CourselistData.get(j).getCourses().get(k).getId(), "100", userId);
+                                    String totalLEssonITEm = lessonDatabaseRepository.getLessonStringProgress(CourselistData.get(j).getCourses().get(k).getId(), userId);
 
                                     if (totalLEssonITEm != null) {
                                         int totalCount = Integer.parseInt(totalLEssonITEm);

@@ -20,6 +20,7 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.ibl.apps.Adapter.DiscussionsListAdapter;
 import com.ibl.apps.Base.BaseFragment;
+import com.ibl.apps.DiscussionManagement.DiscussionRepository;
 import com.ibl.apps.Interface.BackInterface;
 import com.ibl.apps.Model.DiscssionsAllTopics;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
@@ -41,9 +42,6 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.HttpException;
-
-import static com.ibl.apps.Base.BaseActivity.apiService;
-
 
 public class DiscussionsFragment extends BaseFragment implements View.OnClickListener {
 
@@ -76,6 +74,7 @@ public class DiscussionsFragment extends BaseFragment implements View.OnClickLis
     DiscussionsListAdapter discussionsListAdapter;
     BackInterface backInterface;
     private String keyWord = " ";
+    private DiscussionRepository discussionRepository;
 
     public DiscussionsFragment() {
         // Required empty public constructor
@@ -110,6 +109,7 @@ public class DiscussionsFragment extends BaseFragment implements View.OnClickLis
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT) {
             fragmentDiscussionsLayoutBinding.discussionText.setTextSize(35);
         }
+        discussionRepository = new DiscussionRepository();
         Bundle bundle = this.getArguments();
         backInterface = (BackInterface) getActivity();
 //        View v = fragmentDiscussionsLayoutBinding.disccusionsearchview.findViewById(android.support.v7.appcompat.R.id.search_plate);
@@ -162,7 +162,7 @@ public class DiscussionsFragment extends BaseFragment implements View.OnClickLis
             @Override
             public boolean onQueryTextChange(String s) {
                 keyWord = s;
-                disposable.add(apiService.getSearchDiscussionTopic(keyWord, Integer.parseInt(GradeId), isPrivate)
+                disposable.add(discussionRepository.getSearchDiscussionTopic(keyWord, Integer.parseInt(GradeId), isPrivate)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribeWith(new DisposableSingleObserver<DiscssionsAllTopics>() {
@@ -230,7 +230,7 @@ public class DiscussionsFragment extends BaseFragment implements View.OnClickLis
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 isPrivate = b;
 
-                disposable.add(apiService.getSearchDiscussionTopic(keyWord, Integer.parseInt(GradeId), isPrivate)
+                disposable.add(discussionRepository.getSearchDiscussionTopic(keyWord, Integer.parseInt(GradeId), isPrivate)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribeWith(new DisposableSingleObserver<DiscssionsAllTopics>() {
@@ -383,7 +383,7 @@ public class DiscussionsFragment extends BaseFragment implements View.OnClickLis
         fragmentDiscussionsLayoutBinding.layDiscussionList.setVisibility(View.VISIBLE);
         fragmentDiscussionsLayoutBinding.addButton.setVisibility(View.VISIBLE);
 
-        disposable.add(apiService.GetAllTopics(String.valueOf(pageNumber), perpagerecord, GradeId, false)
+        disposable.add(discussionRepository.GetAllTopics(String.valueOf(pageNumber), perpagerecord, GradeId, false)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<DiscssionsAllTopics>() {

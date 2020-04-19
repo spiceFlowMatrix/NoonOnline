@@ -87,7 +87,7 @@ public interface ApiService {
     @POST("Users/SignupTrialUser")
     Single<TrileSignupObject> SignupTrialUser(@Body JsonObject body);
 
-    // Signup user
+    // Signup user //NOT USABLE
     @POST("Users/Signup")
     Single<LoginObject> signUpUser(@Body JsonObject body);
 
@@ -103,7 +103,7 @@ public interface ApiService {
     @PUT("Profile")
     Single<UserObject> updateProfile(@Body JsonObject body);
 
-    // Check Username is exiest or not
+    // Check Username is exist or not
     @GET("Profile")
     Observable<String> userExiest(@Query("Username") String Username);
 
@@ -116,7 +116,8 @@ public interface ApiService {
     @PUT("Upload/UploadProfilePicture")
     Call<UploadImageObject> uploadImage(@Part MultipartBody.Part image);
 
-    // UserCourseData
+
+    // UserCourseData //NOT USABLE
     @GET("UserCourse/GetCoursesByUserId/{id}")
     Single<APICourseObject> fetchcourse(@Path("id") String userId,
                                         @Query("pagenumber") String pagenumber,
@@ -146,7 +147,7 @@ public interface ApiService {
     Single<SignedUrlObject> fetchSignedUrl(@Query("fileid") String fileid,
                                            @Query("lessionid") String lessionid);
 
-    // Get Statistic
+    // Get Statistic //NOT USABLE
     @GET("Users/GetStatistic")
     Single<StatisticsObject> StatisticUser();
 

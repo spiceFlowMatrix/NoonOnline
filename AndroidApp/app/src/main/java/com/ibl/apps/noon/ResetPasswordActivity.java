@@ -3,19 +3,20 @@ package com.ibl.apps.noon;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import androidx.core.content.res.ResourcesCompat;
-
 import android.view.MenuItem;
 import android.view.View;
+
+import androidx.core.content.res.ResourcesCompat;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.ibl.apps.Base.BaseActivity;
 import com.ibl.apps.Model.UserObject;
+import com.ibl.apps.UserProfileManagement.UserProfileRepository;
+import com.ibl.apps.noon.databinding.ResetPasswordLayoutBinding;
 import com.ibl.apps.util.Const;
 import com.ibl.apps.util.Validator;
-import com.ibl.apps.noon.databinding.ResetPasswordLayoutBinding;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,6 +32,7 @@ public class ResetPasswordActivity extends BaseActivity implements View.OnClickL
 
     ResetPasswordLayoutBinding resetPasswordLayoutBinding;
     private CompositeDisposable disposable = new CompositeDisposable();
+    UserProfileRepository userProfileRepository;
 
     @Override
     protected int getContentView() {
@@ -43,6 +45,7 @@ public class ResetPasswordActivity extends BaseActivity implements View.OnClickL
         resetPasswordLayoutBinding = (ResetPasswordLayoutBinding) getBindObj();
 //        resetPasswordLayoutBinding.edtOldPassword.setTypeface(Typeface.DEFAULT);
 //        resetPasswordLayoutBinding.edtOldPassword.setTransformationMethod(new PasswordTransformationMethod());
+        userProfileRepository = new UserProfileRepository();
         setOnClickListener();
         setToolbar(resetPasswordLayoutBinding.toolbarLayout.toolBar);
         showBackArrow(getString(R.string.reset_password));
@@ -150,7 +153,7 @@ public class ResetPasswordActivity extends BaseActivity implements View.OnClickL
         }
         JsonParser jsonParser = new JsonParser();
         gsonObject = (JsonObject) jsonParser.parse(jsonObject.toString());
-        disposable.add(apiService.changePassword(gsonObject)
+        disposable.add(userProfileRepository.changePassword(gsonObject)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<UserObject>() {

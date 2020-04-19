@@ -5,11 +5,8 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import androidx.databinding.DataBindingUtil;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
-import androidx.core.content.res.ResourcesCompat;
-import androidx.recyclerview.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextUtils;
@@ -23,6 +20,10 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.core.content.res.ResourcesCompat;
+import androidx.databinding.DataBindingUtil;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.crashlytics.android.Crashlytics;
 import com.downloader.Error;
@@ -39,6 +40,7 @@ import com.github.barteksc.pdfviewer.listener.OnLoadCompleteListener;
 import com.github.barteksc.pdfviewer.listener.OnPageChangeListener;
 import com.github.barteksc.pdfviewer.listener.OnRenderListener;
 import com.google.gson.Gson;
+import com.ibl.apps.DownloadFileManagement.DownloadFileRepository;
 import com.ibl.apps.Interface.EncryptDecryptAsyncResponse;
 import com.ibl.apps.Model.EncryptDecryptObject;
 import com.ibl.apps.Model.LibraryGradeObject;
@@ -46,14 +48,14 @@ import com.ibl.apps.Model.SignedUrlObject;
 import com.ibl.apps.Network.ApiClient;
 import com.ibl.apps.Network.ApiService;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
-import com.ibl.apps.util.Const;
-import com.ibl.apps.util.CustomTypefaceSpan;
-import com.ibl.apps.util.GlideApp;
-import com.ibl.apps.util.VideoEncryptDecrypt.EncrypterDecryptAlgo;
 import com.ibl.apps.noon.R;
 import com.ibl.apps.noon.databinding.DialogViewerItemLayoutBinding;
 import com.ibl.apps.noon.databinding.LibraryGradeInnerItemLayoutBinding;
 import com.ibl.apps.noon.databinding.LibraryProgressDialogBinding;
+import com.ibl.apps.util.Const;
+import com.ibl.apps.util.CustomTypefaceSpan;
+import com.ibl.apps.util.GlideApp;
+import com.ibl.apps.util.VideoEncryptDecrypt.EncrypterDecryptAlgo;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -108,6 +110,7 @@ public class LibraryGradeInnerListAdapter extends RecyclerView.Adapter<LibraryGr
     private ProgressBar progressbar;
     private Dialog dialog;
     LibraryProgressDialogBinding libraryProgressDialogBinding;
+    private DownloadFileRepository downloadFileRepository;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         LibraryGradeInnerItemLayoutBinding libraryGradeInnerItemLayoutBinding;
@@ -126,7 +129,7 @@ public class LibraryGradeInnerListAdapter extends RecyclerView.Adapter<LibraryGr
         if (userDetailsObject != null) {
             userIdSlash = userDetailsObject.getId() + "/";
         }
-
+        downloadFileRepository = new DownloadFileRepository();
         apiService = ApiClient.getClient(ctx).create(ApiService.class);
         mDroidNet = DroidNet.getInstance();
         mDroidNet.addInternetConnectivityListener(this);
@@ -272,7 +275,7 @@ public class LibraryGradeInnerListAdapter extends RecyclerView.Adapter<LibraryGr
 
         //showDialog(ctx.getString(R.string.loading));
 
-        disposable.add(apiService.fetchSignedUrl(fileID, lessionID)
+        disposable.add(downloadFileRepository.fetchSignedUrl(fileID, lessionID)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<SignedUrlObject>() {
