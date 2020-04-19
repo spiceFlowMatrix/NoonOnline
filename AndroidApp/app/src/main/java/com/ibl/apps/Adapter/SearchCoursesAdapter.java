@@ -21,6 +21,7 @@ import com.droidnet.DroidListener;
 import com.droidnet.DroidNet;
 import com.ibl.apps.Model.CoursePriviewObject;
 import com.ibl.apps.Model.SearchObject;
+import com.ibl.apps.RoomDatabase.dao.courseManagementDatabase.CourseDatabaseRepository;
 import com.ibl.apps.RoomDatabase.database.AppDatabase;
 import com.ibl.apps.util.Const;
 import com.ibl.apps.util.CustomTypefaceSpan;
@@ -43,6 +44,7 @@ public class SearchCoursesAdapter extends RecyclerView.Adapter<SearchCoursesAdap
     String userId;
     DroidNet mDroidNet;
     public static boolean isNetworkConnected = false;
+    CourseDatabaseRepository courseDatabaseRepository;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         SearchCoursesLayoutBinding searchCoursesLayoutBinding;
@@ -54,6 +56,7 @@ public class SearchCoursesAdapter extends RecyclerView.Adapter<SearchCoursesAdap
     }
 
     public SearchCoursesAdapter(Context ctx, ArrayList<SearchObject.Courses> listProg, String userId) {
+        courseDatabaseRepository = new CourseDatabaseRepository();
         this.listProg = listProg;
         this.ctx = ctx;
         this.contactListFiltered = listProg;
@@ -96,7 +99,7 @@ public class SearchCoursesAdapter extends RecyclerView.Adapter<SearchCoursesAdap
 
                     try {
                         CoursePriviewObject coursePriviewObject;
-                        coursePriviewObject = AppDatabase.getAppDatabase(ctx).courseDetailsDao().getAllCourseDetails(model.getId(), userId);
+                        coursePriviewObject = courseDatabaseRepository.getAllCourseDetailsById(model.getId(), userId);
 
                         if (coursePriviewObject != null) {
                             ((Activity) ctx).runOnUiThread(new Runnable() {

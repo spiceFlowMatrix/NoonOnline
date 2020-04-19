@@ -38,10 +38,13 @@ import com.ibl.apps.Model.LoginObject;
 import com.ibl.apps.Model.SyncRecords;
 import com.ibl.apps.Model.TemsCondition;
 import com.ibl.apps.Model.UserObject;
-import com.ibl.apps.RoomDatabase.database.AppDatabase;
+import com.ibl.apps.RoomDatabase.dao.lessonManagementDatabase.LessonDatabaseRepository;
+import com.ibl.apps.RoomDatabase.dao.quizManagementDatabase.QuizDatabaseRepository;
+import com.ibl.apps.RoomDatabase.dao.userManagementDatabse.UserDatabaseRepository;
 import com.ibl.apps.RoomDatabase.entity.LessonProgress;
 import com.ibl.apps.RoomDatabase.entity.QuizUserResult;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
+import com.ibl.apps.UserCredentialsManagement.UserRepository;
 import com.ibl.apps.noon.databinding.LoginLayoutBinding;
 import com.ibl.apps.util.Const;
 import com.ibl.apps.util.JWTUtils;
@@ -67,6 +70,9 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     LoginLayoutBinding loginLayoutBinding;
     private CompositeDisposable disposable = new CompositeDisposable();
     private FirebaseAuth mAuth;
+    UserRepository userRepository;
+    UserDatabaseRepository userDatabaseRepository;
+    LessonDatabaseRepository lessonDatabaseRepository;
 
     @Override
     protected int getContentView() {
@@ -78,6 +84,10 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         super.onViewReady(savedInstanceState, intent);
         loginLayoutBinding = (LoginLayoutBinding) getBindObj();
         mAuth = FirebaseAuth.getInstance();
+        userRepository = new UserRepository();
+        userDatabaseRepository = new UserDatabaseRepository();
+        lessonDatabaseRepository = new LessonDatabaseRepository();
+
         try {
             PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
             String version = pInfo.versionName;
@@ -117,6 +127,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                     }
                 }
                 break;
+
+            //This implementation has removed from application & it's related to old sign API.
             case R.id.cardSignup:
                 if (validateFields()) {
                     if (!Validator.checkPassword(loginLayoutBinding.loginPassword)) {
@@ -137,6 +149,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                     }
                 }
                 break;
+
             case R.id.forgotPassword:
                 openActivity(ForgotPasswordActivity.class);
                 break;
@@ -147,7 +160,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 
             case R.id.txt_privacy_policy:
                 showDialog(getResources().getString(R.string.loading));
-                disposable.add(apiService.getTerms()
+                disposable.add(userRepository.getTerms()
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribeWith(new DisposableSingleObserver<TemsCondition>() {
@@ -264,11 +277,11 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     public void LocalLogin(String email, String password, Throwable e) {
         Log.e("LOGIN", "---3---");
         showDialog(getString(R.string.loading));
-        LoginObject loginModel = AppDatabase.getAppDatabase(getApplicationContext()).loginDao().getLoginModel();
+        LoginObject loginModel = userDatabaseRepository.getUserLoginModel();
         if (loginModel != null) {
-            LoginObject loginObject = AppDatabase.getAppDatabase(getApplicationContext()).loginDao().getLogin(email, password);
-            LoginObject loginEmail = AppDatabase.getAppDatabase(getApplicationContext()).loginDao().getLoginEmail(email);
-            LoginObject loginPassword = AppDatabase.getAppDatabase(getApplicationContext()).loginDao().getLoginPassword(password);
+            LoginObject loginObject = userDatabaseRepository.getLoginDetail(email, password);
+            LoginObject loginEmail = userDatabaseRepository.getLoginEmailDetail(email);
+            LoginObject loginPassword = userDatabaseRepository.getLoginPasswordDetail(password);
             if (loginObject != null && loginEmail != null && loginPassword != null) {
                 PrefUtils.clearSharedPreferences(getApplicationContext());
                 PrefUtils.storeAuthid(getApplicationContext(), loginObject.getSub());
@@ -304,6 +317,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         }
     }
 
+    //This implementation has removed from application & it's related to old sign API.
     public void callSignupUser(String email, String password) {
 
         showDialog(getString(R.string.loading));
@@ -413,7 +427,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                             authTokenObject.setExpiresIn(payload.getExpiresIn());
                             authTokenObject.setScope(payload.getScope());
                             authTokenObject.setExpiresAt(String.valueOf(payload.getExpiresAt()));
-                            AppDatabase.getAppDatabase(getApplicationContext()).authTokenDao().insertAll(authTokenObject);
+                            userDatabaseRepository.insertAuthTokenData(authTokenObject);
                             Log.e("storeAuthid", "onSuccess: " + sub);
                             PrefUtils.storeAuthid(LoginActivity.this, sub);
 
@@ -477,7 +491,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         JsonParser jsonParser = new JsonParser();
         gsonObject = (JsonObject) jsonParser.parse(jsonObject.toString());
 
-        disposable.add(apiService.loginUser(gsonObject)
+        disposable.add(userRepository.loginUser(gsonObject)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<LoginObject>() {
@@ -502,7 +516,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                                 editor.putString("uid", loginUser.getUserid());
                                 editor.apply();
                             }
-                            AppDatabase.getAppDatabase(getApplicationContext()).loginDao().insertAll(loginUser1);
+                            userDatabaseRepository.insertLoginData(loginUser1);
 
                             callApiUserDetails(loginUser.getUserid(), sub, email, password);
 
@@ -538,7 +552,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 //            String outtimrsave = sharedPreferences.getString("userrolename", "");
 
 
-            disposable.add(apiService.fetchUser(userId)
+            disposable.add(userRepository.fetchUser(userId)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeWith(new DisposableSingleObserver<UserObject>() {
@@ -583,8 +597,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                                     userDetails.setIs_discussion_authorized(userObject.getData().getIs_discussion_authorized());
                                     userDetails.setIs_library_authorized(userObject.getData().getIs_library_authorized());
                                     userDetails.setIs_assignment_authorized(userObject.getData().getIs_assignment_authorized());
-                                    AppDatabase.getAppDatabase(getApplicationContext()).userDetailDao().deleteByUserId(sub);
-                                    AppDatabase.getAppDatabase(getApplicationContext()).userDetailDao().insertAll(userDetails);
+                                    userDatabaseRepository.deleteByUserId(sub);
+                                    userDatabaseRepository.insertUserDetails(userDetails);
 
                                     return null;
                                 }
@@ -623,7 +637,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 
     public void callApiGetSyncRecords(String userId) {
 
-        disposable.add(apiService.GetSyncRecords()
+        disposable.add(userRepository.GetSyncRecords()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<SyncRecords>() {
@@ -640,10 +654,9 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 
                                     if (syncData.getProgressdata() != null && syncData.getProgressdata().size() != 0) {
                                         for (int i = 0; i < syncData.getProgressdata().size(); i++) {
-                                            LessonProgress lessonProgress = AppDatabase.getAppDatabase(NoonApplication.getContext()).lessonProgressDao().getItemProgress(syncData.getProgressdata().get(i).getLessonProgressId(), userId);
+                                            LessonProgress lessonProgress = lessonDatabaseRepository.getItemProgressData(syncData.getProgressdata().get(i).getLessonProgressId(), userId);
                                             if (lessonProgress != null) {
-                                                AppDatabase.getAppDatabase(NoonApplication.getContext()).lessonProgressDao().
-                                                        updateLessonIDWise(syncData.getProgressdata().get(i).getLessonId(),
+                                                lessonDatabaseRepository.updateLessonUserIdWise(syncData.getProgressdata().get(i).getLessonId(),
                                                                 syncData.getProgressdata().get(i).getLessonProgress().split("\\.")[0],
                                                                 syncData.getProgressdata().get(i).getGradeId(),
                                                                 syncData.getProgressdata().get(i).getUserId(),
@@ -663,11 +676,11 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                                                 lessonProgress.setGradeId(syncData.getProgressdata().get(i).getGradeId());
                                                 lessonProgress.setTotalRecords(syncData.getProgressdata().get(i).getTotalRecords());
                                                 lessonProgress.setFileId(syncData.getProgressdata().get(i).getFileId());
-                                                AppDatabase.getAppDatabase(NoonApplication.getContext()).lessonProgressDao().insertAll(lessonProgress);
+                                                lessonDatabaseRepository.insertLessonProgressData(lessonProgress);
                                             }
                                         }
                                     }
-
+                                    QuizDatabaseRepository quizDatabaseRepository = new QuizDatabaseRepository();
                                     if (syncData.getTimerdata() != null && syncData.getTimerdata().size() != 0) {
                                         for (int i = 0; i < syncData.getTimerdata().size(); i++) {
                                             QuizUserResult quizUserResult = new QuizUserResult();
@@ -677,7 +690,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                                             quizUserResult.setPassingScore(syncData.getTimerdata().get(i).getPassingScore());
                                             quizUserResult.setQuizTime(syncData.getTimerdata().get(i).getQuizTime());
                                             quizUserResult.setQuizId(syncData.getTimerdata().get(i).getQuizId());
-                                            AppDatabase.getAppDatabase(NoonApplication.getContext()).quizUserResultDao().insertAll(quizUserResult);
+                                            quizDatabaseRepository.insertAllQuizUserResult(quizUserResult);
                                         }
                                     }
                                 }

@@ -1,13 +1,9 @@
 package com.ibl.apps.Fragment;
 
-import androidx.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.res.ResourcesCompat;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,6 +12,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+
+import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
+import androidx.databinding.DataBindingUtil;
 
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
@@ -42,14 +43,16 @@ import com.ibl.apps.Model.parent.ParentSpinnerModel;
 import com.ibl.apps.Model.parent.ProgressReport;
 import com.ibl.apps.Network.ApiClient;
 import com.ibl.apps.Network.ApiService;
+import com.ibl.apps.ParentControlManagement.ParentControlRepository;
+import com.ibl.apps.RoomDatabase.dao.userManagementDatabse.UserDatabaseRepository;
 import com.ibl.apps.RoomDatabase.database.AppDatabase;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
-import com.ibl.apps.util.CustomView.MultiSelectSpinner;
-import com.ibl.apps.util.PrefUtils;
-import com.ibl.apps.util.TimeAgoLastOnlineClass;
 import com.ibl.apps.noon.NoonApplication;
 import com.ibl.apps.noon.R;
 import com.ibl.apps.noon.databinding.FragmentAssignmentQuizePerformanceBinding;
+import com.ibl.apps.util.CustomView.MultiSelectSpinner;
+import com.ibl.apps.util.PrefUtils;
+import com.ibl.apps.util.TimeAgoLastOnlineClass;
 
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -82,6 +85,8 @@ public class AssignmentQuizePerformanceFragment extends BaseFragment implements 
     private int couresId;
     private ArrayList<Integer> userIdArray = new ArrayList<>();
     private ParentSpinnerModel parentSpinner = new ParentSpinnerModel();
+    private ParentControlRepository parentControlRepository;
+    private UserDatabaseRepository userDatabaseRepository;
 
     public static AssignmentQuizePerformanceFragment newInstance(String param1, String param2) {
         AssignmentQuizePerformanceFragment fragment = new AssignmentQuizePerformanceFragment();
@@ -111,6 +116,8 @@ public class AssignmentQuizePerformanceFragment extends BaseFragment implements 
     @Override
     protected void setUp(View view) {
         showDialog(Objects.requireNonNull(getActivity()).getResources().getString(R.string.loading));
+        parentControlRepository = new ParentControlRepository();
+        userDatabaseRepository = new UserDatabaseRepository();
         apiService = ApiClient.getClient(getContext()).create(ApiService.class);
         getflag();
         //getQuizProgressPieChartApi();
@@ -126,18 +133,18 @@ public class AssignmentQuizePerformanceFragment extends BaseFragment implements 
     private void callApiForStudentSpinner() {
         String authid = PrefUtils.getAuthid(NoonApplication.getContext());
         if (!TextUtils.isEmpty(authid)) {
-            AuthTokenObject authTokenObject = AppDatabase.getAppDatabase(NoonApplication.getContext()).authTokenDao().getauthTokenData(authid);
+            AuthTokenObject authTokenObject = userDatabaseRepository.getAuthTokenData(authid);
 
             if (authTokenObject != null) {
                 String sub = "";
                 if (authTokenObject.getSub() != null) {
                     sub = authTokenObject.getSub();
-                    userDetails = AppDatabase.getAppDatabase(NoonApplication.getContext()).userDetailDao().getUserDetials(sub);
+                    userDetails = userDatabaseRepository.getUserDetails(sub);
                 }
             }
         }
 
-        disposable.add(apiService.getUserSpinnerData(Integer.parseInt(userDetails.getId()))
+        disposable.add(parentControlRepository.getUserSpinnerData(Integer.parseInt(userDetails.getId()))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<ParentSpinnerModel>() {
@@ -191,7 +198,7 @@ public class AssignmentQuizePerformanceFragment extends BaseFragment implements 
         if (parentSpinnerModel.getData().size() == selectedIdsForCallback.size()) {
             fragmentAssignmentQuizeBinding.allUser.setVisibility(View.VISIBLE);
             fragmentAssignmentQuizeBinding.spUser.setText(Objects.requireNonNull(getActivity()).getResources().getString(R.string.all_users));
-            fragmentAssignmentQuizeBinding.allUser.setText("( "+userArray.size()+" )");
+            fragmentAssignmentQuizeBinding.allUser.setText("( " + userArray.size() + " )");
         } else {
             fragmentAssignmentQuizeBinding.spUser.setText(userArray.size() + " " + getActivity().getResources().getString(R.string.user_selected));
             fragmentAssignmentQuizeBinding.allUser.setVisibility(View.GONE);
@@ -210,7 +217,7 @@ public class AssignmentQuizePerformanceFragment extends BaseFragment implements 
                         if (parentSpinnerModel.getData().size() == selectedIdsForCallback.size()) {
                             fragmentAssignmentQuizeBinding.allUser.setVisibility(View.VISIBLE);
                             fragmentAssignmentQuizeBinding.spUser.setText(Objects.requireNonNull(getActivity()).getResources().getString(R.string.all_users));
-                            fragmentAssignmentQuizeBinding.allUser.setText("( "+var1.size()+" )");
+                            fragmentAssignmentQuizeBinding.allUser.setText("( " + var1.size() + " )");
                         } else {
                             fragmentAssignmentQuizeBinding.spUser.setText(var1.size() + " " + getActivity().getResources().getString(R.string.user_selected));
                             fragmentAssignmentQuizeBinding.allUser.setVisibility(View.GONE);
@@ -319,7 +326,7 @@ public class AssignmentQuizePerformanceFragment extends BaseFragment implements 
         } catch (JsonSyntaxException e) {
             e.printStackTrace();
         }
-        disposable.add(apiService.getCourseData(jsonObject)
+        disposable.add(parentControlRepository.getCourseData(jsonObject)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<CourseSpinnerData>() {
@@ -359,7 +366,7 @@ public class AssignmentQuizePerformanceFragment extends BaseFragment implements 
             } catch (JsonSyntaxException e) {
                 e.printStackTrace();
             }
-            disposable.add(apiService.getLastOnline(jsonobject)
+            disposable.add(parentControlRepository.getLastOnline(jsonobject)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeWith(new DisposableSingleObserver<LastOnline>() {
@@ -382,7 +389,7 @@ public class AssignmentQuizePerformanceFragment extends BaseFragment implements 
                             fragmentAssignmentQuizeBinding.tvLastSeen.setText("--");
                         }
                     }));
-        }else {
+        } else {
             fragmentAssignmentQuizeBinding.tvLastSeen.setText("--");
         }
     }
@@ -488,7 +495,7 @@ public class AssignmentQuizePerformanceFragment extends BaseFragment implements 
         } catch (JsonSyntaxException e) {
             e.printStackTrace();
         }
-        disposable.add(apiService.getQuizProgress(jsonObject)
+        disposable.add(parentControlRepository.getQuizProgress(jsonObject)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<ProgressReport>() {
@@ -554,7 +561,7 @@ public class AssignmentQuizePerformanceFragment extends BaseFragment implements 
         } catch (JsonSyntaxException e) {
             e.printStackTrace();
         }
-        disposable.add(apiService.getAssignmentProgress(jsonObject)
+        disposable.add(parentControlRepository.getAssignmentProgress(jsonObject)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<ProgressReport>() {
@@ -876,7 +883,7 @@ public class AssignmentQuizePerformanceFragment extends BaseFragment implements 
         } catch (JsonSyntaxException e) {
             e.printStackTrace();
         }
-        disposable.add(apiService.getAssignmentChartData(jsonObject)
+        disposable.add(parentControlRepository.getAssignmentChartData(jsonObject)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<Chart>() {
@@ -1238,7 +1245,7 @@ public class AssignmentQuizePerformanceFragment extends BaseFragment implements 
         } catch (JsonSyntaxException e) {
             e.printStackTrace();
         }
-        disposable.add(apiService.getQuizChartData(jsonObject)
+        disposable.add(parentControlRepository.getQuizChartData(jsonObject)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<Chart>() {

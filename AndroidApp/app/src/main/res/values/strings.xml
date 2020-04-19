@@ -402,6 +402,20 @@
     <string name="login_trial">Login Trial</string>
     <string name="sign_up_trial">Sign Up Trial</string>
 
+    <!--Device Management-->
+    <string name="activate_deactivate_device">Activate/Deactivate device</string>
+    <string name="clicking_below_button">You can deactivate or activate your device by clicking on the below button.</string>
+    <string name="activate_deactivate">Activate/Deactivate</string>
+    <string name="new_quote_limit">New Quote Limit</string>
+    <string name="extend_quota">EXTEND QUOTA</string>
+    <string name="request_quota_extension">REQUEST QUOTA EXTENSION</string>
+    <string name="devices">DEVICES</string>
+    <string name="logins">Logins</string>
+    <string name="extend_quote_request">Extend quote request</string>
+    <string name="out_of_device_quota">You are out of device quota</string>
+    <string name="device_activate_instruction">Please deactivate another device or request \na quota extension from the Device Management \ncontrol panel in order to activate this device</string>
+    <string name="go_to_device_management">GO TO DEVICE MANAGEMENT</string>
+
     <!--<string name="pashto_school">مدرسة الباشتو</string>-->
     <!--For Pashto Notification Translation-->
     <!-- <string name="just_now_pashto">همدا اوس</string>

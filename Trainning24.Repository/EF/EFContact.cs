@@ -28,7 +28,7 @@ namespace Trainning24.Repository.EF
 
         public List<Contact> GetAll()
         {
-            throw new NotImplementedException();
+            return _context.GetAll();
         }
 
         public List<Contact> GetAllActive()

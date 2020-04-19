@@ -1,10 +1,8 @@
 package com.ibl.apps.Fragment;
 
 import android.content.Intent;
-import androidx.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -13,6 +11,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.databinding.DataBindingUtil;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -20,15 +21,16 @@ import com.ibl.apps.Base.BaseFragment;
 import com.ibl.apps.Model.StatisticsObject;
 import com.ibl.apps.Model.UploadImageObject;
 import com.ibl.apps.Model.UserObject;
-import com.ibl.apps.RoomDatabase.database.AppDatabase;
+import com.ibl.apps.RoomDatabase.dao.userManagementDatabse.UserDatabaseRepository;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
+import com.ibl.apps.UserProfileManagement.UserProfileRepository;
+import com.ibl.apps.noon.NoonApplication;
+import com.ibl.apps.noon.R;
+import com.ibl.apps.noon.databinding.ProfileLayoutBinding;
 import com.ibl.apps.util.Const;
 import com.ibl.apps.util.GlideApp;
 import com.ibl.apps.util.PrefUtils;
 import com.ibl.apps.util.Validator;
-import com.ibl.apps.noon.NoonApplication;
-import com.ibl.apps.noon.R;
-import com.ibl.apps.noon.databinding.ProfileLayoutBinding;
 import com.theartofdev.edmodo.cropper.CropImage;
 
 import org.json.JSONException;
@@ -53,7 +55,6 @@ import retrofit2.Callback;
 import retrofit2.HttpException;
 
 import static android.app.Activity.RESULT_OK;
-import static com.ibl.apps.Base.BaseActivity.apiService;
 
 
 public class ProfileFragment extends BaseFragment implements View.OnClickListener {
@@ -71,6 +72,8 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
     List<UserDetails> userDetailsList;
     UserDetails userDetailsObject = new UserDetails();
     String userId = "0";
+    private UserProfileRepository userProfileRepository;
+    private UserDatabaseRepository userDatabaseRepository;
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -102,7 +105,9 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
 
     @Override
     protected void setUp(View view) {
-        userDetailsList = AppDatabase.getAppDatabase(NoonApplication.getContext()).userDetailDao().getAllUserDetials();
+        userProfileRepository = new UserProfileRepository();
+        userDatabaseRepository = new UserDatabaseRepository();
+        userDetailsList = userDatabaseRepository.getAllUserDetails();
         PrefUtils.MyAsyncTask asyncTask = (PrefUtils.MyAsyncTask) new PrefUtils.MyAsyncTask(new PrefUtils.MyAsyncTask.AsyncResponse() {
             @Override
             public UserDetails getLocalUserDetails(UserDetails userDetails) {
@@ -243,7 +248,7 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
         RequestBody requestFile = RequestBody.create(MediaType.parse("image/jpeg"), imageFilePath);
         MultipartBody.Part body = MultipartBody.Part.createFormData(Const.uploadImagePara, "image.jpg", requestFile);
 
-        Call<UploadImageObject> call = apiService.uploadImage(body);
+        Call<UploadImageObject> call = userProfileRepository.uploadImage(body);
         showDialog(getString(R.string.loading));
         call.enqueue(new Callback<UploadImageObject>() {
             @Override
@@ -265,7 +270,7 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
                         @Override
                         public UserDetails getLocalUserDetails(UserDetails userDetails) {
                             if (userDetails != null) {
-                                AppDatabase.getAppDatabase(getActivity()).userDetailDao().updateUserPhoto(userDetails.getId(), uploadImageObject.getData(), imageFilePath);
+                                userDatabaseRepository.updateUserPhoto(userDetails.getId(), uploadImageObject.getData(), imageFilePath);
                             }
                             return null;
                         }
@@ -315,7 +320,7 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
                                                 .error(R.drawable.ic_account_circle_black_24dp)
                                                 .into(profileLayoutBinding.profileImage);
 
-                                        AppDatabase.getAppDatabase(getActivity()).userDetailDao().updateUserPhoto(userDetails.getId(), "", bitmapImage);
+                                        userDatabaseRepository.updateUserPhoto(userDetails.getId(), "", bitmapImage);
                                     }
 
                                     return null;
@@ -349,7 +354,7 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
     public void callApiUsernameExiest(String username) {
 
         if (isNetworkAvailable(getActivity())) {
-            disposable.add(apiService.userExiest(username)
+            disposable.add(userProfileRepository.userExiest(username)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeWith(new DisposableObserver<String>() {
@@ -406,7 +411,7 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
             JsonParser jsonParser = new JsonParser();
             gsonObject = (JsonObject) jsonParser.parse(jsonObject.toString());
 
-            disposable.add(apiService.updateProfile(gsonObject)
+            disposable.add(userProfileRepository.updateProfile(gsonObject)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeWith(new DisposableSingleObserver<UserObject>() {
@@ -416,7 +421,7 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
                             showSnackBar(profileLayoutBinding.mainChangeProfileLayout, userObject.getMessage());
                             for (int i = 0; i < userDetailsList.size(); i++) {
                                 if (userDetailsList.get(i).getId().equals(userId)) {
-                                    AppDatabase.getAppDatabase(NoonApplication.getContext()).userDetailDao().updateUserDetails(userId, username, userfullname, phonenumber);
+                                    userDatabaseRepository.updateUserDetails(userId, username, userfullname, phonenumber);
                                 }
                             }
                         }
@@ -443,7 +448,7 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
                     //Log.e(Const.LOG_NOON_TAG, "==userfullname==" + userfullname);
                     //Log.e(Const.LOG_NOON_TAG, "==phonenumber==" + phonenumber);
 
-                    AppDatabase.getAppDatabase(NoonApplication.getContext()).userDetailDao().updateUserDetails(userId, username, userfullname, phonenumber);
+                    userDatabaseRepository.updateUserDetails(userId, username, userfullname, phonenumber);
                 }
             }
             Toast.makeText(getActivity(), getString(R.string.validation_profile_Update), Toast.LENGTH_LONG).show();
@@ -456,7 +461,7 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
 
         if (isNetworkAvailable(getActivity())) {
             showDialog(getString(R.string.loading));
-            disposable.add(apiService.StatisticUser()
+            disposable.add(userProfileRepository.StatisticUser()
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeWith(new DisposableSingleObserver<StatisticsObject>() {
@@ -473,7 +478,7 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
                                 profileLayoutBinding.txtTotalCourse.setText(statisticsobject.getData().getTotalcourse());
 
                                 statisticsobject.setUserId(userId);
-                                AppDatabase.getAppDatabase(getActivity()).statisticsDao().insertAll(statisticsobject);
+                                userDatabaseRepository.insertStatisticData(statisticsobject);
                             }
                             hideDialog();
                         }
@@ -489,7 +494,7 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
                     }));
         } else {
             if (userId != null && !userId.isEmpty()) {
-                StatisticsObject statisticsobject = AppDatabase.getAppDatabase(getActivity()).statisticsDao().getStatisticsObject(userId);
+                StatisticsObject statisticsobject = userDatabaseRepository.getStatisticsObjectData(userId);
                 if (statisticsobject != null) {
 
                     if (statisticsobject.getData() != null) {
@@ -513,7 +518,7 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
             showDialog(getString(R.string.loading));
             try {
                 if (userId != null && !userId.isEmpty()) {
-                    disposable.add(apiService.fetchUser(userId)
+                    disposable.add(userProfileRepository.fetchUser(userId)
                             .subscribeOn(Schedulers.io())
                             .observeOn(AndroidSchedulers.mainThread())
                             .subscribeWith(new DisposableSingleObserver<UserObject>() {

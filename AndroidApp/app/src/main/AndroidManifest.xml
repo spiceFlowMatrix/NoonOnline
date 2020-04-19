@@ -98,6 +98,10 @@
             android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity
             android:name=".SignUpTrialActivity"
+            android:name=".LoginDevicesActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
+        <activity
+            android:name=".ExtendQuotaRequestActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
 
         <meta-data

@@ -85,7 +85,6 @@ public class StatisticsFragment extends BaseFragment implements View.OnClickList
     }
 
     public void callApiStatistics() {
-
         showDialog(getString(R.string.loading));
         disposable.add(apiService.StatisticUser()
                 .subscribeOn(Schedulers.io())

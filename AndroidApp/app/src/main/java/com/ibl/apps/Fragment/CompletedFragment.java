@@ -13,9 +13,8 @@ import android.view.ViewGroup;
 
 import com.ibl.apps.Adapter.QueueListAdapter;
 import com.ibl.apps.Base.BaseFragment;
+import com.ibl.apps.FeedbackManagement.FeedbackRepository;
 import com.ibl.apps.Model.feedback.FeebBackTask;
-import com.ibl.apps.Network.ApiClient;
-import com.ibl.apps.Network.ApiService;
 import com.ibl.apps.util.LoadMoreData.OnLoadMoreListener;
 import com.ibl.apps.util.LoadMoreData.RecyclerViewLoadMoreScroll;
 import com.ibl.apps.noon.NoonApplication;
@@ -39,12 +38,12 @@ public class CompletedFragment extends BaseFragment {
 
     private FragmentCompletedBinding binding;
     CompositeDisposable disposable = new CompositeDisposable();
-    private ApiService apiService;
     int pagenumber = 1;
     int perpagerecord = 10;
     private RecyclerViewLoadMoreScroll scrollListener;
     private boolean isLoad = true;
     private List<FeebBackTask.Data> feebBackTaskdata = new ArrayList<>();
+    private FeedbackRepository feedbackRepository;
 
     public CompletedFragment() {
         // Required empty public constructor
@@ -60,7 +59,7 @@ public class CompletedFragment extends BaseFragment {
 
     @Override
     protected void setUp(View view) {
-        apiService = ApiClient.getClient(NoonApplication.getContext()).create(ApiService.class);
+        feedbackRepository = new FeedbackRepository();
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(NoonApplication.getContext());
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
@@ -88,7 +87,7 @@ public class CompletedFragment extends BaseFragment {
     }
 
     private void callApiForCompletedList() {
-        disposable.add(apiService.getCompletedListApp(pagenumber, perpagerecord)
+        disposable.add(feedbackRepository.getCompletedListApp(pagenumber, perpagerecord)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<FeebBackTask>() {

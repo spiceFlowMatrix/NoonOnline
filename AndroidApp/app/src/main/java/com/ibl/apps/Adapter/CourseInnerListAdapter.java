@@ -25,6 +25,7 @@ import com.droidnet.DroidNet;
 import com.google.gson.Gson;
 import com.ibl.apps.Model.CourseObject;
 import com.ibl.apps.Model.CoursePriviewObject;
+import com.ibl.apps.RoomDatabase.dao.courseManagementDatabase.CourseDatabaseRepository;
 import com.ibl.apps.RoomDatabase.database.AppDatabase;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
 import com.ibl.apps.util.Const;
@@ -46,6 +47,7 @@ public class CourseInnerListAdapter extends RecyclerView.Adapter<CourseInnerList
     UserDetails userDetailsObject;
     DroidNet mDroidNet;
     public static boolean isNetworkConnected = false;
+    CourseDatabaseRepository courseDatabaseRepository;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         CourseInnerLayoutBinding courseInnerLayoutBinding;
@@ -57,6 +59,7 @@ public class CourseInnerListAdapter extends RecyclerView.Adapter<CourseInnerList
     }
 
     public CourseInnerListAdapter(Context ctx, List<CourseObject.Courses> list, UserDetails userDetailsObject) {
+        courseDatabaseRepository = new CourseDatabaseRepository();
         this.list = list;
         this.ctx = ctx;
         this.userDetailsObject = userDetailsObject;
@@ -115,7 +118,7 @@ public class CourseInnerListAdapter extends RecyclerView.Adapter<CourseInnerList
                     try {
                         CoursePriviewObject coursePriviewObject;
                         String userId = userDetailsObject.getId();
-                        coursePriviewObject = AppDatabase.getAppDatabase(ctx).courseDetailsDao().getAllCourseDetails(model.getId(), userId);
+                        coursePriviewObject = courseDatabaseRepository.getAllCourseDetailsById(model.getId(), userId);
 
                         if (coursePriviewObject != null) {
                             ((Activity) ctx).runOnUiThread(new Runnable() {

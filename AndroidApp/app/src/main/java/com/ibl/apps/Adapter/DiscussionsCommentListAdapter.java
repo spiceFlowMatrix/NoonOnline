@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import com.droidnet.DroidListener;
 import com.droidnet.DroidNet;
 import com.google.gson.JsonObject;
+import com.ibl.apps.DiscussionManagement.DiscussionRepository;
 import com.ibl.apps.Model.GetAllComment;
 import com.ibl.apps.Model.TopicLike;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
@@ -185,8 +186,9 @@ public class DiscussionsCommentListAdapter extends RecyclerView.Adapter<Discussi
     }
 
     private void callApiForlikeDislike(JsonObject jsonObject, MyViewHolder holder, GetAllComment.Data model) {
+        DiscussionRepository discussionRepository = new DiscussionRepository();
         CompositeDisposable disposable = new CompositeDisposable();
-        disposable.add(apiService.getDiscussionCommentLike(jsonObject)
+        disposable.add(discussionRepository.getDiscussionCommentLike(jsonObject)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<TopicLike>() {

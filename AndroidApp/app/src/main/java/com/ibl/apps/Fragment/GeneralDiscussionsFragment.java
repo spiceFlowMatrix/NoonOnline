@@ -2,31 +2,33 @@ package com.ibl.apps.Fragment;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import androidx.databinding.DataBindingUtil;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SearchView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
+import androidx.recyclerview.widget.LinearLayoutManager;
+
 import com.google.gson.Gson;
 import com.ibl.apps.Adapter.GeneralDiscussionsListAdapter;
 import com.ibl.apps.Base.BaseFragment;
+import com.ibl.apps.DiscussionManagement.DiscussionRepository;
 import com.ibl.apps.Interface.BackInterface;
 import com.ibl.apps.Model.DiscssionsAllTopics;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
+import com.ibl.apps.noon.GeneralDiscussionsAddActivity;
+import com.ibl.apps.noon.R;
+import com.ibl.apps.noon.databinding.FragmentDiscussionsLayoutBinding;
 import com.ibl.apps.util.Const;
 import com.ibl.apps.util.LoadMoreData.OnLoadMoreListener;
 import com.ibl.apps.util.LoadMoreData.RecyclerViewLoadMoreScroll;
 import com.ibl.apps.util.PrefUtils;
-import com.ibl.apps.noon.GeneralDiscussionsAddActivity;
-import com.ibl.apps.noon.R;
-import com.ibl.apps.noon.databinding.FragmentDiscussionsLayoutBinding;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -37,8 +39,6 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.HttpException;
-
-import static com.ibl.apps.Base.BaseActivity.apiService;
 
 
 public class GeneralDiscussionsFragment extends BaseFragment implements View.OnClickListener {
@@ -71,6 +71,7 @@ public class GeneralDiscussionsFragment extends BaseFragment implements View.OnC
 
     GeneralDiscussionsListAdapter generalDiscussionsListAdapter;
     BackInterface backInterface;
+    private DiscussionRepository discussionRepository;
 
 
     public GeneralDiscussionsFragment() {
@@ -103,7 +104,7 @@ public class GeneralDiscussionsFragment extends BaseFragment implements View.OnC
 
     @Override
     protected void setUp(View view) {
-
+        discussionRepository = new DiscussionRepository();
         Bundle bundle = this.getArguments();
         if (bundle != null) {
             GradeId = bundle.getString(Const.GradeID, "");
@@ -273,7 +274,7 @@ public class GeneralDiscussionsFragment extends BaseFragment implements View.OnC
         fragmentDiscussionsLayoutBinding.layDiscussionList.setVisibility(View.VISIBLE);
         fragmentDiscussionsLayoutBinding.addButton.setVisibility(View.VISIBLE);
 
-        disposable.add(apiService.GetAllTopics(String.valueOf(pageNumber), perpagerecord, GradeId, true)
+        disposable.add(discussionRepository.GetAllTopics(String.valueOf(pageNumber), perpagerecord, GradeId, true)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<DiscssionsAllTopics>() {
