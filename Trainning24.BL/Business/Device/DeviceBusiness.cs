@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Trainning24.Domain.Entity;
 using Trainning24.Repository.EF;
@@ -17,7 +18,7 @@ namespace Trainning24.BL.Business.Device
 
         public List<Devices> GetAll(int UserId)
         {
-            return _eFDeviceRepository.ListQuery(b => b.UserId == UserId);
+            return _eFDeviceRepository.ListQuery(b => b.UserId == UserId).ToList();
         }
 
         public Devices Create(Devices obj, int id)

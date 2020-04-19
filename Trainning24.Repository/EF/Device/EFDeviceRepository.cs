@@ -47,7 +47,7 @@ namespace Trainning24.Repository.EF
             return _context.Insert(obj);
         }
 
-        public List<Devices> ListQuery(Expression<Func<Devices, bool>> where)
+        public IQueryable<Devices> ListQuery(Expression<Func<Devices, bool>> where)
         {
             return _context.ListQuery(where);
         }
