@@ -14,6 +14,7 @@ using RestSharp;
 using Training24Admin.Model;
 using Training24Admin.Security.Bearer.Helpers;
 using Trainning24.BL.Business;
+using Trainning24.BL.ViewModels;
 using Trainning24.BL.ViewModels.BundleCourse;
 using Trainning24.BL.ViewModels.UserRole;
 using Trainning24.BL.ViewModels.Users;
@@ -21,7 +22,10 @@ using Trainning24.Domain.Entity;
 
 namespace Training24Admin.Controllers
 {
+    [ApiController]
+    [Produces("application/json")]
     [Route("api/v1/[controller]")]
+    [ApiExplorerSettings(GroupName = nameof(SwaggerGrouping.Account))]
     public class AccountController : ControllerBase
     {
         private IConfiguration _config;
