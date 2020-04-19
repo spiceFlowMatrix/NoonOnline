@@ -396,6 +396,11 @@
     <string name="spent_hour">Spent Hour&#160;&#160;:&#160;&#160;</string>
     <string name="validation_limitDecription">There is limit of only 150 characters</string>
     <string name="many_attempt">Too many attempts!! Please try later</string>
+    <string name="sign_up_with_trial">Sign Up with Trial</string>
+    <string name="first_name">First Name</string>
+    <string name="last_name">Last Name</string>
+    <string name="login_trial">Login Trial</string>
+    <string name="sign_up_trial">Sign Up Trial</string>
 
     <!--Device Management-->
     <string name="activate_deactivate_device">Activate/Deactivate device</string>

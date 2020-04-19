@@ -16,6 +16,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.res.ResourcesCompat;
 
@@ -24,6 +25,10 @@ import com.auth0.android.authentication.AuthenticationAPIClient;
 import com.auth0.android.authentication.AuthenticationException;
 import com.auth0.android.callback.BaseCallback;
 import com.auth0.android.result.Credentials;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -64,6 +69,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 
     LoginLayoutBinding loginLayoutBinding;
     private CompositeDisposable disposable = new CompositeDisposable();
+    private FirebaseAuth mAuth;
     UserRepository userRepository;
     UserDatabaseRepository userDatabaseRepository;
     LessonDatabaseRepository lessonDatabaseRepository;
@@ -77,6 +83,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     protected void onViewReady(Bundle savedInstanceState, Intent intent) {
         super.onViewReady(savedInstanceState, intent);
         loginLayoutBinding = (LoginLayoutBinding) getBindObj();
+        mAuth = FirebaseAuth.getInstance();
         userRepository = new UserRepository();
         userDatabaseRepository = new UserDatabaseRepository();
         lessonDatabaseRepository = new LessonDatabaseRepository();
@@ -100,6 +107,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         loginLayoutBinding.forgotPassword.setOnClickListener(this);
         loginLayoutBinding.createNewAccount.setOnClickListener(this);
         loginLayoutBinding.txtPrivacyPolicy.setOnClickListener(this);
+        loginLayoutBinding.signupTial.setOnClickListener(this);
+        loginLayoutBinding.cardLoginTrial.setOnClickListener(this);
     }
 
     @Override
@@ -170,6 +179,44 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                                 hideDialog();
                             }
                         }));
+                break;
+
+            case R.id.signupTial:
+                openActivity(SignUpTrialActivity.class);
+                break;
+
+            case R.id.cardLoginTrial:
+
+                if (validateFields()) {
+                    String email = loginLayoutBinding.loginEmail.getText().toString().trim();
+                    String password = loginLayoutBinding.loginPassword.getText().toString().trim();
+                    Intent intent = new Intent(LoginActivity.this, MainDashBoardTrialActivity.class);
+                    startActivity(intent);
+                    /*showDialog(getString(R.string.loading));
+                    if (isNetworkAvailable(this)) {
+                        mAuth.signInWithEmailAndPassword(email, password)
+                                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<AuthResult> task) {
+                                        if (task.isSuccessful()) {
+                                            Toast.makeText(getApplicationContext(), "Login successful!", Toast.LENGTH_LONG).show();
+                                            hideDialog();
+
+                                            Intent intent = new Intent(LoginActivity.this, MainDashBoardTrialActivity.class);
+                                            startActivity(intent);
+                                        } else {
+                                            Log.e("TAG", "onComplete: " + task.getException().getMessage());
+                                            Toast.makeText(getApplicationContext(), "Login failed! Please try again later", Toast.LENGTH_LONG).show();
+                                            hideDialog();
+                                        }
+                                    }
+                                });
+                    } else {
+                        Toast.makeText(getApplicationContext(), "No Internet! Please try again later", Toast.LENGTH_LONG).show();
+//                        LocalLogin(email, password, null);
+                    }*/
+                }
+
                 break;
         }
     }
