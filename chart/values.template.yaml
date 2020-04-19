@@ -1,0 +1,31 @@
+## This document is to be used by system administrators to ensure they provide all the necessary configuration values for production application deployments
+
+image: noononline:weblatest
+gitlabDockerConfigJson: base64 encoded value of .dockerConfigJson object for gitlab registry
+name: noon-web
+webHostingUrl: dari-staging-apps.noon-online.com
+applicationServiceAccount: base64 encoded value
+
+deploymentNamespace: devenv
+netCoreEnvironment: Development
+
+## Database configuration values.
+sqlInstanceConnectionName: proj-id:sql-instance-regsion:sql-instance-name
+sqlDbName: base64 encoded value
+sqlDbUser: base64 encoded value
+sqlDbPassword: base64 encoded value
+appDbConnectionString: base64 encoded value
+
+## Auth0 configuration values.
+auth0Tenant: base64 encoded value
+auth0ManagementUrl: base64 encoded value
+auth0ManagementClientId: base64 encoded value
+auth0ManagementClientSecret: base64 encoded value
+auth0ManagementAudience: base64 encoded value
+smtpServerDomain: base64 encoded value
+smtpServerPort: base64 encoded value
+smtpServerEmailAddress: base64 encoded value
+smtpServerEmailPassword: base64 encoded value
+
+## Value can either be fa or pa, any other value will throw an error.
+applicationLanguage: fa 

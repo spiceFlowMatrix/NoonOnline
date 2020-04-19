@@ -1,16 +1,13 @@
 package com.ibl.apps.Adapter;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
-import android.databinding.DataBindingUtil;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
+
+import androidx.databinding.DataBindingUtil;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
-import com.ibl.apps.Utils.Const;
-import com.ibl.apps.noon.FilesFeedbackActivity;
 import com.ibl.apps.noon.R;
 import com.ibl.apps.noon.databinding.QueueListItemBinding;
 

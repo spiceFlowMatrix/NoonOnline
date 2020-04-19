@@ -6,10 +6,10 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.ibl.apps.Model.AuthTokenObject;
-import com.ibl.apps.RoomDatabase.database.AppDatabase;
-import com.ibl.apps.Utils.Const;
-import com.ibl.apps.Utils.PrefUtils;
+import com.ibl.apps.RoomDatabase.dao.userManagementDatabse.UserDatabaseRepository;
 import com.ibl.apps.noon.R;
+import com.ibl.apps.util.Const;
+import com.ibl.apps.util.PrefUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -97,9 +97,9 @@ public class ApiClient {
 
                 //Log.e(Const.LOG_NOON_TAG, "===authid=" + authid);
 
+                UserDatabaseRepository userDatabaseRepository = new UserDatabaseRepository();
                 if (!TextUtils.isEmpty(authid)) {
-
-                    AuthTokenObject authTokenObject = AppDatabase.getAppDatabase(context).authTokenDao().getauthTokenData(authid);
+                    AuthTokenObject authTokenObject = userDatabaseRepository.getAuthTokenData(authid);
                     if (authTokenObject != null) {
 
                         String accessToken = "";

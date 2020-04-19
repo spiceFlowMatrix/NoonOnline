@@ -3,7 +3,6 @@ package com.ibl.apps.noon;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputFilter;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CompoundButton;
@@ -13,30 +12,25 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
+import com.ibl.apps.AssignmentManagement.AssignmentRepository;
 import com.ibl.apps.Base.BaseActivity;
-import com.ibl.apps.Model.AddDiscussionTopic;
 import com.ibl.apps.Model.CoursePriviewObject;
 import com.ibl.apps.Model.RestResponse;
 import com.ibl.apps.Model.assignment.AssignmentData;
-import com.ibl.apps.Model.assignment.StudentDetailData;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
-import com.ibl.apps.Utils.Const;
-import com.ibl.apps.Utils.InputFilterMinMax;
-import com.ibl.apps.Utils.PrefUtils;
-import com.ibl.apps.Utils.Validator;
 import com.ibl.apps.noon.databinding.AssignmentReviewLayoutBinding;
+import com.ibl.apps.util.Const;
+import com.ibl.apps.util.InputFilterMinMax;
+import com.ibl.apps.util.PrefUtils;
+import com.ibl.apps.util.Validator;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
-import retrofit2.HttpException;
 
 
 public class AssignmentReviewActivity extends BaseActivity implements View.OnClickListener {
@@ -52,6 +46,7 @@ public class AssignmentReviewActivity extends BaseActivity implements View.OnCli
     int flag;
     String remark, score;
     int scoreValue;
+    private AssignmentRepository assignmentRepository;
 
     @Override
 
@@ -63,7 +58,7 @@ public class AssignmentReviewActivity extends BaseActivity implements View.OnCli
     protected void onViewReady(Bundle savedInstanceState, Intent intent) {
         super.onViewReady(savedInstanceState, intent);
         assignmentReviewLayoutBinding = (AssignmentReviewLayoutBinding) getBindObj();
-
+        assignmentRepository = new AssignmentRepository();
         if (getIntent() != null) {
             flag = getIntent().getIntExtra(Const.Flag, 0);
             assignment = new Gson().fromJson(getIntent().getStringExtra(Const.Assignment), new TypeToken<CoursePriviewObject.Assignment>() {
@@ -144,7 +139,7 @@ public class AssignmentReviewActivity extends BaseActivity implements View.OnCli
         gsonObject = (JsonObject) jsonParser.parse(jsonObject.toString());
 
         showDialog(getString(R.string.loading));
-        disposable.add(apiService.addTeaherTopicSubmission(gsonObject)
+        disposable.add(assignmentRepository.addTeaherTopicSubmission(gsonObject)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<RestResponse<AssignmentData>>() {
@@ -192,7 +187,7 @@ public class AssignmentReviewActivity extends BaseActivity implements View.OnCli
         gsonObject = (JsonObject) jsonParser.parse(jsonObject.toString());
 
         showDialog(getString(R.string.loading));
-        disposable.add(apiService.addTeaherTopicSubmissionChapter(gsonObject)
+        disposable.add(assignmentRepository.addTeaherTopicSubmissionChapter(gsonObject)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<RestResponse<AssignmentData>>() {

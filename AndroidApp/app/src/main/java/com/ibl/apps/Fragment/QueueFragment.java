@@ -1,11 +1,11 @@
 package com.ibl.apps.Fragment;
 
 
-import android.databinding.DataBindingUtil;
+import androidx.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,11 +13,12 @@ import android.view.ViewGroup;
 
 import com.ibl.apps.Adapter.QueueListAdapter;
 import com.ibl.apps.Base.BaseFragment;
+import com.ibl.apps.FeedbackManagement.FeedbackRepository;
 import com.ibl.apps.Model.feedback.FeebBackTask;
 import com.ibl.apps.Network.ApiClient;
 import com.ibl.apps.Network.ApiService;
-import com.ibl.apps.Utils.LoadMoreData.OnLoadMoreListener;
-import com.ibl.apps.Utils.LoadMoreData.RecyclerViewLoadMoreScroll;
+import com.ibl.apps.util.LoadMoreData.OnLoadMoreListener;
+import com.ibl.apps.util.LoadMoreData.RecyclerViewLoadMoreScroll;
 import com.ibl.apps.noon.NoonApplication;
 import com.ibl.apps.noon.R;
 import com.ibl.apps.noon.databinding.FragmentQueueBinding;
@@ -44,6 +45,7 @@ public class QueueFragment extends BaseFragment {
     private RecyclerViewLoadMoreScroll scrollListener;
     private boolean isLoad = true;
     List<FeebBackTask.Data> feebBackTaskdata = new ArrayList<>();
+    private FeedbackRepository feedbackRepository;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
@@ -55,7 +57,7 @@ public class QueueFragment extends BaseFragment {
     @Override
     protected void setUp(View view) {
         showDialog(NoonApplication.getContext().getResources().getString(R.string.loading));
-        apiService = ApiClient.getClient(NoonApplication.getContext()).create(ApiService.class);
+        feedbackRepository = new FeedbackRepository();
         if (feebBackTaskdata != null && feebBackTaskdata.size() != 0) {
             feebBackTaskdata.clear();
             pagenumber = 1;
@@ -82,7 +84,7 @@ public class QueueFragment extends BaseFragment {
     }
 
     private void callApiForQueueList() {
-        disposable.add(apiService.getInQueueListApp(pagenumber, perpagerecord)
+        disposable.add(feedbackRepository.getInQueueListApp(pagenumber, perpagerecord)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<FeebBackTask>() {

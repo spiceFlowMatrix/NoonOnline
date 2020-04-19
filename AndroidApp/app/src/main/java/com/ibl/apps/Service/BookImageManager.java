@@ -4,18 +4,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
-import android.os.ParcelFileDescriptor;
-import android.support.annotation.NonNull;
-import android.support.v4.app.JobIntentService;
+
+import androidx.annotation.NonNull;
+import androidx.core.app.JobIntentService;
 import android.util.Log;
 
 import com.ibl.apps.Model.LibraryObject;
+import com.ibl.apps.RoomDatabase.dao.libraryManagementDatabase.LibraryDatabaseRepository;
 import com.ibl.apps.RoomDatabase.database.AppDatabase;
 import com.ibl.apps.RoomDatabase.entity.BookImageTable;
 import com.ibl.apps.noon.R;
-import com.shockwave.pdfium.PdfDocument;
-import com.shockwave.pdfium.PdfiumCore;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -64,13 +62,13 @@ public class BookImageManager extends JobIntentService {
                             byte[] bitmapImage = getByteArrayImage(libraryObject.getData().get(j).getBookcoverimage());
 
                             //Log.e(Const.LOG_NOON_TAG, "=====BITMAPIMAGE===" + bitmapImage);
-
+                            LibraryDatabaseRepository libraryDatabaseRepository = new LibraryDatabaseRepository();
                             if (bitmapImage != null) {
                                 BookImageTable bookImageTable = new BookImageTable();
                                 bookImageTable.setBookId(libraryObject.getData().get(j).getId());
                                 bookImageTable.setUserId(userId);
                                 bookImageTable.setBookImage(bitmapImage);
-                                AppDatabase.getAppDatabase(context).libraryDao().insertAll(bookImageTable);
+                                libraryDatabaseRepository.insertBookImageTable(bookImageTable);
                             } else {
                                 Bitmap myLogo = BitmapFactory.decodeResource(context.getResources(), R.drawable.noon_logo);
                                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -81,7 +79,7 @@ public class BookImageManager extends JobIntentService {
                                 bookImageTable.setBookId(libraryObject.getData().get(j).getId());
                                 bookImageTable.setUserId(userId);
                                 bookImageTable.setBookImage(bitmapdata);
-                                AppDatabase.getAppDatabase(context).libraryDao().insertAll(bookImageTable);
+                                libraryDatabaseRepository.insertBookImageTable(bookImageTable);
                             }
                         }
                     }

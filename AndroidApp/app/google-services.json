@@ -1,70 +1,45 @@
 {
   "project_info": {
-    "project_number": "811104853915",
-    "firebase_url": "https://training24-197210.firebaseio.com",
-    "project_id": "training24-197210",
-    "storage_bucket": "training24-197210.appspot.com"
+    "project_number": "763668390610",
+    "firebase_url": "https://noon-1da98.firebaseio.com",
+    "project_id": "noon-1da98",
+    "storage_bucket": "noon-1da98.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:811104853915:android:eb69bee2dc9f7f06",
+        "mobilesdk_app_id": "1:763668390610:android:85607db105e726c004430b",
         "android_client_info": {
           "package_name": "com.app.training24.noon"
         }
       },
       "oauth_client": [
         {
-          "client_id": "811104853915-c0l1g8unaqj6aoi3so16mia5v8vq15db.apps.googleusercontent.com",
+          "client_id": "763668390610-p5rnme8rmq1a4n5gojlpbd7s6lkiu8sc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.app.training24.noon",
+            "certificate_hash": "5497cd626cef8fe452820a60d528a92e0d92d265"
+          }
+        },
+        {
+          "client_id": "763668390610-uo0c0e5m9uc5i1f6iohpqfsc86tvhaod.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDyTHgI4VZ65GfBdjsDBt7bH-3DbjT6Ps0"
+          "current_key": "AIzaSyAbEy8R0WJ4qi9cLBpUPs_L1spUoTlp4tI"
         }
       ],
       "services": {
-        "analytics_service": {
-          "status": 1
-        },
         "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
-        },
-        "ads_service": {
-          "status": 2
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:811104853915:android:51e3e0aa3d8ff0eb",
-        "android_client_info": {
-          "package_name": "com.app.training24.noonpashto"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "811104853915-c0l1g8unaqj6aoi3so16mia5v8vq15db.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyDyTHgI4VZ65GfBdjsDBt7bH-3DbjT6Ps0"
-        }
-      ],
-      "services": {
-        "analytics_service": {
-          "status": 1
-        },
-        "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
-        },
-        "ads_service": {
-          "status": 2
+          "other_platform_oauth_client": [
+            {
+              "client_id": "763668390610-uo0c0e5m9uc5i1f6iohpqfsc86tvhaod.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

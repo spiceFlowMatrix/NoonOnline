@@ -5,30 +5,29 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.databinding.DataBindingUtil;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.design.widget.BottomNavigationView;
-import android.support.design.widget.NavigationView.OnNavigationItemSelectedListener;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.view.ViewPager;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AlertDialog;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.viewpager.widget.ViewPager;
+
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationView.OnNavigationItemSelectedListener;
 import com.ibl.apps.Adapter.ViewPagerAdapter;
 import com.ibl.apps.Base.BaseActivity;
 import com.ibl.apps.Fragment.ComplaintFragment;
@@ -38,16 +37,15 @@ import com.ibl.apps.Fragment.LibraryFragment;
 import com.ibl.apps.Fragment.ProfileFragment;
 import com.ibl.apps.Fragment.ReportFragment;
 import com.ibl.apps.Interface.BackInterface;
-import com.ibl.apps.RoomDatabase.dao.SyncTimeTrackingDao;
-import com.ibl.apps.RoomDatabase.database.AppDatabase;
+import com.ibl.apps.RoomDatabase.dao.courseManagementDatabase.CourseDatabaseRepository;
 import com.ibl.apps.RoomDatabase.entity.SyncTimeTrackingObject;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
 import com.ibl.apps.Service.TimeOut.SyncEventReceiver;
-import com.ibl.apps.Utils.Const;
-import com.ibl.apps.Utils.PrefUtils;
-import com.ibl.apps.Utils.SingleShotLocationProvider;
 import com.ibl.apps.noon.databinding.LogoutPopupLayoutBinding;
 import com.ibl.apps.noon.databinding.MainDashboardLayoutBinding;
+import com.ibl.apps.util.Const;
+import com.ibl.apps.util.PrefUtils;
+import com.ibl.apps.util.SingleShotLocationProvider;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -55,8 +53,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
-
-import io.reactivex.disposables.CompositeDisposable;
 
 /**
  * Created by iblinfotech on 10/09/18.
@@ -67,7 +63,6 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
     MainDashboardLayoutBinding mainDashboardLayoutBinding;
     private boolean doubleBackToExitPressedOnce = false;
     MenuItem prevMenuItem;
-    CompositeDisposable disposable = new CompositeDisposable();
     //Fragments
     GradeFragment gradeFragment;
     ProfileFragment profileFragment;
@@ -82,6 +77,7 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
     private String userId;
     private String userRoleName;
     private UserDetails userDetail;
+    CourseDatabaseRepository courseDatabaseRepository;
 
     @Override
     protected int getContentView() {
@@ -95,6 +91,7 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
         mainDashboardLayoutBinding = (MainDashboardLayoutBinding) getBindObj();
         setSupportActionBar(mainDashboardLayoutBinding.appBarLayout.toolBar);
         //callApiForInterval();
+        courseDatabaseRepository = new CourseDatabaseRepository();
 
         sharedPreferences = getSharedPreferences("rolename", MODE_PRIVATE);
         userRoleName = sharedPreferences.getString("userrolename", "");
@@ -321,7 +318,7 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
 
                 assert userId != null;
                 if (!userId.equals("")) {
-                    SyncTimeTrackingObject syncTimeTrackingObject = AppDatabase.getAppDatabase(NoonApplication.getContext()).syncTimeTrackingDao().getSyncTimeTrack(Integer.parseInt(userId));
+                    SyncTimeTrackingObject syncTimeTrackingObject = courseDatabaseRepository.getSyncTimeTrackById(Integer.parseInt(userId));
                     if (syncTimeTrackingObject != null) {
                         syncTimeTrackingObject.setLatitude("");
                         syncTimeTrackingObject.setLongitude("");
@@ -330,7 +327,7 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
                         syncTimeTrackingObject.setServiceprovider(getCarierName());
                         syncTimeTrackingObject.setVersion(Build.VERSION.RELEASE);
                         syncTimeTrackingObject.setUserid(Integer.parseInt(userId));
-                        AppDatabase.getAppDatabase(NoonApplication.getContext()).syncTimeTrackingDao().updateSyncTimeTracking(syncTimeTrackingObject);
+                        courseDatabaseRepository.updateSyncTimeTracking(syncTimeTrackingObject);
                     } else {
                         SyncTimeTrackingObject syncTimeTrackingObjectinsert = new SyncTimeTrackingObject();
                         syncTimeTrackingObjectinsert.setLatitude("");
@@ -341,7 +338,7 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
                         syncTimeTrackingObjectinsert.setVersion(Build.VERSION.RELEASE);
                         syncTimeTrackingObjectinsert.setActivitytime(getUTCTime());
                         syncTimeTrackingObjectinsert.setUserid(Integer.parseInt(userId));
-                        AppDatabase.getAppDatabase(NoonApplication.getContext()).syncTimeTrackingDao().insertAll(syncTimeTrackingObjectinsert);
+                       courseDatabaseRepository.insertSyncTimeTrackingData(syncTimeTrackingObjectinsert);
                     }
                 }
                 return null;
@@ -428,7 +425,7 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
 
                     assert userId != null;
                     if (!userId.equals("")) {
-                        SyncTimeTrackingObject syncTimeTrackingObject = AppDatabase.getAppDatabase(this).syncTimeTrackingDao().getSyncTimeTrack(Integer.parseInt(userId));
+                        SyncTimeTrackingObject syncTimeTrackingObject = courseDatabaseRepository.getSyncTimeTrackById(Integer.parseInt(userId));
                         if (syncTimeTrackingObject != null) {
                             syncTimeTrackingObject.setLatitude("");
                             syncTimeTrackingObject.setLongitude("");
@@ -437,7 +434,7 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
                             syncTimeTrackingObject.setServiceprovider(getCarierName());
                             syncTimeTrackingObject.setVersion(Build.VERSION.RELEASE);
                             syncTimeTrackingObject.setUserid(Integer.parseInt(userId));
-                            AppDatabase.getAppDatabase(NoonApplication.getContext()).syncTimeTrackingDao().updateSyncTimeTracking(syncTimeTrackingObject);
+                            courseDatabaseRepository.updateSyncTimeTracking(syncTimeTrackingObject);
                         } else {
                             SyncTimeTrackingObject syncTimeTrackingObjectinsert = new SyncTimeTrackingObject();
                             syncTimeTrackingObjectinsert.setLatitude("");
@@ -448,7 +445,7 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
                             syncTimeTrackingObjectinsert.setVersion(Build.VERSION.RELEASE);
                             syncTimeTrackingObjectinsert.setActivitytime(getUTCTime());
                             syncTimeTrackingObjectinsert.setUserid(Integer.parseInt(userId));
-                            AppDatabase.getAppDatabase(NoonApplication.getContext()).syncTimeTrackingDao().insertAll(syncTimeTrackingObjectinsert);
+                            courseDatabaseRepository.insertSyncTimeTrackingData(syncTimeTrackingObjectinsert);
                         }
                     }
                 }
@@ -536,6 +533,7 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
         mainDashboardLayoutBinding.appBarLayout.logOutBtn.setOnClickListener(this);
         mainDashboardLayoutBinding.appBarLayout.editprofileBtn.setOnClickListener(this);
         mainDashboardLayoutBinding.appBarLayout.btnNotification.setOnClickListener(this);
+        mainDashboardLayoutBinding.appBarLayout.txtDevice.setOnClickListener(this);
     }
 
     @Override
@@ -575,45 +573,12 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
                     profileFragment.hideVisibleLay(true);
                 }
                 break;
+            case R.id.txtDevice:
+                Intent mobileIntent = new Intent(MainDashBoardActivity.this, LoginDevicesActivity.class);
+                startActivity(mobileIntent);
+                break;
+
         }
-    }
-
-
-    public void showLogoutDialog() {
-
-        //before inflating the custom alert dialog layout, we will get the current activity viewgroup
-        //ViewGroup viewGroup = findViewById(android.R.id.content);
-
-        logoutPopupLayoutBinding = DataBindingUtil.inflate(LayoutInflater.from(this), R.layout.logout_popup_layout, null, false);
-
-        //Now we need an AlertDialog.Builder object
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
-        //setting the view of the builder to our custom view that we already inflated
-        builder.setView(logoutPopupLayoutBinding.getRoot());
-
-        //finally creating the alert dialog and displaying it
-        final AlertDialog alertDialog = builder.create();
-        //alertDialog.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-        logoutPopupLayoutBinding.txtLogoutOk.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                alertDialog.dismiss();
-                if (isNetworkAvailable(MainDashBoardActivity.this)) {
-                    callApiLogoutUser();
-                } else {
-                    locallyLogout();
-                }
-            }
-        });
-
-        logoutPopupLayoutBinding.txtLogoutCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                alertDialog.cancel();
-            }
-        });
-        alertDialog.show();
     }
 
     @Override
@@ -694,13 +659,12 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
     }
 
     private void getLocation(SingleShotLocationProvider.GPSCoordinates location) {
-        SyncTimeTrackingDao syncTimeTrackingDao = AppDatabase.getAppDatabase(this).syncTimeTrackingDao();
         SharedPreferences sharedPreferences = getSharedPreferences("user", MODE_PRIVATE);
         userId = sharedPreferences.getString("uid", "");
 
         assert userId != null;
         if (!userId.equals("")) {
-            SyncTimeTrackingObject syncTimeTrackingObject = syncTimeTrackingDao.getSyncTimeTrack(Integer.parseInt(userId));
+            SyncTimeTrackingObject syncTimeTrackingObject = courseDatabaseRepository.getSyncTimeTrackById(Integer.parseInt(userId));
             if (syncTimeTrackingObject != null) {
                 syncTimeTrackingObject.setLatitude(String.valueOf(location.latitude));
                 syncTimeTrackingObject.setLongitude(String.valueOf(location.longitude));
@@ -709,7 +673,7 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
                 syncTimeTrackingObject.setServiceprovider(getCarierName());
                 syncTimeTrackingObject.setVersion(Build.VERSION.RELEASE);
                 syncTimeTrackingObject.setUserid(Integer.parseInt(userId));
-                syncTimeTrackingDao.updateSyncTimeTracking(syncTimeTrackingObject);
+                courseDatabaseRepository.updateSyncTimeTracking(syncTimeTrackingObject);
             } else {
                 SyncTimeTrackingObject syncTimeTrackingObjectinsert = new SyncTimeTrackingObject();
                 syncTimeTrackingObjectinsert.setLatitude(String.valueOf(location.latitude));
@@ -720,7 +684,7 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
                 syncTimeTrackingObjectinsert.setVersion(Build.VERSION.RELEASE);
                 syncTimeTrackingObjectinsert.setActivitytime(getUTCTime());
                 syncTimeTrackingObjectinsert.setUserid(Integer.parseInt(userId));
-                syncTimeTrackingDao.insertAll(syncTimeTrackingObjectinsert);
+                courseDatabaseRepository.insertSyncTimeTrackingData(syncTimeTrackingObjectinsert);
             }
         }
 

@@ -2,12 +2,14 @@ package com.ibl.apps.Service;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.annotation.NonNull;
-import android.support.v4.app.JobIntentService;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+import androidx.core.app.JobIntentService;
+
+import com.ibl.apps.CourseManagement.CourseRepository;
 import com.ibl.apps.Model.CourseObject;
-import com.ibl.apps.RoomDatabase.database.AppDatabase;
+import com.ibl.apps.RoomDatabase.dao.courseManagementDatabase.CourseDatabaseRepository;
 import com.ibl.apps.RoomDatabase.entity.CourseImageTable;
 
 import java.io.BufferedInputStream;
@@ -60,7 +62,8 @@ public class CourseImageManager extends JobIntentService {
                                     courseImageTable.setGradeId(apiCourseObject.getData().get(j).getCourses().get(k).getId());
                                     courseImageTable.setUserId(userId);
                                     courseImageTable.setCourseImage(bitmapImage);
-                                    AppDatabase.getAppDatabase(context).courseDao().insertAll(courseImageTable);
+                                    CourseDatabaseRepository courseDatabaseRepository = new CourseDatabaseRepository();
+                                    courseDatabaseRepository.insertCourseImageTable(courseImageTable);
                                 }
                             }
                         }

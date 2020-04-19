@@ -6,9 +6,9 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.MenuItem;
@@ -21,12 +21,13 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.ibl.apps.Adapter.DiscussionFIleUploadListAdapter;
 import com.ibl.apps.Base.BaseActivity;
+import com.ibl.apps.DiscussionManagement.DiscussionRepository;
 import com.ibl.apps.Model.AddDiscussionTopic;
 import com.ibl.apps.Model.UploadTopicFile;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
-import com.ibl.apps.Utils.Const;
-import com.ibl.apps.Utils.PrefUtils;
-import com.ibl.apps.Utils.Validator;
+import com.ibl.apps.util.Const;
+import com.ibl.apps.util.PrefUtils;
+import com.ibl.apps.util.Validator;
 import com.ibl.apps.noon.databinding.DiscussionsAddLayoutBinding;
 
 import org.json.JSONArray;
@@ -51,7 +52,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.HttpException;
 
-import static com.ibl.apps.Utils.Const.GradeID;
+import static com.ibl.apps.util.Const.GradeID;
 
 
 public class GeneralDiscussionsAddActivity extends BaseActivity implements View.OnClickListener {
@@ -68,6 +69,7 @@ public class GeneralDiscussionsAddActivity extends BaseActivity implements View.
     DiscussionFIleUploadListAdapter discussionFIleUploadListAdapter;
     String GradeId, CourseName, ActivityFlag, LessonID, QuizID;
     String AddtionalLibrary, AddtionalDiscussions, AddtionalAssignment = "";
+    private DiscussionRepository discussionRepository;
 
     @Override
     protected int getContentView() {
@@ -83,7 +85,7 @@ public class GeneralDiscussionsAddActivity extends BaseActivity implements View.
     protected void onViewReady(Bundle savedInstanceState, Intent intent) {
         super.onViewReady(savedInstanceState, intent);
         discussionsAddLayoutBinding = (DiscussionsAddLayoutBinding) getBindObj();
-
+        discussionRepository = new DiscussionRepository();
 
         if (getIntent() != null) {
             GradeId = getIntent().getStringExtra(GradeID);
@@ -271,7 +273,7 @@ public class GeneralDiscussionsAddActivity extends BaseActivity implements View.
         gsonObject = (JsonObject) jsonParser.parse(jsonObject.toString());
 
         showDialog(getString(R.string.loading));
-        disposable.add(apiService.AddDiscussionTopic(gsonObject)
+        disposable.add(discussionRepository.AddDiscussionTopic(gsonObject)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<AddDiscussionTopic>() {
@@ -349,7 +351,7 @@ public class GeneralDiscussionsAddActivity extends BaseActivity implements View.
                         RequestBody duration = RequestBody.create(MediaType.parse("text/plain"), "");
                         RequestBody filesize = RequestBody.create(MediaType.parse("text/plain"), "");
 
-                        Call<UploadTopicFile> call = apiService.UploadTopicFile(body, fileTypeId, duration, filesize);
+                        Call<UploadTopicFile> call = discussionRepository.UploadTopicFile(body, fileTypeId, duration, filesize);
                         call.enqueue(new Callback<UploadTopicFile>() {
                             @Override
                             public void onResponse(Call<UploadTopicFile> call, retrofit2.Response<UploadTopicFile> response) {

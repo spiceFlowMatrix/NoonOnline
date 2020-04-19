@@ -3,16 +3,16 @@ package com.ibl.apps.noon;
 import android.Manifest;
 import android.content.Intent;
 import android.database.Cursor;
-import android.databinding.DataBindingUtil;
+import androidx.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.BottomSheetBehavior;
-import android.support.design.widget.BottomSheetDialog;
-import android.support.v7.widget.GridLayoutManager;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import androidx.recyclerview.widget.GridLayoutManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,6 +26,7 @@ import com.google.gson.JsonObject;
 import com.ibl.apps.Adapter.ImageUploadAdapter;
 import com.ibl.apps.Adapter.ImageUploadAdapterList;
 import com.ibl.apps.Base.BaseActivity;
+import com.ibl.apps.FeedbackManagement.FeedbackRepository;
 import com.ibl.apps.Model.RestResponse;
 import com.ibl.apps.Model.assignment.FileUploadResponse;
 import com.ibl.apps.Model.feedback.ChapterData;
@@ -37,8 +38,8 @@ import com.ibl.apps.Model.feedback.FillesData;
 import com.ibl.apps.Model.feedback.LessonData;
 import com.ibl.apps.Network.ApiClient;
 import com.ibl.apps.Network.ApiService;
-import com.ibl.apps.Utils.Const;
-import com.ibl.apps.Utils.Validator;
+import com.ibl.apps.util.Const;
+import com.ibl.apps.util.Validator;
 import com.ibl.apps.noon.databinding.ActivityFilesFeedbackBinding;
 import com.ibl.apps.noon.databinding.FileSelectItemBinding;
 import com.ibl.apps.noon.databinding.PickVideoFileBinding;
@@ -77,6 +78,7 @@ public class FilesFeedbackActivity extends BaseActivity implements View.OnClickL
     private int lessonid = 0;
     private int chpterId = 0;
     private Long id;
+    private FeedbackRepository feedbackRepository;
 
     @Override
     protected int getContentView() {
@@ -87,7 +89,7 @@ public class FilesFeedbackActivity extends BaseActivity implements View.OnClickL
     protected void onViewReady(Bundle savedInstanceState, Intent intent) {
         super.onViewReady(savedInstanceState, intent);
         binding = (ActivityFilesFeedbackBinding) getBindObj();
-        apiService = ApiClient.getClient(getApplicationContext()).create(ApiService.class);
+        feedbackRepository = new FeedbackRepository();
 
         if (fileIdList != null) {
             fileIdList.clear();
@@ -141,7 +143,7 @@ public class FilesFeedbackActivity extends BaseActivity implements View.OnClickL
     }
 
     public void callApiForFeedbackDeatil() {
-        disposable.add(apiService.getTaskFeedBackDetailsById(id)
+        disposable.add(feedbackRepository.getTaskFeedBackDetailsById(id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<FeedBackTaskDetail>() {
@@ -390,7 +392,7 @@ public class FilesFeedbackActivity extends BaseActivity implements View.OnClickL
     }
 
     private void callApiForCourseSpinner() {
-        disposable.add(apiService.getAllCourseByUser()
+        disposable.add(feedbackRepository.getAllCourseByUser()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<CourseSpinner>() {
@@ -423,7 +425,7 @@ public class FilesFeedbackActivity extends BaseActivity implements View.OnClickL
     }
 
     private void callApiForChapter(int courseId) {
-        disposable.add(apiService.getChapterByCourse(courseId)
+        disposable.add(feedbackRepository.getChapterByCourse(courseId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<ChapterData>() {
@@ -451,7 +453,7 @@ public class FilesFeedbackActivity extends BaseActivity implements View.OnClickL
     }
 
     private void callApiForLesson(int courseId) {
-        disposable.add(apiService.getLessonByCourse(courseId)
+        disposable.add(feedbackRepository.getLessonByCourse(courseId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<LessonData>() {
@@ -609,7 +611,7 @@ public class FilesFeedbackActivity extends BaseActivity implements View.OnClickL
         RequestBody filesize = RequestBody.create(MediaType.parse("text/plain"), "");
         RequestBody totalpages = RequestBody.create(MediaType.parse("text/plain"), "0");
 
-        Call<RestResponse<FileUploadResponse>> call = apiService.uploadAssignmentFile(body, fileTypeId, duration, filesize, totalpages);
+        Call<RestResponse<FileUploadResponse>> call = feedbackRepository.uploadAssignmentFile(body, fileTypeId, duration, filesize, totalpages);
         call.enqueue(new Callback<RestResponse<FileUploadResponse>>() {
             @Override
             public void onResponse(@NonNull Call<RestResponse<FileUploadResponse>> call, @NonNull Response<RestResponse<FileUploadResponse>> response) {
@@ -702,7 +704,7 @@ public class FilesFeedbackActivity extends BaseActivity implements View.OnClickL
         jsonObject.addProperty(Const.operatingsystem, Const.var_deviceType);
         jsonObject.add(Const.filesids, jsonArray);
 
-        disposable.add(apiService.getAddFeedbackApp(jsonObject)
+        disposable.add(feedbackRepository.getAddFeedbackApp(jsonObject)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<FeedBack>() {

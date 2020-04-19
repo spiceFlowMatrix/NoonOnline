@@ -2,9 +2,9 @@ package com.ibl.apps.Adapter;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.databinding.DataBindingUtil;
-import android.support.annotation.NonNull;
-import android.support.v4.view.PagerAdapter;
+import androidx.databinding.DataBindingUtil;
+import androidx.annotation.NonNull;
+import androidx.viewpager.widget.PagerAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +14,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.ibl.apps.Model.QuizMainObject;
-import com.ibl.apps.Utils.GlideApp;
+import com.ibl.apps.util.GlideApp;
 import com.ibl.apps.noon.R;
 import com.ibl.apps.noon.databinding.ImageviewpagerLayoutBinding;
 

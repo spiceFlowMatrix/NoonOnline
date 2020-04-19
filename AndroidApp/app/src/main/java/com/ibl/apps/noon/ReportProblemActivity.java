@@ -2,15 +2,15 @@ package com.ibl.apps.noon;
 
 import android.content.Intent;
 import android.database.Cursor;
-import android.databinding.DataBindingUtil;
+import androidx.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.annotation.Nullable;
-import android.support.design.widget.BottomSheetBehavior;
-import android.support.design.widget.BottomSheetDialog;
-import android.support.v7.widget.GridLayoutManager;
+import androidx.annotation.Nullable;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import androidx.recyclerview.widget.GridLayoutManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,14 +22,15 @@ import com.google.gson.JsonObject;
 import com.ibl.apps.Adapter.ImageUploadAdapter;
 import com.ibl.apps.Adapter.ImageUploadAdapterList;
 import com.ibl.apps.Base.BaseActivity;
+import com.ibl.apps.FeedbackManagement.FeedbackRepository;
 import com.ibl.apps.Model.RestResponse;
 import com.ibl.apps.Model.assignment.FileUploadResponse;
 import com.ibl.apps.Model.feedback.FeedBack;
 import com.ibl.apps.Model.feedback.FeedBackTaskDetail;
 import com.ibl.apps.Model.feedback.FileData;
 import com.ibl.apps.Model.feedback.FillesData;
-import com.ibl.apps.Utils.Const;
-import com.ibl.apps.Utils.Validator;
+import com.ibl.apps.util.Const;
+import com.ibl.apps.util.Validator;
 import com.ibl.apps.noon.databinding.FileSelectItemBinding;
 import com.ibl.apps.noon.databinding.PickVideoFileBinding;
 import com.ibl.apps.noon.databinding.ReportProblemActivityBinding;
@@ -63,6 +64,7 @@ public class ReportProblemActivity extends BaseActivity implements View.OnClickL
     public static ArrayList<String> fileIdList = new ArrayList<>();
     private Long id;
     private ArrayList<FileData> filesArrayList = new ArrayList<>();
+    private FeedbackRepository feedbackRepository;
 
 
     @Override
@@ -74,7 +76,7 @@ public class ReportProblemActivity extends BaseActivity implements View.OnClickL
     protected void onViewReady(Bundle savedInstanceState, Intent intent) {
         super.onViewReady(savedInstanceState, intent);
         binding = (ReportProblemActivityBinding) getBindObj();
-
+        feedbackRepository = new FeedbackRepository();
 
         if (fileIdList != null) {
             fileIdList.clear();
@@ -121,7 +123,7 @@ public class ReportProblemActivity extends BaseActivity implements View.OnClickL
     }
 
     public void callApiForFeedbackDeatil() {
-        disposable.add(apiService.getTaskFeedBackDetailsById(id)
+        disposable.add(feedbackRepository.getTaskFeedBackDetailsById(id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<FeedBackTaskDetail>() {
@@ -199,6 +201,7 @@ public class ReportProblemActivity extends BaseActivity implements View.OnClickL
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         Uri resultUri = null;
         if (resultCode == RESULT_CANCELED || data == null) {
             setSendButtonEnable(true);
@@ -287,7 +290,7 @@ public class ReportProblemActivity extends BaseActivity implements View.OnClickL
         RequestBody filesize = RequestBody.create(MediaType.parse("text/plain"), "");
         RequestBody totalpages = RequestBody.create(MediaType.parse("text/plain"), "0");
 
-        Call<RestResponse<FileUploadResponse>> call = apiService.uploadAssignmentFile(body, fileTypeId, duration, filesize, totalpages);
+        Call<RestResponse<FileUploadResponse>> call = feedbackRepository.uploadAssignmentFile(body, fileTypeId, duration, filesize, totalpages);
         call.enqueue(new Callback<RestResponse<FileUploadResponse>>() {
             @Override
             public void onResponse(Call<RestResponse<FileUploadResponse>> call, Response<RestResponse<FileUploadResponse>> response) {
@@ -486,7 +489,7 @@ public class ReportProblemActivity extends BaseActivity implements View.OnClickL
         jsonObject.addProperty(Const.operatingsystem, Const.var_deviceType);
         jsonObject.add(Const.filesids, jsonArray);
 
-        disposable.add(apiService.getAddFeedbackApp(jsonObject)
+        disposable.add(feedbackRepository.getAddFeedbackApp(jsonObject)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<FeedBack>() {

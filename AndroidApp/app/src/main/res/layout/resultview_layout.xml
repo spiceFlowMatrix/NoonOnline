@@ -54,7 +54,7 @@
                             android:layout_marginBottom="-5dp"
                             android:orientation="vertical" />
 
-                        <com.ibl.apps.Utils.CustomProgressBar
+                        <com.ibl.apps.util.CustomProgressBar
                             android:id="@+id/customProgressbar"
                             android:layout_width="match_parent"
                             android:layout_height="@dimen/_15sdp"
@@ -203,13 +203,13 @@
                                     android:layout_height="@dimen/_40sdp"
                                     android:layout_marginEnd="@dimen/_10sdp">
 
-                                    <android.support.v4.view.ViewPager
+                                    <androidx.viewpager.widget.ViewPager
                                         android:id="@+id/questionExplainationImagePager"
                                         android:layout_width="match_parent"
                                         android:layout_height="match_parent"
                                         android:layout_gravity="center">
 
-                                    </android.support.v4.view.ViewPager>
+                                    </androidx.viewpager.widget.ViewPager>
 
 
                                 </FrameLayout>

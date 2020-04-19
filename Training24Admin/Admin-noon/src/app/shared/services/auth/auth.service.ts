@@ -70,6 +70,7 @@ import { flatMap } from 'rxjs/operators';
 // import 'rxjs/add/operator/filter';
 import * as auth0 from 'auth0-js';
 import { pipe } from '@angular/core/src/render3/pipe';
+import { DataService } from '../data.services';
 
 (window as any).global = window;
 
@@ -79,8 +80,9 @@ export class AuthService {
     clientID: AUTH_CONFIG.clientID,
     domain: AUTH_CONFIG.domain,
     audience: AUTH_CONFIG.audience + "api/v2/",
-    responseType: 'token id_token',
-    redirectUri: AUTH_CONFIG.callbackURL,
+      responseType: 'token id_token',
+      redirectUri: localStorage.getItem('callback-admin'),
+    //redirectUri: AUTH_CONFIG.callbackURL,
     scope: 'openid profile'
   });
 
@@ -93,7 +95,7 @@ export class AuthService {
 
   ssoAuthComplete$ = this.observer.asObservable();
 
-  constructor(public router: Router) { }
+    constructor(public router: Router, public dataService: DataService) { }
 
   public login(): void {
     this.auth0.authorize();
@@ -168,8 +170,8 @@ export class AuthService {
     localStorage.removeItem('access_token');
     localStorage.removeItem('id_token');
     localStorage.removeItem('expires_at');
-    this.auth0.logout({
-      returnTo: 'http://localhost:4200',
+      this.auth0.logout({
+          returnTo: localStorage.getItem('callback-admin'),
       clientID: AUTH_CONFIG.clientID
     });
     this.unscheduleRenewal();

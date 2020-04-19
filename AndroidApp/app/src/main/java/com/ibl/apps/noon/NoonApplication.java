@@ -1,9 +1,9 @@
 package com.ibl.apps.noon;
 
-import android.arch.lifecycle.Lifecycle;
-import android.arch.lifecycle.LifecycleObserver;
-import android.arch.lifecycle.OnLifecycleEvent;
-import android.arch.lifecycle.ProcessLifecycleOwner;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleObserver;
+import androidx.lifecycle.OnLifecycleEvent;
+import androidx.lifecycle.ProcessLifecycleOwner;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.IntentFilter;
@@ -13,9 +13,9 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Handler;
-import android.support.multidex.MultiDex;
-import android.support.multidex.MultiDexApplication;
-import android.support.v7.app.AppCompatDelegate;
+import androidx.multidex.MultiDex;
+import androidx.multidex.MultiDexApplication;
+import androidx.appcompat.app.AppCompatDelegate;
 import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
@@ -25,13 +25,16 @@ import com.droidnet.DroidNet;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
+import com.ibl.apps.CourseManagement.CourseRepository;
 import com.ibl.apps.Model.SyncTimeTracking;
 import com.ibl.apps.Network.ApiClient;
 import com.ibl.apps.Network.ApiService;
+import com.ibl.apps.RoomDatabase.dao.courseManagementDatabase.CourseDatabaseRepository;
 import com.ibl.apps.RoomDatabase.database.AppDatabase;
 import com.ibl.apps.RoomDatabase.entity.SyncTimeTrackingObject;
 import com.ibl.apps.Service.NetworkChangeReceiver;
-import com.ibl.apps.Utils.Const;
+import com.ibl.apps.UserCredentialsManagement.UserRepository;
+import com.ibl.apps.util.Const;
 
 import java.io.File;
 import java.io.IOException;
@@ -125,6 +128,7 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
     }
 
     private void saveDataOffline() {
+        CourseDatabaseRepository courseDatabaseRepository= new CourseDatabaseRepository();
         SharedPreferences sharedPreferences = getSharedPreferences("spendtime", MODE_PRIVATE);
         if (sharedPreferences != null) {
             SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -135,11 +139,11 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
         String userId = sharedPreferencesuser.getString("uid", "");
         SyncTimeTrackingObject syncTimeTrackingObject = null;
         if (userId != null) {
-            syncTimeTrackingObject = AppDatabase.getAppDatabase(getContext()).syncTimeTrackingDao().getSyncTimeTrack(Integer.parseInt(userId));
+            syncTimeTrackingObject = courseDatabaseRepository.getSyncTimeTrackById(Integer.parseInt(userId));
         }
         if (syncTimeTrackingObject != null) {
             syncTimeTrackingObject.setOuttime(getUTCTime());
-            AppDatabase.getAppDatabase(getContext()).syncTimeTrackingDao().updateSyncTimeTracking(syncTimeTrackingObject);
+            courseDatabaseRepository.updateSyncTimeTracking(syncTimeTrackingObject);
         }
     }
 
@@ -154,8 +158,10 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
             SharedPreferences sharedPreferencesuser = getSharedPreferences("user", MODE_PRIVATE);
             String userId = sharedPreferencesuser.getString("uid", "");
 
+            CourseDatabaseRepository courseDatabaseRepository = new CourseDatabaseRepository();
+
             if (userId != null && !userId.isEmpty()) {
-                SyncTimeTrackingObject syncTimeTrackingObject = AppDatabase.getAppDatabase(getContext()).syncTimeTrackingDao().getSyncTimeTrack(Integer.parseInt(userId));
+                SyncTimeTrackingObject syncTimeTrackingObject = courseDatabaseRepository.getSyncTimeTrackById(Integer.parseInt(userId));
                 if (syncTimeTrackingObject != null) {
                     JsonArray array = new JsonArray();
                     JsonObject jsonObject = new JsonObject();
@@ -182,9 +188,9 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
 
 
                     if (outtimrsave != null && ((syncTimeTrackingObject.getOuttime() != null && !syncTimeTrackingObject.getOuttime().isEmpty()) || !outtimrsave.isEmpty())) {
-                        ApiService apiService = ApiClient.getClient(getContext()).create(ApiService.class);
+                        UserRepository userRepository = new UserRepository();
                         CompositeDisposable disposable = new CompositeDisposable();
-                        disposable.add(apiService.getSyncTimeTracking(array).subscribeOn(Schedulers.io())
+                        disposable.add(userRepository.getSyncTimeTracking(array).subscribeOn(Schedulers.io())
                                 .observeOn(AndroidSchedulers.mainThread())
                                 .subscribeWith(new DisposableSingleObserver<SyncTimeTracking>() {
                                     @Override
@@ -198,7 +204,7 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
                                                 editor.clear();
                                                 editor.apply();
                                             }
-                                            AppDatabase.getAppDatabase(getContext()).syncTimeTrackingDao().updateSyncTimeTracking(syncTimeTrackingObject);
+                                            courseDatabaseRepository.updateSyncTimeTracking(syncTimeTrackingObject);
                                         }
                                     }
 

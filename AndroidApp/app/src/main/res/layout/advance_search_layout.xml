@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
 
-    <android.support.v7.widget.CardView
+    <androidx.cardview.widget.CardView
         android:id="@+id/mainAdvanceSearchLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -105,7 +105,7 @@
                 android:orientation="horizontal"
                 android:weightSum="2">
 
-                <android.support.v7.widget.CardView
+                <androidx.cardview.widget.CardView
                     android:id="@+id/cardsearch"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -126,9 +126,9 @@
                         android:textColor="@color/colorWhite"
                         android:textSize="@dimen/_13sdp" />
 
-                </android.support.v7.widget.CardView>
+                </androidx.cardview.widget.CardView>
 
-                <android.support.v7.widget.CardView
+                <androidx.cardview.widget.CardView
                     android:id="@+id/cardclear"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -150,14 +150,14 @@
                         android:textColor="@color/colorWhite"
                         android:textSize="@dimen/_13sdp" />
 
-                </android.support.v7.widget.CardView>
+                </androidx.cardview.widget.CardView>
 
             </LinearLayout>
 
         </LinearLayout>
 
 
-    </android.support.v7.widget.CardView>
+    </androidx.cardview.widget.CardView>
 
 
 </layout>

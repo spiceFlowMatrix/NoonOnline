@@ -24,7 +24,7 @@
                 android:background="@color/colorGray" />
         </LinearLayout>
 
-        <android.support.v4.widget.NestedScrollView
+        <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_above="@+id/bottom_Lay"
@@ -81,7 +81,7 @@
                             android:background="@color/colorPrimary" />
                     </LinearLayout>
 
-                    <android.support.design.widget.TextInputLayout
+                    <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/generaldescrptionWrapper"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -102,9 +102,9 @@
                             android:textSize="@dimen/_12sdp"
                             app:x_disableEmoji="true" />
 
-                    </android.support.design.widget.TextInputLayout>
+                    </com.google.android.material.textfield.TextInputLayout>
 
-                    <android.support.design.widget.TextInputLayout
+                    <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/descrptionWrapperApp"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -125,7 +125,7 @@
                             android:textSize="@dimen/_12sdp"
                             app:x_disableEmoji="true" />
 
-                    </android.support.design.widget.TextInputLayout>
+                    </com.google.android.material.textfield.TextInputLayout>
 
                     <RelativeLayout
                         android:id="@+id/card_cameraroll"
@@ -187,7 +187,7 @@
 
                 </LinearLayout>
             </LinearLayout>
-        </android.support.v4.widget.NestedScrollView>
+        </androidx.core.widget.NestedScrollView>
 
         <RelativeLayout
             android:id="@+id/bottom_Lay"

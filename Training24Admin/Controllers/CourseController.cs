@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using Training24Admin.Model;
 using Trainning24.BL.Business;
+using Trainning24.BL.ViewModels;
 using Trainning24.BL.ViewModels.BundleCourse;
 using Trainning24.BL.ViewModels.Course;
 using Trainning24.BL.ViewModels.CourseGrade;
@@ -30,6 +31,8 @@ namespace Training24Admin.Controllers
 {
     [Route("api/v1/[controller]")]
     [ApiController]
+    [Produces("application/json")]
+    [ApiExplorerSettings(GroupName = nameof(SwaggerGrouping.Course))]
     //[Authorize]
     public class CourseController : ControllerBase
     {

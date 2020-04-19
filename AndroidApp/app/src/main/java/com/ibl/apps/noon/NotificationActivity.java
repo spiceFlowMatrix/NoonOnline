@@ -2,20 +2,22 @@ package com.ibl.apps.noon;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
+
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.gson.Gson;
 import com.ibl.apps.Adapter.NotificationListAdapter;
 import com.ibl.apps.Base.BaseActivity;
 import com.ibl.apps.Model.NotificationObject;
+import com.ibl.apps.NotificationManagement.NotificationRepository;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
-import com.ibl.apps.Utils.LoadMoreData.OnLoadMoreListener;
-import com.ibl.apps.Utils.LoadMoreData.RecyclerViewLoadMoreScroll;
-import com.ibl.apps.Utils.PrefUtils;
 import com.ibl.apps.noon.databinding.NotificationLayoutBinding;
+import com.ibl.apps.util.LoadMoreData.OnLoadMoreListener;
+import com.ibl.apps.util.LoadMoreData.RecyclerViewLoadMoreScroll;
+import com.ibl.apps.util.PrefUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +41,7 @@ public class NotificationActivity extends BaseActivity implements View.OnClickLi
     String userId = "0";
     boolean isLoad = true;
     NotificationListAdapter notificationListAdapter;
+    NotificationRepository notificationRepository;
 
     @Override
     protected int getContentView() {
@@ -51,6 +54,7 @@ public class NotificationActivity extends BaseActivity implements View.OnClickLi
         notificationLayoutBinding = (NotificationLayoutBinding) getBindObj();
         setToolbar(notificationLayoutBinding.toolbarLayout.toolBar);
         showBackArrow(getString(R.string.notification_label));
+        notificationRepository = new NotificationRepository();
 
         PrefUtils.MyAsyncTask asyncTask = (PrefUtils.MyAsyncTask) new PrefUtils.MyAsyncTask(new PrefUtils.MyAsyncTask.AsyncResponse() {
             @Override
@@ -105,7 +109,7 @@ public class NotificationActivity extends BaseActivity implements View.OnClickLi
 
     public void callApiNotificationList() {
 
-        disposable.add(apiService.fetchNotification(String.valueOf(pageNumber), perpagerecord)
+        disposable.add(notificationRepository.fetchNotification(String.valueOf(pageNumber), perpagerecord)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<NotificationObject>() {

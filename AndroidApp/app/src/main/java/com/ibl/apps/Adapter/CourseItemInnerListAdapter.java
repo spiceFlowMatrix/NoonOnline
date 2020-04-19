@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.databinding.DataBindingUtil;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
@@ -17,12 +16,6 @@ import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.res.ResourcesCompat;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextUtils;
@@ -31,6 +24,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
+import androidx.databinding.DataBindingUtil;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.auth0.android.Auth0;
 import com.auth0.android.authentication.AuthenticationAPIClient;
@@ -50,6 +51,7 @@ import com.droidnet.DroidListener;
 import com.droidnet.DroidNet;
 import com.google.gson.Gson;
 import com.ibl.apps.Base.BaseActivity;
+import com.ibl.apps.DownloadFileManagement.DownloadFileRepository;
 import com.ibl.apps.Fragment.CourseItemFragment;
 import com.ibl.apps.Interface.CourseHideResponse;
 import com.ibl.apps.Interface.CourseInnerItemInterface;
@@ -64,7 +66,11 @@ import com.ibl.apps.Model.QuizMainObject;
 import com.ibl.apps.Model.SignedUrlObject;
 import com.ibl.apps.Network.ApiClient;
 import com.ibl.apps.Network.ApiService;
-import com.ibl.apps.RoomDatabase.database.AppDatabase;
+import com.ibl.apps.RoomDatabase.dao.chapterManagementDatabase.ChapterDatabaseRepository;
+import com.ibl.apps.RoomDatabase.dao.courseManagementDatabase.CourseDatabaseRepository;
+import com.ibl.apps.RoomDatabase.dao.lessonManagementDatabase.LessonDatabaseRepository;
+import com.ibl.apps.RoomDatabase.dao.quizManagementDatabase.QuizDatabaseRepository;
+import com.ibl.apps.RoomDatabase.dao.userManagementDatabse.UserDatabaseRepository;
 import com.ibl.apps.RoomDatabase.entity.ChapterProgress;
 import com.ibl.apps.RoomDatabase.entity.FileDownloadStatus;
 import com.ibl.apps.RoomDatabase.entity.FileProgress;
@@ -72,18 +78,17 @@ import com.ibl.apps.RoomDatabase.entity.LessonNewProgress;
 import com.ibl.apps.RoomDatabase.entity.LessonProgress;
 import com.ibl.apps.RoomDatabase.entity.QuizProgress;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
-import com.ibl.apps.Utils.Const;
-import com.ibl.apps.Utils.CustomTypefaceSpan;
-import com.ibl.apps.Utils.JWTUtils;
-import com.ibl.apps.Utils.PrefUtils;
-import com.ibl.apps.Utils.VideoEncryptDecrypt.EncrypterDecryptAlgo;
 import com.ibl.apps.noon.AssignmentDetailActivity;
 import com.ibl.apps.noon.MainDashBoardActivity;
-import com.ibl.apps.noon.NoonApplication;
 import com.ibl.apps.noon.R;
 import com.ibl.apps.noon.databinding.CourseInnerItemLayoutBinding;
 import com.ibl.apps.noon.databinding.DeletePopupLayoutBinding;
 import com.ibl.apps.noon.databinding.DownloadPopupLayoutBinding;
+import com.ibl.apps.util.Const;
+import com.ibl.apps.util.CustomTypefaceSpan;
+import com.ibl.apps.util.JWTUtils;
+import com.ibl.apps.util.PrefUtils;
+import com.ibl.apps.util.VideoEncryptDecrypt.EncrypterDecryptAlgo;
 
 import org.json.JSONObject;
 
@@ -126,6 +131,7 @@ import static android.view.View.VISIBLE;
  */
 
 public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemInnerListAdapter.MyViewHolder> implements View.OnClickListener, DroidListener {
+
 
     ArrayList<CoursePriviewObject.Lessons> list;
     int lessonProg = 0;
@@ -171,6 +177,12 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
     public static ArrayList<QuizProgress> quizProgressList = new ArrayList<>();
     public static ArrayList<LessonNewProgress> lessonProgressList = new ArrayList<>();
     public static ArrayList<ChapterProgress> chapterProgressList = new ArrayList<>();
+    private DownloadFileRepository downloadFileRepository;
+    private QuizDatabaseRepository quizDatabaseRepository;
+    private CourseDatabaseRepository courseDatabaseRepository;
+    private UserDatabaseRepository userDatabaseRepository;
+    private LessonDatabaseRepository lessonDatabaseRepository;
+    private ChapterDatabaseRepository chapterDatabaseRepository;
 
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
@@ -184,6 +196,13 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
     }
 
     public CourseItemInnerListAdapter(Context ctx, ArrayList<CoursePriviewObject.Lessons> list, CourseInnerItemInterface courseInnerItemInterface, boolean isisLastItemViewed, boolean isPlayFirstItem, String chapterid, UserDetails userDetailsObject, String activityFlag, String lessonID, String QuizID, Boolean isNotification, CourseHideResponse courseHideResponse, ArrayList<CoursePriviewObject.Assignment> assignments, String Coursename, String gradeId) {
+        downloadFileRepository = new DownloadFileRepository();
+        quizDatabaseRepository = new QuizDatabaseRepository();
+        courseDatabaseRepository = new CourseDatabaseRepository();
+        userDatabaseRepository = new UserDatabaseRepository();
+        lessonDatabaseRepository = new LessonDatabaseRepository();
+        chapterDatabaseRepository = new ChapterDatabaseRepository();
+
         this.list = list;
         this.ctx = ctx;
         this.isisLastItemViewed = isisLastItemViewed;
@@ -312,14 +331,14 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
             callApiSyncLessonProgress(lessonProgressList);
             callApiSyncQuiz(quizProgressList);
             callApiSyncChapter(chapterProgressList);*/
-            ChapterProgress progress = AppDatabase.getAppDatabase(ctx).chapterProgressDao().getChapterProgress(gradeId, chapterid);
+            ChapterProgress progress = chapterDatabaseRepository.getChapterProgressData(gradeId, chapterid);
             if (progress != null && progress.getChapterId().equals(chapterid) && progress.getCourseId().equals(gradeId)) {
                 ChapterProgress chapterProgress = new ChapterProgress();
                 chapterProgress.setUserId(userId);
                 chapterProgress.setCourseId(gradeId);
                 chapterProgress.setChapterId(chapterid);
                 chapterProgress.setProgress(String.valueOf(pro));
-                AppDatabase.getAppDatabase(ctx).chapterProgressDao().updateChapterProgress(chapterProgress);
+                chapterDatabaseRepository.updateChapterProgressData(chapterProgress);
                 chapterProgressList.add(chapterProgress);
             } else {
                 ChapterProgress chapterProgress = new ChapterProgress();
@@ -327,7 +346,7 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
                 chapterProgress.setCourseId(gradeId);
                 chapterProgress.setChapterId(chapterid);
                 chapterProgress.setProgress(String.valueOf(pro));
-                AppDatabase.getAppDatabase(ctx).chapterProgressDao().insertAll(chapterProgress);
+                chapterDatabaseRepository.insertChapterProgressData(chapterProgress);
                 chapterProgressList.add(chapterProgress);
             }
 
@@ -349,7 +368,7 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
                 });
                 for (int i = 0; i < lessonfiles.size(); i++) {
                     CoursePriviewObject.Lessonfiles lessonsModel = lessonfiles.get(i);
-                    LessonProgress lessonProgressPrv = AppDatabase.getAppDatabase(NoonApplication.getContext()).lessonProgressDao().getItemLessonProgress(model.getId(), lessonsModel.getFiles().getId(), userId);
+                    LessonProgress lessonProgressPrv = lessonDatabaseRepository.getItemLessonProgressData(model.getId(), lessonsModel.getFiles().getId(), userId);
                     if (lessonProgressPrv != null && !lessonProgressPrv.getLessonProgress().isEmpty()) {
                         lessonprogress += Integer.parseInt(lessonProgressPrv.getLessonProgress());
                         lessonProg = Integer.parseInt(lessonProgressPrv.getLessonProgress());
@@ -359,7 +378,7 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
                         holder.courseInnerItemLayoutBinding.tvProgress.setText(("0").concat(" ").concat(holder.itemView.getContext().getString(R.string.completed1)));
                     }
 
-                    FileProgress progress = AppDatabase.getAppDatabase(ctx).fileProgressDao().getFileProgress(lessonsModel.getFiles().getId(), model.getId());
+                    FileProgress progress = lessonDatabaseRepository.getFileProgressData(lessonsModel.getFiles().getId(), model.getId());
                     if (progress != null && progress.getLessonId().equals(model.getId()) && progress.getFileId().equals(lessonsModel.getFiles().getId())) {
                         FileProgress fileProgress = new FileProgress();
                         /*if (i == lessonfiles.size() - 1) {
@@ -369,7 +388,7 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
                         fileProgress.setLessonId(model.getId());
                         fileProgress.setFileId(lessonsModel.getFiles().getId());
                         fileProgress.setProgress(String.valueOf(model.getProgressVal()));
-                        AppDatabase.getAppDatabase(ctx).fileProgressDao().updateFileProgress(fileProgress);
+                        lessonDatabaseRepository.updateFileProgressData(fileProgress);
                         fileProgressList.add(fileProgress);
 
 
@@ -382,7 +401,7 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
                         fileProgress.setLessonId(model.getId());
                         fileProgress.setFileId(lessonsModel.getFiles().getId());
                         fileProgress.setProgress(String.valueOf(model.getProgressVal()));
-                        AppDatabase.getAppDatabase(ctx).fileProgressDao().insertAll(fileProgress);
+                        lessonDatabaseRepository.insertFileProgressData(fileProgress);
                         fileProgressList.add(fileProgress);
                     }
 
@@ -451,7 +470,7 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
                         }
                     }
                 }
-                LessonNewProgress lessonNewProgress1 = AppDatabase.getAppDatabase(NoonApplication.getContext()).lessonnewProgressDao().getLessonProgress(lessonID, chapterid);
+                LessonNewProgress lessonNewProgress1 = lessonDatabaseRepository.getLessonProgressData(lessonID, chapterid);
                 if (lessonNewProgress1 != null && lessonNewProgress1.getLessonId().equals(lessonID) && lessonNewProgress1.getChapterId().equals(chapterid)) {
                     LessonNewProgress lessonNewProgress = new LessonNewProgress();
                     lessonNewProgress.setUserId(userId);
@@ -459,7 +478,7 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
                     lessonNewProgress.setLessonId(model.getId());
                     lessonNewProgress.setProgress(String.valueOf(lessonprogress / lessonfiles.size()));
                     chapterPro += lessonprogress / lessonfiles.size();
-                    AppDatabase.getAppDatabase(NoonApplication.getContext()).lessonnewProgressDao().updateLessonProgress(lessonNewProgress);
+                    lessonDatabaseRepository.updateLessonProgressData(lessonNewProgress);
                     lessonProgressList.add(lessonNewProgress);
 
                 } else {
@@ -469,7 +488,7 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
                     lessonNewProgress.setLessonId(model.getId());
                     lessonNewProgress.setProgress(String.valueOf(lessonprogress / lessonfiles.size()));
                     chapterPro += lessonprogress / lessonfiles.size();
-                    AppDatabase.getAppDatabase(NoonApplication.getContext()).lessonnewProgressDao().insertAll(lessonNewProgress);
+                    lessonDatabaseRepository.insertLessonNewProgress(lessonNewProgress);
                     lessonProgressList.add(lessonNewProgress);
                 }
 //                holder.courseInnerItemLayoutBinding.tvProgress.setText(String.valueOf(lessonprogress/lessonfiles.size()).concat(" ").concat(holder.itemView.getContext().getString(R.string.completed1)));
@@ -481,7 +500,7 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
             holder.courseInnerItemLayoutBinding.txtFileName.setText(model.getName());
             holder.courseInnerItemLayoutBinding.txtfileType.setText("Quiz");
             holder.courseInnerItemLayoutBinding.txtLanguagemin.setText(model.getNumquestions() + " " + "Questions");
-            QuizProgress progress = AppDatabase.getAppDatabase(ctx).quizProgressDao().getQuizProgress(model.getId(), chapterid);
+            QuizProgress progress = quizDatabaseRepository.getQuizProgress(model.getId(), chapterid);
             if (progress != null && progress.getQuizId().equals(model.getId()) && progress.getChapterId().equals(chapterid)) {
                 QuizProgress quizProgress = new QuizProgress();
                 quizProgress.setUserId(userId);
@@ -489,7 +508,7 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
                 quizProgress.setChapterId(chapterid);
                 quizProgress.setProgress(String.valueOf(model.getProgressVal()));
                 holder.courseInnerItemLayoutBinding.tvProgress.setText(String.valueOf(model.getProgressVal()).concat(" ").concat(holder.itemView.getContext().getString(R.string.completed1)));
-                AppDatabase.getAppDatabase(ctx).quizProgressDao().updateQuizProgress(quizProgress);
+                quizDatabaseRepository.updateQuizProgress(quizProgress);
                 quizProgressList.add(quizProgress);
             } else {
                 QuizProgress quizProgress = new QuizProgress();
@@ -497,12 +516,12 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
                 quizProgress.setQuizId(model.getId());
                 quizProgress.setChapterId(chapterid);
                 quizProgress.setProgress(String.valueOf(model.getProgressVal()));
-                AppDatabase.getAppDatabase(ctx).quizProgressDao().insertAll(quizProgress);
+                quizDatabaseRepository.insertAllQuizProgress(quizProgress);
                 holder.courseInnerItemLayoutBinding.tvProgress.setText(String.valueOf(0).concat(" ").concat(holder.itemView.getContext().getString(R.string.completed1)));
                 quizProgressList.add(quizProgress);
             }
 
-            QuizMainObject quizMainObject = AppDatabase.getAppDatabase(ctx).quizAnswerDao().getquizData(userId, model.getId());
+            QuizMainObject quizMainObject = quizDatabaseRepository.getQuizByUserId(userId, model.getId());
 
             if (quizMainObject != null) {
                 holder.courseInnerItemLayoutBinding.disableLay.setVisibility(GONE);
@@ -594,7 +613,7 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
                 holder.courseInnerItemLayoutBinding.imgdownloadContent.setEnabled(false);
                 // Log.e("INTERVALLLLLL", "=====11==");
                 long milliseconds = System.currentTimeMillis();
-                IntervalTableObject myintervalobject = AppDatabase.getAppDatabase(ctx).intervalDao().getAllInterval();
+                IntervalTableObject myintervalobject = courseDatabaseRepository.getAllInterval();
                 if (myintervalobject != null) {
                     // Log.e("INTERVALLLLLL", "=====22==");
 
@@ -613,7 +632,7 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
                             //Log.e("INTERVALLLLLL", "=====66==");
                             showDialogcancle(position, holder);
                             //showCustomDialogcancle(position, holder);
-                            AppDatabase.getAppDatabase(ctx).intervalDao().updateItem(String.valueOf(milliseconds), myintervalobject.getIntervalTableID());
+                            courseDatabaseRepository.updateItemIntervalId(String.valueOf(milliseconds), myintervalobject.getIntervalTableID());
                         } else {
                             //Log.e("INTERVALLLLLL", "=====77==");
                             startDownload(position, holder);
@@ -622,7 +641,7 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
                         // Log.e("INTERVALLLLLL", "=====55==");
                         showDialogcancle(position, holder);
                         //showCustomDialogcancle(position, holder);
-                        AppDatabase.getAppDatabase(ctx).intervalDao().updateItem(String.valueOf(milliseconds), myintervalobject.getIntervalTableID());
+                        courseDatabaseRepository.updateItemIntervalId(String.valueOf(milliseconds), myintervalobject.getIntervalTableID());
                     }
                 } else {
                     //Log.e("INTERVALLLLLL", "=====33==");
@@ -1052,7 +1071,7 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
 
         for (int i = 0; i < downloadQueueObjects.size(); i++) {
             int finalI = i;
-            disposable.add(apiService.fetchSignedUrl(downloadQueueObjects.get(i).getFileid(), downloadQueueObjects.get(i).getLessonID())
+            disposable.add(downloadFileRepository.fetchSignedUrl(downloadQueueObjects.get(i).getFileid(), downloadQueueObjects.get(i).getLessonID())
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeWith(new DisposableSingleObserver<SignedUrlObject>() {
@@ -1098,7 +1117,7 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
         CoursePriviewObject.Lessonfiles lessonsModel = downloadQueueObject.getLessonsModel();
         CoursePriviewObject.Lessons model = downloadQueueObject.getLemodel();
 
-        disposable.add(apiService.fetchSignedUrl(fileID, lessionID)
+        disposable.add(downloadFileRepository.fetchSignedUrl(fileID, lessionID)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<SignedUrlObject>() {
@@ -1138,7 +1157,7 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
             CoursePriviewObject.Lessonfiles lessonsModel = download.getLessonsModel();
             CoursePriviewObject.Lessons model = download.getLemodel();
 
-            disposable.add(apiService.fetchSignedUrl(fileID, lessionID)
+            disposable.add(downloadFileRepository.fetchSignedUrl(fileID, lessionID)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeWith(new DisposableSingleObserver<SignedUrlObject>() {
@@ -1259,7 +1278,7 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
                                             fileDownloadStatus.setLessonid("0");
                                             fileDownloadStatus.setFileid(downloadQueueObjects.get(finalI).getLessonsModel().getFiles().getId());
                                             fileDownloadStatus.setDownloadID(finalDownloadId);
-                                            AppDatabase.getAppDatabase(ctx).fileDownloadStatusDao().insertAll(fileDownloadStatus);
+                                            lessonDatabaseRepository.insertFileDownloadData(fileDownloadStatus);
                                             return null;
                                         }
                                     }.execute();
@@ -1380,9 +1399,9 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
 
                                                 if (finalI == signedUrl.size() - 1) {
                                                     com.downloader.Status fileStatus = PRDownloader.getStatus(downloadId);
-                                                    FileDownloadStatus fileDownloadStatus = AppDatabase.getAppDatabase(ctx).fileDownloadStatusDao().getItemFileDownloadStatus(downloadQueueObjects.get(finalI).getLessonsModel().getFiles().getId());
+                                                    FileDownloadStatus fileDownloadStatus = lessonDatabaseRepository.getItemFileDownloadStatusData(downloadQueueObjects.get(finalI).getLessonsModel().getFiles().getId());
                                                     if (fileDownloadStatus != null) {
-                                                        AppDatabase.getAppDatabase(ctx).fileDownloadStatusDao().updateItemFileDownloadStatus(downloadQueueObjects.get(finalI).getLessonsModel().getFiles().getId(), fileStatus.toString(), (int) progressval);
+                                                        lessonDatabaseRepository.updateItemFileDownloadStatusData(downloadQueueObjects.get(finalI).getLessonsModel().getFiles().getId(), fileStatus.toString(), (int) progressval);
                                                     }
                                                     DownloadProgress downloadProgress = downloadIdArray.get(downloadIdArray.size() - 1);
                                                     com.downloader.Status status = PRDownloader.getStatus((int) downloadProgress.getDownloadId());
@@ -1621,7 +1640,7 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
                                         fileDownloadStatus.setLessonid("0");
                                         fileDownloadStatus.setFileid(lessonsModel.getFiles().getId());
                                         fileDownloadStatus.setDownloadID(downloadId);
-                                        AppDatabase.getAppDatabase(ctx).fileDownloadStatusDao().insertAll(fileDownloadStatus);
+                                        lessonDatabaseRepository.insertFileDownloadData(fileDownloadStatus);
                                         return null;
                                     }
                                 }.execute();
@@ -1706,9 +1725,9 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
 
 
                                             com.downloader.Status fileStatus = PRDownloader.getStatus(downloadId);
-                                            FileDownloadStatus fileDownloadStatus = AppDatabase.getAppDatabase(ctx).fileDownloadStatusDao().getItemFileDownloadStatus(lessonsModel.getFiles().getId());
+                                            FileDownloadStatus fileDownloadStatus = lessonDatabaseRepository.getItemFileDownloadStatusData(lessonsModel.getFiles().getId());
                                             if (fileDownloadStatus != null) {
-                                                AppDatabase.getAppDatabase(ctx).fileDownloadStatusDao().updateItemFileDownloadStatus(lessonsModel.getFiles().getId(), fileStatus.toString(), (int) progressval);
+                                                lessonDatabaseRepository.updateItemFileDownloadStatusData(lessonsModel.getFiles().getId(), fileStatus.toString(), (int) progressval);
                                             }
 
                                         } catch (NoSuchAlgorithmException e) {
@@ -2164,7 +2183,7 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
 
         String authid = PrefUtils.getAuthid(ctx);
         if (!TextUtils.isEmpty(authid)) {
-            AuthTokenObject authTokenObject = AppDatabase.getAppDatabase(ctx).authTokenDao().getauthTokenData(authid);
+            AuthTokenObject authTokenObject = userDatabaseRepository.getAuthTokenData(authid);
             if (authTokenObject != null) {
 
                 String accessToken = "";
@@ -2221,7 +2240,7 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
                                                 String exp = jsonObj.get(Const.LOG_NOON_EXP).toString();
                                                 String sub = jsonObj.get(Const.LOG_NOON_SUB).toString();
 
-                                                AppDatabase.getAppDatabase(ctx).authTokenDao().updateToken(sub,
+                                                userDatabaseRepository.updateAuthToken(sub,
                                                         credentials.getAccessToken(),
                                                         credentials.getIdToken(),
                                                         credentials.getExpiresIn(),

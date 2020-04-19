@@ -3,10 +3,9 @@ package com.ibl.apps.Adapter;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.databinding.DataBindingUtil;
-import android.support.v7.widget.RecyclerView;
+import androidx.databinding.DataBindingUtil;
+import androidx.recyclerview.widget.RecyclerView;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,8 +16,8 @@ import com.droidnet.DroidListener;
 import com.droidnet.DroidNet;
 import com.ibl.apps.Model.QuizMainObject;
 import com.ibl.apps.Model.SearchObject;
-import com.ibl.apps.RoomDatabase.database.AppDatabase;
-import com.ibl.apps.Utils.Const;
+import com.ibl.apps.RoomDatabase.dao.quizManagementDatabase.QuizDatabaseRepository;
+import com.ibl.apps.util.Const;
 import com.ibl.apps.noon.ChapterActivity;
 import com.ibl.apps.noon.R;
 import com.ibl.apps.noon.databinding.CourseInnerItemLayoutBinding;
@@ -118,7 +117,8 @@ public class SearchLessonAdapter extends RecyclerView.Adapter<SearchLessonAdapte
                 holder.courseInnerItemLayoutBinding.txtfileType.setText("Quiz");
                 holder.courseInnerItemLayoutBinding.imgdownloadContentLayout.setVisibility(GONE);
 
-                QuizMainObject quizMainObject = AppDatabase.getAppDatabase(ctx).quizAnswerDao().getquizData(userIdWithoutSlash, model.getId());
+                QuizDatabaseRepository quizDatabaseRepository = new QuizDatabaseRepository();
+                QuizMainObject quizMainObject = quizDatabaseRepository.getQuizByUserId(userIdWithoutSlash, model.getId());
                 if (quizMainObject != null) {
                     holder.courseInnerItemLayoutBinding.disableLay.setVisibility(GONE);
                 } else {
@@ -210,7 +210,7 @@ public class SearchLessonAdapter extends RecyclerView.Adapter<SearchLessonAdapte
 
     public static void showNetworkAlert(Context activity) {
         try {
-            android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(activity);
+            androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(activity);
             builder.setTitle(activity.getResources().getString(R.string.validation_warning));
             builder.setMessage(activity.getResources().getString(R.string.validation_Connect_internet))
                     .setPositiveButton(activity.getResources().getString(R.string.button_ok), new DialogInterface.OnClickListener() {

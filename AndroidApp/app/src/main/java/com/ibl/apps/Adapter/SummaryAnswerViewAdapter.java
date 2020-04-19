@@ -1,14 +1,14 @@
 package com.ibl.apps.Adapter;
 
 import android.content.Context;
-import android.databinding.DataBindingUtil;
-import android.support.v7.widget.RecyclerView;
+import androidx.databinding.DataBindingUtil;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.ibl.apps.Model.QuizMainObject;
-import com.ibl.apps.RoomDatabase.database.AppDatabase;
+import com.ibl.apps.RoomDatabase.dao.quizManagementDatabase.QuizDatabaseRepository;
 import com.ibl.apps.RoomDatabase.entity.QuizAnswerSelect;
 import com.ibl.apps.noon.R;
 import com.ibl.apps.noon.databinding.SummaryAnswerItemLayoutBinding;
@@ -80,7 +80,8 @@ public class SummaryAnswerViewAdapter extends RecyclerView.Adapter<SummaryAnswer
         }
 
         try {
-            QuizAnswerSelect quizAnswerSelect = AppDatabase.getAppDatabase(ctx).quizAnswerDao().getItemAnswerSelect(questionID);
+            QuizDatabaseRepository quizDatabaseRepository = new QuizDatabaseRepository();
+            QuizAnswerSelect quizAnswerSelect = quizDatabaseRepository.getItemAnswerSelect(questionID);
             if (quizAnswerSelect != null) {
                 if (quizAnswerSelect.getSelectedAnswerId().equals(model.getId())) {
                     if (!model.getIscorrect().equals("true")) {

@@ -3,18 +3,18 @@ package com.ibl.apps.Fragment;
 import android.app.AlertDialog;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.databinding.DataBindingUtil;
+import androidx.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.res.ResourcesCompat;
-import android.support.v7.widget.LinearLayoutManager;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -63,14 +63,16 @@ import com.ibl.apps.Model.parent.ParentGraphPoints;
 import com.ibl.apps.Model.parent.ParentSpinnerModel;
 import com.ibl.apps.Network.ApiClient;
 import com.ibl.apps.Network.ApiService;
+import com.ibl.apps.ParentControlManagement.ParentControlRepository;
+import com.ibl.apps.RoomDatabase.dao.userManagementDatabse.UserDatabaseRepository;
 import com.ibl.apps.RoomDatabase.database.AppDatabase;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
-import com.ibl.apps.Utils.CustomView.MultiSelectSpinner;
-import com.ibl.apps.Utils.LoadMoreData.OnLoadMoreListener;
-import com.ibl.apps.Utils.LoadMoreData.RecyclerViewLoadMoreScroll;
-import com.ibl.apps.Utils.PrefUtils;
-import com.ibl.apps.Utils.TimeAgoLastOnlineClass;
-import com.ibl.apps.Utils.WorkaroundMapFragment;
+import com.ibl.apps.util.CustomView.MultiSelectSpinner;
+import com.ibl.apps.util.LoadMoreData.OnLoadMoreListener;
+import com.ibl.apps.util.LoadMoreData.RecyclerViewLoadMoreScroll;
+import com.ibl.apps.util.PrefUtils;
+import com.ibl.apps.util.TimeAgoLastOnlineClass;
+import com.ibl.apps.util.WorkaroundMapFragment;
 import com.ibl.apps.noon.NoonApplication;
 import com.ibl.apps.noon.R;
 import com.ibl.apps.noon.databinding.FragmentProgressReportBinding;
@@ -122,6 +124,8 @@ public class ProgressReportFragment extends BaseFragment implements View.OnClick
     int pagenumber = 1;
     int perpagerecord = 20;
     List<ParentGraphPoints.Data> paretnData = new ArrayList<>();
+    private ParentControlRepository parentControlRepository;
+    private UserDatabaseRepository userDatabaseRepository;
 
 
     public static ProgressReportFragment newInstance(String param1, String param2) {
@@ -137,7 +141,8 @@ public class ProgressReportFragment extends BaseFragment implements View.OnClick
     @Override
     protected void setUp(View view) {
         showDialog(Objects.requireNonNull(getActivity()).getResources().getString(R.string.loading));
-        apiService = ApiClient.getClient(getContext()).create(ApiService.class);
+        parentControlRepository = new ParentControlRepository();
+        userDatabaseRepository = new UserDatabaseRepository();
 //        callApiLocationData();
         setUpAllSpinners();
         setonclicklistner();
@@ -156,18 +161,18 @@ public class ProgressReportFragment extends BaseFragment implements View.OnClick
     private void callApiForStudentSpinner() {
         String authid = PrefUtils.getAuthid(NoonApplication.getContext());
         if (!TextUtils.isEmpty(authid)) {
-            AuthTokenObject authTokenObject = AppDatabase.getAppDatabase(NoonApplication.getContext()).authTokenDao().getauthTokenData(authid);
+            AuthTokenObject authTokenObject = userDatabaseRepository.getAuthTokenData(authid);
 
             if (authTokenObject != null) {
                 String sub = "";
                 if (authTokenObject.getSub() != null) {
                     sub = authTokenObject.getSub();
-                    userDetails = AppDatabase.getAppDatabase(NoonApplication.getContext()).userDetailDao().getUserDetials(sub);
+                    userDetails = userDatabaseRepository.getUserDetails(sub);
                 }
             }
         }
 
-        disposable.add(apiService.getUserSpinnerData(Integer.parseInt(userDetails.getId()))
+        disposable.add(parentControlRepository.getUserSpinnerData(Integer.parseInt(userDetails.getId()))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<ParentSpinnerModel>() {
@@ -328,7 +333,8 @@ public class ProgressReportFragment extends BaseFragment implements View.OnClick
         } catch (JsonSyntaxException e) {
             e.printStackTrace();
         }
-        disposable.add(apiService.getUsersLocation(jsonObject)
+
+        disposable.add(parentControlRepository.getUsersLocation(jsonObject)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<LocationData>() {
@@ -408,7 +414,7 @@ public class ProgressReportFragment extends BaseFragment implements View.OnClick
             } catch (JsonSyntaxException e) {
                 e.printStackTrace();
             }
-            disposable.add(apiService.getLastOnline(jsonobject)
+            disposable.add(parentControlRepository.getLastOnline(jsonobject)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeWith(new DisposableSingleObserver<LastOnline>() {
@@ -581,7 +587,7 @@ public class ProgressReportFragment extends BaseFragment implements View.OnClick
             e.printStackTrace();
         }
 
-        disposable.add(apiService.getOverAllChartData(jsonObject)
+        disposable.add(parentControlRepository.getOverAllChartData(jsonObject)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<Chart>() {
@@ -1078,7 +1084,7 @@ public class ProgressReportFragment extends BaseFragment implements View.OnClick
 
 
     private void callApiForUserLocationList(String date, MarkerViewBinding binding, AlertDialog alertDialog) {
-        disposable.add(apiService.getViewChildActivity(date, pagenumber, perpagerecord)
+        disposable.add(parentControlRepository.getViewChildActivity(date, pagenumber, perpagerecord)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<ParentGraphPoints>() {

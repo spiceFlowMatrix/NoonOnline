@@ -1,9 +1,9 @@
 package com.ibl.apps.Fragment;
 
-import android.databinding.DataBindingUtil;
+import androidx.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,7 +11,6 @@ import android.view.ViewGroup;
 import com.google.gson.Gson;
 import com.ibl.apps.Base.BaseFragment;
 import com.ibl.apps.Model.StatisticsObject;
-import com.ibl.apps.Utils.Const;
 import com.ibl.apps.noon.R;
 import com.ibl.apps.noon.databinding.FragmentStatisticsLayoutBinding;
 
@@ -86,7 +85,6 @@ public class StatisticsFragment extends BaseFragment implements View.OnClickList
     }
 
     public void callApiStatistics() {
-
         showDialog(getString(R.string.loading));
         disposable.add(apiService.StatisticUser()
                 .subscribeOn(Schedulers.io())

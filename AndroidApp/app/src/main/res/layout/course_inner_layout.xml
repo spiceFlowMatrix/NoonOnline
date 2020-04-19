@@ -30,7 +30,7 @@
 
                     <include
                         android:id="@+id/progressBarLayout"
-                        layout="@layout/progressbar_layout"></include>
+                        layout="@layout/progressbar_layout" />
 
                 </LinearLayout>
 

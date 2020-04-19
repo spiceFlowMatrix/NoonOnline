@@ -1,16 +1,15 @@
 package com.ibl.apps.Adapter;
 
 import android.content.Context;
-import android.databinding.DataBindingUtil;
-import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
+import androidx.databinding.DataBindingUtil;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import com.droidnet.DroidListener;
 import com.droidnet.DroidNet;
 import com.ibl.apps.Model.feedback.FillesData;
-import com.ibl.apps.Utils.GlideApp;
 import com.ibl.apps.noon.R;
 import com.ibl.apps.noon.databinding.DiscussionsFilePreviewItemLayoutBinding;
 

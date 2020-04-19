@@ -1,0 +1,121 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    annotations:
+        app.gitlab.com/app: {{ .Values.gitlabCiProjectPath }}
+        app.gitlab.com/env: {{ .Values.gitlabCiProjectEnvironment }}
+    name: {{ .Values.name }}
+    namespace: {{ .Values.deploymentNamespace }}
+    labels:
+        app: {{ .Values.name }}
+spec:
+    replicas: {{ .Values.replicas }}
+    selector:
+        matchLabels:
+            app: {{ .Values.name }}
+    template:
+        metadata:
+            annotations:
+                app.gitlab.com/app: {{ .Values.gitlabCiProjectPath }}
+                app.gitlab.com/env: {{ .Values.gitlabCiProjectEnvironment }}
+            labels:
+                app: {{ .Values.name }}
+        spec:
+            imagePullSecrets:
+                - name: {{ .Values.name }}-gitlab-registry-secret
+            containers:
+                -   name: {{ .Values.name }}
+                    image: {{ .Values.image }}
+                    imagePullPolicy: Always
+                    ports:
+                        - containerPort: 80
+                    env:
+                    -   name: ASPNETCORE_ENVIRONMENT
+                        value: {{ .Values.netCoreEnvironment }}
+                    -   name: ASPNET_DB_CONNECTIONSTRING
+                        valueFrom:
+                            secretKeyRef:
+                                name: {{ .Values.name }}-secrets
+                                key: appDbConnectionString
+                    -   name: MYSQL_DB_HOST
+                        value: 127.0.0.1:3306
+                    -   name: MYSQL_DB_NAME
+                        valueFrom:
+                            secretKeyRef:
+                                name: {{ .Values.name }}-secrets
+                                key: sqlDbName
+                    -   name: MYSQL_DB_USER
+                        valueFrom:
+                            secretKeyRef:
+                                name: {{ .Values.name }}-secrets
+                                key: sqlDbUser
+                    -   name: MYSQL_DB_PASSWORD
+                        valueFrom:
+                            secretKeyRef:
+                                name: {{ .Values.name }}-secrets
+                                key: sqlDbPassword
+                    -   name: MANAGEMENTURL_ENVIRONMENT
+                        valueFrom:
+                            secretKeyRef:
+                                name: {{ .Values.name }}-secrets
+                                key: auth0ManagementUrl
+                    -   name: CLIENT_ID_ENVIRONMENT
+                        valueFrom:
+                            secretKeyRef:
+                                name: {{ .Values.name }}-secrets
+                                key: auth0ManagementClientId
+                    -   name: CLIENT_SECRET_ENVIRONMENT
+                        valueFrom:
+                            secretKeyRef:
+                                name: {{ .Values.name }}-secrets
+                                key: auth0ManagementClientSecret
+                    -   name: AUDIENCE_ENVIRONMENT
+                        valueFrom:
+                            secretKeyRef:
+                                name: {{ .Values.name }}-secrets
+                                key: auth0ManagementAudience
+                    -   name: DOMAINNAME_ENVIRONMENT
+                        valueFrom:
+                            secretKeyRef:
+                                name: {{ .Values.name }}-secrets
+                                key: auth0Tenant
+                    -   name: PRIMARY_DOMAIN
+                        valueFrom:
+                            secretKeyRef:
+                                name: {{ .Values.name }}-secrets
+                                key: smtpServerDomain
+                    -   name: PRIMARY_PORT
+                        valueFrom:
+                            secretKeyRef:
+                                name: {{ .Values.name }}-secrets
+                                key: smtpServerPort
+                    -   name: USERNAME_EMAIL
+                        valueFrom:
+                            secretKeyRef:
+                                name: {{ .Values.name }}-secrets
+                                key: smtpServerEmailAddress
+                    -   name: USERNAME_PASSWORD
+                        valueFrom:
+                            secretKeyRef:
+                                name: {{ .Values.name }}-secrets
+                                key: smtpServerEmailPassword
+                    -   name: LANGUAGE
+                        value: {{ .Values.applicationLanguage }}
+                -   name: cloudsql-proxy
+                    image: gcr.io/cloudsql-docker/gce-proxy:1.16
+                    imagePullPolicy: IfNotPresent
+                    command: {{- printf "[\"cloud_sql_proxy\", \"-instances=%s=tcp:3306\", \"-credential_file=/secrets/gcp/credentials.json\"]" .Values.sqlInstanceConnectionName }}
+                    securityContext:
+                        runAsUser: {{ .Values.sqlDbUser }} # non-root user
+                        allowPrivilegeEscalation: false
+                    volumeMounts:
+                        -   name: application-gcp-serviceaccount
+                            mountPath: /secrets
+                            readOnly: true
+            volumes:
+            -   name: application-gcp-serviceaccount
+                secret:
+                    secretName: {{ .Values.name }}-secrets
+                    items:
+                    -   key: appServiceAccount
+                        path: gcp/credentials.json

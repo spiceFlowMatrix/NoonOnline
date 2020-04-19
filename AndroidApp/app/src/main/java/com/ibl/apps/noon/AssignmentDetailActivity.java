@@ -11,17 +11,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.FileProvider;
-import android.support.v7.widget.LinearLayoutManager;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.util.Log;
@@ -34,6 +27,14 @@ import android.view.WindowManager;
 import android.webkit.MimeTypeMap;
 import android.widget.LinearLayout;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
+import androidx.databinding.DataBindingUtil;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.crashlytics.android.Crashlytics;
 import com.downloader.Error;
@@ -54,7 +55,9 @@ import com.google.gson.reflect.TypeToken;
 import com.ibl.apps.Adapter.AssignmentCommentListAdapter;
 import com.ibl.apps.Adapter.AssignmentFileListAdapter;
 import com.ibl.apps.Adapter.StudentListAdapter;
+import com.ibl.apps.AssignmentManagement.AssignmentRepository;
 import com.ibl.apps.Base.BaseActivity;
+import com.ibl.apps.DownloadFileManagement.DownloadFileRepository;
 import com.ibl.apps.Interface.EncryptDecryptAsyncResponse;
 import com.ibl.apps.Interface.ViewFiles;
 import com.ibl.apps.Model.AssignmentDetailObject;
@@ -68,15 +71,15 @@ import com.ibl.apps.Model.assignment.CommentResponse;
 import com.ibl.apps.Model.assignment.StudentDetailData;
 import com.ibl.apps.Model.assignment.SubmissionFiles;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
-import com.ibl.apps.Utils.Const;
-import com.ibl.apps.Utils.GlideApp;
-import com.ibl.apps.Utils.LoadMoreData.RecyclerViewLoadMoreScroll;
-import com.ibl.apps.Utils.PrefUtils;
-import com.ibl.apps.Utils.VideoEncryptDecrypt.EncrypterDecryptAlgo;
 import com.ibl.apps.noon.databinding.AssignmentDetailLayoutBinding;
 import com.ibl.apps.noon.databinding.AssignmentfilesItemLayoutBinding;
 import com.ibl.apps.noon.databinding.DialogViewerItemLayoutBinding;
 import com.ibl.apps.noon.databinding.FragmentAssignmentLayoutBinding;
+import com.ibl.apps.util.Const;
+import com.ibl.apps.util.GlideApp;
+import com.ibl.apps.util.LoadMoreData.RecyclerViewLoadMoreScroll;
+import com.ibl.apps.util.PrefUtils;
+import com.ibl.apps.util.VideoEncryptDecrypt.EncrypterDecryptAlgo;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -140,6 +143,8 @@ public class AssignmentDetailActivity extends BaseActivity implements View.OnCli
     private CompositeDisposable disposable = new CompositeDisposable();
     private RecyclerViewLoadMoreScroll scrollListener;
     private Context context;
+    private DownloadFileRepository downloadFileRepository;
+    private AssignmentRepository assignmentRepository;
 
     static String getMimeType(@NonNull File file, String selectedFilePath) {
         String type = null;
@@ -159,7 +164,7 @@ public class AssignmentDetailActivity extends BaseActivity implements View.OnCli
             public void run() {
                 try {
                     SpannableStringBuilder message = setTypeface(activity, activity.getResources().getString(R.string.error_no_space));
-                    android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(activity);
+                    androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(activity);
                     builder.setTitle(activity.getResources().getString(R.string.validation_warning));
                     builder.setMessage(message)
                             .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
@@ -194,7 +199,8 @@ public class AssignmentDetailActivity extends BaseActivity implements View.OnCli
         super.onViewReady(savedInstanceState, intent);
         assignmentDetailLayoutBinding = (AssignmentDetailLayoutBinding) getBindObj();
         context = this;
-
+        assignmentRepository = new AssignmentRepository();
+        downloadFileRepository = new DownloadFileRepository();
         if (getIntent() != null) {
             CourseName = getIntent().getStringExtra("coursename");
             LessonName = getIntent().getStringExtra("lessonname");
@@ -361,7 +367,7 @@ public class AssignmentDetailActivity extends BaseActivity implements View.OnCli
             }
         });
         if (flag == 1) {
-            disposable.add(apiService.assignmentStudentDetail(assignmnetid)
+            disposable.add(assignmentRepository.assignmentStudentDetail(assignmnetid)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeWith(new DisposableSingleObserver<RestResponse<ArrayList<StudentDetailData>>>() {
@@ -398,7 +404,7 @@ public class AssignmentDetailActivity extends BaseActivity implements View.OnCli
                         }
                     }));
         } else {
-            disposable.add(apiService.assignmentStudentDetailChapter(assignmnetid)
+            disposable.add(assignmentRepository.assignmentStudentDetailChapter(assignmnetid)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeWith(new DisposableSingleObserver<RestResponse<ArrayList<StudentDetailData>>>() {
@@ -477,7 +483,7 @@ public class AssignmentDetailActivity extends BaseActivity implements View.OnCli
         gsonObject = (JsonObject) jsonParser.parse(jsonObject.toString());
 
         showDialog(getString(R.string.loading));
-        disposable.add(apiService.assignmentAddComment(gsonObject)
+        disposable.add(assignmentRepository.assignmentAddComment(gsonObject)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<AssignmentSubmission>() {
@@ -524,7 +530,7 @@ public class AssignmentDetailActivity extends BaseActivity implements View.OnCli
         gsonObject = (JsonObject) jsonParser.parse(jsonObject.toString());
 
         showDialog(getString(R.string.loading));
-        disposable.add(apiService.assignmentAddCommentChapter(gsonObject)
+        disposable.add(assignmentRepository.assignmentAddCommentChapter(gsonObject)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<AssignmentSubmission>() {
@@ -572,7 +578,7 @@ public class AssignmentDetailActivity extends BaseActivity implements View.OnCli
         gsonObject = (JsonObject) jsonParser.parse(jsonObject.toString());
 
         showDialog(getString(R.string.loading));
-        disposable.add(apiService.assignmentAddComment(gsonObject)
+        disposable.add(assignmentRepository.assignmentAddComment(gsonObject)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<AssignmentSubmission>() {
@@ -625,7 +631,7 @@ public class AssignmentDetailActivity extends BaseActivity implements View.OnCli
         gsonObject = (JsonObject) jsonParser.parse(jsonObject.toString());
 
         showDialog(getString(R.string.loading));
-        disposable.add(apiService.assignmentAddCommentChapter(gsonObject)
+        disposable.add(assignmentRepository.assignmentAddCommentChapter(gsonObject)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<AssignmentSubmission>() {
@@ -781,7 +787,7 @@ public class AssignmentDetailActivity extends BaseActivity implements View.OnCli
 
     private void CallApiGetAssignmentComments(String assignmentId, String id) {
 
-        disposable.add(apiService.getAssignmentComments(String.valueOf(pageNumber), perpagerecord, assignmentId, id)
+        disposable.add(assignmentRepository.getAssignmentComments(String.valueOf(pageNumber), perpagerecord, assignmentId, id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<RestResponse<CommentResponse>>() {
@@ -827,7 +833,7 @@ public class AssignmentDetailActivity extends BaseActivity implements View.OnCli
 
     private void CallApiGetAssignmentCommentsChapter(String assignmentId, String id) {
 
-        disposable.add(apiService.getAssignmentCommentsChapter(String.valueOf(pageNumber), perpagerecord, assignmentId, id)
+        disposable.add(assignmentRepository.getAssignmentCommentsChapter(String.valueOf(pageNumber), perpagerecord, assignmentId, id)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<RestResponse<CommentResponse>>() {
@@ -927,7 +933,7 @@ public class AssignmentDetailActivity extends BaseActivity implements View.OnCli
     private void callApifetchAssignmentSignedUrl(int fileID, String lessionID, SubmissionFiles model, Dialog dialog, AssignmentfilesItemLayoutBinding assignmentfilesItemLayoutBinding, String extension) {
         switch (model.getFiles().getFiletypeid()) {
             case 1:
-                disposable.add(apiService.fetchSignedUrl(String.valueOf(fileID), lessionID)
+                disposable.add(downloadFileRepository.fetchSignedUrl(String.valueOf(fileID), lessionID)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribeWith(new DisposableSingleObserver<SignedUrlObject>() {
@@ -963,7 +969,7 @@ public class AssignmentDetailActivity extends BaseActivity implements View.OnCli
             case 6:
             case 7:
             case 8:
-                disposable.add(apiService.fetchSignedUrl(String.valueOf(fileID), lessionID)
+                disposable.add(downloadFileRepository.fetchSignedUrl(String.valueOf(fileID), lessionID)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribeWith(new DisposableSingleObserver<SignedUrlObject>() {
@@ -1135,7 +1141,7 @@ public class AssignmentDetailActivity extends BaseActivity implements View.OnCli
             lessionID, CoursePriviewObject.Assignmentfiles model, ArrayList<CoursePriviewObject.Assignmentfiles> assignmentfiles) {
 
 
-        disposable.add(apiService.fetchSignedUrl(fileID, lessionID)
+        disposable.add(downloadFileRepository.fetchSignedUrl(fileID, lessionID)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<SignedUrlObject>() {
@@ -1288,9 +1294,8 @@ public class AssignmentDetailActivity extends BaseActivity implements View.OnCli
     }
 
     private void CallApiAssignmentList(String assignmentId) {
-
         showDialog(getString(R.string.loading));
-        disposable.add(apiService.fetchAssignmentsDetails(assignmentId)
+        disposable.add(assignmentRepository.fetchAssignmentsDetails(assignmentId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<AssignmentDetailObject>() {

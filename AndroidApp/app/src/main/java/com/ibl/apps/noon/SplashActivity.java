@@ -7,14 +7,14 @@ import android.text.TextUtils;
 
 import com.ibl.apps.Base.BaseActivity;
 import com.ibl.apps.Model.AuthTokenObject;
-import com.ibl.apps.RoomDatabase.database.AppDatabase;
-import com.ibl.apps.Utils.PrefUtils;
+import com.ibl.apps.RoomDatabase.dao.userManagementDatabse.UserDatabaseRepository;
 import com.ibl.apps.noon.databinding.SplashLayoutBinding;
+import com.ibl.apps.util.PrefUtils;
 
 import io.reactivex.disposables.CompositeDisposable;
 
 
-public class  SplashActivity extends BaseActivity {
+public class SplashActivity extends BaseActivity {
 
     SplashLayoutBinding splashLayoutBinding;
     private CompositeDisposable disposable = new CompositeDisposable();
@@ -36,7 +36,8 @@ public class  SplashActivity extends BaseActivity {
                 String authid = PrefUtils.getAuthid(SplashActivity.this);
                 if (!TextUtils.isEmpty(authid)) {
 
-                    AuthTokenObject authTokenObject = AppDatabase.getAppDatabase(SplashActivity.this).authTokenDao().getauthTokenData(authid);
+                    UserDatabaseRepository userDatabaseRepository = new UserDatabaseRepository();
+                    AuthTokenObject authTokenObject = userDatabaseRepository.getAuthTokenData(authid);
                     if (authTokenObject != null) {
 
                         //Log.e(Const.LOG_NOON_TAG,"==AuthTokenObject=="+authTokenObject.toString());

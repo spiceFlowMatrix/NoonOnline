@@ -1,8 +1,8 @@
 package com.ibl.apps.Fragment;
 
-import android.databinding.DataBindingUtil;
+import androidx.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +13,7 @@ import com.ibl.apps.Base.BaseFragment;
 import com.ibl.apps.Interface.IOnBackPressed;
 import com.ibl.apps.Model.APICourseObject;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
-import com.ibl.apps.Utils.PrefUtils;
+import com.ibl.apps.util.PrefUtils;
 import com.ibl.apps.noon.R;
 import com.ibl.apps.noon.databinding.FragmentCourseItemLayoutBinding;
 

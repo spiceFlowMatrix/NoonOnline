@@ -1,15 +1,16 @@
 package com.ibl.apps.Fragment;
 
 
-import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+
+import androidx.annotation.NonNull;
+import androidx.databinding.DataBindingUtil;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -20,16 +21,16 @@ import com.ibl.apps.Model.parent.CourseSpinnerData;
 import com.ibl.apps.Model.parent.LastOnline;
 import com.ibl.apps.Model.parent.ParentSpinnerModel;
 import com.ibl.apps.Model.parent.ProgressReport;
-import com.ibl.apps.Network.ApiClient;
-import com.ibl.apps.Network.ApiService;
+import com.ibl.apps.ParentControlManagement.ParentControlRepository;
+import com.ibl.apps.RoomDatabase.dao.userManagementDatabse.UserDatabaseRepository;
 import com.ibl.apps.RoomDatabase.database.AppDatabase;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
-import com.ibl.apps.Utils.CustomView.MultiSelectSpinner;
-import com.ibl.apps.Utils.PrefUtils;
-import com.ibl.apps.Utils.TimeAgoLastOnlineClass;
 import com.ibl.apps.noon.NoonApplication;
 import com.ibl.apps.noon.R;
 import com.ibl.apps.noon.databinding.FragmentOverAllProgressBinding;
+import com.ibl.apps.util.CustomView.MultiSelectSpinner;
+import com.ibl.apps.util.PrefUtils;
+import com.ibl.apps.util.TimeAgoLastOnlineClass;
 
 import java.text.DecimalFormat;
 import java.text.ParseException;
@@ -47,7 +48,6 @@ import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 
 import static android.view.View.GONE;
-import static com.ibl.apps.Base.BaseActivity.apiService;
 import static com.ibl.apps.Fragment.ProgressReportFragment.selectedIdsForCallback;
 
 public class OverAllProgressFragment extends BaseFragment implements View.OnClickListener {
@@ -62,6 +62,8 @@ public class OverAllProgressFragment extends BaseFragment implements View.OnClic
     private ArrayList<Integer> userIdArray = new ArrayList<>();
     private List<ParentSpinnerModel.Data> studentNamecategories;
     private ParentSpinnerModel parentSpinner = new ParentSpinnerModel();
+    private ParentControlRepository parentControlRepository;
+    private UserDatabaseRepository userDatabaseRepository;
 
 
     public OverAllProgressFragment() {
@@ -80,6 +82,8 @@ public class OverAllProgressFragment extends BaseFragment implements View.OnClic
     protected void setUp(View view) {
         showDialog(Objects.requireNonNull(getActivity()).getResources().getString(R.string.loading));
         //setUpProgress();
+        parentControlRepository = new ParentControlRepository();
+        userDatabaseRepository = new UserDatabaseRepository();
         callApiForStudentSpinner();
         setonClickListner();
     }
@@ -113,7 +117,7 @@ public class OverAllProgressFragment extends BaseFragment implements View.OnClic
         } catch (JsonSyntaxException e) {
             e.printStackTrace();
         }
-        disposable.add(apiService.getCourseData(jsonObject)
+        disposable.add(parentControlRepository.getCourseData(jsonObject)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<CourseSpinnerData>() {
@@ -168,7 +172,7 @@ public class OverAllProgressFragment extends BaseFragment implements View.OnClic
             } catch (JsonSyntaxException e) {
                 e.printStackTrace();
             }
-            disposable.add(apiService.getLastOnline(jsonobject)
+            disposable.add(parentControlRepository.getLastOnline(jsonobject)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeWith(new DisposableSingleObserver<LastOnline>() {
@@ -281,7 +285,6 @@ public class OverAllProgressFragment extends BaseFragment implements View.OnClic
     }
 
     private void callApiForOverAllProgress(ArrayList<Integer> userArray) {
-        ApiService apiService = ApiClient.getClient(getContext()).create(ApiService.class);
         JsonObject jsonobject = new JsonObject();
         try {
             JsonArray array = new JsonArray();
@@ -295,7 +298,7 @@ public class OverAllProgressFragment extends BaseFragment implements View.OnClic
         } catch (JsonSyntaxException e) {
             e.printStackTrace();
         }
-        disposable.add(apiService.getOverAllProgress(jsonobject)
+        disposable.add(parentControlRepository.getOverAllProgress(jsonobject)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<ProgressReport>() {
@@ -448,18 +451,17 @@ public class OverAllProgressFragment extends BaseFragment implements View.OnClic
     private void callApiForStudentSpinner() {
         String authid = PrefUtils.getAuthid(NoonApplication.getContext());
         if (!TextUtils.isEmpty(authid)) {
-            AuthTokenObject authTokenObject = AppDatabase.getAppDatabase(NoonApplication.getContext()).authTokenDao().getauthTokenData(authid);
+            AuthTokenObject authTokenObject = userDatabaseRepository.getAuthTokenData(authid);
 
             if (authTokenObject != null) {
                 String sub = "";
                 if (authTokenObject.getSub() != null) {
                     sub = authTokenObject.getSub();
-                    userDetails = AppDatabase.getAppDatabase(NoonApplication.getContext()).userDetailDao().getUserDetials(sub);
+                    userDetails = userDatabaseRepository.getUserDetails(sub);
                 }
             }
         }
-        ApiService apiService = ApiClient.getClient(getContext()).create(ApiService.class);
-        disposable.add(apiService.getUserSpinnerData(Integer.parseInt(userDetails.getId()))
+        disposable.add(parentControlRepository.getUserSpinnerData(Integer.parseInt(userDetails.getId()))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<ParentSpinnerModel>() {

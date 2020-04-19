@@ -4,15 +4,15 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.databinding.DataBindingUtil;
+import androidx.databinding.DataBindingUtil;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.res.ResourcesCompat;
-import android.support.v7.widget.RecyclerView;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
+import androidx.recyclerview.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextUtils;
@@ -25,11 +25,12 @@ import com.droidnet.DroidNet;
 import com.google.gson.Gson;
 import com.ibl.apps.Model.CourseObject;
 import com.ibl.apps.Model.CoursePriviewObject;
+import com.ibl.apps.RoomDatabase.dao.courseManagementDatabase.CourseDatabaseRepository;
 import com.ibl.apps.RoomDatabase.database.AppDatabase;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
-import com.ibl.apps.Utils.Const;
-import com.ibl.apps.Utils.CustomTypefaceSpan;
-import com.ibl.apps.Utils.GlideApp;
+import com.ibl.apps.util.Const;
+import com.ibl.apps.util.CustomTypefaceSpan;
+import com.ibl.apps.util.GlideApp;
 import com.ibl.apps.noon.ChapterActivity;
 import com.ibl.apps.noon.R;
 import com.ibl.apps.noon.databinding.CourseInnerLayoutBinding;
@@ -46,6 +47,7 @@ public class CourseInnerListAdapter extends RecyclerView.Adapter<CourseInnerList
     UserDetails userDetailsObject;
     DroidNet mDroidNet;
     public static boolean isNetworkConnected = false;
+    CourseDatabaseRepository courseDatabaseRepository;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         CourseInnerLayoutBinding courseInnerLayoutBinding;
@@ -57,6 +59,7 @@ public class CourseInnerListAdapter extends RecyclerView.Adapter<CourseInnerList
     }
 
     public CourseInnerListAdapter(Context ctx, List<CourseObject.Courses> list, UserDetails userDetailsObject) {
+        courseDatabaseRepository = new CourseDatabaseRepository();
         this.list = list;
         this.ctx = ctx;
         this.userDetailsObject = userDetailsObject;
@@ -115,7 +118,7 @@ public class CourseInnerListAdapter extends RecyclerView.Adapter<CourseInnerList
                     try {
                         CoursePriviewObject coursePriviewObject;
                         String userId = userDetailsObject.getId();
-                        coursePriviewObject = AppDatabase.getAppDatabase(ctx).courseDetailsDao().getAllCourseDetails(model.getId(), userId);
+                        coursePriviewObject = courseDatabaseRepository.getAllCourseDetailsById(model.getId(), userId);
 
                         if (coursePriviewObject != null) {
                             ((Activity) ctx).runOnUiThread(new Runnable() {
@@ -233,7 +236,7 @@ public class CourseInnerListAdapter extends RecyclerView.Adapter<CourseInnerList
     public static void showNetworkAlert(Context activity) {
         try {
             SpannableStringBuilder message = setTypeface(activity, activity.getResources().getString(R.string.validation_Connect_internet));
-            android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(activity);
+            androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(activity);
             builder.setTitle(activity.getResources().getString(R.string.validation_warning));
             builder.setMessage(message)
                     .setPositiveButton(activity.getResources().getString(R.string.button_ok), new DialogInterface.OnClickListener() {

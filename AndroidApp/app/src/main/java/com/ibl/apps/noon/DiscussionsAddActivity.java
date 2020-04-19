@@ -9,10 +9,6 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -21,22 +17,26 @@ import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.ibl.apps.Adapter.DiscussionFIleUploadListAdapter;
 import com.ibl.apps.Base.BaseActivity;
+import com.ibl.apps.DiscussionManagement.DiscussionRepository;
 import com.ibl.apps.Model.AddDiscussionTopic;
 import com.ibl.apps.Model.RestResponse;
 import com.ibl.apps.Model.UploadTopicFile;
 import com.ibl.apps.Model.assignment.FileUploadResponse;
 import com.ibl.apps.Model.feedback.FillesData;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
-import com.ibl.apps.Utils.Const;
-import com.ibl.apps.Utils.PrefUtils;
-import com.ibl.apps.Utils.Validator;
 import com.ibl.apps.noon.databinding.DiscussionsAddLayoutBinding;
-import com.theartofdev.edmodo.cropper.CropImage;
+import com.ibl.apps.util.Const;
+import com.ibl.apps.util.PrefUtils;
+import com.ibl.apps.util.Validator;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -61,8 +61,7 @@ import retrofit2.Callback;
 import retrofit2.HttpException;
 import retrofit2.Response;
 
-import static com.ibl.apps.Utils.Const.GradeID;
-import static com.ibl.apps.noon.AssignmentAddActivity.getMimeType;
+import static com.ibl.apps.util.Const.GradeID;
 
 
 public class DiscussionsAddActivity extends BaseActivity implements View.OnClickListener {
@@ -80,6 +79,7 @@ public class DiscussionsAddActivity extends BaseActivity implements View.OnClick
     DiscussionFIleUploadListAdapter discussionFIleUploadListAdapter;
     String GradeId, CourseName, ActivityFlag, LessonID, QuizID;
     String AddtionalLibrary, AddtionalDiscussions, AddtionalAssignment = "";
+    private DiscussionRepository discussionRepository;
 
     @Override
     protected int getContentView() {
@@ -97,7 +97,7 @@ public class DiscussionsAddActivity extends BaseActivity implements View.OnClick
         super.onViewReady(savedInstanceState, intent);
         discussionsAddLayoutBinding = (DiscussionsAddLayoutBinding) getBindObj();
 
-
+        discussionRepository = new DiscussionRepository();
         if (getIntent() != null) {
             GradeId = getIntent().getStringExtra(GradeID);
             CourseName = getIntent().getStringExtra(Const.CourseName);
@@ -282,7 +282,7 @@ public class DiscussionsAddActivity extends BaseActivity implements View.OnClick
         gsonObject = (JsonObject) jsonParser.parse(jsonObject.toString());
 
         showDialog(getString(R.string.loading));
-        disposable.add(apiService.AddDiscussionTopic(gsonObject)
+        disposable.add(discussionRepository.AddDiscussionTopic(gsonObject)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<AddDiscussionTopic>() {
@@ -368,7 +368,7 @@ public class DiscussionsAddActivity extends BaseActivity implements View.OnClick
                         RequestBody duration = RequestBody.create(MediaType.parse("text/plain"), "");
                         RequestBody filesize = RequestBody.create(MediaType.parse("text/plain"), "");
 
-                        Call<UploadTopicFile> call = apiService.UploadTopicFile(body, fileTypeId, duration, filesize);
+                        Call<UploadTopicFile> call = discussionRepository.UploadTopicFile(body, fileTypeId, duration, filesize);
                         call.enqueue(new Callback<UploadTopicFile>() {
                             @Override
                             public void onResponse(Call<UploadTopicFile> call, retrofit2.Response<UploadTopicFile> response) {
@@ -504,7 +504,7 @@ public class DiscussionsAddActivity extends BaseActivity implements View.OnClick
         RequestBody filesize = RequestBody.create(MediaType.parse("text/plain"), "");
         RequestBody totalpages = RequestBody.create(MediaType.parse("text/plain"), "0");
 
-        Call<RestResponse<FileUploadResponse>> call = apiService.uploadAssignmentFile(body, fileTypeId, duration, filesize, totalpages);
+        Call<RestResponse<FileUploadResponse>> call = discussionRepository.uploadAssignmentFile(body, fileTypeId, duration, filesize, totalpages);
         call.enqueue(new Callback<RestResponse<FileUploadResponse>>() {
             @Override
             public void onResponse(Call<RestResponse<FileUploadResponse>> call, Response<RestResponse<FileUploadResponse>> response) {

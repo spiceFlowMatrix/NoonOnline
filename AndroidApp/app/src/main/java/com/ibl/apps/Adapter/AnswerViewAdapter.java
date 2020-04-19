@@ -1,15 +1,15 @@
 package com.ibl.apps.Adapter;
 
 import android.content.Context;
-import android.databinding.DataBindingUtil;
+import androidx.databinding.DataBindingUtil;
 import android.os.AsyncTask;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.ibl.apps.Model.QuizMainObject;
-import com.ibl.apps.RoomDatabase.database.AppDatabase;
+import com.ibl.apps.RoomDatabase.dao.quizManagementDatabase.QuizDatabaseRepository;
 import com.ibl.apps.RoomDatabase.entity.QuizAnswerSelect;
 import com.ibl.apps.noon.R;
 import com.ibl.apps.noon.databinding.AnswerItemLayoutBinding;
@@ -27,6 +27,7 @@ public class AnswerViewAdapter extends RecyclerView.Adapter<AnswerViewAdapter.My
     Context ctx;
     OnItemClickListener onItemClickListener;
     String quizID, questionID, nextID;
+    private QuizDatabaseRepository quizDatabaseRepository;
 
     public interface OnItemClickListener {
         void onItemClick(String nextID, String answerID);
@@ -48,6 +49,7 @@ public class AnswerViewAdapter extends RecyclerView.Adapter<AnswerViewAdapter.My
         this.questionID = questionID;
         this.nextID = nextID;
         this.onItemClickListener = onItemClickListener;
+        quizDatabaseRepository = new QuizDatabaseRepository();
     }
 
     @Override
@@ -81,7 +83,8 @@ public class AnswerViewAdapter extends RecyclerView.Adapter<AnswerViewAdapter.My
 
 
         try {
-            QuizAnswerSelect quizAnswerSelect = AppDatabase.getAppDatabase(ctx).quizAnswerDao().getItemAnswerSelect(nextID);
+            //Her is local db
+            QuizAnswerSelect quizAnswerSelect = quizDatabaseRepository.getItemAnswerSelect(nextID);
             if (quizAnswerSelect != null) {
                 if (quizAnswerSelect.getSelectedAnswerId().equals(model.getId())) {
                     holder.answerItemLayoutBinding.mainitemLessonLayout.setCardBackgroundColor(ctx.getResources().getColor(R.color.colorPrimary));
@@ -106,9 +109,9 @@ public class AnswerViewAdapter extends RecyclerView.Adapter<AnswerViewAdapter.My
                     protected String doInBackground(Void... voids) {
                         try {
 
-                            QuizAnswerSelect quizAnswerSelect = AppDatabase.getAppDatabase(ctx).quizAnswerDao().getItemAnswerSelect(nextID);
+                            QuizAnswerSelect quizAnswerSelect = quizDatabaseRepository.getItemAnswerSelect(nextID);
                             if (quizAnswerSelect != null) {
-                                AppDatabase.getAppDatabase(ctx).quizAnswerDao().updateItemQuizAnswerSelect(model.getId(), nextID);
+                                quizDatabaseRepository.updateItemQuizAnswerSelect(model.getId(), nextID);
                             } else {
                                 QuizAnswerSelect answerSelect = new QuizAnswerSelect();
                                 answerSelect.setQuizID(quizID);
@@ -117,7 +120,7 @@ public class AnswerViewAdapter extends RecyclerView.Adapter<AnswerViewAdapter.My
                                 answerSelect.setNextID(nextID);
                                 answerSelect.setIscorrect(model.getIscorrect());
                                 answerSelect.setIsStatus("0");
-                                AppDatabase.getAppDatabase(ctx).quizAnswerDao().insertAll(answerSelect);
+                                quizDatabaseRepository.insertAllQuizAnswerSelect(answerSelect);
                             }
                         } catch (Exception e) {
                             e.printStackTrace();

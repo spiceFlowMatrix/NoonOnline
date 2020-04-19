@@ -6,18 +6,11 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v4.content.res.ResourcesCompat;
-import android.support.v7.widget.LinearLayoutManager;
-import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextUtils;
@@ -27,12 +20,19 @@ import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.Toast;
 
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.ibl.apps.Adapter.DiscussionFIlePreviewListAdapter;
 import com.ibl.apps.Adapter.DiscussionsCommentListAdapter;
 import com.ibl.apps.Base.BaseActivity;
+import com.ibl.apps.DiscussionManagement.DiscussionRepository;
 import com.ibl.apps.Interface.ViewDiscussionsFiles;
 import com.ibl.apps.Model.AddComment;
 import com.ibl.apps.Model.AddDiscussionTopic;
@@ -41,13 +41,13 @@ import com.ibl.apps.Model.GetAllComment;
 import com.ibl.apps.Model.UploadImageObject;
 import com.ibl.apps.Model.UploadTopicFile;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
-import com.ibl.apps.Utils.Const;
-import com.ibl.apps.Utils.CustomTypefaceSpan;
-import com.ibl.apps.Utils.LoadMoreData.OnLoadMoreListener;
-import com.ibl.apps.Utils.LoadMoreData.RecyclerViewLoadMoreScroll;
-import com.ibl.apps.Utils.PrefUtils;
-import com.ibl.apps.Utils.Validator;
 import com.ibl.apps.noon.databinding.DiscussionsDetailLayoutBinding;
+import com.ibl.apps.util.Const;
+import com.ibl.apps.util.CustomTypefaceSpan;
+import com.ibl.apps.util.LoadMoreData.OnLoadMoreListener;
+import com.ibl.apps.util.LoadMoreData.RecyclerViewLoadMoreScroll;
+import com.ibl.apps.util.PrefUtils;
+import com.ibl.apps.util.Validator;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -57,11 +57,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.observers.DisposableObserver;
 import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 import ir.sohreco.androidfilechooser.ExternalStorageNotAvailableException;
@@ -74,7 +72,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.HttpException;
 
-import static com.ibl.apps.Utils.Const.GradeID;
+import static com.ibl.apps.util.Const.GradeID;
 
 
 public class GeneralDiscussionsDetailActivity extends BaseActivity implements View.OnClickListener, ViewDiscussionsFiles {
@@ -101,6 +99,7 @@ public class GeneralDiscussionsDetailActivity extends BaseActivity implements Vi
     boolean mainClickFlag = false;
     boolean enableDisabl = false;
     String AddtionalLibrary, AddtionalDiscussions, AddtionalAssignment = "";
+    private DiscussionRepository discussionRepository;
 
     @Override
     protected int getContentView() {
@@ -111,7 +110,7 @@ public class GeneralDiscussionsDetailActivity extends BaseActivity implements Vi
     protected void onViewReady(Bundle savedInstanceState, Intent intent) {
         super.onViewReady(savedInstanceState, intent);
         discussionsDetailLayoutBinding = (DiscussionsDetailLayoutBinding) getBindObj();
-
+        discussionRepository = new DiscussionRepository();
         if (getIntent() != null) {
             topicId = getIntent().getStringExtra(Const.topicId);
             topicname = getIntent().getStringExtra(Const.topicname);
@@ -349,7 +348,7 @@ public class GeneralDiscussionsDetailActivity extends BaseActivity implements Vi
     public void showDeleteAlert(Context activity) {
         try {
             SpannableStringBuilder message = setTypeface(activity, activity.getResources().getString(R.string.validation_delete));
-            android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(activity);
+            androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(activity);
             builder.setTitle(activity.getResources().getString(R.string.validation_warning));
             builder.setMessage(message)
                     .setPositiveButton(activity.getResources().getString(R.string.button_ok), new DialogInterface.OnClickListener() {
@@ -393,7 +392,7 @@ public class GeneralDiscussionsDetailActivity extends BaseActivity implements Vi
         gsonObject = (JsonObject) jsonParser.parse(jsonObject.toString());
 
         showDialog(getString(R.string.loading));
-        disposable.add(apiService.AddComment(gsonObject)
+        disposable.add(discussionRepository.AddComment(gsonObject)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<AddComment>() {
@@ -427,7 +426,7 @@ public class GeneralDiscussionsDetailActivity extends BaseActivity implements Vi
     private void CallApiDiscussionsDetails(String topicId) {
 
         showDialog(getString(R.string.loading));
-        disposable.add(apiService.DiscussionsDetails(topicId)
+        disposable.add(discussionRepository.DiscussionsDetails(topicId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<DiscussionsDetails>() {
@@ -472,7 +471,8 @@ public class GeneralDiscussionsDetailActivity extends BaseActivity implements Vi
                     }
                 }));
     }
-    private void CallApi(){
+
+    private void CallApi() {
         h.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -481,8 +481,9 @@ public class GeneralDiscussionsDetailActivity extends BaseActivity implements Vi
             }
         }, 60000);
     }
+
     private void CallApiGetComments(String topicId) {
-        disposable.add(apiService.GetComments(String.valueOf(pageNumber), perpagerecord, topicId)
+        disposable.add(discussionRepository.GetComments(String.valueOf(pageNumber), perpagerecord, topicId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<GetAllComment>() {
@@ -536,7 +537,7 @@ public class GeneralDiscussionsDetailActivity extends BaseActivity implements Vi
         gsonObject = (JsonObject) jsonParser.parse(jsonObject.toString());
 
         showDialog(getString(R.string.loading));
-        disposable.add(apiService.UpdateDiscussionTopic(gsonObject)
+        disposable.add(discussionRepository.UpdateDiscussionTopic(gsonObject)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<AddDiscussionTopic>() {
@@ -610,7 +611,7 @@ public class GeneralDiscussionsDetailActivity extends BaseActivity implements Vi
     private void CallApiDeleteDiscussions(String topicId) {
 
         showDialog(getString(R.string.loading));
-        disposable.add(apiService.DeleteTopic(topicId)
+        disposable.add(discussionRepository.DeleteTopic(topicId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<UploadImageObject>() {
@@ -674,7 +675,7 @@ public class GeneralDiscussionsDetailActivity extends BaseActivity implements Vi
                         RequestBody duration = RequestBody.create(MediaType.parse("text/plain"), "");
                         RequestBody filesize = RequestBody.create(MediaType.parse("text/plain"), "");
 
-                        Call<UploadTopicFile> call = apiService.UploadTopicFile(body, fileTypeId, duration, filesize);
+                        Call<UploadTopicFile> call = discussionRepository.UploadTopicFile(body, fileTypeId, duration, filesize);
                         call.enqueue(new Callback<UploadTopicFile>() {
                             @Override
                             public void onResponse(Call<UploadTopicFile> call, retrofit2.Response<UploadTopicFile> response) {
@@ -745,7 +746,7 @@ public class GeneralDiscussionsDetailActivity extends BaseActivity implements Vi
                     RequestBody duration = RequestBody.create(MediaType.parse("text/plain"), "");
                     RequestBody filesize = RequestBody.create(MediaType.parse("text/plain"), "");
 
-                    Call<UploadTopicFile> call = apiService.UploadAddCommentFile(body, fileTypeId, duration, filesize);
+                    Call<UploadTopicFile> call = discussionRepository.UploadAddCommentFile(body, fileTypeId, duration, filesize);
                     call.enqueue(new Callback<UploadTopicFile>() {
                         @Override
                         public void onResponse(Call<UploadTopicFile> call, retrofit2.Response<UploadTopicFile> response) {

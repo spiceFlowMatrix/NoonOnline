@@ -1,17 +1,38 @@
-lane :beta do
-  gradle(task: 'assemble', build_type: 'Debug')
-  crashlytics(
-      api_token: '6f464d8e08fe20e531aed1c267141f189c1abbfd',
-      build_secret: 'c2dca5d29c7b6724d1a1d8659b2798a2e4c947f6b81acfa67856074a4a8d6e31',
-      emails: 'paras.chodavadiya@gmail.com,
-               Salamfaeq7@gmail.com,
-               fvasoya1992@gmail.com,
-               jatin.dudhat75@gmail.com,
-               mhamid.xi@gmail.com,
-               rahimy.hamza@gmail.com,
-               salam.faeq@edgsolutions.com,
-               androidtester1@edgsolutions.com'
-    )
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
 
-    # slack(message: 'Successfully distributed a new beta build')
+# Uncomment the line if you want fastlane to automatically update itself
+# update_fastlane
+
+default_platform(:android)
+
+platform :android do
+  desc "Builds the debug code"
+  lane :buildDebug do
+    gradle(task: "assembleDebug", flags: "--stacktrace")
+  end
+
+  desc "Builds the release code"
+  lane :buildRelease do
+    gradle(task: "assembleRelease")
+  end
+
+  desc "Runs all the tests"
+  lane :test do
+    gradle(task: "test")
+  end
+
+  desc "Submit a new Release Build to Play Store"
+  lane :production do
+    upload_to_play_store(track: 'production', apk: 'app/build/outputs/apk/release/app-release.apk')
+  end
 end

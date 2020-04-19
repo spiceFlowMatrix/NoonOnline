@@ -5,13 +5,8 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.databinding.DataBindingUtil;
 import android.graphics.Typeface;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
-import android.support.v4.content.res.ResourcesCompat;
-import android.support.v7.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextUtils;
@@ -25,6 +20,10 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.core.content.res.ResourcesCompat;
+import androidx.databinding.DataBindingUtil;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.crashlytics.android.Crashlytics;
 import com.downloader.Error;
@@ -41,6 +40,7 @@ import com.github.barteksc.pdfviewer.listener.OnLoadCompleteListener;
 import com.github.barteksc.pdfviewer.listener.OnPageChangeListener;
 import com.github.barteksc.pdfviewer.listener.OnRenderListener;
 import com.google.gson.Gson;
+import com.ibl.apps.DownloadFileManagement.DownloadFileRepository;
 import com.ibl.apps.Interface.EncryptDecryptAsyncResponse;
 import com.ibl.apps.Model.EncryptDecryptObject;
 import com.ibl.apps.Model.LibraryGradeObject;
@@ -48,14 +48,14 @@ import com.ibl.apps.Model.SignedUrlObject;
 import com.ibl.apps.Network.ApiClient;
 import com.ibl.apps.Network.ApiService;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
-import com.ibl.apps.Utils.Const;
-import com.ibl.apps.Utils.CustomTypefaceSpan;
-import com.ibl.apps.Utils.GlideApp;
-import com.ibl.apps.Utils.VideoEncryptDecrypt.EncrypterDecryptAlgo;
 import com.ibl.apps.noon.R;
 import com.ibl.apps.noon.databinding.DialogViewerItemLayoutBinding;
 import com.ibl.apps.noon.databinding.LibraryGradeInnerItemLayoutBinding;
 import com.ibl.apps.noon.databinding.LibraryProgressDialogBinding;
+import com.ibl.apps.util.Const;
+import com.ibl.apps.util.CustomTypefaceSpan;
+import com.ibl.apps.util.GlideApp;
+import com.ibl.apps.util.VideoEncryptDecrypt.EncrypterDecryptAlgo;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -110,6 +110,7 @@ public class LibraryGradeInnerListAdapter extends RecyclerView.Adapter<LibraryGr
     private ProgressBar progressbar;
     private Dialog dialog;
     LibraryProgressDialogBinding libraryProgressDialogBinding;
+    private DownloadFileRepository downloadFileRepository;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         LibraryGradeInnerItemLayoutBinding libraryGradeInnerItemLayoutBinding;
@@ -128,7 +129,7 @@ public class LibraryGradeInnerListAdapter extends RecyclerView.Adapter<LibraryGr
         if (userDetailsObject != null) {
             userIdSlash = userDetailsObject.getId() + "/";
         }
-
+        downloadFileRepository = new DownloadFileRepository();
         apiService = ApiClient.getClient(ctx).create(ApiService.class);
         mDroidNet = DroidNet.getInstance();
         mDroidNet.addInternetConnectivityListener(this);
@@ -274,7 +275,7 @@ public class LibraryGradeInnerListAdapter extends RecyclerView.Adapter<LibraryGr
 
         //showDialog(ctx.getString(R.string.loading));
 
-        disposable.add(apiService.fetchSignedUrl(fileID, lessionID)
+        disposable.add(downloadFileRepository.fetchSignedUrl(fileID, lessionID)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableSingleObserver<SignedUrlObject>() {
@@ -490,7 +491,7 @@ public class LibraryGradeInnerListAdapter extends RecyclerView.Adapter<LibraryGr
             public void run() {
                 try {
                     SpannableStringBuilder message = setTypeface(activity, activity.getResources().getString(R.string.error_no_space));
-                    android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(activity);
+                    androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(activity);
                     builder.setTitle(activity.getResources().getString(R.string.validation_warning));
                     builder.setMessage(message)
                             .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
@@ -765,7 +766,7 @@ public class LibraryGradeInnerListAdapter extends RecyclerView.Adapter<LibraryGr
     public static void showNetworkAlert(Context activity) {
         try {
             SpannableStringBuilder message = setTypeface(activity, activity.getResources().getString(R.string.validation_Connect_internet));
-            android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(activity);
+            androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(activity);
             builder.setTitle(activity.getResources().getString(R.string.validation_warning));
             builder.setMessage(message)
                     .setPositiveButton(activity.getResources().getString(R.string.button_ok), new DialogInterface.OnClickListener() {

@@ -5,12 +5,12 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.databinding.DataBindingUtil;
+import androidx.databinding.DataBindingUtil;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.support.v4.content.res.ResourcesCompat;
-import android.support.v7.widget.RecyclerView;
+import androidx.core.content.res.ResourcesCompat;
+import androidx.recyclerview.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.util.Log;
@@ -31,8 +31,8 @@ import com.ibl.apps.Model.SignedUrlObject;
 import com.ibl.apps.Network.ApiClient;
 import com.ibl.apps.Network.ApiService;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
-import com.ibl.apps.Utils.CustomTypefaceSpan;
-import com.ibl.apps.Utils.VideoEncryptDecrypt.EncrypterDecryptAlgo;
+import com.ibl.apps.util.CustomTypefaceSpan;
+import com.ibl.apps.util.VideoEncryptDecrypt.EncrypterDecryptAlgo;
 import com.ibl.apps.noon.R;
 import com.ibl.apps.noon.databinding.AssignmentfilesItemLayoutBinding;
 import com.ibl.apps.noon.databinding.DiscussionsFilePreviewItemLayoutBinding;
@@ -137,112 +137,6 @@ public class DiscussionFIlePreviewListAdapter extends RecyclerView.Adapter<Discu
         });
     }
 
-    private void callApifetchAssignmentSignedUrl(String fileID, String lessionID, DiscussionsDetails.Files model, String extension, Dialog dialog, AssignmentfilesItemLayoutBinding assignmentfilesItemLayoutBinding) {
-
-        ApiService apiService = ApiClient.getClient(ctx).create(ApiService.class);
-        disposable.add(apiService.fetchSignedUrl(String.valueOf(fileID), lessionID)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(new DisposableSingleObserver<SignedUrlObject>() {
-                    @Override
-                    public void onSuccess(SignedUrlObject signedUrlObject) {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-
-                        try {
-                            HttpException error = (HttpException) e;
-                            SignedUrlObject signedUrlObject = new Gson().fromJson(error.response().errorBody().string(), SignedUrlObject.class);
-                            // Log.e(Const.LOG_NOON_TAG, "==SignedUrl==" + signedUrlObject.getMessage());
-                            Toast.makeText(ctx, signedUrlObject.getMessage(), Toast.LENGTH_SHORT).show();
-                        } catch (Exception e1) {
-                            Toast.makeText(ctx, e1.getMessage(), Toast.LENGTH_SHORT).show();
-                            //showError(e);
-                        }
-                        //hideDialog();
-                        Crashlytics.log(Log.ERROR, ctx.getString(R.string.app_name), e.getMessage());
-                    }
-                }));
-
-    }
-
-
-    public class SetEncryptDecryptTask extends AsyncTask<Void, Void, EncryptDecryptObject> {
-
-        EncryptDecryptObject encryptDecryptObject;
-        EncryptDecryptAsyncResponse delegate = null;
-
-        public SetEncryptDecryptTask(EncryptDecryptAsyncResponse delegate, EncryptDecryptObject encryptDecryptObject) {
-            this.encryptDecryptObject = encryptDecryptObject;
-            this.delegate = delegate;
-        }
-
-        @Override
-
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected EncryptDecryptObject doInBackground(Void... params) {
-
-            try {
-                String selectedVideoPath = encryptDecryptObject.getSelectedVideoPath();
-                String filename = encryptDecryptObject.getFilename();
-                File inFile = new File(selectedVideoPath);
-                File outFile = new File(selectedVideoPath.substring(0, selectedVideoPath.lastIndexOf("/")) + "/" + filename);
-                EncrypterDecryptAlgo.encrypt(key, paramSpec, new FileInputStream(inFile), new FileOutputStream(outFile));
-                inFile.delete();
-
-            } catch (NoSuchAlgorithmException e) {
-                ((Activity) ctx).runOnUiThread(new Runnable() {
-                    public void run() {
-                        Toast.makeText(ctx, e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
-                e.printStackTrace();
-            } catch (NoSuchPaddingException e) {
-                ((Activity) ctx).runOnUiThread(new Runnable() {
-                    public void run() {
-                        Toast.makeText(ctx, e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
-                e.printStackTrace();
-            } catch (InvalidKeyException e) {
-                ((Activity) ctx).runOnUiThread(new Runnable() {
-                    public void run() {
-                        Toast.makeText(ctx, e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
-                e.printStackTrace();
-            } catch (InvalidAlgorithmParameterException e) {
-                ((Activity) ctx).runOnUiThread(new Runnable() {
-                    public void run() {
-                        Toast.makeText(ctx, e.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
-                e.printStackTrace();
-            } catch (IOException e) {
-                //encryptArray = new ArrayList<>();
-                //downloadArray = new ArrayList<>();
-                if (e.getMessage().contains("ENOSPC") || e.getMessage().contains("No space left on device")) {
-                    // showNoSpaceAlert(ctx);
-                }
-                Crashlytics.log(Log.ERROR, ctx.getString(R.string.app_name), e.getMessage());
-                e.printStackTrace();
-            }
-            return encryptDecryptObject;
-        }
-
-        @Override
-        protected void onPostExecute(EncryptDecryptObject encryptDecryptObject) {
-            delegate.getEncryptDecryptObjects(encryptDecryptObject);
-        }
-
-    }
-
 
     @Override
     public int getItemCount() {
@@ -277,7 +171,7 @@ public class DiscussionFIlePreviewListAdapter extends RecyclerView.Adapter<Discu
     public static void showNetworkAlert(Context activity) {
         try {
             SpannableStringBuilder message = setTypeface(activity, activity.getResources().getString(R.string.validation_Connect_internet));
-            android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(activity);
+            androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(activity);
             builder.setTitle(activity.getResources().getString(R.string.validation_warning));
             builder.setMessage(message)
                     .setPositiveButton(activity.getResources().getString(R.string.button_ok), new DialogInterface.OnClickListener() {
