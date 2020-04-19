@@ -17,6 +17,10 @@
             "description": "webHostingUrl is the base url under which all the applications will be hosted by Ingress service.\n [1] This value is supplied automatically by CI/CD scripts and administrator input is not required",
             "type": "string"
         },
+        "applicationListenUri": {
+            "description": "applicationListenUri tells the underlying application which url and port to listen on once running. [1] This value is supplied automatically by CI/CD scripts and administrator input is not required. [2] Used by the chart to supply the URLS system environment variable to the deployment",
+            "type": "string"
+        },
         "applicationServiceAccount": {
             "description": "applicationServiceAccount is the service account json credential file needed by application deployments to set up Cloud SQL proxy to connect to the production SQL server via private ip address.\n [1] Administrators must ensure they supply ONLY the base64 encoded version of this value by running `base64 -w 0` on it.\n [2] The service account that this credential was created for MUST have the `Cloud SQL Client` and `Cloud SQL Viewer` roles assigned to them, otherwise connections to the database will not work",
             "type": "string"
@@ -111,6 +115,7 @@
         "name",
         "gitlabDockerConfigJson",
         "webHostingUrl",
+        "applicationListenUri",
         "applicationServiceAccount",
         "deploymentNamespace",
         "netCoreEnvironment",

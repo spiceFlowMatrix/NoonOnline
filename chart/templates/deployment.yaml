@@ -101,6 +101,8 @@ spec:
                                 key: smtpServerEmailPassword
                     -   name: LANGUAGE
                         value: {{ .Values.applicationLanguage }}
+                    -   name: URLS
+                        value: {{ .Values.applicationListenUri }}
                 -   name: cloudsql-proxy
                     image: gcr.io/cloudsql-docker/gce-proxy:1.16
                     imagePullPolicy: IfNotPresent
