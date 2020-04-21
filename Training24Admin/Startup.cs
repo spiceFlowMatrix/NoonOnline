@@ -42,8 +42,11 @@ namespace Training24Admin
         private FilesBusiness FilesBusiness;
         private bool includeControllerXmlComments;
 
-        public Startup(IConfiguration configuration)
+        private readonly IHostingEnvironment _currentEnvironment;
+
+        public Startup(IConfiguration configuration, IHostingEnvironment env)
         {
+            _currentEnvironment = env;
             Configuration = configuration;
         }
 
@@ -571,9 +574,10 @@ namespace Training24Admin
             //    c.SwaggerDoc("v1", new Info { Title = "Training24 Admin", Version = "v1" });
             //});
 
-#if DEBUG
-            // swagger configuration
-            services.AddSwaggerGen(c =>
+            if (!_currentEnvironment.IsProduction())
+            {
+                // swagger configuration
+                services.AddSwaggerGen(c =>
                 {
                     c.SwaggerDoc("v1", new Info { Title = "Noon Online Education v1", Version = "v1" });
                     // swagger tags config
@@ -600,7 +604,7 @@ namespace Training24Admin
                     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                     c.IncludeXmlComments(xmlPath, includeControllerXmlComments = true);
                 });
-#endif
+            }
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -639,16 +643,17 @@ namespace Training24Admin
             //    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Training24 Admin V1");
             //});
 
-#if DEBUG
-            app.UseSwagger();
-            app.UseSwaggerUI(c =>
+            if (!env.IsProduction())
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Noon Online Education API v1");
-                c.DocumentTitle = "Noon Online Education";
-                c.DocExpansion(DocExpansion.None);
-                c.EnableFilter();
-            });
-#endif
+                app.UseSwagger();
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Noon Online Education API v1");
+                    c.DocumentTitle = "Noon Online Education";
+                    c.DocExpansion(DocExpansion.None);
+                    c.EnableFilter();
+                });
+            }
 
             app.UseCors("AllowAnyOrigin");
             app.UseMvc();
