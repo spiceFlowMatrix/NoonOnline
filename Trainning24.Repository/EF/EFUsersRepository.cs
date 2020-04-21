@@ -16,23 +16,13 @@ namespace Trainning24.Repository.EF
     public class EFUsersRepository : IGenericRepository<User>
     {
         private readonly EFGenericRepository<User> _context;
-        private readonly EFGenericRepository<Role> _roleContext;
-        private readonly EFGenericRepository<UserRole> _userroleContext;
-        //private static Training24Context _updateContext;
-
 
         public EFUsersRepository
         (
-            EFGenericRepository<User> context,
-            EFGenericRepository<Role> roleContext,
-            EFGenericRepository<UserRole> userroleContext
-        //Training24Context training24Context
+            EFGenericRepository<User> context
         )
         {
             _context = context;
-            _roleContext = roleContext;
-            _userroleContext = userroleContext;
-            //_updateContext = training24Context;
         }
 
         public int Insert(User obj)
@@ -40,7 +30,35 @@ namespace Trainning24.Repository.EF
             return _context.Insert(obj);
         }
 
+        public async Task<int> InsertAsync(User obj)
+        {
+            return await _context.InsertAsync(obj);
+        }
+
         public int Update(User obj)
+        {
+            User user = _context.GetById(b => b.Id == obj.Id);
+
+            user.Email = obj.Email;
+            user.FullName = obj.FullName;
+            user.LastModificationTime = DateTime.Now.ToString();
+            user.LastModifierUserId = 1;
+            user.Username = obj.Username;
+            user.is_skippable = obj.is_skippable;
+            user.timeout = obj.timeout;
+            user.reminder = obj.reminder;
+            user.istimeouton = obj.istimeouton;
+            user.intervals = obj.intervals;
+            user.is_discussion_authorized = obj.is_discussion_authorized;
+
+            if (!string.IsNullOrEmpty(obj.Password))
+                user.Password = obj.Password;
+
+
+            return _context.Update(user);
+        }
+
+        public async Task<int> UpdateAsync(User obj)
         {
             User user = _context.GetById(b => b.Id == obj.Id);
 
@@ -192,37 +210,6 @@ namespace Trainning24.Repository.EF
             return result;
         }
 
-        public List<Role> Role(User user)
-        {
-            List<UserRole> roles = _userroleContext.ListQuery(b => b.UserId == user.Id).ToList();
-            List<Role> roleList = new List<Role>();
-
-            if (roles != null)
-            {
-                foreach (var role in roles)
-                {
-                    Role role1st = _roleContext.GetById(b => b.Id == role.RoleId);
-                    roleList.Add(role1st);
-                }
-            }
-
-            return roleList;
-        }
-
-        public List<Role> RoleList()
-        {
-            List<Role> roleData = new List<Role>();
-            try
-            {
-                roleData = _roleContext.GetAll();
-            }
-            catch (Exception ex)
-            {
-
-            }
-            return roleData;
-        }
-
         public List<User> UserList()
         {
             List<User> userData = new List<User>();
@@ -281,11 +268,27 @@ namespace Trainning24.Repository.EF
             return _context.GetById(ex);
         }
 
+        public async Task<User> GetByIdAsync(Expression<Func<User, bool>> ex)
+        {
+            try
+            {
+                return await _context.GetByIdAsyncTest(ex);
+            }
+            catch (Exception)
+            {
+                throw;
+            }  
+        }
+
         public IQueryable<User> ListQuery(Expression<Func<User, bool>> where)
         {
             return _context.ListQuery(where);
         }
 
+        public async Task<List<User>> ListQueryAsync(Expression<Func<User, bool>> where)
+        {
+            return await _context.FindByConditionAsync(where);
+        }
         public int Save()
         {
             throw new NotImplementedException();
@@ -294,18 +297,6 @@ namespace Trainning24.Repository.EF
         public int Delete(User obj)
         {
             throw new NotImplementedException();
-        }
-
-        public List<UserRole> UserRoleList()
-        {
-            List<UserRole> roles = _userroleContext.GetAll();
-
-            return roles;
-        }
-
-        public int UserRoleAdd(UserRole obj)
-        {
-            return _userroleContext.Insert(obj);
         }
 
         public User GetById(int Id)

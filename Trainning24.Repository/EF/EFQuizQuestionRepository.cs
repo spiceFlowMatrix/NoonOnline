@@ -11,16 +11,13 @@ namespace Trainning24.Repository.EF
     public class EFQuizQuestionRepository : IGenericRepository<QuizQuestion>
     {
         private readonly EFGenericRepository<QuizQuestion> _context;
-        //private static Training24Context _updateContext;
 
         public EFQuizQuestionRepository
         (
             EFGenericRepository<QuizQuestion> context
-            //Training24Context training24Context
         )
         {
             _context = context;
-            //_updateContext = training24Context;
         }
 
         public int Update(QuizQuestion obj, string uId)

@@ -11,7 +11,7 @@ namespace Trainning24.Repository.EF.Generics
 {
     public class EFGenericRepository<T> where T : class, IEntityBase
     {
-        private static Training24Context _context;
+        private readonly Training24Context _context;
 
         protected DbSet<T> _objSet;
 
@@ -31,7 +31,7 @@ namespace Trainning24.Repository.EF.Generics
         public async Task<int> InsertAsync(T obj)
         {
             await _objSet.AddAsync(obj);
-            return Save();
+            return await SaveAsync();
         }
 
         public int Delete(T obj, string Id)
@@ -65,6 +65,12 @@ namespace Trainning24.Repository.EF.Generics
             return Save();
         }
 
+        public int DeleteRow(T obj)
+        {
+            _objSet.Remove(obj);
+            return Save();
+        }
+
         public int Update(T obj)
         {
             _objSet.Update(obj);
@@ -90,6 +96,11 @@ namespace Trainning24.Repository.EF.Generics
         public T GetById(Expression<Func<T, bool>> where)
         {
             return _objSet.FirstOrDefault(where);
+        }
+
+        public async Task<T> GetByIdAsyncTest(Expression<Func<T, bool>> where)
+        {
+            return await _objSet.FirstOrDefaultAsync(where);
         }
 
         public IQueryable<T> ListQuery(Expression<Func<T, bool>> where)

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using Trainning24.Abstract.Infrastructure.IGeneric;
 using Trainning24.Domain.Entity;
 using Trainning24.Repository.EF.Generics;
@@ -10,16 +11,15 @@ namespace Trainning24.Repository.EF
     public class EFQuestionAnswerRepository
     {
         private readonly EFGenericRepository<QuestionAnswer> _context;
-        //private static Training24Context _updateContext;
+        private readonly EFGenericRepository<AnswerFile> _answerfileContext;
 
         public EFQuestionAnswerRepository
         (
-            EFGenericRepository<QuestionAnswer> context
-            //Training24Context training24Context
+            EFGenericRepository<QuestionAnswer> context, EFGenericRepository<AnswerFile> answerfileContext
         )
         {
             _context = context;
-            //_updateContext = training24Context;
+            _answerfileContext = answerfileContext;
         }
 
         public int Insert(QuestionAnswer obj)
@@ -47,7 +47,20 @@ namespace Trainning24.Repository.EF
             return _context.Update(obj);
         }
 
+        public int InsertAnswerFile(AnswerFile obj)
+        {
+            return _answerfileContext.Insert(obj);
+        }
 
+        public IQueryable<AnswerFile> AnswerFileListQuery(Expression<Func<AnswerFile, bool>> where)
+        {
+            return _answerfileContext.ListQuery(where);
+        }
+
+        public int DeleteAnswerFile(AnswerFile obj)
+        {
+            return _answerfileContext.DeleteRow(obj);
+        }
 
         public int Delete(QuestionAnswer obj, string Id)
         {
@@ -64,22 +77,6 @@ namespace Trainning24.Repository.EF
             }
             catch { }
         }
-
-        //public QuestionAnswer QuestionAnswerExist(QuestionAnswer QuestionAnswer)
-        //{
-        //    QuestionAnswer result = null;
-
-        //    try
-        //    {
-        //        result = _context.ListQuery(b => b.Name == QuestionAnswer.Name).FirstOrDefault();
-        //    }
-        //    catch (Exception ex)
-        //    {
-
-        //    }
-
-        //    return result;
-        //}
 
         public List<QuestionAnswer> GetAnswersByQuestionId(long QuestionId)
         {

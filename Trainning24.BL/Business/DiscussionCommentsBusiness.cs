@@ -22,32 +22,32 @@ namespace Trainning24.BL.Business
     public class DiscussionCommentsBusiness
     {
         private readonly EFDiscussionCommentsRepository _EFDiscussionCommentsRepository;
-        private static Training24Context _training24Context;
         private readonly UsersBusiness UsersBusiness;
         private readonly UserNotificationBusiness userNotificationBusiness;
         private readonly DiscussionTopicBusiness discussionTopicBusiness;
         private readonly DiscussionCommentFilesBusiness discussionCommentFilesBusiness;
         private readonly LogObjectBusiness _logObjectBusiness;
+        private readonly EFDiscussionTopicRepository _eFDiscussionTopicRepository;
         public Language _language { get; }
         public DiscussionCommentsBusiness
         (
             EFDiscussionCommentsRepository _efDiscussionCommentsRepository,
-            Training24Context training24Context,
             UsersBusiness UsersBusiness,
             UserNotificationBusiness userNotificationBusiness,
             DiscussionTopicBusiness discussionTopicBusiness,
             DiscussionCommentFilesBusiness discussionCommentFilesBusiness,
             LogObjectBusiness logObjectBusiness,
+            EFDiscussionTopicRepository eFDiscussionTopicRepository,
             IOptions<Language> language
         )
         {
             _EFDiscussionCommentsRepository = _efDiscussionCommentsRepository;
-            _training24Context = training24Context;
             this.UsersBusiness = UsersBusiness;
             this.userNotificationBusiness = userNotificationBusiness;
             this.discussionTopicBusiness = discussionTopicBusiness;
             this.discussionCommentFilesBusiness = discussionCommentFilesBusiness;
             _logObjectBusiness = logObjectBusiness;
+            _eFDiscussionTopicRepository = eFDiscussionTopicRepository;
             _language = language.Value;
         }
 
@@ -221,14 +221,13 @@ namespace Trainning24.BL.Business
 
         public List<long> GetCommentUserByTopicId(long Id, long userid)
         {
-            var obj = (from uc in _training24Context.DiscussionComments
-                       where (uc.TopicId == Id && uc.DeletionTime == null && uc.CreatorUserId != userid)
-                       select uc.CreatorUserId).Distinct().ToList();
+            var obj = _EFDiscussionCommentsRepository.ListQuery(b => b.TopicId == Id && b.DeleterUserId == null && b.CreatorUserId != userid)
+                      .Select(b => b.CreatorUserId).Distinct().ToList();
 
             List<long> longs = obj.ConvertAll(i => (long)i);
-            var getTopicOwner = (from tc in _training24Context.DiscussionTopic
-                                 where tc.Id == Id && tc.DeletionTime == null && tc.CreatorUserId != userid
-                                 select tc.CreatorUserId).FirstOrDefault();
+
+            var getTopicOwner = _eFDiscussionTopicRepository.ListQuery(b => b.Id == Id && b.DeletionTime == null && b.CreatorUserId != userid)
+                                .Select(b => b.CreatorUserId).FirstOrDefault();
             if (getTopicOwner != null)
             {
                 long topicOwner = (long)getTopicOwner;

@@ -5,6 +5,7 @@ using Trainning24.Repository.EF;
 using System.Linq;
 using System.Web.Helpers;
 using Trainning24.BL.ViewModels.Users;
+using System.Threading.Tasks;
 
 namespace Trainning24.BL.Business
 {
@@ -138,26 +139,6 @@ namespace Trainning24.BL.Business
             return EFIndividualDetails.GetIndiviualDetails(search);
         }
 
-
-        //public object GetSchoolList(string search)
-        //{
-        //    if (string.IsNullOrEmpty(search))
-        //    {
-        //        var userListwithp = from testind in _training24Context.SchoolDetails select new { testind.Id, testind.RegisterNumber, testind.SchoolName, testind.SchoolAddress };
-        //        return userListwithp;
-        //    }
-        //    else
-        //    {
-        //        var userListwithp = (from testind in _training24Context.SchoolDetails
-        //                             where testind.IsDeleted != true
-        //                             select new { testind.Id, testind.RegisterNumber, testind.SchoolName, testind.SchoolAddress }).ToList();
-
-        //        userListwithp = userListwithp.Where(b => b.RegisterNumber.ToLower().Contains(search.ToLower()) ||
-        //            !string.IsNullOrEmpty(b.SchoolName) && b.SchoolName.ToLower().Contains(search.ToLower())).ToList();
-        //        return userListwithp;
-        //    }
-        //}
-
         public List<SchoolDetails> GetSchoolDetails(string search)
         {
             return EFIndividualDetails.GetSchoolDetails(search);
@@ -263,7 +244,7 @@ namespace Trainning24.BL.Business
             return EFIndividualDetails.GetSchoolList(search);
         }
 
-        public IndividualDetails CreateTrialUser(CreateTrialUser dto)
+        public async Task<IndividualDetails> CreateTrialUser(CreateTrialUser dto)
         {
             IndividualDetails individualDetails = new IndividualDetails
             {
@@ -288,7 +269,7 @@ namespace Trainning24.BL.Business
                 CreationTime = DateTime.Now.ToString(),
                 CreatorUserId = 1
             };
-            EFIndividualDetails.Insert(individualDetails);
+            await EFIndividualDetails.InsertAsync(individualDetails);
             return individualDetails;
         }
     }
