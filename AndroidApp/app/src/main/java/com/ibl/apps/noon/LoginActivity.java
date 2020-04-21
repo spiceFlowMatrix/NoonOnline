@@ -107,8 +107,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         loginLayoutBinding.forgotPassword.setOnClickListener(this);
         loginLayoutBinding.createNewAccount.setOnClickListener(this);
         loginLayoutBinding.txtPrivacyPolicy.setOnClickListener(this);
-        loginLayoutBinding.signupTial.setOnClickListener(this);
-        loginLayoutBinding.cardLoginTrial.setOnClickListener(this);
+       /* loginLayoutBinding.signupTial.setOnClickListener(this);
+        loginLayoutBinding.cardLoginTrial.setOnClickListener(this);*/
     }
 
     @Override
@@ -181,18 +181,18 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                         }));
                 break;
 
-            case R.id.signupTial:
-                openActivity(SignUpTrialActivity.class);
-                break;
+           /* case R.id.signupTial:
+                //openActivity(SignUpTrialActivity.class);
+                break;*/
 
-            case R.id.cardLoginTrial:
+          //  case R.id.cardLoginTrial:
 
-                if (validateFields()) {
+                /*if (validateFields()) {
                     String email = loginLayoutBinding.loginEmail.getText().toString().trim();
                     String password = loginLayoutBinding.loginPassword.getText().toString().trim();
                     Intent intent = new Intent(LoginActivity.this, MainDashBoardTrialActivity.class);
                     startActivity(intent);
-                    /*showDialog(getString(R.string.loading));
+                    *//*showDialog(getString(R.string.loading));
                     if (isNetworkAvailable(this)) {
                         mAuth.signInWithEmailAndPassword(email, password)
                                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -214,10 +214,10 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                     } else {
                         Toast.makeText(getApplicationContext(), "No Internet! Please try again later", Toast.LENGTH_LONG).show();
 //                        LocalLogin(email, password, null);
-                    }*/
-                }
+                    }*//*
+                }*/
 
-                break;
+              //  break;
         }
     }
 
