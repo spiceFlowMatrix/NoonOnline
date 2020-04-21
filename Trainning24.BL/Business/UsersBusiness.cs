@@ -724,7 +724,7 @@ namespace Trainning24.BL.Business
             {
                 throw;
             }
-            
+
         }
 
         public int updateForgotCode(User user)
@@ -760,7 +760,9 @@ namespace Trainning24.BL.Business
                 mail.IsBodyHtml = true;
                 mail.Priority = MailPriority.High;
 
-                using (SmtpClient smtp = new SmtpClient(_emailSettings.PrimaryDomain, _emailSettings.PrimaryPort))
+                var port = Convert.ToInt16(_emailSettings.PrimaryPort.Replace("\"", "").Replace("'", ""));
+
+                using (SmtpClient smtp = new SmtpClient(_emailSettings.PrimaryDomain, port))
                 {
                     smtp.Credentials = new NetworkCredential(_emailSettings.UsernameEmail, _emailSettings.UsernamePassword);
                     smtp.EnableSsl = true;

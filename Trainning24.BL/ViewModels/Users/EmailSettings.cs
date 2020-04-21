@@ -8,7 +8,7 @@ namespace Trainning24.BL.ViewModels.Users
     {
         public string PrimaryDomain { get; set; }
 
-        public int PrimaryPort { get; set; }
+        public string PrimaryPort { get; set; }
 
         public string SecondayDomain { get; set; }
 

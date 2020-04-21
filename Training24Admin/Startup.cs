@@ -78,7 +78,7 @@ namespace Training24Admin
             services.Configure<EmailSettings>(emailSettings =>
             {
                 emailSettings.PrimaryDomain = Environment.GetEnvironmentVariable("PRIMARY_DOMAIN");
-                emailSettings.PrimaryPort = Convert.ToInt32(Environment.GetEnvironmentVariable("PRIMARY_PORT"));
+                emailSettings.PrimaryPort = Environment.GetEnvironmentVariable("PRIMARY_PORT");
                 emailSettings.UsernameEmail = Environment.GetEnvironmentVariable("USERNAME_EMAIL");
                 emailSettings.UsernamePassword = Environment.GetEnvironmentVariable("USERNAME_PASSWORD");
             });
