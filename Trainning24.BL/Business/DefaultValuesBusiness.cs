@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using Trainning24.BL.ViewModels.DefaultValues;
 using Trainning24.Domain.Entity;
 using Trainning24.Repository.EF;
@@ -62,6 +63,11 @@ namespace Trainning24.BL.Business
         public DefaultValues GetById(long id)
         {
             return EFDefaultValues.GetById(b=>b.Id==id);
+        }
+
+        public async Task<DefaultValues> GetByIdAsync(long id)
+        {
+            return await EFDefaultValues.GetByIdAsync(b => b.Id == id);
         }
 
 

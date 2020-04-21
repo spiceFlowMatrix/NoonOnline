@@ -21,7 +21,6 @@ namespace Trainning24.BL.Business
     public class UsersBusiness
     {
         private readonly EFUsersRepository _EFUsersRepository;
-        private static Training24Context _training24Context;
         private static EFStudentCourseRepository _EFStudentCourseRepository;
         private readonly EFCourseRepository _EFCourseRepository;
         private readonly LessonBusiness _lessonBusiness;
@@ -29,23 +28,25 @@ namespace Trainning24.BL.Business
         public ErpSettings _erpSettings { get; }
         public readonly EFStudParentRepository _eFStudParentRepository;
         private readonly LogObjectBusiness _logObjectBusiness;
+        private readonly EFUserRoleRepository _eFUserRoleRepository;
+        private readonly EFRoleRepository _eFRoleRepository;
 
 
         public UsersBusiness
         (
             EFUsersRepository eFUsersRepository,
-            Training24Context training24Context,
             EFStudentCourseRepository EFStudentCourseRepository,
             EFCourseRepository EFCourseRepository,
             IOptions<EmailSettings> emailSettings,
             IOptions<ErpSettings> erpSettings,
             LessonBusiness lessonBusiness,
             LogObjectBusiness logObjectBusiness,
-            EFStudParentRepository eFStudParentRepository
+            EFStudParentRepository eFStudParentRepository,
+            EFUserRoleRepository eFUserRoleRepository,
+            EFRoleRepository eFRoleRepository
         )
         {
             _EFUsersRepository = eFUsersRepository;
-            _training24Context = training24Context;
             _EFStudentCourseRepository = EFStudentCourseRepository;
             _EFCourseRepository = EFCourseRepository;
             _emailSettings = emailSettings.Value;
@@ -53,6 +54,8 @@ namespace Trainning24.BL.Business
             _lessonBusiness = lessonBusiness;
             _logObjectBusiness = logObjectBusiness;
             _eFStudParentRepository = eFStudParentRepository;
+            _eFUserRoleRepository = eFUserRoleRepository;
+            _eFRoleRepository = eFRoleRepository;
         }
 
 
@@ -259,7 +262,7 @@ namespace Trainning24.BL.Business
 
         public List<UserRole> getUserRole(long id)
         {
-            return _training24Context.UserRole.Where(b => b.RoleId == id).ToList();
+            return _eFUserRoleRepository.ListQuery(b => b.RoleId == id).ToList();
         }
 
         public User GetUserbyId(long id)
@@ -308,7 +311,7 @@ namespace Trainning24.BL.Business
                     CreatorUserId = 1,//int.Parse(Id),
                     IsDeleted = false
                 };
-                _EFUsersRepository.UserRoleAdd(userRole);
+                _eFUserRoleRepository.Insert(userRole);
             }
             return newUser;
         }
@@ -363,13 +366,12 @@ namespace Trainning24.BL.Business
 
             _EFUsersRepository.Update(newUser);
             _logObjectBusiness.AddLogsObject(5, newUser.Id, newUser.CreatorUserId ?? 1);
-            List<UserRole> existUserRoles = _training24Context.UserRole.Where(b => b.UserId == newUser.Id).ToList();
+            List<UserRole> existUserRoles = _eFUserRoleRepository.ListQuery(b => b.UserId == newUser.Id).ToList();
             if (existUserRoles != null)
             {
                 foreach (var existingUserRole in existUserRoles)
                 {
-                    _training24Context.UserRole.Remove(existingUserRole);
-                    _training24Context.SaveChanges();
+                    _eFUserRoleRepository.DeleteUserRole(existingUserRole);
                 }
             }
             foreach (var userrole in createUserViewModel.Roles)
@@ -382,7 +384,7 @@ namespace Trainning24.BL.Business
                     CreatorUserId = int.Parse(Id),
                     IsDeleted = false
                 };
-                _EFUsersRepository.UserRoleAdd(userRole);
+                _eFUserRoleRepository.Insert(userRole);
             }
 
             return newUser;
@@ -419,13 +421,12 @@ namespace Trainning24.BL.Business
 
             _EFUsersRepository.Update(newUser);
             _logObjectBusiness.AddLogsObject(5, newUser.Id, newUser.CreatorUserId ?? 1);
-            List<UserRole> existUserRoles = _training24Context.UserRole.Where(b => b.UserId == newUser.Id && b.RoleId == 17).ToList();
+            List<UserRole> existUserRoles = _eFUserRoleRepository.ListQuery(b => b.UserId == newUser.Id && b.RoleId == 17).ToList();
             if (existUserRoles != null)
             {
                 foreach (var existingUserRole in existUserRoles)
                 {
-                    _training24Context.UserRole.Remove(existingUserRole);
-                    _training24Context.SaveChanges();
+                    _eFUserRoleRepository.DeleteUserRole(existingUserRole);
                 }
             }
             foreach (var userrole in createUserViewModel.Roles)
@@ -438,7 +439,7 @@ namespace Trainning24.BL.Business
                     CreatorUserId = int.Parse(Id),
                     IsDeleted = false
                 };
-                _EFUsersRepository.UserRoleAdd(userRole);
+                _eFUserRoleRepository.Insert(userRole);
             }
 
             return newUser;
@@ -513,19 +514,48 @@ namespace Trainning24.BL.Business
             return _EFUsersRepository.UserExistById(_user); ;
         }
 
-        public List<Role> Role(User role)
+        public List<Role> Role(User user)
         {
-            return _EFUsersRepository.Role(role);
+            List<UserRole> roles = _eFUserRoleRepository.ListQuery(b => b.UserId == user.Id).ToList();
+            List<Role> roleList = new List<Role>();
+
+            if (roles != null)
+            {
+                foreach (var role in roles)
+                {
+                    Role role1st = _eFRoleRepository.GetById(b => b.Id == role.RoleId);
+                    roleList.Add(role1st);
+                }
+            }
+
+            return roleList;
+        }
+
+        public async Task<List<Role>> RoleAsync(User user)
+        {
+            List<UserRole> roles = await _eFUserRoleRepository.ListQueryAsync(b => b.UserId == user.Id);
+            List<Role> roleList = new List<Role>();
+
+            if (roles != null)
+            {
+                foreach (var role in roles)
+                {
+                    Role role1st = await _eFRoleRepository.GetByIdAsync(b => b.Id == role.RoleId);
+                    roleList.Add(role1st);
+                }
+            }
+
+            return roleList;
         }
 
         public Role GetRole(long id)
         {
-            return _training24Context.Role.SingleOrDefault(b => b.Id == id);
+            return _eFRoleRepository.GetById(b => b.Id == id);
         }
 
         public List<Role> RoleList()
         {
-            return _EFUsersRepository.RoleList();
+            return _eFRoleRepository.GetAll();
         }
 
         public int TotalUserCount()
@@ -556,23 +586,20 @@ namespace Trainning24.BL.Business
         public List<AssignedPersonModel> GetAssignedPersonDetails(long id, List<String> rolename, PaginationModel paginationModel, out int total)
         {
             List<AssignedPersonModel> allAssigned = new List<AssignedPersonModel>();
-
-            foreach (var usercourse in (
-                                            from allcourses in _training24Context.UserCourse
-                                            where allcourses.UserId == id
-                                            select allcourses
-                                        ).ToList()
-                    )
+            var usercourses = _EFStudentCourseRepository.ListQuery(b => b.UserId == id).ToList();
+            foreach (var usercourse in usercourses)
             {
                 List<UserDetails> users = new List<UserDetails>();
-                Course userCourseDetail = _training24Context.Course.Where(b => b.Id == usercourse.CourseId).SingleOrDefault();
+                Course userCourseDetail = _EFCourseRepository.GetById(b => b.Id == usercourse.CourseId);
 
-
+                var usersList = _EFUsersRepository.GetAll();
+                var userCourseList = _EFStudentCourseRepository.GetAll();
+                var userrolelist = _eFUserRoleRepository.GetAll();
                 List<User> allUsers = new List<User>();
                 if (rolename.Contains(LessonBusiness.getRoleType("3")))
                 {
-                    allUsers = (from user in _training24Context.Users
-                                join userCourse in _training24Context.UserCourse on user.Id equals userCourse.UserId
+                    allUsers = (from user in usersList
+                                join userCourse in userCourseList on user.Id equals userCourse.UserId
                                 where userCourse.CourseId == usercourse.CourseId && user.Id != id
                                 select user
                                              ).ToList();
@@ -582,9 +609,9 @@ namespace Trainning24.BL.Business
                 if (rolename.Contains(LessonBusiness.getRoleType("4")))
                 {
                     allUsers = (
-                                from user in _training24Context.Users
-                                join userCourse in _training24Context.UserCourse on user.Id equals userCourse.UserId
-                                join thatsrole in _training24Context.UserRole on user.Id equals thatsrole.UserId
+                                from user in usersList
+                                join userCourse in userCourseList on user.Id equals userCourse.UserId
+                                join thatsrole in userrolelist on user.Id equals thatsrole.UserId
                                 where userCourse.CourseId == usercourse.CourseId && thatsrole.RoleId == 3
                                 select user
                                ).ToList();
@@ -687,6 +714,19 @@ namespace Trainning24.BL.Business
             return _EFUsersRepository.ListQuery(b => b.Email == email && b.IsDeleted != true).FirstOrDefault();
         }
 
+        public async Task<User> UserExistsByEmailAsync(string email)
+        {
+            try
+            {
+                return await _EFUsersRepository.GetByIdAsync(b => b.Email == email && b.IsDeleted != true);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+            
+        }
+
         public int updateForgotCode(User user)
         {
             return _EFUsersRepository.Update(user);
@@ -735,9 +775,13 @@ namespace Trainning24.BL.Business
 
         public List<long> GetTeachersByCourseId(long courseid)
         {
-            var obj = (from uc in _training24Context.UserCourse
-                       join ul in _training24Context.Users on uc.UserId equals ul.Id
-                       join ur in _training24Context.UserRole on ul.Id equals ur.UserId
+            var usersList = _EFUsersRepository.GetAll();
+            var userCourseList = _EFStudentCourseRepository.GetAll();
+            var userrolelist = _eFUserRoleRepository.GetAll();
+
+            var obj = (from uc in userCourseList
+                       join ul in usersList on uc.UserId equals ul.Id
+                       join ur in userrolelist on ul.Id equals ur.UserId
                        where uc.CourseId == courseid && uc.DeletionTime == null && ur.RoleId == 3
                        select ul.Id).Distinct().ToList();
             return obj;
@@ -745,9 +789,13 @@ namespace Trainning24.BL.Business
 
         public List<long> GetStudentsByCourseId(long courseid)
         {
-            var obj = (from uc in _training24Context.UserCourse
-                       join ul in _training24Context.Users on uc.UserId equals ul.Id
-                       join ur in _training24Context.UserRole on ul.Id equals ur.UserId
+            var usersList = _EFUsersRepository.GetAll();
+            var userCourseList = _EFStudentCourseRepository.GetAll();
+            var userrolelist = _eFUserRoleRepository.GetAll();
+
+            var obj = (from uc in userCourseList
+                       join ul in usersList on uc.UserId equals ul.Id
+                       join ur in userrolelist on ul.Id equals ur.UserId
                        where uc.CourseId == courseid && uc.DeletionTime == null && ur.RoleId == 4 && ul.is_discussion_authorized == true
                        select ul.Id).Distinct().ToList();
 
@@ -756,10 +804,7 @@ namespace Trainning24.BL.Business
 
         public List<long> GetUserByCourseId(long courseid)
         {
-            List<long> userlist = (from uc in _training24Context.UserCourse
-                                   where uc.CourseId == courseid && uc.DeletionTime == null
-                                   select uc.UserId).Distinct().ToList();
-
+            List<long> userlist = _EFStudentCourseRepository.ListQuery(b => b.CourseId == courseid && b.DeletionTime == null).Select(u => u.UserId).ToList();
             return userlist;
         }
 
@@ -791,7 +836,7 @@ namespace Trainning24.BL.Business
         public object GetUserList(PaginationModel2 paginationModel, out int total)
         {
             var userList = _EFUsersRepository.ListQuery(u => u.IsDeleted != true).ToList();
-            var userrole = _EFUsersRepository.UserRoleList();
+            var userrole = _eFUserRoleRepository.GetAll();
 
             var userListwithp = (from ul in userList
                                  join ur in userrole on ul.Id equals ur.UserId
@@ -840,7 +885,7 @@ namespace Trainning24.BL.Business
         {
             List<User> userList = new List<User>();
             var users = _EFUsersRepository.ListQuery(u => u.IsDeleted != true).ToList();
-            var userrole = _EFUsersRepository.UserRoleList();
+            var userrole = _eFUserRoleRepository.GetAll();
             try
             {
                 if (paginationModel.roleid != null)
@@ -905,13 +950,12 @@ namespace Trainning24.BL.Business
         {
             try
             {
-                List<UserRole> existUserRoles = _training24Context.UserRole.Where(b => b.UserId == userId && b.RoleId == roleId).ToList();
+                List<UserRole> existUserRoles = _eFUserRoleRepository.ListQuery(b => b.UserId == userId && b.RoleId == roleId).ToList();
                 if (existUserRoles != null)
                 {
                     foreach (var existingUserRole in existUserRoles)
                     {
-                        _training24Context.UserRole.Remove(existingUserRole);
-                        _training24Context.SaveChanges();
+                        _eFUserRoleRepository.DeleteUserRole(existingUserRole);
                     }
                 }
                 return 1;
@@ -945,7 +989,7 @@ namespace Trainning24.BL.Business
                 is_library_authorized = dto.is_library_authorized,
                 istrial = true
             };
-            _EFUsersRepository.Insert(newUser);
+            await _EFUsersRepository.InsertAsync(newUser);
             _logObjectBusiness.AddLogsObject(4, newUser.Id, newUser.CreatorUserId ?? 1);
             foreach (var userrole in dto.Roles)
             {
@@ -957,8 +1001,9 @@ namespace Trainning24.BL.Business
                     CreatorUserId = 1,//int.Parse(Id),
                     IsDeleted = false
                 };
-                _EFUsersRepository.UserRoleAdd(userRole);
+                await _eFUserRoleRepository.InsertAsync(userRole);
             }
+
             return newUser;
         }
 

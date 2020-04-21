@@ -30,7 +30,9 @@ namespace Training24Admin.Controllers
         private readonly GradeBusiness GradeBusiness;
         private readonly LessonBusiness LessonBusiness;
         private readonly UsersBusiness usersBusiness;
-        private static Training24Context _training24Context;
+        private readonly EFUsersRepository _eFUsersRepository;
+        private readonly EFRoleRepository _eFRoleRepository;
+        private readonly EFUserRoleRepository _eFUserRoleRepository;
         private IHostingEnvironment hostingEnvironment;
 
         public StudentCourseController
@@ -40,10 +42,12 @@ namespace Training24Admin.Controllers
             UsersBusiness usersBusiness,
             CourseBusiness courseBusiness,
             LessonBusiness LessonBusiness,
-            Training24Context training24Context,
             EFCourseGradeRepository EFCourseGradeRepository,
             CourseGradeBusiness CourseGradeBusiness,
-            GradeBusiness GradeBusiness
+            GradeBusiness GradeBusiness,
+            EFUsersRepository eFUsersRepository,
+            EFRoleRepository eFRoleRepository,
+            EFUserRoleRepository eFUserRoleRepository
         )
         {
             this.hostingEnvironment = hostingEnvironment;
@@ -51,10 +55,12 @@ namespace Training24Admin.Controllers
             this.usersBusiness = usersBusiness;
             this.LessonBusiness = LessonBusiness;
             this.courseBusiness = courseBusiness;
-            _training24Context = training24Context;
             this.EFCourseGradeRepository = EFCourseGradeRepository;
             this.CourseGradeBusiness = CourseGradeBusiness;
             this.GradeBusiness = GradeBusiness;
+            this._eFUsersRepository = eFUsersRepository;
+            this._eFRoleRepository = eFRoleRepository;
+            this._eFUserRoleRepository = eFUserRoleRepository;
         }
 
         [HttpPost]
@@ -75,8 +81,10 @@ namespace Training24Admin.Controllers
                     {
                         User user = usersBusiness.GetUserbyId(StudentCourseModel.userid);
 
-                        List<Role> userallroles = (from allrole in _training24Context.Role
-                                                   join userrole in _training24Context.UserRole on allrole.Id equals userrole.RoleId
+                        var roles = _eFRoleRepository.GetAll();
+                        var userroles = _eFUserRoleRepository.GetAll();
+                        List<Role> userallroles = (from allrole in roles
+                                                   join userrole in userroles on allrole.Id equals userrole.RoleId
                                                    where userrole.UserId == user.Id
                                                    select allrole).ToList();
 
@@ -168,8 +176,11 @@ namespace Training24Admin.Controllers
 
                         User user = usersBusiness.GetUserbyId(updateStudentCourseModel.userid);
 
-                        List<Role> userallroles = (from allrole in _training24Context.Role
-                                                   join userrole in _training24Context.UserRole on allrole.Id equals userrole.RoleId
+                        var roles = _eFRoleRepository.GetAll();
+                        var userroles = _eFUserRoleRepository.GetAll();
+
+                        List<Role> userallroles = (from allrole in roles
+                                                   join userrole in userroles on allrole.Id equals userrole.RoleId
                                                    where userrole.UserId == user.Id
                                                    select allrole).ToList();
 

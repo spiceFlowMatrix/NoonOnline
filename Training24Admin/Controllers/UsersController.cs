@@ -13,7 +13,6 @@ using Newtonsoft.Json;
 using RestSharp;
 using Training24Admin.Model;
 using Trainning24.BL.Business;
-using Trainning24.BL.ViewModels;
 using Trainning24.BL.ViewModels.Terms;
 using Trainning24.BL.ViewModels.UserRole;
 using Trainning24.BL.ViewModels.Users;
@@ -24,8 +23,6 @@ namespace Training24Admin.Controllers
 
     [Route("api/v1/[controller]")]
     [ApiController]
-    [Produces("application/json")]
-    [ApiExplorerSettings(GroupName = nameof(SwaggerGrouping.Users))]
     //[Authorize]
     public class UsersController : ControllerBase
     {
@@ -938,7 +935,7 @@ namespace Training24Admin.Controllers
         {
             SuccessResponse successResponse = new SuccessResponse();
             UnsuccessResponse unsuccessResponse = new UnsuccessResponse();
-            Trainning24.Domain.Entity.User user = usersBusiness.UserExistsByEmail(dto.Email);
+            Trainning24.Domain.Entity.User user = await usersBusiness.UserExistsByEmailAsync(dto.Email);
             try
             {
                 if (ModelState.IsValid)
@@ -959,7 +956,7 @@ namespace Training24Admin.Controllers
                             unsuccessResponse.status = "Unsuccess";
                             return StatusCode(401, unsuccessResponse);
                         }
-                        DefaultValues newDefaultValuesList = DefaultValuesBusiness.GetById(6);
+                        DefaultValues newDefaultValuesList = await DefaultValuesBusiness.GetByIdAsync(6);
                         if (newDefaultValuesList != null)
                         {
                             if (string.IsNullOrEmpty(dto.istimeouton.ToString()))
@@ -980,7 +977,7 @@ namespace Training24Admin.Controllers
                         _lstRoles.Add(_roles);
                         dto.Roles = _lstRoles;
                         //getting ManagementAPIClient authority for Auth0 implementation this is used for calling Auth Management API
-                        ManagementApiClient mac = General.getAuthManagementApiToken();
+                        ManagementApiClient mac = await General.getAuthManagementApiTokenAsync();
                         Trainning24.Domain.Entity.User newuser = await usersBusiness.CreateTrialUser(dto);
                         UserCreateRequest userCreateRequest = new UserCreateRequest();
                         //userCreateRequest.UserName = createUserViewModel.Username;
@@ -1005,7 +1002,7 @@ namespace Training24Admin.Controllers
                             updateUserViewModel.authid = a0User.UserId;
                             usersBusiness.UpdateAuthId(updateUserViewModel);
                             dto.UserId = newuser.Id;
-                            _individualDetailsBusiness.CreateTrialUser(dto);
+                            await _individualDetailsBusiness.CreateTrialUser(dto);
                         }
                         catch (Exception ex)
                         {
@@ -1015,7 +1012,7 @@ namespace Training24Admin.Controllers
                             return StatusCode(500, unsuccessResponse);
                         }
                         DetailUserDTO userDTO = new DetailUserDTO();
-                        List<Role> roles = usersBusiness.Role(newuser);
+                        List<Role> roles = await usersBusiness.RoleAsync(newuser);
                         if (roles != null)
                         {
                             List<long> roleids = new List<long>();

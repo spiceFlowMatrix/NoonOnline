@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Training24Admin.Model
@@ -41,30 +42,54 @@ namespace Training24Admin.Model
 
 
         //Uncomment this for live
-        //public static ManagementApiClient getAuthManagementApiToken()
-        //{
-        //    string managementurl = Environment.GetEnvironmentVariable("MANAGEMENTURL_ENVIRONMENT");
-        //    string client_id = Environment.GetEnvironmentVariable("CLIENT_ID_ENVIRONMENT");
-        //    string client_secret = Environment.GetEnvironmentVariable("CLIENT_SECRET_ENVIRONMENT");
-        //    string audience = Environment.GetEnvironmentVariable("AUDIENCE_ENVIRONMENT");
-        //    string environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-        //    string token = "";
+        public static ManagementApiClient getAuthManagementApiToken()
+        {
+            string managementurl = Environment.GetEnvironmentVariable("MANAGEMENTURL_ENVIRONMENT");
+            string client_id = Environment.GetEnvironmentVariable("CLIENT_ID_ENVIRONMENT");
+            string client_secret = Environment.GetEnvironmentVariable("CLIENT_SECRET_ENVIRONMENT");
+            string audience = Environment.GetEnvironmentVariable("AUDIENCE_ENVIRONMENT");
+            string environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 
-        //    //get auth0 management api token
-        //    var clientA0 = new RestClient(managementurl);
-        //    var request = new RestRequest(Method.POST);
-        //    request.AddHeader("content-type", "application/json");
-        //    request.AddParameter("application/json", "{\"grant_type\":\"client_credentials\",\"client_id\": \"" + client_id + "\",\"client_secret\": \"" + client_secret + "\",\"audience\": \"" + audience + "\"}", ParameterType.RequestBody);
-        //    IRestResponse response = clientA0.Execute(request);
-        //    string strResponse = response.Content;
-        //    var definition = new { access_token = "", token_type = "" };
-        //    var resp = JsonConvert.DeserializeAnonymousType(strResponse, definition);
-        //    token = resp.access_token;
-        //    return new ManagementApiClient(token, new Uri(audience));
-        //}
+            string token = "";
+            //get auth0 management api token
+            var clientA0 = new RestClient(managementurl);
+            var request = new RestRequest(Method.POST);
+            request.AddHeader("content-type", "application/json");
+            request.AddParameter("application/json", "{\"grant_type\":\"client_credentials\",\"client_id\": \"" + client_id + "\",\"client_secret\": \"" + client_secret + "\",\"audience\": \"" + audience + "\"}", ParameterType.RequestBody);
+            IRestResponse response = clientA0.Execute(request);
+            string strResponse = response.Content;
+            var definition = new { access_token = "", token_type = "" };
+            var resp = JsonConvert.DeserializeAnonymousType(strResponse, definition);
+            token = resp.access_token;
+            return new ManagementApiClient(token, new Uri(audience));
+        }
+
+        //Uncomment this for live
+        public static async Task<ManagementApiClient> getAuthManagementApiTokenAsync()
+        {
+            string managementurl = Environment.GetEnvironmentVariable("MANAGEMENTURL_ENVIRONMENT");
+            string client_id = Environment.GetEnvironmentVariable("CLIENT_ID_ENVIRONMENT");
+            string client_secret = Environment.GetEnvironmentVariable("CLIENT_SECRET_ENVIRONMENT");
+            string audience = Environment.GetEnvironmentVariable("AUDIENCE_ENVIRONMENT");
+            string environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+
+            string token = "";
+            //get auth0 management api token
+            var clientA0 = new RestClient(managementurl);
+            var request = new RestRequest(Method.POST);
+            var cancellationTokenSource = new CancellationTokenSource();
+            request.AddHeader("content-type", "application/json");
+            request.AddParameter("application/json", "{\"grant_type\":\"client_credentials\",\"client_id\": \"" + client_id + "\",\"client_secret\": \"" + client_secret + "\",\"audience\": \"" + audience + "\"}", ParameterType.RequestBody);
+            IRestResponse response = await clientA0.ExecuteTaskAsync(request, cancellationTokenSource.Token);
+            string strResponse = response.Content;
+            var definition = new { access_token = "", token_type = "" };
+            var resp = JsonConvert.DeserializeAnonymousType(strResponse, definition);
+            token = resp.access_token;
+            return new ManagementApiClient(token, new Uri(audience));
+        }
 
 
-        //getting ManagementAPIClient authority for Auth0 implementation
+        ////getting ManagementAPIClient authority for Auth0 implementation
         //public static ManagementApiClient getAuthManagementApiToken()
         //{
         //    string token = "";
@@ -81,24 +106,60 @@ namespace Training24Admin.Model
         //    return new ManagementApiClient(token, new Uri("https://edgsolutions.eu.auth0.com/api/v2/"));
         //}
 
+        ////getting ManagementAPIClient authority for Auth0 implementation
+        //public static async Task<ManagementApiClient> getAuthManagementApiTokenAsync()
+        //{
+        //    string token = "";
+        //    //get auth0 management api token
+        //    var clientA0 = new RestClient("https://edgsolutions.eu.auth0.com/oauth/token");
+        //    var request = new RestRequest(Method.POST);
+        //    var cancellationTokenSource = new CancellationTokenSource();
+        //    request.AddHeader("content-type", "application/json");
+        //    request.AddParameter("application/json", "{\"grant_type\":\"client_credentials\",\"client_id\": \"53ufLSqF7qvyqRaPb8DLCexw33PQp2qz\",\"client_secret\": \"Qs9ciXa7ijSM-aCE-If4g_TAA14pa0xA3-L5YzsEcplIDjshfYTePZvkVh1_wD2f\",\"audience\": \"https://edgsolutions.eu.auth0.com/api/v2/\"}", ParameterType.RequestBody);
+        //    IRestResponse response = await clientA0.ExecuteTaskAsync(request, cancellationTokenSource.Token);
+        //    string strResponse = response.Content;
+        //    var definition = new { access_token = "", token_type = "" };
+        //    var resp = JsonConvert.DeserializeAnonymousType(strResponse, definition);
+        //    token = resp.access_token;
+        //    return new ManagementApiClient(token, new Uri("https://edgsolutions.eu.auth0.com/api/v2/"));
+        //}
 
 
-        // this is for local
-        public static ManagementApiClient getAuthManagementApiToken()
-        {
-            string token = "";
-            //get auth0 management api token
-            var clientA0 = new RestClient("https://satyamdev.auth0.com/oauth/token");
-            var request = new RestRequest(Method.POST);
-            request.AddHeader("content-type", "application/json");
-            request.AddParameter("application/json", "{\"grant_type\":\"client_credentials\",\"client_id\": \"3aM51DshJGurH3sp41VMtBC5EH9gOEkD\",\"client_secret\": \"tYdUEQLusO83YWRkWCKY1qWtLl7nwFAw-1VOM8Z39UOEBHYOZ11EvI1XZDa-84zy\",\"audience\": \"https://satyamdev.auth0.com/api/v2/\"}", ParameterType.RequestBody);
-            IRestResponse response = clientA0.Execute(request);
-            string strResponse = response.Content;
-            var definition = new { access_token = "", token_type = "" };
-            var resp = JsonConvert.DeserializeAnonymousType(strResponse, definition);
-            token = resp.access_token;
-            return new ManagementApiClient(token, new Uri("https://satyamdev.auth0.com/api/v2"));
-        }
+
+        //// this is for local
+        //public static ManagementApiClient getAuthManagementApiToken()
+        //{
+        //    string token = "";
+        //    //get auth0 management api token
+        //    var clientA0 = new RestClient("https://satyamdev.auth0.com/oauth/token");
+        //    var request = new RestRequest(Method.POST);
+        //    request.AddHeader("content-type", "application/json");
+        //    request.AddParameter("application/json", "{\"grant_type\":\"client_credentials\",\"client_id\": \"3aM51DshJGurH3sp41VMtBC5EH9gOEkD\",\"client_secret\": \"tYdUEQLusO83YWRkWCKY1qWtLl7nwFAw-1VOM8Z39UOEBHYOZ11EvI1XZDa-84zy\",\"audience\": \"https://satyamdev.auth0.com/api/v2/\"}", ParameterType.RequestBody);
+        //    IRestResponse response = clientA0.Execute(request);
+        //    string strResponse = response.Content;
+        //    var definition = new { access_token = "", token_type = "" };
+        //    var resp = JsonConvert.DeserializeAnonymousType(strResponse, definition);
+        //    token = resp.access_token;
+        //    return new ManagementApiClient(token, new Uri("https://satyamdev.auth0.com/api/v2"));
+        //}
+
+        //// this is for local
+        //public static async Task<ManagementApiClient> getAuthManagementApiTokenAsync()
+        //{
+        //    string token = "";
+        //    //get auth0 management api token
+        //    var clientA0 = new RestClient("https://satyamdev.auth0.com/oauth/token");
+        //    var request = new RestRequest(Method.POST);
+        //    var cancellationTokenSource = new CancellationTokenSource();
+        //    request.AddHeader("content-type", "application/json");
+        //    request.AddParameter("application/json", "{\"grant_type\":\"client_credentials\",\"client_id\": \"3aM51DshJGurH3sp41VMtBC5EH9gOEkD\",\"client_secret\": \"tYdUEQLusO83YWRkWCKY1qWtLl7nwFAw-1VOM8Z39UOEBHYOZ11EvI1XZDa-84zy\",\"audience\": \"https://satyamdev.auth0.com/api/v2/\"}", ParameterType.RequestBody);
+        //    IRestResponse response = await clientA0.ExecuteTaskAsync(request, cancellationTokenSource.Token);
+        //    string strResponse = response.Content;
+        //    var definition = new { access_token = "", token_type = "" };
+        //    var resp = JsonConvert.DeserializeAnonymousType(strResponse, definition);
+        //    token = resp.access_token;
+        //    return new ManagementApiClient(token, new Uri("https://satyamdev.auth0.com/api/v2"));
+        //}
 
         public static string getRoleType(string roleid)
         {

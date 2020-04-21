@@ -14,16 +14,13 @@ namespace Trainning24.BL.Business
     public class QuestionAnswerBusiness
     {
         private readonly EFQuestionAnswerRepository _EFQuestionAnswerRepository;
-        private static Training24Context _training24Context;
 
         public QuestionAnswerBusiness
         (
-            EFQuestionAnswerRepository EFQuestionAnswerRepository,
-            Training24Context training24Context
+            EFQuestionAnswerRepository EFQuestionAnswerRepository
         )
         {
             _EFQuestionAnswerRepository = EFQuestionAnswerRepository;
-            _training24Context = training24Context;
         }
 
         public void Create(QuestionModel objModel, string uId)
@@ -76,7 +73,7 @@ namespace Trainning24.BL.Business
                 Answer = QuestionAnswer.answer,
                 ExtraText = QuestionAnswer.extratext,
                 IsCorrect = QuestionAnswer.iscorrect,
-                QuestionId = QuestionAnswer.questionid,                
+                QuestionId = QuestionAnswer.questionid,
                 CreationTime = DateTime.Now.ToString(),
                 CreatorUserId = int.Parse(Id),
                 IsDeleted = false,
@@ -127,26 +124,24 @@ namespace Trainning24.BL.Business
                 IsDeleted = false
             };
 
-            _training24Context.AnswerFile.Add(newAnswerFile);
-
-            return _training24Context.SaveChanges();
+            return _EFQuestionAnswerRepository.InsertAnswerFile(newAnswerFile);
         }
 
 
         public int AnswerFileRemoving(long answerId)
         {
-            List<AnswerFile> answerFiles = _training24Context.AnswerFile.Where(b => b.AnswerId == answerId).ToList();
+            List<AnswerFile> answerFiles = _EFQuestionAnswerRepository.AnswerFileListQuery(b => b.AnswerId == answerId).ToList();
 
             if (answerFiles.Count != 0)
             {
                 foreach (var file in answerFiles)
                 {
-                    _training24Context.AnswerFile.Remove(file);
-                    _training24Context.SaveChanges();
+                    _EFQuestionAnswerRepository.DeleteAnswerFile(file);
                 }
+                return 1;
             }
 
-            return _training24Context.SaveChanges();
+            return 0;
         }
 
         public QuestionAnswer Update(QuestionAnswer QuestionAnswer, string Id)
@@ -157,7 +152,7 @@ namespace Trainning24.BL.Business
                 Answer = QuestionAnswer.Answer,
                 ExtraText = QuestionAnswer.ExtraText,
                 IsCorrect = QuestionAnswer.IsCorrect,
-                QuestionId = QuestionAnswer.QuestionId,                
+                QuestionId = QuestionAnswer.QuestionId,
                 CreationTime = DateTime.Now.ToString(),
                 CreatorUserId = 0,
                 IsDeleted = false,

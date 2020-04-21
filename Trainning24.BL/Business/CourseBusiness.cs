@@ -664,23 +664,6 @@ namespace Trainning24.BL.Business
             return coursePriviewGradeWiseModelstest;
         }
 
-        public List<CoursePriviewGradeWiseModel> getCoursePriviewGradeWiseTmp(long id)
-        {
-            List<CoursePriviewGradeWiseModel> coursePriviewGradeWiseModels = new List<CoursePriviewGradeWiseModel>();
-
-
-            var allgrade = from allgrades in _training24Context.Grade
-                           join allcoursegrade in _training24Context.CourseGrade on allgrades.Id equals allcoursegrade.Gradeid
-                           where (from allcoursegrade in _training24Context.CourseGrade
-                                  join allusercourse in _training24Context.UserCourse on allcoursegrade.CourseId equals allusercourse.CourseId
-                                  where allusercourse.UserId == id
-                                  select allcoursegrade).Contains(allcoursegrade)
-                           group allgrades by allgrades.Id into grouped
-                           select new { Grades = grouped };
-
-            return coursePriviewGradeWiseModels;
-        }
-
         public object GetAllDetails(long id, string search, string[] filter, string[] bygrade, string Certificate)
         {
             GetAllDetailsModel getAllDetailsModel = new GetAllDetailsModel();
