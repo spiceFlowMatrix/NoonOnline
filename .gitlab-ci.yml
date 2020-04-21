@@ -50,6 +50,7 @@ lintDebug:
     name: review
   script:
     - ./gradlew -Pci --console=plain :app:lintDebug -PbuildDir=lint
+  allow_failure: true
   artifacts:
     expire_in: 1 week
     when: always
