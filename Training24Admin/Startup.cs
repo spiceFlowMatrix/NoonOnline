@@ -82,12 +82,12 @@ namespace Training24Admin
                 emailSettings.UsernameEmail = Environment.GetEnvironmentVariable("USERNAME_EMAIL");
                 emailSettings.UsernamePassword = Environment.GetEnvironmentVariable("USERNAME_PASSWORD");
             });
-            services.Configure<ErpSettings>(erpSettings =>
-            {
-                erpSettings.Url = Environment.GetEnvironmentVariable("ERP_URL");
-                erpSettings.Un = Environment.GetEnvironmentVariable("ERP_UN");
-                erpSettings.Pw = Environment.GetEnvironmentVariable("ERP_PW");
-            });
+            //services.Configure<ErpSettings>(erpSettings =>
+            //{
+            //    erpSettings.Url = Environment.GetEnvironmentVariable("ERP_URL");
+            //    erpSettings.Un = Environment.GetEnvironmentVariable("ERP_UN");
+            //    erpSettings.Pw = Environment.GetEnvironmentVariable("ERP_PW");
+            //});
             services.Configure<Language>(language =>
             {
                 language.lan = Environment.GetEnvironmentVariable("LANGUAGE");

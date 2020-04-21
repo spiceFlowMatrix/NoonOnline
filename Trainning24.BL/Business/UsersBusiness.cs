@@ -25,7 +25,7 @@ namespace Trainning24.BL.Business
         private readonly EFCourseRepository _EFCourseRepository;
         private readonly LessonBusiness _lessonBusiness;
         public EmailSettings _emailSettings { get; }
-        public ErpSettings _erpSettings { get; }
+        //public ErpSettings _erpSettings { get; }
         public readonly EFStudParentRepository _eFStudParentRepository;
         private readonly LogObjectBusiness _logObjectBusiness;
         private readonly EFUserRoleRepository _eFUserRoleRepository;
@@ -38,7 +38,7 @@ namespace Trainning24.BL.Business
             EFStudentCourseRepository EFStudentCourseRepository,
             EFCourseRepository EFCourseRepository,
             IOptions<EmailSettings> emailSettings,
-            IOptions<ErpSettings> erpSettings,
+            //IOptions<ErpSettings> erpSettings,
             LessonBusiness lessonBusiness,
             LogObjectBusiness logObjectBusiness,
             EFStudParentRepository eFStudParentRepository,
@@ -50,7 +50,7 @@ namespace Trainning24.BL.Business
             _EFStudentCourseRepository = EFStudentCourseRepository;
             _EFCourseRepository = EFCourseRepository;
             _emailSettings = emailSettings.Value;
-            _erpSettings = erpSettings.Value;
+            //_erpSettings = erpSettings.Value;
             _lessonBusiness = lessonBusiness;
             _logObjectBusiness = logObjectBusiness;
             _eFStudParentRepository = eFStudParentRepository;
@@ -1007,10 +1007,10 @@ namespace Trainning24.BL.Business
             return newUser;
         }
 
-        public object GetErpDetails()
-        {
-            return _erpSettings;
-        }
+        //public object GetErpDetails()
+        //{
+        //    return _erpSettings;
+        //}
 
         public BasicUserDTO GetUserBasicDetails(long TeacherId, long StudentId, string Certificate)
         {
