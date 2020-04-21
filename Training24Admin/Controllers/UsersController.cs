@@ -1056,17 +1056,17 @@ namespace Training24Admin.Controllers
             }
         }
 
-        [HttpGet("GetErpDetails")]
-        public IActionResult GetErpDetails()
-        {
-            SuccessResponse successResponse = new SuccessResponse();
-            var getErpSettings = usersBusiness.GetErpDetails();
-            successResponse.data = getErpSettings;
-            successResponse.response_code = 0;
-            successResponse.message = "Detail fetched";
-            successResponse.status = "Success";
-            return StatusCode(200, successResponse);
-        }
+        //[HttpGet("GetErpDetails")]
+        //public IActionResult GetErpDetails()
+        //{
+        //    SuccessResponse successResponse = new SuccessResponse();
+        //    var getErpSettings = usersBusiness.GetErpDetails();
+        //    successResponse.data = getErpSettings;
+        //    successResponse.response_code = 0;
+        //    successResponse.message = "Detail fetched";
+        //    successResponse.status = "Success";
+        //    return StatusCode(200, successResponse);
+        //}
 
         [HttpPost("UpdateTerms")]
         public IActionResult UpdateTerms([FromBody]TermsDTO dto)
