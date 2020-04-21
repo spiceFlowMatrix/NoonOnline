@@ -571,10 +571,9 @@ namespace Training24Admin
             //    c.SwaggerDoc("v1", new Info { Title = "Training24 Admin", Version = "v1" });
             //});
 
-            if (environment == "Staging")
-            {
-                // swagger configuration
-                services.AddSwaggerGen(c =>
+#if DEBUG
+            // swagger configuration
+            services.AddSwaggerGen(c =>
                 {
                     c.SwaggerDoc("v1", new Info { Title = "Noon Online Education v1", Version = "v1" });
                     // swagger tags config
@@ -601,7 +600,7 @@ namespace Training24Admin
                     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                     c.IncludeXmlComments(xmlPath, includeControllerXmlComments = true);
                 });
-            }
+#endif
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -640,17 +639,16 @@ namespace Training24Admin
             //    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Training24 Admin V1");
             //});
 
-            if (environment == "Staging")
+#if DEBUG
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
             {
-                app.UseSwagger();
-                app.UseSwaggerUI(c =>
-                {
-                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Noon Online Education API v1");
-                    c.DocumentTitle = "Noon Online Education";
-                    c.DocExpansion(DocExpansion.None);
-                    c.EnableFilter();
-                });
-            }
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Noon Online Education API v1");
+                c.DocumentTitle = "Noon Online Education";
+                c.DocExpansion(DocExpansion.None);
+                c.EnableFilter();
+            });
+#endif
 
             app.UseCors("AllowAnyOrigin");
             app.UseMvc();
