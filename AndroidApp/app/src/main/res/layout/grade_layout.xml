@@ -20,13 +20,6 @@
                 android:visibility="visible" />
 
             <include
-                android:id="@+id/deviceQuota"
-                layout="@layout/device_quote_out_layout"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:visibility="gone" />
-
-            <include
                 android:id="@+id/advanceSearchLayout"
                 layout="@layout/advance_search_layout"
                 android:layout_width="match_parent"

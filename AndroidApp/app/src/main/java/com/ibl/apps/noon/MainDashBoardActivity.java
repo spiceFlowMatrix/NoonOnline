@@ -338,7 +338,7 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
                         syncTimeTrackingObjectinsert.setVersion(Build.VERSION.RELEASE);
                         syncTimeTrackingObjectinsert.setActivitytime(getUTCTime());
                         syncTimeTrackingObjectinsert.setUserid(Integer.parseInt(userId));
-                       courseDatabaseRepository.insertSyncTimeTrackingData(syncTimeTrackingObjectinsert);
+                        courseDatabaseRepository.insertSyncTimeTrackingData(syncTimeTrackingObjectinsert);
                     }
                 }
                 return null;
@@ -533,7 +533,6 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
         mainDashboardLayoutBinding.appBarLayout.logOutBtn.setOnClickListener(this);
         mainDashboardLayoutBinding.appBarLayout.editprofileBtn.setOnClickListener(this);
         mainDashboardLayoutBinding.appBarLayout.btnNotification.setOnClickListener(this);
-        mainDashboardLayoutBinding.appBarLayout.txtDevice.setOnClickListener(this);
     }
 
     @Override
@@ -572,10 +571,6 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
                     profileFragment.updateUserData();
                     profileFragment.hideVisibleLay(true);
                 }
-                break;
-            case R.id.txtDevice:
-                Intent mobileIntent = new Intent(MainDashBoardActivity.this, LoginDevicesActivity.class);
-                startActivity(mobileIntent);
                 break;
 
         }

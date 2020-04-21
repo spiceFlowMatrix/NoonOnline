@@ -8,9 +8,6 @@ import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
 import androidx.room.migration.Migration;
 import androidx.sqlite.db.SupportSQLiteDatabase;
-
-import com.ibl.apps.DeviceManagement.UserDeviceModel;
-import com.ibl.apps.DeviceManagement.UserDeviceProfileModel;
 import com.ibl.apps.Model.AuthTokenObject;
 import com.ibl.apps.Model.CourseObject;
 import com.ibl.apps.Model.CoursePriviewObject;
@@ -26,8 +23,6 @@ import com.ibl.apps.RoomDatabase.dao.courseManagementDatabase.CourseDetailsDao;
 import com.ibl.apps.RoomDatabase.dao.courseManagementDatabase.GradeProgressDao;
 import com.ibl.apps.RoomDatabase.dao.courseManagementDatabase.IntervalDao;
 import com.ibl.apps.RoomDatabase.dao.courseManagementDatabase.SyncTimeTrackingDao;
-import com.ibl.apps.RoomDatabase.dao.deviceManagementDatabase.DeviceManagementDataDao;
-import com.ibl.apps.RoomDatabase.dao.deviceManagementDatabase.DeviceManagementProfileDao;
 import com.ibl.apps.RoomDatabase.dao.lessonManagementDatabase.FileDownloadStatusDao;
 import com.ibl.apps.RoomDatabase.dao.lessonManagementDatabase.FileProgressDao;
 import com.ibl.apps.RoomDatabase.dao.lessonManagementDatabase.LessonNewProgressDao;
@@ -81,8 +76,6 @@ import com.ibl.apps.RoomDatabase.entity.UserDetails;
         LessonNewProgress.class,
         FileProgress.class,
         QuizProgress.class,
-        UserDeviceModel.class,
-        UserDeviceProfileModel.class
 },
         version = 5,
         exportSchema = false)
@@ -249,9 +242,9 @@ public abstract class AppDatabase extends RoomDatabase {
     //DONE
     public abstract QuizProgressDao quizProgressDao();
 
-    //DONE
+   /* //DONE
     public abstract DeviceManagementDataDao deviceManagementDataDao();
 
     //DONE
-    public abstract DeviceManagementProfileDao deviceManagementProfileDao();
+    public abstract DeviceManagementProfileDao deviceManagementProfileDao();*/
 }

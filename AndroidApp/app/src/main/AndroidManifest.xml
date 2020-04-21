@@ -29,8 +29,6 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
         tools:replace="android:allowBackup">
-        <activity android:name=".TrialChapterActivity"></activity>
-        <activity android:name=".MainDashBoardTrialActivity" />
         <activity android:name=".SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -95,15 +93,6 @@
             android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity
             android:name=".FilesFeedbackActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
-        <activity
-            android:name=".SignUpTrialActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
-        <activity
-            android:name=".LoginDevicesActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
-        <activity
-            android:name=".ExtendQuotaRequestActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
 
         <meta-data
