@@ -42,8 +42,11 @@ namespace Training24Admin
         private FilesBusiness FilesBusiness;
         private bool includeControllerXmlComments;
 
-        public Startup(IConfiguration configuration)
+        private readonly IHostingEnvironment _currentEnvironment;
+
+        public Startup(IConfiguration configuration, IHostingEnvironment env)
         {
+            _currentEnvironment = env;
             Configuration = configuration;
         }
 
@@ -573,7 +576,7 @@ namespace Training24Admin
             //    c.SwaggerDoc("v1", new Info { Title = "Training24 Admin", Version = "v1" });
             //});
 
-            if (environment == "Staging")
+            if (!_currentEnvironment.IsProduction())
             {
                 // swagger configuration
                 services.AddSwaggerGen(c =>
@@ -642,7 +645,7 @@ namespace Training24Admin
             //    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Training24 Admin V1");
             //});
 
-            if (environment == "Staging")
+            if (!env.IsProduction())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI(c =>
