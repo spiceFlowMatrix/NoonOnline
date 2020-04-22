@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Trainning24.Domain.Entity;
 
 namespace Trainning24.Domain.Migrations
 {
     [DbContext(typeof(Training24Context))]
-    partial class Training24ContextModelSnapshot : ModelSnapshot
+    [Migration("20200422145847_22042020_default_user_seed")]
+    partial class _22042020_default_user_seed
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
