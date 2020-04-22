@@ -206,10 +206,10 @@ namespace Trainning24.Domain.Entity
                     LastModifierUserId = null,
                     Username = "Admin",
                     FullName = "Admin",
-                    Password = "F925916E2754E5E03F75DD58A5733251",
+                    Password = "",
                     Email = "adminuser@email.com",
-                    Bio = "string",
-                    ProfilePicUrl = "https://www.googleapis.com/download/storage/v1/b/edg-primary-profile-image-storage/o/3_d279c045-9325-4cbb-bd31-16a40f70a080.png?generation=1540626401907278&alt=media",
+                    Bio = "Admin",
+                    ProfilePicUrl = "",
                     IsBlocked = false,
                     is_skippable = true,
                     istimeouton = false,
@@ -217,9 +217,8 @@ namespace Trainning24.Domain.Entity
                     timeout = 0,
                     intervals = 0,
                     phonenumber = null,
-                    AuthId = "auth0|5c08a3afe9f0262e9378a9b2",
+                    AuthId = "auth0|5ea05a1a8c1d6e0c0c607177",
                     isfirstlogin = false
-
                 }
             );
 
