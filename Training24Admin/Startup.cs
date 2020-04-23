@@ -631,7 +631,7 @@ namespace Training24Admin
             }
             else
             {
-                app.UseHsts();
+                // app.UseHsts();
             }
 
             app.UseStaticFiles();
