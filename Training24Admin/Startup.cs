@@ -528,8 +528,8 @@ namespace Training24Admin
 
 
             //// this is used for live 
-            //string domainname = Environment.GetEnvironmentVariable("DOMAINNAME_ENVIRONMENT");
-            string domainname = "edgsolutions.eu.auth0.com";
+            string domainname = Environment.GetEnvironmentVariable("DOMAINNAME_ENVIRONMENT");
+            //string domainname = "edgsolutions.eu.auth0.com";
 
             //// this is used for live 
             string domain = $"https://" + domainname + "/";
