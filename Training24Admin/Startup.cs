@@ -73,7 +73,7 @@ namespace Training24Admin
             //emailSettings1.UsernamePassword = Environment.GetEnvironmentVariable("USERNAME_PASSWORD");
 
             services.AddDbContext<Training24Context>(optionsAction =>
-                optionsAction.UseMySql(dbconnection), ServiceLifetime.Transient);
+                optionsAction.UseMySql(dbconnection));
             services.Configure<FilesSettings>(Configuration.GetSection("Buckets"));
             services.Configure<EmailSettings>(emailSettings =>
             {
