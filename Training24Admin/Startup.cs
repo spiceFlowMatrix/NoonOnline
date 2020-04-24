@@ -63,7 +63,7 @@ namespace Training24Admin
             }
             else
             {
-                dbconnection = Configuration.GetConnectionString("DefaultConnection");
+                dbconnection = Environment.GetEnvironmentVariable("ASPNET_DB_CONNECTIONSTRING");
             }
 
             //EmailSettings emailSettings1 = new EmailSettings();
