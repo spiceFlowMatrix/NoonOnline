@@ -207,10 +207,10 @@ buildSalesAppDari:
   script:
     # Begin script for dari version
     ## We encrypt the environment.ts file in base64 by applying `base64 -w 0 FILENAME.ts` command on it and then supply it as environmet variable
-    - echo ${PASHTO_SALES_APP_CONFIG_VALUES} | base64 -d > src/environments/environment.ts
-    - echo ${PASHTO_SALES_APP_CONFIG_VALUES} | base64 -d > src/environments/environment.prod.ts
+    - echo ${DARI_SALES_APP_CONFIG_VALUES} | base64 -d > src/environments/environment.ts
+    - echo ${DARI_SALES_APP_CONFIG_VALUES} | base64 -d > src/environments/environment.prod.ts
     - npm run build --prod
-    - cp -r dist/ distPashto
+    - cp -r dist/ distDari
   after_script:
     - rm -rf dist/
     - rm -rf src/environments/environment.ts
@@ -270,10 +270,10 @@ buildFeedbackAppDari:
   script:
     # Begin script for dari version
     ## We encrypt the environment.ts file in base64 by applying `base64 -w 0 FILENAME.ts` command on it and then supply it as environmet variable
-    - echo ${PASHTO_FEEDBACK_APP_CONFIG_VALUES} | base64 -d > src/environments/environment.ts
-    - echo ${PASHTO_FEEDBACK_APP_CONFIG_VALUES} | base64 -d > src/environments/environment.prod.ts
+    - echo ${DARI_FEEDBACK_APP_CONFIG_VALUES} | base64 -d > src/environments/environment.ts
+    - echo ${DARI_FEEDBACK_APP_CONFIG_VALUES} | base64 -d > src/environments/environment.prod.ts
     - npm run build --prod
-    - cp -r dist/ distPashto
+    - cp -r dist/ distDari
   after_script:
     - rm -rf dist/
     - rm -rf src/environments/environment.ts
