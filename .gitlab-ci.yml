@@ -58,7 +58,7 @@ lintDebug:
       - AndroidApp/giraffeplayer2/lint/
       - AndroidApp/prdownloader/lint/
 
-assembleDebug:
+assembleDebugDari:
   extends: .buildAndroidJob
   stage: buildApps
   environment:
@@ -90,7 +90,7 @@ assembleDebug:
     paths:
       - AndroidApp/dariBuildOutputs/
 
-assembleDebug:
+assembleDebugPashto:
   extends: .buildAndroidJob
   stage: buildApps
   environment:
@@ -125,7 +125,7 @@ assembleDebug:
 
 
 # Build and artifact the admin web app. Cache packages downloaded in node modules to be reused for future runs of the same job on the same branch
-buildAdminApp:
+buildAdminAppDari:
   image: node:latest
   stage: buildApps
   environment:
@@ -156,7 +156,7 @@ buildAdminApp:
       - Training24Admin/Admin-noon/distDari/
     expire_in: 1 week
 
-buildAdminApp:
+buildAdminAppPashto:
   image: node:latest
   stage: buildApps
   environment:
@@ -188,7 +188,7 @@ buildAdminApp:
     expire_in: 1 week
 
 # Build and artifact the sales web app. Cache packages downloaded in node modules to be reused for future runs of the same job on the same branch
-buildSalesApp:
+buildSalesAppDari:
   image: node:latest
   stage: buildApps
   environment:
@@ -206,14 +206,6 @@ buildSalesApp:
   script:
     # Begin script for dari version
     ## We encrypt the environment.ts file in base64 by applying `base64 -w 0 FILENAME.ts` command on it and then supply it as environmet variable
-    - echo ${DARI_SALES_APP_CONFIG_VALUES} | base64 -d > src/environments/environment.ts
-    - echo ${DARI_SALES_APP_CONFIG_VALUES} | base64 -d > src/environments/environment.prod.ts
-    - npm run build --prod
-    - cp -r dist/ distDari
-    - rm -r dist/
-    - rm src/environments/environment.ts
-    - rm src/environments/environment.prod.ts
-    # Begin script for Pashto version
     - echo ${PASHTO_SALES_APP_CONFIG_VALUES} | base64 -d > src/environments/environment.ts
     - echo ${PASHTO_SALES_APP_CONFIG_VALUES} | base64 -d > src/environments/environment.prod.ts
     - npm run build --prod
@@ -227,7 +219,7 @@ buildSalesApp:
       - Training24Admin/Sales-noon/distDari/
     expire_in: 1 week
 
-buildSalesApp:
+buildSalesAppPashto:
   image: node:latest
   stage: buildApps
   environment:
@@ -259,7 +251,7 @@ buildSalesApp:
     expire_in: 1 week
 
 # Build and artifact the feedback web app. Cache packages downloaded in node modules to be reused for future runs of the same job on the same branch
-buildFeedbackApp:
+buildFeedbackAppDari:
   image: node:latest
   stage: buildApps
   environment:
@@ -277,14 +269,6 @@ buildFeedbackApp:
   script:
     # Begin script for dari version
     ## We encrypt the environment.ts file in base64 by applying `base64 -w 0 FILENAME.ts` command on it and then supply it as environmet variable
-    - echo ${DARI_FEEDBACK_APP_CONFIG_VALUES} | base64 -d > src/environments/environment.ts
-    - echo ${DARI_FEEDBACK_APP_CONFIG_VALUES} | base64 -d > src/environments/environment.prod.ts
-    - npm run build --prod
-    - cp -r dist/ distDari
-    - rm -r dist/
-    - rm src/environments/environment.ts
-    - rm src/environments/environment.prod.ts
-    # Begin script for Pashto version
     - echo ${PASHTO_FEEDBACK_APP_CONFIG_VALUES} | base64 -d > src/environments/environment.ts
     - echo ${PASHTO_FEEDBACK_APP_CONFIG_VALUES} | base64 -d > src/environments/environment.prod.ts
     - npm run build --prod
@@ -298,7 +282,7 @@ buildFeedbackApp:
       - Training24Admin/Feedback-noon/distDari/
     expire_in: 1 week
 
-buildFeedbackApp:
+buildFeedbackAppPashto:
   image: node:latest
   stage: buildApps
   environment:
@@ -330,15 +314,16 @@ buildFeedbackApp:
     expire_in: 1 week
 
 # Build ASPNETCORE API, package web app artifacts from previous jobs in webhost directory, generate artifact holding all files of API and web apps. Cache downloaded nuget packages to be reused for future runs of the same job on the same branch
-buildBackend:
+buildBackendDari:
   image: mcr.microsoft.com/dotnet/core/sdk:2.1
   stage: buildPackageBackendHost
   environment:
     name: review/dari
   dependencies:
-    - buildAdminApp
-    - buildSalesApp
-    - buildFeedbackApp
+    - assembleDebugDari
+    - buildAdminAppDari
+    - buildSalesAppDari
+    - buildFeedbackAppDari
   variables:
     OBJECTS_DIRECTORY: obj/
     BINARIES_DIRECTORY: bin/
@@ -368,15 +353,16 @@ buildBackend:
       - ${SOURCE_CODE_PATH}${DARI_RELEASE_OBJECTS_DIRECTORY}
     expire_in: 1 week
 
-buildBackend:
+buildBackendPashto:
   image: mcr.microsoft.com/dotnet/core/sdk:2.1
   stage: buildPackageBackendHost
   environment:
     name: review/pashto
   dependencies:
-    - buildAdminApp
-    - buildSalesApp
-    - buildFeedbackApp
+    - assembleDebugPashto
+    - buildAdminAppPashto
+    - buildSalesAppPashto
+    - buildFeedbackAppPashto
   variables:
     OBJECTS_DIRECTORY: obj/
     BINARIES_DIRECTORY: bin/
@@ -406,7 +392,7 @@ buildBackend:
       - ${SOURCE_CODE_PATH}${PASHTO_RELEASE_OBJECTS_DIRECTORY}
     expire_in: 1 week
 
-publishWebHostableContainer:
+publishWebHostableContainerDari:
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: ['']
@@ -420,7 +406,7 @@ publishWebHostableContainer:
     refs:
       - master
 
-publishWebHostableContainer:
+publishWebHostableContainerPashto:
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: ['']
@@ -446,7 +432,7 @@ deployDariReview:
     - gcloud auth activate-service-account --key-file=/etc/deploy/sa.json --project=${GKE_PROJECT}
     - gcloud container clusters get-credentials ${GKE_CLUSTER_NAME} --zone=${GKE_ZONE} --project=${GKE_PROJECT}
     - echo "${DARI_WEB_DEPLOYMENT_CONFIG_VALUES}" > chart/values.yaml
-  script: 
+  script:
     - helm upgrade --install --namespace ${KUBE_NAMESPACE} --set image=${NOON_WEB_IMAGE_DARI} --set webHostingUrl=${DARI_REVIEW_ENV_URL} --set deploymentNamespace=${KUBE_NAMESPACE} --set netCoreEnvironment=Production --set gitlabCiProjectPath=${CI_PROJECT_PATH_SLUG} --set gitlabCiProjectEnvironment=${CI_ENVIRONMENT_SLUG} --set name=noonweb-dari-review --set applicationListenUri=http://*:80 --wait noonweb-dari ./chart
   only:
     refs:
