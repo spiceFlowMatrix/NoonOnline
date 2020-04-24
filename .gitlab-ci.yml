@@ -20,6 +20,7 @@ stages:
   - buildPackageBackendHost
   - containerizeWeb
   - deployWeb
+  - lint
 
 .buildAndroidJob:
   before_script:
@@ -45,7 +46,7 @@ stages:
 
 lintDebug:
   extends: .buildAndroidJob
-  stage: buildApps
+  stage: lint
   script:
     - ./gradlew -Pci --console=plain :app:lintDebug -PbuildDir=lint
   allow_failure: true
