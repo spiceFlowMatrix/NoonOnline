@@ -635,11 +635,6 @@ namespace Training24Admin
                 // app.UseHsts();
             }
 
-            app.UseForwardedHeaders(new ForwardedHeadersOptions
-            {
-                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-            });
-
             app.UseStaticFiles();
             app.UseAuthentication();
             //app.UseHttpsRedirection();
