@@ -4,6 +4,7 @@ metadata:
     annotations:
         app.gitlab.com/app: {{ .Values.gitlabCiProjectPath }}
         app.gitlab.com/env: {{ .Values.gitlabCiProjectEnvironment }}
+        nginx.org/proxy-pass-headers: "id_token"
         cert-manager.io/cluster-issuer: letsencrypt-staging
         kubernetes.io/tls-acme: "true"
     name: {{ .Values.name }}-ingress
