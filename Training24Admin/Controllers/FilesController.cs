@@ -51,8 +51,8 @@ namespace Training24Admin.Controllers
             _mapper = mapper;
         }
 
-        [DisableRequestSizeLimit]
         [HttpPost]
+        [RequestSizeLimit(1073741824)]
         public async Task<IActionResult> Post()
         {
             string jsonPath = Path.GetFileName(hostingEnvironment.WebRootPath + "/training24-28e994f9833c.json");
@@ -800,8 +800,8 @@ namespace Training24Admin.Controllers
             }
         }
 
-        [DisableRequestSizeLimit]
         [HttpPost("UploadMultiple")]
+        [RequestSizeLimit(1073741824)]
         public async Task<IActionResult> UploadMultiple()
         {
             string jsonPath = Path.GetFileName(hostingEnvironment.WebRootPath + "/training24-28e994f9833c.json");
