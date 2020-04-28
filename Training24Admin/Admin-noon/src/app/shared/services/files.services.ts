@@ -32,6 +32,39 @@ export class FileService {
         );
     }
 
+    getPdfSigned(data) {
+        let formData = new FormData();
+        Object.keys(data).forEach(key => {
+            if (['id'].indexOf(key) < 0)
+                formData.append(key, data[key]);
+        });
+       return this.commonApiService.postWithFormData('v1/Files/UploadLessonPdf', formData);
+    }
+
+    getImageSigned(data) {
+        let formData = new FormData();
+        Object.keys(data).forEach(key => {
+            if (['id'].indexOf(key) < 0)
+                formData.append(key, data[key]);
+        });
+       return this.commonApiService.postWithFormData('v1/Files/UploadLessonPdf', formData);
+    }
+
+    getVideoSigned(data) {
+        let formData = new FormData();
+        Object.keys(data).forEach(key => {
+            if (['id'].indexOf(key) < 0)
+                formData.append(key, data[key]);
+        });
+       return this.commonApiService.postWithFormData('v1/Files/UploadLessonPdf', formData);
+    }
+
+    putFileOnBucket(url, file) {
+        let formData = new FormData();
+        formData.append('file', file);
+        return this.commonApiService.putWithFormDataUrl(url, formData);
+    }
+
     searchGetFileListNew(filterObj?: any) {
         if (!filterObj || (filterObj && !filterObj.search)) {
             return of([]);

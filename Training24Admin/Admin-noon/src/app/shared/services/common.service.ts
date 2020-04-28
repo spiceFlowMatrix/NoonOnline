@@ -53,6 +53,20 @@ export class CommonAPIService {
                 })
             );
     }
+    
+    putWithFormDataUrl(url, formData) {
+        let userHeaders = _.clone(this._adminHeaders);
+        userHeaders.delete("Content-Type");
+        return this.http
+            .put<any>(url, formData)
+            .pipe(
+                map(response => response),
+                catchError(error => {
+                    return throwError(error);
+                })
+            );
+    }
+
     public getAdminHeaders(): HttpHeaders {
         this._adminHeaders = new HttpHeaders({
             Authorization: "Bearer " + localStorage.getItem("access_token"),

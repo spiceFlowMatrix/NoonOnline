@@ -57,4 +57,22 @@ export class QuizService {
     uploadQuizQuestion(data) {
         return this.commonApiService.postWithFormData('v1/Questions/UploadQuizDetail', data);
     }
+
+    getQuizQuestionImageSigned(data) {
+        let formData = new FormData();
+        Object.keys(data).forEach(key => {
+            if (['id'].indexOf(key) < 0)
+                formData.append(key, data[key]);
+        });
+       return this.commonApiService.postWithFormData('v1/Files/UploadQuizImage', formData);
+    }
+
+    getQuizAnswerImageSigned(data) {
+        let formData = new FormData();
+        Object.keys(data).forEach(key => {
+            if (['id'].indexOf(key) < 0)
+                formData.append(key, data[key]);
+        });
+       return this.commonApiService.postWithFormData('v1/Files/UploadQuizAnswerImage', formData);
+    }
 }

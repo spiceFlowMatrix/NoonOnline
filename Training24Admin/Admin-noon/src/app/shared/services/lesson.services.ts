@@ -62,4 +62,31 @@ export class LessonService {
     deleteLesson(id) {
         return this.commonApiService.delete('v1/Lesson/' + id);
     }
+
+    getLessonPdfSigned(data) {
+        let formData = new FormData();
+        Object.keys(data).forEach(key => {
+            if (['id'].indexOf(key) < 0)
+                formData.append(key, data[key]);
+        });
+       return this.commonApiService.postWithFormData('v1/Files/UploadLessonPdf', formData);
+    }
+
+    getLessonAssignmentFileSigned(data) {
+        let formData = new FormData();
+        Object.keys(data).forEach(key => {
+            if (['id'].indexOf(key) < 0)
+                formData.append(key, data[key]);
+        });
+       return this.commonApiService.postWithFormData('v1/Files/UploadLessonAssignment', formData);
+    }
+
+    getLesssonVideoSigned(data) {
+        let formData = new FormData();
+        Object.keys(data).forEach(key => {
+            if (['id'].indexOf(key) < 0)
+                formData.append(key, data[key]);
+        });
+       return this.commonApiService.postWithFormData('v1/Files/UploadLessonVideo', formData);
+    }
 }
