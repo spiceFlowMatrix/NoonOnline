@@ -325,19 +325,7 @@ namespace Training24Admin.Controllers
                 {
                     if (tc.RoleName.Contains(General.getRoleType("1")))
                     {
-                        Course newCourse = CourseBusiness.Delete(id, int.Parse(tc.Id));
-
-                        ResponseCourseModel responseCourseModel = new ResponseCourseModel
-                        {
-                            Name = newCourse.Name,
-                            Id = int.Parse(newCourse.Id.ToString()),
-                            Code = newCourse.Code,
-                            Description = newCourse.Description,
-                            Image = newCourse.Image,
-                            //TeacherId = newCourse.TeacherId
-                        };
-
-                        successResponse.data = responseCourseModel;
+                        var DeleteCourse = CourseBusiness.Delete(id, int.Parse(tc.Id));
                         successResponse.response_code = 0;
                         successResponse.message = "Course Deleted";
                         successResponse.status = "Success";
@@ -392,9 +380,9 @@ namespace Training24Admin.Controllers
                         if (!string.IsNullOrEmpty(newCourse.Image))
                         {
                             if (newCourse.Image.Contains("t24-primary-image-storage"))
-                              imageurl = newCourse.Image;
+                                imageurl = newCourse.Image;
                             else
-                              imageurl = LessonBusiness.geturl(newCourse.Image, Certificate);
+                                imageurl = LessonBusiness.geturl(newCourse.Image, Certificate);
                         }
 
                         ResponseCourseModel responseCourseModel = new ResponseCourseModel
@@ -476,9 +464,9 @@ namespace Training24Admin.Controllers
                         if (!string.IsNullOrEmpty(newCourse.Image))
                         {
                             if (newCourse.Image.Contains("t24-primary-image-storage"))
-                              imageurl = newCourse.Image;
+                                imageurl = newCourse.Image;
                             else
-                              imageurl = LessonBusiness.geturl(newCourse.Image, Certificate);
+                                imageurl = LessonBusiness.geturl(newCourse.Image, Certificate);
                         }
                         List<ResponseGradeModel> responseGradeModels = CourseBusiness.GetGradeByCourseId(newCourse.Id);
                         ResponseCourseModel responseCourseModel = new ResponseCourseModel
