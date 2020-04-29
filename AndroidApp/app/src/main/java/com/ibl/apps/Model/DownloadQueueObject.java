@@ -18,6 +18,16 @@ public class DownloadQueueObject {
 
     CoursePriviewObject.Lessons lemodel;
 
+    int numberOfDownload;
+
+    public int getNumberOfDownload() {
+        return numberOfDownload;
+    }
+
+    public void setNumberOfDownload(int numberOfDownload) {
+        this.numberOfDownload = numberOfDownload;
+    }
+
 
     public String getFileid() {
         return fileid;

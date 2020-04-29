@@ -266,6 +266,11 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
             }
         }
 
+//        BadgeDrawable badgeDrawable = BadgeDrawable.create(ctx);
+//        badgeDrawable.setBadgeTextColor(ContextCompat.getColor(ctx, R.color.colorWhite));
+//        badgeDrawable.setBackgroundColor(ContextCompat.getColor(ctx, R.color.colorDarkBlue));
+//        badgeDrawable.setNumber(5);
+//        BadgeUtils.attachBadgeDrawable(badgeDrawable, holder.courseInnerItemLayoutBinding.imgdownloadContent, holder.courseInnerItemLayoutBinding.imgdownloadContentLayout);
         if (position == 0) {
             if (isisLastItemViewed) {
                 if (isPlayFirstItem) {
@@ -896,18 +901,23 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
         }
     }
 
-    public void downloadProcess(DownloadQueueObject downloadQueueObject) {
+    public void downloadProcess(DownloadQueueObject downloadQueueObject, boolean isExist) {
+
         if (CourseItemFragment.isdownload) {
             CourseItemFragment.isdownload = false;
+            downloadQueueObject.getHolder().courseInnerItemLayoutBinding.tvDownloadCount.setVisibility(VISIBLE);
+            downloadQueueObject.getHolder().courseInnerItemLayoutBinding.tvDownloadCount.setText(String.valueOf(downloadQueueObject.getNumberOfDownload()));
             downloadQueueObject.getHolder().courseInnerItemLayoutBinding.imgdownloadContent.setEnabled(false);
             callApifetchSignedUrl(downloadQueueObject);
         } else {
-            downloadQueueObject.getHolder().courseInnerItemLayoutBinding.imgdownloadContent.setVisibility(GONE);
-            downloadQueueObject.getHolder().courseInnerItemLayoutBinding.progressBarSpinnerLayout.progressBar.setVisibility(View.VISIBLE);
-            downloadQueueObject.getHolder().courseInnerItemLayoutBinding.progressBarSpinnerLayout.progressBar.setProgress(0);
-            downloadQueueObject.getHolder().courseInnerItemLayoutBinding.PushResumeLay.setVisibility(VISIBLE);
-            downloadQueueObject.getHolder().courseInnerItemLayoutBinding.imgPushContent.setVisibility(GONE);
-            downloadQueueObject.getHolder().courseInnerItemLayoutBinding.imgcloseContent.setVisibility(VISIBLE);
+            if (!isExist) {
+                downloadQueueObject.getHolder().courseInnerItemLayoutBinding.imgdownloadContent.setVisibility(GONE);
+                downloadQueueObject.getHolder().courseInnerItemLayoutBinding.progressBarSpinnerLayout.progressBar.setVisibility(View.VISIBLE);
+                downloadQueueObject.getHolder().courseInnerItemLayoutBinding.progressBarSpinnerLayout.progressBar.setProgress(0);
+                downloadQueueObject.getHolder().courseInnerItemLayoutBinding.PushResumeLay.setVisibility(VISIBLE);
+                downloadQueueObject.getHolder().courseInnerItemLayoutBinding.imgPushContent.setVisibility(GONE);
+                downloadQueueObject.getHolder().courseInnerItemLayoutBinding.imgcloseContent.setVisibility(VISIBLE);
+            }
         }
     }
 
@@ -1098,7 +1108,7 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
                             CourseItemFragment.hashMap.remove(downloadQueueObjects.get(0).getLemodel().getId());
                             refreshToken(downloadQueueObjects.get(finalI));
 
-                            // handleDownloadCounterWhenFailAndComplite(downloadQueueObjects.get(0));
+                            handleDownloadCounterWhenFailAndComplite(downloadQueueObjects.get(0));
                             Crashlytics.log(Log.ERROR, ctx.getString(R.string.app_name), e.getMessage());
                             showDialogNoNetwork();
                         }
@@ -1141,7 +1151,7 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
                         refreshToken(downloadQueueObject);
 
 
-                        //handleDownloadCounterWhenFailAndComplite(downloadQueueObject);
+                        handleDownloadCounterWhenFailAndComplite(downloadQueueObject);
                         Crashlytics.log(Log.ERROR, ctx.getString(R.string.app_name), e.getMessage());
                         showDialogNoNetwork();
                     }
@@ -1180,7 +1190,7 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
                         public void onError(Throwable e) {
                             refreshToken(download);
 
-                            //handleDownloadCounterWhenFailAndComplite(download);
+                            handleDownloadCounterWhenFailAndComplite(download);
                             Crashlytics.log(Log.ERROR, ctx.getString(R.string.app_name), e.getMessage());
                             showDialogNoNetwork();
                         }
@@ -1582,233 +1592,16 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
 
     }
 
+    public void handleDownloadCounterWhenFailAndComplite(DownloadQueueObject downloadQueueObject) {
 
-    public class DownloadStatusTask extends AsyncTask<Void, Void, String> {
+        BaseActivity.freeMemory(ctx);
 
-        String fileURL;
-        MyViewHolder holder;
-        CoursePriviewObject.Lessonfiles lessonsModel;
-        int downloadId = 0;
-        long progressval = 0;
-        CoursePriviewObject.Lessons model;
-        DownloadQueueObject downloadQueueObject;
-
-        public DownloadStatusTask(String fileURL, MyViewHolder holder, CoursePriviewObject.Lessonfiles lessonsModel, CoursePriviewObject.Lessons model, DownloadQueueObject downloadQueueObject) {
-            this.fileURL = fileURL;
-            this.holder = holder;
-            this.lessonsModel = lessonsModel;
-            this.model = model;
-            this.downloadQueueObject = downloadQueueObject;
-        }
-
-        @Override
-        protected String doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
-
-            String EncryptFileName = lessonsModel.getFiles().getFilename();
-            String filetype = lessonsModel.getFiles().getFiletypename();
-            String fileName = lessonsModel.getId() + "_" + lessonsModel.getFiles().getId() + "_" + EncryptFileName.substring(EncryptFileName.lastIndexOf('-') + 1);
-
-            String downloadFilePath = Const.destPath + userIdSlash + fileName;
-
-            //Log.e(Const.LOG_NOON_TAG, "====downloadFilePath===" + downloadFilePath);
-
-            try {
-                String str = lessonsModel.getId() + "_" + lessonsModel.getFiles().getId() + "_" + EncryptFileName.replaceFirst(".*-(\\w+).*", "$1") + "_" + filetype + Const.extension;
-                PRDownloader.cleanUp(1);
-
-                //Log.e("COUNTER", "======downloadCount===IF===" + downloadCount);
-
-                downloadId = PRDownloader.download(fileURL, Const.destPath + userIdSlash, fileName)
-                        .build()
-                        .setOnStartOrResumeListener(new OnStartOrResumeListener() {
-                            @Override
-                            public void onStartOrResume() {
-                                //hideDialog();
-                                holder.courseInnerItemLayoutBinding.imgdownloadContent.setVisibility(GONE);
-                                holder.courseInnerItemLayoutBinding.progressBarSpinnerLayout.progressBar.setVisibility(View.VISIBLE);
-                                holder.courseInnerItemLayoutBinding.PushResumeLay.setVisibility(View.VISIBLE);
-                                holder.courseInnerItemLayoutBinding.imgPushContent.setVisibility(View.VISIBLE);
-                                holder.courseInnerItemLayoutBinding.imgcloseContent.setVisibility(GONE);
-
-                                Toast.makeText(ctx, ctx.getString(R.string.downloading) + model.getName(), Toast.LENGTH_SHORT).show();
-
-                                new AsyncTask<Void, Void, String>() {
-                                    @Override
-                                    protected String doInBackground(Void... voids) {
-                                        FileDownloadStatus fileDownloadStatus = new FileDownloadStatus();
-                                        fileDownloadStatus.setLessonid("0");
-                                        fileDownloadStatus.setFileid(lessonsModel.getFiles().getId());
-                                        fileDownloadStatus.setDownloadID(downloadId);
-                                        lessonDatabaseRepository.insertFileDownloadData(fileDownloadStatus);
-                                        return null;
-                                    }
-                                }.execute();
-
-                                //Log.e("COUNTER", "======onStartOrResume======");
-                                showDialogNoNetwork();
-
-                            }
-                        })
-                        .setOnPauseListener(new OnPauseListener() {
-                            @Override
-                            public void onPause() {
-                                //Log.e("COUNTER", "======setOnPauseListener======");
-                                showDialogNoNetwork();
-
-                            }
-                        })
-                        .setOnCancelListener(new OnCancelListener() {
-                            @Override
-                            public void onCancel() {
-                                //handleDownloadCounterWhenFailAndComplite(downloadQueueObject);
-                                //Log.e("COUNTER", "======setOnCancelListener======");
-                                showDialogNoNetwork();
-                                PRDownloader.cancelAll();
-                            }
-                        })
-                        .setOnProgressListener(new OnProgressListener() {
-                            @Override
-                            public void onProgress(Progress progress) {
-                                progressval = (progress.currentBytes * 100) / progress.totalBytes;
-                                holder.courseInnerItemLayoutBinding.progressBarSpinnerLayout.progressBar.setProgress((int) progressval);
-                                Log.e("-------------", "==== 4444444444 =====" + progressval);
-                                //Log.e("COUNTER", "======setOnProgressListener======");
-                                showDialogNoNetwork();
-
-                            }
-                        })
-                        .start(new OnDownloadListener() {
-                            @Override
-                            public void onDownloadComplete() {
-
-                                //Log.e("COUNTER", "======onDownloadComplete======");
-
-                                BaseActivity.freeMemory(ctx);
-
-                                EncryptDecryptObject encryptDecryptObject = new EncryptDecryptObject();
-                                encryptDecryptObject.setSelectedVideoPath(downloadFilePath);
-                                encryptDecryptObject.setFilename(str);
-                                encryptDecryptObject.setHolder(holder);
-                                new SetEncryptDecryptTask(new EncryptDecryptAsyncResponse() {
-                                    @Override
-                                    public EncryptDecryptObject getEncryptDecryptObjects(EncryptDecryptObject encryptDecryptObjects) {
-
-                                        //handleDownloadCounterWhenFailAndComplite(downloadQueueObject);
-                                        try {
-                                            BaseActivity.freeMemory(ctx);
-                                            String selectedVideoPath = encryptDecryptObject.getSelectedVideoPath();
-                                            String filename = encryptDecryptObject.getFilename();
-                                            MyViewHolder holder = encryptDecryptObject.getHolder();
-
-                                            encrypted_path = selectedVideoPath.substring(0, selectedVideoPath.lastIndexOf("/")) + "/" + filename;
-                                            EncrypterDecryptAlgo.decrypt(keyFromKeydata, paramSpec, new FileInputStream(outFile), encrypted_path);
-                                            holder.courseInnerItemLayoutBinding.imgdownloadContent.setVisibility(GONE);
-                                            holder.courseInnerItemLayoutBinding.progressBarSpinnerLayout.progressBar.setVisibility(GONE);
-                                            holder.courseInnerItemLayoutBinding.PushResumeLay.setVisibility(GONE);
-                                            holder.courseInnerItemLayoutBinding.layPlayContent.setVisibility(VISIBLE);
-
-                                            Log.e("000FILESIZE", "---queueArray---" + CourseItemFragment.queueArray.size()
-                                                    + "--lessonfiles---" + lessonfiles.size());
-                                            if (lessonfiles.size() == CourseItemFragment.queueArray.size()) {
-                                                holder.courseInnerItemLayoutBinding.imgdownloadContent.setVisibility(GONE);
-                                                holder.courseInnerItemLayoutBinding.progressBarSpinnerLayout.progressBar.setVisibility(GONE);
-                                            }
-
-                                            /*if (CourseItemFragment.queueArray.size() > 0) {
-                                                CourseItemFragment.queueArray.remove(downloadQueueObject);
-                                                CourseItemFragment.isdownload = true;
-                                                if (CourseItemFragment.queueArray.size() != 0) {
-                                                    downloadProcess(CourseItemFragment.queueArray.get(0));
-                                                }
-                                            }*/
-
-
-                                            com.downloader.Status fileStatus = PRDownloader.getStatus(downloadId);
-                                            FileDownloadStatus fileDownloadStatus = lessonDatabaseRepository.getItemFileDownloadStatusData(lessonsModel.getFiles().getId());
-                                            if (fileDownloadStatus != null) {
-                                                lessonDatabaseRepository.updateItemFileDownloadStatusData(lessonsModel.getFiles().getId(), fileStatus.toString(), (int) progressval);
-                                            }
-
-                                        } catch (NoSuchAlgorithmException e) {
-                                            Toast.makeText(ctx, e.getMessage(), Toast.LENGTH_SHORT).show();
-                                            e.printStackTrace();
-                                        } catch (NoSuchPaddingException e) {
-                                            Toast.makeText(ctx, e.getMessage(), Toast.LENGTH_SHORT).show();
-                                            e.printStackTrace();
-                                        } catch (InvalidKeyException e) {
-                                            Toast.makeText(ctx, e.getMessage(), Toast.LENGTH_SHORT).show();
-                                            e.printStackTrace();
-                                        } catch (InvalidAlgorithmParameterException e) {
-                                            Toast.makeText(ctx, e.getMessage(), Toast.LENGTH_SHORT).show();
-                                            e.printStackTrace();
-                                        } catch (SecurityException e) {
-                                            if (e.getLocalizedMessage().equalsIgnoreCase("Invalid or expired API Key")) {
-                                                showAlertDialog(ctx, holder);
-                                            }
-                                            e.printStackTrace();
-                                        } catch (IOException e) {
-                                            if (e.getMessage().contains("ENOSPC") || e.getMessage().contains("No space left on device")) {
-                                                showNoSpaceAlert(ctx);
-                                            }
-                                            Crashlytics.log(Log.ERROR, ctx.getString(R.string.app_name), e.getMessage());
-                                            e.printStackTrace();
-                                        }
-
-                                        return null;
-                                    }
-                                }, encryptDecryptObject).execute();
-                            }
-
-                            @Override
-                            public void onError(Error error) {
-                                //handle
-                                // DownloadCounterWhenFailAndComplite(downloadQueueObject);
-                                if (error.isServerError()) {
-                                    //Toast.makeText(ctx, "=== DOWNLAOD ServerError===", Toast.LENGTH_SHORT).show();
-                                } else if (error.isConnectionError()) {
-                                    //Toast.makeText(ctx, "=== DOWNLAOD ConnectionError===", Toast.LENGTH_SHORT).show();
-                                } else if (error.isENOSPCError()) {
-                                    //Toast.makeText(ctx, "=== DOWNLAOD ENOSPCError (No space left on device)===", Toast.LENGTH_SHORT).show();
-                                    showNoSpaceAlert(ctx);
-                                }
-                                //hideDialog();
-                                Crashlytics.log(Log.ERROR, ctx.getString(R.string.app_name), error.getError());
-                                showDialogNoNetwork();
-
-                                //Log.e("COUNTER", "======onError==0101====");
-                            }
-                        });
-
-            } catch (Exception e) {
-                //Toast.makeText(ctx, "=== DOWNLAOD CATCH===" + e.getMessage(), Toast.LENGTH_SHORT).show();
-                //Log.e("COUNTER", "======Exception======");
+        if (CourseItemFragment.queueArray.size() > 0) {
+            CourseItemFragment.queueArray.remove(downloadQueueObject);
+            CourseItemFragment.isdownload = true;
+            if (CourseItemFragment.queueArray.size() != 0) {
+                downloadProcess(CourseItemFragment.queueArray.get(0), true);
             }
-
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(final String success) {
-
-            Log.e("onPostExecute", "onPostExecute: ");
-            holder.courseInnerItemLayoutBinding.imgPushContent.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    holder.courseInnerItemLayoutBinding.imgResumeContent.setVisibility(View.VISIBLE);
-                    holder.courseInnerItemLayoutBinding.imgPushContent.setVisibility(GONE);
-                    PRDownloader.pause(downloadId);
-                }
-            });
-
-            holder.courseInnerItemLayoutBinding.imgResumeContent.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    holder.courseInnerItemLayoutBinding.imgResumeContent.setVisibility(GONE);
-                    holder.courseInnerItemLayoutBinding.imgPushContent.setVisibility(View.VISIBLE);
-                    PRDownloader.resume(downloadId);
-                }
-            });
         }
     }
 
@@ -1946,17 +1739,73 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
         }
     }
 
-    public void handleDownloadCounterWhenFailAndComplite(DownloadQueueObject downloadQueueObject) {
+    private void startDownload(int position, MyViewHolder holder) {
+        isdialog = false;
 
-        BaseActivity.freeMemory(ctx);
+        String[] PERMISSIONS = new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE};
+        ArrayList<DownloadQueueObject> downloadQueueObjects = new ArrayList<>();
+        if (!EasyPermissions.hasPermissions(ctx, PERMISSIONS)) {
+            EasyPermissions.requestPermissions((Activity) ctx, ctx.getResources().getString(R.string.validation_download_permission), 0x01, PERMISSIONS);
+        } else {
+            Log.e("onPostExecute", "startDownload: ");
+            CoursePriviewObject.Lessons model = list.get(position);
+            ArrayList<CoursePriviewObject.Lessonfiles> lessonfiles = new ArrayList<>();
+            Collections.addAll(lessonfiles, model.getLessonfiles());
+            if (lessonfiles.size() != 0) {
+                // Call Api for SignedURL
+                if (isNetworkAvailable(ctx)) {
+                    int arrayvalue = lessonfiles.size();
+                    int count = 0;
+                    int downloadno = lessonfiles.size();
+                    for (int i = 0; i < lessonfiles.size(); i++) {
+                        count++;
+                        CoursePriviewObject.Lessonfiles lessonsModel = lessonfiles.get(i);
+                        String str = lessonsModel.getId() + "_" + lessonsModel.getFiles().getId() + "_" + lessonsModel.getFiles().getFilename().replaceFirst(".*-(\\w+).*", "$1") + "_" + lessonsModel.getFiles().getFiletypename() + Const.extension;
+                        File file = new File(Const.destPath + userIdSlash, str);
 
-        if (CourseItemFragment.queueArray.size() > 0) {
-            CourseItemFragment.queueArray.remove(downloadQueueObject);
-            CourseItemFragment.isdownload = true;
-            if (CourseItemFragment.queueArray.size() != 0) {
-                downloadProcess(CourseItemFragment.queueArray.get(0));
+                        if (file.exists()) {
+                            file.delete();
+                        }
+
+                        DownloadQueueObject downloadQueueObject = new DownloadQueueObject();
+                        downloadQueueObject.setFileid(lessonsModel.getFiles().getId());
+                        downloadQueueObject.setLessonID("0");
+                        downloadQueueObject.setHolder(holder);
+                        downloadQueueObject.setLessonsModel(lessonsModel);
+                        downloadQueueObject.setLemodel(model);
+                        downloadQueueObject.setNumberOfDownload(downloadno);
+
+                        downloadQueueObjects.add(downloadQueueObject);
+                        if (count == arrayvalue) {
+                            lessonfiles.clear();
+                            Log.e("Lession files array", String.valueOf(lessonfiles.size()));
+                        }
+                        boolean isExist = false;
+                        ArrayList<String> arrayList = new ArrayList<>();
+                        if (CourseItemFragment.queueArray.size() > 0) {
+                            for (int j = 0; j < CourseItemFragment.queueArray.size(); j++) {
+                                arrayList.add(CourseItemFragment.queueArray.get(j).getLemodel().getId());
+                            }
+                            isExist = arrayList.contains(downloadQueueObject.getLemodel().getId());
+                        }
+                        // CourseItemFragment.isdownload = CourseItemFragment.queueArray.isEmpty();
+                        if (CourseItemFragment.queueArray.size() >= 6) {
+                            downloadQueueObject.getHolder().courseInnerItemLayoutBinding.cardItemLayout.setEnabled(true);
+//                downloadQueueObjects.get(0).getHolder().courseInnerItemLayoutBinding.imgdownloadContent.setEnabled(true);
+                            Toast.makeText(ctx, ctx.getResources().getString(R.string.after_download_complete), Toast.LENGTH_SHORT).show();
+                        } else if (addQueue(downloadQueueObject)) {
+                            downloadProcess(downloadQueueObject, isExist);
+                            downloadno--;
+                        }
+                    }
+                    // holder.courseInnerItemLayoutBinding.txtFileName.setText(String.valueOf(downloadQueueObjects.get(0).getNumberOfDownload()));
+                    // multiplefiledownload(downloadQueueObjects, holder);
+                } else {
+                    showNetworkAlert(ctx);
+                }
             }
         }
+
     }
 
     public boolean addQueue(DownloadQueueObject downloadQueueObject) {
@@ -2126,56 +1975,244 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
 
     ArrayList<CoursePriviewObject.Lessonfiles> lessonfiles = new ArrayList<>();
 
-    private void startDownload(int position, MyViewHolder holder) {
-        isdialog = false;
+    public class DownloadStatusTask extends AsyncTask<Void, Void, String> {
 
-        String[] PERMISSIONS = new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE};
-        ArrayList<DownloadQueueObject> downloadQueueObjects = new ArrayList<>();
-        if (!EasyPermissions.hasPermissions(ctx, PERMISSIONS)) {
-            EasyPermissions.requestPermissions((Activity) ctx, ctx.getResources().getString(R.string.validation_download_permission), 0x01, PERMISSIONS);
-        } else {
-            Log.e("onPostExecute", "startDownload: ");
-            CoursePriviewObject.Lessons model = list.get(position);
-            ArrayList<CoursePriviewObject.Lessonfiles> lessonfiles = new ArrayList<>();
-            Collections.addAll(lessonfiles, model.getLessonfiles());
-            if (lessonfiles.size() != 0) {
-                // Call Api for SignedURL
-                if (isNetworkAvailable(ctx)) {
-                    int arrayvalue = lessonfiles.size();
-                    int count = 0;
-                    for (int i = 0; i < lessonfiles.size(); i++) {
-                        count++;
-                        CoursePriviewObject.Lessonfiles lessonsModel = lessonfiles.get(i);
-                        String str = lessonsModel.getId() + "_" + lessonsModel.getFiles().getId() + "_" + lessonsModel.getFiles().getFilename().replaceFirst(".*-(\\w+).*", "$1") + "_" + lessonsModel.getFiles().getFiletypename() + Const.extension;
-                        File file = new File(Const.destPath + userIdSlash, str);
+        String fileURL;
+        MyViewHolder holder;
+        CoursePriviewObject.Lessonfiles lessonsModel;
+        int downloadId = 0;
+        long progressval = 0;
+        CoursePriviewObject.Lessons model;
+        DownloadQueueObject downloadQueueObject;
 
-                        if (file.exists()) {
-                            file.delete();
-                        }
-
-                        DownloadQueueObject downloadQueueObject = new DownloadQueueObject();
-                        downloadQueueObject.setFileid(lessonsModel.getFiles().getId());
-                        downloadQueueObject.setLessonID("0");
-                        downloadQueueObject.setHolder(holder);
-                        downloadQueueObject.setLessonsModel(lessonsModel);
-                        downloadQueueObject.setLemodel(model);
-
-                        downloadQueueObjects.add(downloadQueueObject);
-                        if (count == arrayvalue) {
-                            lessonfiles.clear();
-                            Log.e("Lession files array", String.valueOf(lessonfiles.size()));
-                        }
-                       /* if (addQueue(downloadQueueObject)) {
-                            downloadProcess(downloadQueueObject);
-                        }*/
-                    }
-                    multiplefiledownload(downloadQueueObjects, holder);
-                } else {
-                    showNetworkAlert(ctx);
-                }
-            }
+        public DownloadStatusTask(String fileURL, MyViewHolder holder, CoursePriviewObject.Lessonfiles lessonsModel, CoursePriviewObject.Lessons model, DownloadQueueObject downloadQueueObject) {
+            this.fileURL = fileURL;
+            this.holder = holder;
+            this.lessonsModel = lessonsModel;
+            this.model = model;
+            this.downloadQueueObject = downloadQueueObject;
         }
 
+        @Override
+        protected String doInBackground(Void... params) {
+            // TODO: attempt authentication against a network service.
+
+            String EncryptFileName = lessonsModel.getFiles().getFilename();
+            String filetype = lessonsModel.getFiles().getFiletypename();
+            String fileName = lessonsModel.getId() + "_" + lessonsModel.getFiles().getId() + "_" + EncryptFileName.substring(EncryptFileName.lastIndexOf('-') + 1);
+
+            String downloadFilePath = Const.destPath + userIdSlash + fileName;
+
+            //Log.e(Const.LOG_NOON_TAG, "====downloadFilePath===" + downloadFilePath);
+
+            try {
+                String str = lessonsModel.getId() + "_" + lessonsModel.getFiles().getId() + "_" + EncryptFileName.replaceFirst(".*-(\\w+).*", "$1") + "_" + filetype + Const.extension;
+                PRDownloader.cleanUp(1);
+
+                //Log.e("COUNTER", "======downloadCount===IF===" + downloadCount);
+
+                downloadId = PRDownloader.download(fileURL, Const.destPath + userIdSlash, fileName)
+                        .build()
+                        .setOnStartOrResumeListener(new OnStartOrResumeListener() {
+                            @Override
+                            public void onStartOrResume() {
+                                //hideDialog();
+                                holder.courseInnerItemLayoutBinding.imgdownloadContent.setVisibility(GONE);
+                                holder.courseInnerItemLayoutBinding.progressBarSpinnerLayout.progressBar.setVisibility(View.VISIBLE);
+                                holder.courseInnerItemLayoutBinding.PushResumeLay.setVisibility(View.VISIBLE);
+                                holder.courseInnerItemLayoutBinding.imgPushContent.setVisibility(View.VISIBLE);
+                                holder.courseInnerItemLayoutBinding.imgcloseContent.setVisibility(GONE);
+
+//                                Toast.makeText(ctx, ctx.getString(R.string.downloading) + model.getName(), Toast.LENGTH_SHORT).show();
+
+                                new AsyncTask<Void, Void, String>() {
+                                    @Override
+                                    protected String doInBackground(Void... voids) {
+                                        FileDownloadStatus fileDownloadStatus = new FileDownloadStatus();
+                                        fileDownloadStatus.setLessonid("0");
+                                        fileDownloadStatus.setFileid(lessonsModel.getFiles().getId());
+                                        fileDownloadStatus.setDownloadID(downloadId);
+                                        lessonDatabaseRepository.insertFileDownloadData(fileDownloadStatus);
+                                        return null;
+                                    }
+                                }.execute();
+
+                                //Log.e("COUNTER", "======onStartOrResume======");
+                                showDialogNoNetwork();
+
+                            }
+                        })
+                        .setOnPauseListener(new OnPauseListener() {
+                            @Override
+                            public void onPause() {
+                                //Log.e("COUNTER", "======setOnPauseListener======");
+                                showDialogNoNetwork();
+
+                            }
+                        })
+                        .setOnCancelListener(new OnCancelListener() {
+                            @Override
+                            public void onCancel() {
+                                //handleDownloadCounterWhenFailAndComplite(downloadQueueObject);
+                                //Log.e("COUNTER", "======setOnCancelListener======");
+                                showDialogNoNetwork();
+                                PRDownloader.cancelAll();
+                            }
+                        })
+                        .setOnProgressListener(new OnProgressListener() {
+                            @Override
+                            public void onProgress(Progress progress) {
+                                progressval = (progress.currentBytes * 100) / progress.totalBytes;
+                                holder.courseInnerItemLayoutBinding.progressBarSpinnerLayout.progressBar.setProgress((int) progressval);
+//                                Log.e("-------------", "==== 4444444444 =====" + progressval);
+                                //Log.e("COUNTER", "======setOnProgressListener======");
+                                showDialogNoNetwork();
+
+                            }
+                        })
+                        .start(new OnDownloadListener() {
+                            @Override
+                            public void onDownloadComplete() {
+
+                                //Log.e("COUNTER", "======onDownloadComplete======");
+
+                                BaseActivity.freeMemory(ctx);
+
+                                EncryptDecryptObject encryptDecryptObject = new EncryptDecryptObject();
+                                encryptDecryptObject.setSelectedVideoPath(downloadFilePath);
+                                encryptDecryptObject.setFilename(str);
+                                encryptDecryptObject.setHolder(holder);
+                                new SetEncryptDecryptTask(new EncryptDecryptAsyncResponse() {
+                                    @Override
+                                    public EncryptDecryptObject getEncryptDecryptObjects(EncryptDecryptObject encryptDecryptObjects) {
+
+                                        //handleDownloadCounterWhenFailAndComplite(downloadQueueObject);
+                                        try {
+                                            BaseActivity.freeMemory(ctx);
+                                            String selectedVideoPath = encryptDecryptObject.getSelectedVideoPath();
+                                            String filename = encryptDecryptObject.getFilename();
+                                            MyViewHolder holder = encryptDecryptObject.getHolder();
+                                            ArrayList<String> arrayList = new ArrayList<>();
+                                            boolean isExist = false;
+                                            if (CourseItemFragment.queueArray.size() > 0) {
+                                                CourseItemFragment.queueArray.remove(downloadQueueObject);
+                                                CourseItemFragment.isdownload = true;
+                                                if (CourseItemFragment.queueArray.size() != 0) {
+                                                    downloadProcess(CourseItemFragment.queueArray.get(0), true);
+                                                }
+                                                for (int i = 0; i < CourseItemFragment.queueArray.size(); i++) {
+                                                    arrayList.add(CourseItemFragment.queueArray.get(i).getLemodel().getId());
+                                                }
+                                                for (int i = 0; i < CourseItemFragment.queueArray.size(); i++) {
+                                                    isExist = arrayList.contains(model.getId());
+                                                }
+                                            }
+
+                                            if (!isExist) {
+                                                encrypted_path = selectedVideoPath.substring(0, selectedVideoPath.lastIndexOf("/")) + "/" + filename;
+                                                EncrypterDecryptAlgo.decrypt(keyFromKeydata, paramSpec, new FileInputStream(outFile), encrypted_path);
+                                                holder.courseInnerItemLayoutBinding.imgdownloadContent.setVisibility(GONE);
+                                                holder.courseInnerItemLayoutBinding.progressBarSpinnerLayout.progressBar.setVisibility(GONE);
+                                                holder.courseInnerItemLayoutBinding.PushResumeLay.setVisibility(GONE);
+                                                holder.courseInnerItemLayoutBinding.layPlayContent.setVisibility(VISIBLE);
+                                                holder.courseInnerItemLayoutBinding.tvDownloadCount.setVisibility(GONE);
+                                                Log.e("000FILESIZE", "---queueArray---" + CourseItemFragment.queueArray.size()
+                                                        + "--lessonfiles---" + lessonfiles.size());
+                                                if (lessonfiles.size() == CourseItemFragment.queueArray.size()) {
+                                                    holder.courseInnerItemLayoutBinding.imgdownloadContent.setVisibility(GONE);
+                                                    holder.courseInnerItemLayoutBinding.progressBarSpinnerLayout.progressBar.setVisibility(GONE);
+                                                }
+                                                holder.courseInnerItemLayoutBinding.cardItemLayout.setEnabled(true);
+                                                holder.courseInnerItemLayoutBinding.imgdownloadContent.setEnabled(true);
+                                            }
+
+
+                                            com.downloader.Status fileStatus = PRDownloader.getStatus(downloadId);
+                                            FileDownloadStatus fileDownloadStatus = lessonDatabaseRepository.getItemFileDownloadStatusData(lessonsModel.getFiles().getId());
+                                            if (fileDownloadStatus != null) {
+                                                lessonDatabaseRepository.updateItemFileDownloadStatusData(lessonsModel.getFiles().getId(), fileStatus.toString(), (int) progressval);
+                                            }
+
+                                        } catch (NoSuchAlgorithmException e) {
+                                            Toast.makeText(ctx, e.getMessage(), Toast.LENGTH_SHORT).show();
+                                            e.printStackTrace();
+                                        } catch (NoSuchPaddingException e) {
+                                            Toast.makeText(ctx, e.getMessage(), Toast.LENGTH_SHORT).show();
+                                            e.printStackTrace();
+                                        } catch (InvalidKeyException e) {
+                                            Toast.makeText(ctx, e.getMessage(), Toast.LENGTH_SHORT).show();
+                                            e.printStackTrace();
+                                        } catch (InvalidAlgorithmParameterException e) {
+                                            Toast.makeText(ctx, e.getMessage(), Toast.LENGTH_SHORT).show();
+                                            e.printStackTrace();
+                                        } catch (SecurityException e) {
+                                            if (e.getLocalizedMessage().equalsIgnoreCase("Invalid or expired API Key")) {
+                                                showAlertDialog(ctx, holder);
+                                            }
+                                            e.printStackTrace();
+                                        } catch (IOException e) {
+                                            if (e.getMessage().contains("ENOSPC") || e.getMessage().contains("No space left on device")) {
+                                                showNoSpaceAlert(ctx);
+                                            }
+                                            Crashlytics.log(Log.ERROR, ctx.getString(R.string.app_name), e.getMessage());
+                                            e.printStackTrace();
+                                        }
+
+                                        return null;
+                                    }
+                                }, encryptDecryptObject).execute();
+                            }
+
+                            @Override
+                            public void onError(Error error) {
+                                //handle
+                                // DownloadCounterWhenFailAndComplite(downloadQueueObject);
+                                if (error.isServerError()) {
+                                    //Toast.makeText(ctx, "=== DOWNLAOD ServerError===", Toast.LENGTH_SHORT).show();
+                                } else if (error.isConnectionError()) {
+                                    //Toast.makeText(ctx, "=== DOWNLAOD ConnectionError===", Toast.LENGTH_SHORT).show();
+                                } else if (error.isENOSPCError()) {
+                                    //Toast.makeText(ctx, "=== DOWNLAOD ENOSPCError (No space left on device)===", Toast.LENGTH_SHORT).show();
+                                    showNoSpaceAlert(ctx);
+                                }
+                                //hideDialog();
+                                Crashlytics.log(Log.ERROR, ctx.getString(R.string.app_name), error.getError());
+                                showDialogNoNetwork();
+
+                                //Log.e("COUNTER", "======onError==0101====");
+                            }
+                        });
+
+            } catch (Exception e) {
+                //Toast.makeText(ctx, "=== DOWNLAOD CATCH===" + e.getMessage(), Toast.LENGTH_SHORT).show();
+                //Log.e("COUNTER", "======Exception======");
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(final String success) {
+
+            Log.e("onPostExecute", "onPostExecute: ");
+            holder.courseInnerItemLayoutBinding.imgPushContent.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    holder.courseInnerItemLayoutBinding.imgResumeContent.setVisibility(View.VISIBLE);
+                    holder.courseInnerItemLayoutBinding.imgPushContent.setVisibility(GONE);
+                    PRDownloader.pause(downloadId);
+                }
+            });
+
+            holder.courseInnerItemLayoutBinding.imgResumeContent.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    holder.courseInnerItemLayoutBinding.imgResumeContent.setVisibility(GONE);
+                    holder.courseInnerItemLayoutBinding.imgPushContent.setVisibility(View.VISIBLE);
+                    PRDownloader.resume(downloadId);
+                }
+            });
+        }
     }
 
 
