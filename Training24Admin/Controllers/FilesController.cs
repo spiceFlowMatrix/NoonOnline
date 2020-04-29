@@ -683,7 +683,8 @@ namespace Training24Admin.Controllers
                                                HttpMethod.Get
                                           );
 
-                singnedUrlResponse.url = url;
+                var urlDecode = HttpUtility.UrlDecode(url);
+                singnedUrlResponse.url = urlDecode;
                 singnedUrlResponse.exp = exp;
 
                 successResponse.data = singnedUrlResponse;
@@ -983,10 +984,24 @@ namespace Training24Admin.Controllers
                 //    {
                 //        { "Content-Type", new[] { contentType } }
                 //    };
-                UrlSigner urlSigner = UrlSigner.FromServiceAccountPath(credential);
-                string url = await urlSigner.SignAsync(bucketName, fileName, timeSpan, HttpMethod.Put, null, null);
+                //UrlSigner urlSigner = UrlSigner.FromServiceAccountPath(credential);
+                //string url = await urlSigner.SignAsync(bucketName, fileName, timeSpan, HttpMethod.Put, null);
 
-                //var urlDecode = HttpUtility.UrlDecode(url);
+                UrlSigner.RequestTemplate requestTemplate = UrlSigner.RequestTemplate
+                                            .FromBucket(bucketName)
+                                            .WithObjectName(fileName)
+                                            .WithHttpMethod(HttpMethod.Put)
+                                            .WithContentHeaders(new Dictionary<string, IEnumerable<string>>
+                                            {
+                                                                { "Content-Type", new[] { contentType } }
+                                            });
+                // Create options specifying for how long the signer URL will be valid.
+                UrlSigner.Options options = UrlSigner.Options.FromDuration(TimeSpan.FromHours(1));
+                // Create a signed URL which allows the requester to PUT data with the text/plain content-type.
+                UrlSigner urlSigner = UrlSigner.FromServiceAccountPath(credential);
+                string url = await urlSigner.SignAsync(requestTemplate, options);
+
+                var urlDecode = HttpUtility.UrlDecode(url);
 
                 var signedurl = new
                 {
@@ -1017,7 +1032,6 @@ namespace Training24Admin.Controllers
             string credential = Path.GetFileName(hostingEnvironment.WebRootPath + "/training24-28e994f9833c.json");
             SuccessResponse successResponse = new SuccessResponse();
             UnsuccessResponse unsuccessResponse = new UnsuccessResponse();
-            string mediaLink = "";
             try
             {
                 var fileName = Request.Form["fileName"].ToString();
@@ -1038,14 +1052,30 @@ namespace Training24Admin.Controllers
                 //    {
                 //        { "Content-Type", new[] { contentType } }
                 //    };
-                UrlSigner urlSigner = UrlSigner.FromServiceAccountPath(credential);
-                string url = await urlSigner.SignAsync(bucketName, fileName, timeSpan, HttpMethod.Put, null, null);
+                //UrlSigner urlSigner = UrlSigner.FromServiceAccountPath(credential);
+                //string url = urlSigner.Sign(bucketName, fileName, timeSpan, HttpMethod.Put, null, null);
 
                 //var urlDecode = HttpUtility.UrlDecode(url);
 
+                UrlSigner.RequestTemplate requestTemplate = UrlSigner.RequestTemplate
+                                                            .FromBucket(bucketName)
+                                                            .WithObjectName(fileName)
+                                                            .WithHttpMethod(HttpMethod.Put)
+                                                            .WithContentHeaders(new Dictionary<string, IEnumerable<string>>
+                                                            {
+                                                                { "Content-Type", new[] { contentType } }
+                                                            });
+                // Create options specifying for how long the signer URL will be valid.
+                UrlSigner.Options options = UrlSigner.Options.FromDuration(TimeSpan.FromHours(1));
+                // Create a signed URL which allows the requester to PUT data with the text/plain content-type.
+                UrlSigner urlSigner = UrlSigner.FromServiceAccountPath(credential);
+                string url = await urlSigner.SignAsync(requestTemplate, options);
+
+                var urlDecode = HttpUtility.UrlDecode(url);
+
                 var signedurl = new
                 {
-                    signedurl = url,
+                    signedurl = urlDecode,
                     filename = fileName
                 };
 
@@ -1060,7 +1090,7 @@ namespace Training24Admin.Controllers
 
                 unsuccessResponse.response_code = 2;
                 unsuccessResponse.message = ex.Message;
-                unsuccessResponse.status = mediaLink;
+                unsuccessResponse.status = "Failure";
                 return StatusCode(500, unsuccessResponse);
             }
         }
@@ -1093,14 +1123,28 @@ namespace Training24Admin.Controllers
                 //    {
                 //        { "Content-Type", new[] { contentType } }
                 //    };
-                UrlSigner urlSigner = UrlSigner.FromServiceAccountPath(credential);
-                string url = await urlSigner.SignAsync(bucketName, fileName, timeSpan, HttpMethod.Put, null, null);
+                //UrlSigner urlSigner = UrlSigner.FromServiceAccountPath(credential);
+                //string url = await urlSigner.SignAsync(bucketName, fileName, timeSpan, HttpMethod.Put, null);
 
-                //var urlDecode = HttpUtility.UrlDecode(url);
+                UrlSigner.RequestTemplate requestTemplate = UrlSigner.RequestTemplate
+                                            .FromBucket(bucketName)
+                                            .WithObjectName(fileName)
+                                            .WithHttpMethod(HttpMethod.Put)
+                                            .WithContentHeaders(new Dictionary<string, IEnumerable<string>>
+                                            {
+                                                                { "Content-Type", new[] { contentType } }
+                                            });
+                // Create options specifying for how long the signer URL will be valid.
+                UrlSigner.Options options = UrlSigner.Options.FromDuration(TimeSpan.FromHours(1));
+                // Create a signed URL which allows the requester to PUT data with the text/plain content-type.
+                UrlSigner urlSigner = UrlSigner.FromServiceAccountPath(credential);
+                string url = await urlSigner.SignAsync(requestTemplate, options);
+
+                var urlDecode = HttpUtility.UrlDecode(url);
 
                 var signedurl = new
                 {
-                    signedurl = url,
+                    signedurl = urlDecode,
                     filename = fileName
                 };
 
@@ -1148,14 +1192,28 @@ namespace Training24Admin.Controllers
                 //    {
                 //        { "Content-Type", new[] { contentType } }
                 //    };
-                UrlSigner urlSigner = UrlSigner.FromServiceAccountPath(credential);
-                string url = await urlSigner.SignAsync(bucketName, fileName, timeSpan, HttpMethod.Put, null, null);
+                //UrlSigner urlSigner = UrlSigner.FromServiceAccountPath(credential);
+                //string url = await urlSigner.SignAsync(bucketName, fileName, timeSpan, HttpMethod.Put, null);
 
-                //var urlDecode = HttpUtility.UrlDecode(url);
+                UrlSigner.RequestTemplate requestTemplate = UrlSigner.RequestTemplate
+                                            .FromBucket(bucketName)
+                                            .WithObjectName(fileName)
+                                            .WithHttpMethod(HttpMethod.Put)
+                                            .WithContentHeaders(new Dictionary<string, IEnumerable<string>>
+                                            {
+                                                                { "Content-Type", new[] { contentType } }
+                                            });
+                // Create options specifying for how long the signer URL will be valid.
+                UrlSigner.Options options = UrlSigner.Options.FromDuration(TimeSpan.FromHours(1));
+                // Create a signed URL which allows the requester to PUT data with the text/plain content-type.
+                UrlSigner urlSigner = UrlSigner.FromServiceAccountPath(credential);
+                string url = await urlSigner.SignAsync(requestTemplate, options);
+
+                var urlDecode = HttpUtility.UrlDecode(url);
 
                 var signedurl = new
                 {
-                    signedurl = url,
+                    signedurl = urlDecode,
                     filename = fileName
                 };
 
@@ -1203,14 +1261,28 @@ namespace Training24Admin.Controllers
                 //    {
                 //        { "Content-Type", new[] { contentType } }
                 //    };
-                UrlSigner urlSigner = UrlSigner.FromServiceAccountPath(credential);
-                string url = await urlSigner.SignAsync(bucketName, fileName, timeSpan, HttpMethod.Put, null, null);
+                //UrlSigner urlSigner = UrlSigner.FromServiceAccountPath(credential);
+                //string url = await urlSigner.SignAsync(bucketName, fileName, timeSpan, HttpMethod.Put, null);
 
-                //var urlDecode = HttpUtility.UrlDecode(url);
+                UrlSigner.RequestTemplate requestTemplate = UrlSigner.RequestTemplate
+                            .FromBucket(bucketName)
+                            .WithObjectName(fileName)
+                            .WithHttpMethod(HttpMethod.Put)
+                            .WithContentHeaders(new Dictionary<string, IEnumerable<string>>
+                            {
+                                                                { "Content-Type", new[] { contentType } }
+                            });
+                // Create options specifying for how long the signer URL will be valid.
+                UrlSigner.Options options = UrlSigner.Options.FromDuration(TimeSpan.FromHours(1));
+                // Create a signed URL which allows the requester to PUT data with the text/plain content-type.
+                UrlSigner urlSigner = UrlSigner.FromServiceAccountPath(credential);
+                string url = await urlSigner.SignAsync(requestTemplate, options);
+
+                var urlDecode = HttpUtility.UrlDecode(url);
 
                 var signedurl = new
                 {
-                    signedurl = url,
+                    signedurl = urlDecode,
                     filename = fileName
                 };
 
@@ -1258,14 +1330,28 @@ namespace Training24Admin.Controllers
                 //    {
                 //        { "Content-Type", new[] { contentType } }
                 //    };
-                UrlSigner urlSigner = UrlSigner.FromServiceAccountPath(credential);
-                string url = await urlSigner.SignAsync(bucketName, fileName, timeSpan, HttpMethod.Put, null, null);
+                //UrlSigner urlSigner = UrlSigner.FromServiceAccountPath(credential);
+                //string url = await urlSigner.SignAsync(bucketName, fileName, timeSpan, HttpMethod.Put, null);
 
-                //var urlDecode = HttpUtility.UrlDecode(url);
+                UrlSigner.RequestTemplate requestTemplate = UrlSigner.RequestTemplate
+                            .FromBucket(bucketName)
+                            .WithObjectName(fileName)
+                            .WithHttpMethod(HttpMethod.Put)
+                            .WithContentHeaders(new Dictionary<string, IEnumerable<string>>
+                            {
+                                      { "Content-Type", new[] { contentType } }
+                            });
+                // Create options specifying for how long the signer URL will be valid.
+                UrlSigner.Options options = UrlSigner.Options.FromDuration(TimeSpan.FromHours(1));
+                // Create a signed URL which allows the requester to PUT data with the text/plain content-type.
+                UrlSigner urlSigner = UrlSigner.FromServiceAccountPath(credential);
+                string url = await urlSigner.SignAsync(requestTemplate, options);
+
+                var urlDecode = HttpUtility.UrlDecode(url);
 
                 var signedurl = new
                 {
-                    signedurl = url,
+                    signedurl = urlDecode,
                     filename = fileName
                 };
 
@@ -1313,14 +1399,28 @@ namespace Training24Admin.Controllers
                 //    {
                 //        { "Content-Type", new[] { contentType } }
                 //    };
-                UrlSigner urlSigner = UrlSigner.FromServiceAccountPath(credential);
-                string url = await urlSigner.SignAsync(bucketName, fileName, timeSpan, HttpMethod.Put, null, null);
+                //UrlSigner urlSigner = UrlSigner.FromServiceAccountPath(credential);
+                //string url = await urlSigner.SignAsync(bucketName, fileName, timeSpan, HttpMethod.Put, null);
 
-                //var urlDecode = HttpUtility.UrlDecode(url);
+                UrlSigner.RequestTemplate requestTemplate = UrlSigner.RequestTemplate
+            .FromBucket(bucketName)
+            .WithObjectName(fileName)
+            .WithHttpMethod(HttpMethod.Put)
+            .WithContentHeaders(new Dictionary<string, IEnumerable<string>>
+            {
+                                      { "Content-Type", new[] { contentType } }
+            });
+                // Create options specifying for how long the signer URL will be valid.
+                UrlSigner.Options options = UrlSigner.Options.FromDuration(TimeSpan.FromHours(1));
+                // Create a signed URL which allows the requester to PUT data with the text/plain content-type.
+                UrlSigner urlSigner = UrlSigner.FromServiceAccountPath(credential);
+                string url = await urlSigner.SignAsync(requestTemplate, options);
+
+                var urlDecode = HttpUtility.UrlDecode(url);
 
                 var signedurl = new
                 {
-                    signedurl = url,
+                    signedurl = urlDecode,
                     filename = fileName
                 };
 
@@ -1368,14 +1468,28 @@ namespace Training24Admin.Controllers
                 //    {
                 //        { "Content-Type", new[] { contentType } }
                 //    };
-                UrlSigner urlSigner = UrlSigner.FromServiceAccountPath(credential);
-                string url = await urlSigner.SignAsync(bucketName, fileName, timeSpan, HttpMethod.Put, null, null);
+                //UrlSigner urlSigner = UrlSigner.FromServiceAccountPath(credential);
+                //string url = await urlSigner.SignAsync(bucketName, fileName, timeSpan, HttpMethod.Put, null);
 
-                //var urlDecode = HttpUtility.UrlDecode(url);
+                UrlSigner.RequestTemplate requestTemplate = UrlSigner.RequestTemplate
+                        .FromBucket(bucketName)
+                        .WithObjectName(fileName)
+                        .WithHttpMethod(HttpMethod.Put)
+                        .WithContentHeaders(new Dictionary<string, IEnumerable<string>>
+                        {
+                              { "Content-Type", new[] { contentType } }
+                        });
+                // Create options specifying for how long the signer URL will be valid.
+                UrlSigner.Options options = UrlSigner.Options.FromDuration(TimeSpan.FromHours(1));
+                // Create a signed URL which allows the requester to PUT data with the text/plain content-type.
+                UrlSigner urlSigner = UrlSigner.FromServiceAccountPath(credential);
+                string url = await urlSigner.SignAsync(requestTemplate, options);
+
+                var urlDecode = HttpUtility.UrlDecode(url);
 
                 var signedurl = new
                 {
-                    signedurl = url,
+                    signedurl = urlDecode,
                     filename = fileName
                 };
 
@@ -1423,14 +1537,28 @@ namespace Training24Admin.Controllers
                 //    {
                 //        { "Content-Type", new[] { contentType } }
                 //    };
-                UrlSigner urlSigner = UrlSigner.FromServiceAccountPath(credential);
-                string url = await urlSigner.SignAsync(bucketName, fileName, timeSpan, HttpMethod.Put, null, null);
+                //UrlSigner urlSigner = UrlSigner.FromServiceAccountPath(credential);
+                //string url = await urlSigner.SignAsync(bucketName, fileName, timeSpan, HttpMethod.Put, null);
 
-                //var urlDecode = HttpUtility.UrlDecode(url);
+                UrlSigner.RequestTemplate requestTemplate = UrlSigner.RequestTemplate
+                        .FromBucket(bucketName)
+                        .WithObjectName(fileName)
+                        .WithHttpMethod(HttpMethod.Put)
+                        .WithContentHeaders(new Dictionary<string, IEnumerable<string>>
+                        {
+                                { "Content-Type", new[] { contentType } }
+                        });
+                // Create options specifying for how long the signer URL will be valid.
+                UrlSigner.Options options = UrlSigner.Options.FromDuration(TimeSpan.FromHours(1));
+                // Create a signed URL which allows the requester to PUT data with the text/plain content-type.
+                UrlSigner urlSigner = UrlSigner.FromServiceAccountPath(credential);
+                string url = await urlSigner.SignAsync(requestTemplate, options);
+
+                var urlDecode = HttpUtility.UrlDecode(url);
 
                 var signedurl = new
                 {
-                    signedurl = url,
+                    signedurl = urlDecode,
                     filename = fileName
                 };
 
@@ -1478,14 +1606,28 @@ namespace Training24Admin.Controllers
                 //    {
                 //        { "Content-Type", new[] { contentType } }
                 //    };
-                UrlSigner urlSigner = UrlSigner.FromServiceAccountPath(credential);
-                string url = await urlSigner.SignAsync(bucketName, fileName, timeSpan, HttpMethod.Put, null, null);
+                //UrlSigner urlSigner = UrlSigner.FromServiceAccountPath(credential);
+                //string url = await urlSigner.SignAsync(bucketName, fileName, timeSpan, HttpMethod.Put, null);
 
-                //var urlDecode = HttpUtility.UrlDecode(url);
+                UrlSigner.RequestTemplate requestTemplate = UrlSigner.RequestTemplate
+                        .FromBucket(bucketName)
+                        .WithObjectName(fileName)
+                        .WithHttpMethod(HttpMethod.Put)
+                        .WithContentHeaders(new Dictionary<string, IEnumerable<string>>
+                        {
+                             { "Content-Type", new[] { contentType } }
+                        });
+                // Create options specifying for how long the signer URL will be valid.
+                UrlSigner.Options options = UrlSigner.Options.FromDuration(TimeSpan.FromHours(1));
+                // Create a signed URL which allows the requester to PUT data with the text/plain content-type.
+                UrlSigner urlSigner = UrlSigner.FromServiceAccountPath(credential);
+                string url = await urlSigner.SignAsync(requestTemplate, options);
+
+                var urlDecode = HttpUtility.UrlDecode(url);
 
                 var signedurl = new
                 {
-                    signedurl = url,
+                    signedurl = urlDecode,
                     filename = fileName
                 };
 
@@ -1533,14 +1675,28 @@ namespace Training24Admin.Controllers
                 //    {
                 //        { "Content-Type", new[] { contentType } }
                 //    };
-                UrlSigner urlSigner = UrlSigner.FromServiceAccountPath(credential);
-                string url = await urlSigner.SignAsync(bucketName, fileName, timeSpan, HttpMethod.Put, null, null);
+                //UrlSigner urlSigner = UrlSigner.FromServiceAccountPath(credential);
+                //string url = await urlSigner.SignAsync(bucketName, fileName, timeSpan, HttpMethod.Put, null);
 
-                //var urlDecode = HttpUtility.UrlDecode(url);
+                UrlSigner.RequestTemplate requestTemplate = UrlSigner.RequestTemplate
+                        .FromBucket(bucketName)
+                        .WithObjectName(fileName)
+                        .WithHttpMethod(HttpMethod.Put)
+                        .WithContentHeaders(new Dictionary<string, IEnumerable<string>>
+                        {
+                                             { "Content-Type", new[] { contentType } }
+                        });
+                // Create options specifying for how long the signer URL will be valid.
+                UrlSigner.Options options = UrlSigner.Options.FromDuration(TimeSpan.FromHours(1));
+                // Create a signed URL which allows the requester to PUT data with the text/plain content-type.
+                UrlSigner urlSigner = UrlSigner.FromServiceAccountPath(credential);
+                string url = await urlSigner.SignAsync(requestTemplate, options);
+
+                var urlDecode = HttpUtility.UrlDecode(url);
 
                 var signedurl = new
                 {
-                    signedurl = url,
+                    signedurl = urlDecode,
                     filename = fileName
                 };
 
@@ -1588,14 +1744,28 @@ namespace Training24Admin.Controllers
                 //    {
                 //        { "Content-Type", new[] { contentType } }
                 //    };
-                UrlSigner urlSigner = UrlSigner.FromServiceAccountPath(credential);
-                string url = await urlSigner.SignAsync(bucketName, fileName, timeSpan, HttpMethod.Put, null, null);
+                //UrlSigner urlSigner = UrlSigner.FromServiceAccountPath(credential);
+                //string url = await urlSigner.SignAsync(bucketName, fileName, timeSpan, HttpMethod.Put, null);
 
-                //var urlDecode = HttpUtility.UrlDecode(url);
+                UrlSigner.RequestTemplate requestTemplate = UrlSigner.RequestTemplate
+                        .FromBucket(bucketName)
+                        .WithObjectName(fileName)
+                        .WithHttpMethod(HttpMethod.Put)
+                        .WithContentHeaders(new Dictionary<string, IEnumerable<string>>
+                        {
+                                { "Content-Type", new[] { contentType } }
+                        });
+                // Create options specifying for how long the signer URL will be valid.
+                UrlSigner.Options options = UrlSigner.Options.FromDuration(TimeSpan.FromHours(1));
+                // Create a signed URL which allows the requester to PUT data with the text/plain content-type.
+                UrlSigner urlSigner = UrlSigner.FromServiceAccountPath(credential);
+                string url = await urlSigner.SignAsync(requestTemplate, options);
+
+                var urlDecode = HttpUtility.UrlDecode(url);
 
                 var signedurl = new
                 {
-                    signedurl = url,
+                    signedurl = urlDecode,
                     filename = fileName
                 };
 
@@ -1643,14 +1813,28 @@ namespace Training24Admin.Controllers
                 //    {
                 //        { "Content-Type", new[] { contentType } }
                 //    };
-                UrlSigner urlSigner = UrlSigner.FromServiceAccountPath(credential);
-                string url = await urlSigner.SignAsync(bucketName, fileName, timeSpan, HttpMethod.Put, null, null);
+                //UrlSigner urlSigner = UrlSigner.FromServiceAccountPath(credential);
+                //string url = await urlSigner.SignAsync(bucketName, fileName, timeSpan, HttpMethod.Put, null);
 
-                //var urlDecode = HttpUtility.UrlDecode(url);
+                UrlSigner.RequestTemplate requestTemplate = UrlSigner.RequestTemplate
+                            .FromBucket(bucketName)
+                            .WithObjectName(fileName)
+                            .WithHttpMethod(HttpMethod.Put)
+                            .WithContentHeaders(new Dictionary<string, IEnumerable<string>>
+                            {
+                                   { "Content-Type", new[] { contentType } }
+                            });
+                // Create options specifying for how long the signer URL will be valid.
+                UrlSigner.Options options = UrlSigner.Options.FromDuration(TimeSpan.FromHours(1));
+                // Create a signed URL which allows the requester to PUT data with the text/plain content-type.
+                UrlSigner urlSigner = UrlSigner.FromServiceAccountPath(credential);
+                string url = await urlSigner.SignAsync(requestTemplate, options);
+
+                var urlDecode = HttpUtility.UrlDecode(url);
 
                 var signedurl = new
                 {
-                    signedurl = url,
+                    signedurl = urlDecode,
                     filename = fileName
                 };
 
@@ -1698,14 +1882,28 @@ namespace Training24Admin.Controllers
                 //    {
                 //        { "Content-Type", new[] { contentType } }
                 //    };
-                UrlSigner urlSigner = UrlSigner.FromServiceAccountPath(credential);
-                string url = await urlSigner.SignAsync(bucketName, fileName, timeSpan, HttpMethod.Put, null, null);
+                //UrlSigner urlSigner = UrlSigner.FromServiceAccountPath(credential);
+                //string url = await urlSigner.SignAsync(bucketName, fileName, timeSpan, HttpMethod.Put, null);
 
-                //var urlDecode = HttpUtility.UrlDecode(url);
+                UrlSigner.RequestTemplate requestTemplate = UrlSigner.RequestTemplate
+                        .FromBucket(bucketName)
+                        .WithObjectName(fileName)
+                        .WithHttpMethod(HttpMethod.Put)
+                        .WithContentHeaders(new Dictionary<string, IEnumerable<string>>
+                        {
+                                { "Content-Type", new[] { contentType } }
+                        });
+                // Create options specifying for how long the signer URL will be valid.
+                UrlSigner.Options options = UrlSigner.Options.FromDuration(TimeSpan.FromHours(1));
+                // Create a signed URL which allows the requester to PUT data with the text/plain content-type.
+                UrlSigner urlSigner = UrlSigner.FromServiceAccountPath(credential);
+                string url = await urlSigner.SignAsync(requestTemplate, options);
+
+                var urlDecode = HttpUtility.UrlDecode(url);
 
                 var signedurl = new
                 {
-                    signedurl = url,
+                    signedurl = urlDecode,
                     filename = fileName
                 };
 
