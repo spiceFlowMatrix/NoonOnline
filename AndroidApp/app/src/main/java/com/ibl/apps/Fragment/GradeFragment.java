@@ -89,7 +89,7 @@ public class GradeFragment extends BaseFragment implements View.OnClickListener,
     List<CourseObject.Data> CourselistData = new ArrayList<>();
 
     private CompositeDisposable disposable = new CompositeDisposable();
-    String[] PERMISSIONS = new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
+    String[] PERMISSIONS = new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
     private int SpinnerGradeId = 0;
     private String SearchText = "";
     CourseListAdapter adp;
@@ -154,7 +154,7 @@ public class GradeFragment extends BaseFragment implements View.OnClickListener,
 //                                    }
 //                                }));
 //                    }
-                    getCurrentLocation();
+                    //getCurrentLocation();
                 }
             }
         }
@@ -220,7 +220,7 @@ public class GradeFragment extends BaseFragment implements View.OnClickListener,
 //                            }
 //                        }));
 //            }
-            getCurrentLocation();
+            //getCurrentLocation();
         }
     }
 
