@@ -74,9 +74,6 @@ android {
             
         }
     }
-    lintOptions {
-        disable 'RestrictedApi'
-    }
     buildTypes {
         debug {
             minifyEnabled true
