@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Trainning24.BL.ViewModels;
 using Trainning24.BL.ViewModels.Assignment;
+using Trainning24.BL.ViewModels.AssignmentFile;
 using Trainning24.BL.ViewModels.Chapter;
 using Trainning24.BL.ViewModels.Course;
 using Trainning24.BL.ViewModels.CourseGrade;
@@ -20,7 +21,10 @@ using Trainning24.BL.ViewModels.Files;
 using Trainning24.BL.ViewModels.Grade;
 using Trainning24.BL.ViewModels.Language;
 using Trainning24.BL.ViewModels.Lesson;
+using Trainning24.BL.ViewModels.LessonAssignment;
+using Trainning24.BL.ViewModels.LessonAssignmentFile;
 using Trainning24.BL.ViewModels.LessonFile;
+using Trainning24.BL.ViewModels.StudentLessonProgress;
 using Trainning24.BL.ViewModels.Users;
 using Trainning24.Domain.Entity;
 using Trainning24.Repository.EF;
@@ -484,6 +488,226 @@ namespace Trainning24.BL.Business
             chapterPreviewModels = chapterPreviewModels.OrderBy(b => b.itemorder).ToList();
             coursePreview.chapters = chapterPreviewModels;
             return coursePreview;
+        }
+
+        public CoursePreviewModel getCoursePreviewByIdTest(long id, string Certificate)
+        {
+            var coursePreView = (from c in _training24Context.Course
+                                 where c.Id == id && c.IsDeleted != true
+                                 let chapterPreviewModels = (from cpt in _training24Context.Chapter
+                                                             where cpt.CourseId == c.Id && cpt.IsDeleted != true
+
+                                                             let chapterQuizPrivewModels = (from cq in _training24Context.chapterQuiz
+                                                                                            join q in _training24Context.Quiz on cq.QuizId equals q.Id
+                                                                                            where cq.ChapterId == cpt.Id && cq.IsDeleted != true && q.IsDeleted != true
+                                                                                            select new QuizPreviewModel()
+                                                                                            {
+                                                                                                id = q.Id,
+                                                                                                name = q.Name,
+                                                                                                code = q.Code,
+                                                                                                numquestions = q.NumQuestions,
+                                                                                                itemorder = q.ItemOrder,
+                                                                                                type = 2
+                                                                                            }).ToList()
+                                                             let assignmentsPrivewModels = (from a in _training24Context.Assignment
+                                                                                            where a.ChapterId == cpt.Id && a.IsDeleted != true
+                                                                                            select new AssignmentPreviewModel
+                                                                                            {
+                                                                                                id = a.Id,
+                                                                                                name = a.Name,
+                                                                                                code = a.Code,
+                                                                                                description = a.Description,
+                                                                                                itemorder = a.ItemOrder,
+                                                                                                type = 3,
+                                                                                            }).ToList()
+                                                             let lessonPrivewModels = (from x in _training24Context.Lesson
+                                                                                       where x.ChapterId == cpt.Id && x.IsDeleted != true
+                                                                                       select new LessonPrivewModel
+                                                                                       {
+                                                                                           id = x.Id,
+                                                                                           name = x.Name,
+                                                                                           code = x.Code,
+                                                                                           description = x.Description,
+                                                                                           itemorder = x.ItemOrder,
+                                                                                           type = 1
+                                                                                       }).ToList()
+                                                             select new ChapterPreviewModel()
+                                                             {
+                                                                 Id = cpt.Id,
+                                                                 Code = cpt.Code,
+                                                                 Name = cpt.Name,
+                                                                 itemorder = cpt.ItemOrder,
+                                                                 quizs = chapterQuizPrivewModels,
+                                                                 assignments = assignmentsPrivewModels,
+                                                                 lessons = lessonPrivewModels.Cast<object>().ToList(),
+                                                             }
+                                                 ).ToList()
+                                 select new CoursePreviewModel
+                                 {
+                                     Id = c.Id,
+                                     Code = c.Code,
+                                     Description = c.Description,
+                                     Name = c.Name,
+                                     Image = !string.IsNullOrEmpty(c.Image) ? c.Image.Contains("t24-primary-image-storage") ? c.Image : LessonBusiness.geturl(c.Image, Certificate) : "",
+                                     chapters = chapterPreviewModels.OrderBy(b => b.itemorder).ToList()
+                                 }).FirstOrDefault();
+            return coursePreView;
+        }
+
+
+        public CoursePreviewModel getCoursePreviewByIdTest(long id, long studentid, string Certificate)
+        {
+            var coursePreView = (from c in _training24Context.Course
+                                 where c.Id == id && c.IsDeleted != true
+                                 let chapterPreviewModels = (from cpt in _training24Context.Chapter
+                                                             where cpt.CourseId == c.Id && cpt.IsDeleted != true
+
+                                                             let chapterQuizPrivewModels = (from cq in _training24Context.chapterQuiz
+                                                                                            join q in _training24Context.Quiz on cq.QuizId equals q.Id
+                                                                                            where cq.ChapterId == cpt.Id && cq.IsDeleted != true && q.IsDeleted != true
+                                                                                            select new QuizPreviewModel()
+                                                                                            {
+                                                                                                id = q.Id,
+                                                                                                name = q.Name,
+                                                                                                code = q.Code,
+                                                                                                numquestions = q.NumQuestions,
+                                                                                                itemorder = q.ItemOrder,
+                                                                                                type = 2
+                                                                                            }).ToList()
+                                                             let assignmentsPrivewModels = (from a in _training24Context.Assignment
+                                                                                            where a.ChapterId == cpt.Id && a.IsDeleted != true
+                                                                                            let chapterAssigmentFiles = (from laf in _training24Context.AssignmentFile
+                                                                                                                         where laf.AssignmentId == a.Id && laf.IsDeleted != true
+                                                                                                                         let assignmentFilesPreviewModel = (from f in _training24Context.Files
+                                                                                                                                                            join ft in _training24Context.FileTypes on f.FileTypeId equals ft.Id
+                                                                                                                                                            where f.Id == laf.FileId && f.IsDeleted != true && ft.IsDeleted != true
+                                                                                                                                                            select new ResponseFilesModel()
+                                                                                                                                                            {
+                                                                                                                                                                Id = f.Id,
+                                                                                                                                                                name = f.Name,
+                                                                                                                                                                url = LessonBusiness.geturl(f.Url, Certificate),
+                                                                                                                                                                filename = f.FileName,
+                                                                                                                                                                filetypeid = f.FileTypeId,
+                                                                                                                                                                description = f.Description,
+                                                                                                                                                                filetypename = ft.Filetype,
+                                                                                                                                                                filesize = f.FileSize,
+                                                                                                                                                                duration = f.Duration,
+                                                                                                                                                                totalpages = f.TotalPages,
+                                                                                                                                                            }).FirstOrDefault()
+                                                                                                                         select new ResponseAssignmentFileModel
+                                                                                                                         {
+                                                                                                                             id = laf.Id,
+                                                                                                                             files = assignmentFilesPreviewModel
+                                                                                                                         }).ToList()
+                                                                                            select new AssignmentPreviewModel
+                                                                                            {
+                                                                                                id = a.Id,
+                                                                                                name = a.Name,
+                                                                                                code = a.Code,
+                                                                                                description = a.Description,
+                                                                                                assignmentfiles = chapterAssigmentFiles //AssignmentBusiness.GetAssignmentFilesByAssignmentId(a.Id, Certificate)
+                                                                                            }).ToList()
+                                                             let lessonPrivewModels = (from x in _training24Context.Lesson
+                                                                                       where x.ChapterId == cpt.Id && x.IsDeleted != true
+                                                                                       let lessonFilesPreviewModel = (from lf in _training24Context.LessonFile
+                                                                                                                      where lf.LessionId == x.Id && lf.IsDeleted != true
+                                                                                                                      let filesPreviewModel = (from f in _training24Context.Files
+                                                                                                                                               join ft in _training24Context.FileTypes on f.FileTypeId equals ft.Id
+                                                                                                                                               where lf.FileId == f.Id && f.IsDeleted != true && ft.IsDeleted != true
+                                                                                                                                               select new ResponseFilesModel()
+                                                                                                                                               {
+                                                                                                                                                   Id = f.Id,
+                                                                                                                                                   name = f.Name,
+                                                                                                                                                   url = LessonBusiness.geturl(f.Url, Certificate),
+                                                                                                                                                   filename = f.FileName,
+                                                                                                                                                   filetypeid = f.FileTypeId,
+                                                                                                                                                   description = f.Description,
+                                                                                                                                                   filetypename = ft.Filetype,
+                                                                                                                                                   filesize = f.FileSize,
+                                                                                                                                                   duration = f.Duration,
+                                                                                                                                                   totalpages = f.TotalPages,
+                                                                                                                                               }).FirstOrDefault()
+                                                                                                                      let studentLessonProgressModel = (from lp in _training24Context.StudentLessonProgress
+                                                                                                                                                        where lp.LessonId == x.Id && lp.StudentId == studentid && lp.IsDeleted != true
+                                                                                                                                                        select new ResponseStudentLessonProgressModel
+                                                                                                                                                        {
+                                                                                                                                                            id = lp.Id,
+                                                                                                                                                            lessonid = lp.LessonId,
+                                                                                                                                                            lessonstatus = lp.LessonStatus,
+                                                                                                                                                            studentid = lp.StudentId,
+                                                                                                                                                            lessonprogress = lp.LessonProgress
+                                                                                                                                                        }).SingleOrDefault()
+                                                                                                                      select new ResponseLessonFileModel
+                                                                                                                      {
+                                                                                                                          id = lf.Id,
+                                                                                                                          files = filesPreviewModel,
+                                                                                                                          progress = studentLessonProgressModel
+                                                                                                                      }).ToList()
+                                                                                       let responseLessionAssignmentDTO = (from la in _training24Context.LessonAssignments
+                                                                                                                           where la.LessonId == x.Id && la.IsDeleted != true
+                                                                                                                           let lessonAssigmentFiles = (from laf in _training24Context.LessonAssignmentFiles
+                                                                                                                                                       where laf.AssignmentId == la.Id && laf.IsDeleted != true
+                                                                                                                                                       let assignmentFilesPreviewModel = (from f in _training24Context.Files
+                                                                                                                                                                                          join ft in _training24Context.FileTypes on f.FileTypeId equals ft.Id
+                                                                                                                                                                                          where f.Id == laf.FileId && f.IsDeleted != true && ft.IsDeleted != true
+                                                                                                                                                                                          select new ResponseFilesModel()
+                                                                                                                                                                                          {
+                                                                                                                                                                                              Id = f.Id,
+                                                                                                                                                                                              name = f.Name,
+                                                                                                                                                                                              url = LessonBusiness.geturl(f.Url, Certificate),
+                                                                                                                                                                                              filename = f.FileName,
+                                                                                                                                                                                              filetypeid = f.FileTypeId,
+                                                                                                                                                                                              description = f.Description,
+                                                                                                                                                                                              filetypename = ft.Filetype,
+                                                                                                                                                                                              filesize = f.FileSize,
+                                                                                                                                                                                              duration = f.Duration,
+                                                                                                                                                                                              totalpages = f.TotalPages,
+                                                                                                                                                                                          }).FirstOrDefault()
+                                                                                                                                                       select new ResponseLessonAssignmentFileDTO
+                                                                                                                                                       {
+                                                                                                                                                           id = laf.Id,
+                                                                                                                                                           files = assignmentFilesPreviewModel
+                                                                                                                                                       }).ToList()
+                                                                                                                           select new ResponseLessionAssignmentDTO
+                                                                                                                           {
+                                                                                                                               id = Convert.ToInt32(la.Id),
+                                                                                                                               name = la.Name,
+                                                                                                                               code = la.Code,
+                                                                                                                               description = la.Description,
+                                                                                                                               assignmentfiles = lessonAssigmentFiles
+                                                                                                                           }).FirstOrDefault()
+
+                                                                                       select new LessonPrivewModel
+                                                                                       {
+                                                                                           id = x.Id,
+                                                                                           name = x.Name,
+                                                                                           code = x.Code,
+                                                                                           description = x.Description,
+                                                                                           itemorder = x.ItemOrder,
+                                                                                           lessonfiles = lessonFilesPreviewModel,
+                                                                                           assignment = responseLessionAssignmentDTO
+                                                                                       }).ToList()
+                                                             select new ChapterPreviewModel()
+                                                             {
+                                                                 Id = cpt.Id,
+                                                                 Code = cpt.Code,
+                                                                 Name = cpt.Name,
+                                                                 itemorder = cpt.ItemOrder,
+                                                                 quizs = chapterQuizPrivewModels,
+                                                                 assignments = assignmentsPrivewModels,
+                                                                 lessons = lessonPrivewModels.Cast<object>().ToList(),
+                                                             }
+                                                 ).ToList()
+                                 select new CoursePreviewModel
+                                 {
+                                     Id = c.Id,
+                                     Code = c.Code,
+                                     Description = c.Description,
+                                     Name = c.Name,
+                                     Image = !string.IsNullOrEmpty(c.Image) ? c.Image.Contains("t24-primary-image-storage") ? c.Image : LessonBusiness.geturl(c.Image, Certificate) : "",
+                                     chapters = chapterPreviewModels.OrderBy(b => b.itemorder).ToList()
+                                 }).FirstOrDefault();
+            return coursePreView;
         }
 
         public List<ResponseGradeModel> GetGradeByCourseId(long id)

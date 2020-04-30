@@ -899,6 +899,58 @@ namespace Training24Admin.Controllers
             }
         }
 
+        [HttpGet("CoursePriviewTest/{id}/{studentid?}")]
+        public IActionResult CoursePriviewTest(long id, long studentid)
+        {
+            SuccessResponse successResponse = new SuccessResponse();
+            UnsuccessResponse unsuccessResponse = new UnsuccessResponse();
+            try
+            {
+                string Certificate = Path.GetFileName(hostingEnvironment.WebRootPath + "/training24-28e994f9833c.json"); //xxx
+                //string Authorization = Request.Headers["Authorization"];
+                string Authorization = Request.Headers["id_token"];
+                //get claims after decoding id_token 
+                TokenClaims tc = General.GetClaims(Authorization);
+                tc.Id = LessonBusiness.getUserId(tc.sub);
+                if (tc.RoleName.Contains(General.getRoleType("1")) ||
+                    tc.RoleName.Contains(General.getRoleType("3")) ||
+                    tc.RoleName.Contains(General.getRoleType("4")))
+                {
+                    CoursePreviewModel coursePreview = new CoursePreviewModel();
+                    if (studentid == 0)
+                        coursePreview = CourseBusiness.getCoursePreviewByIdTest(id, Certificate);
+                    else
+                        coursePreview = CourseBusiness.getCoursePreviewByIdTest(id, studentid, Certificate);
+                    if (coursePreview == null)
+                    {
+                        unsuccessResponse.response_code = 1;
+                        unsuccessResponse.message = "Course not found";
+                        unsuccessResponse.status = "Success";
+                        return StatusCode(404, unsuccessResponse);
+                    }
+                    successResponse.data = coursePreview;
+                    successResponse.response_code = 0;
+                    successResponse.message = "Course detail";
+                    successResponse.status = "Success";
+                    return StatusCode(200, successResponse);
+                }
+                else
+                {
+                    unsuccessResponse.response_code = 1;
+                    unsuccessResponse.message = "You are not authorized.";
+                    unsuccessResponse.status = "Unsuccess";
+                    return StatusCode(401, unsuccessResponse);
+                }
+            }
+            catch (Exception ex)
+            {
+                unsuccessResponse.response_code = 2;
+                unsuccessResponse.message = ex.Message;
+                unsuccessResponse.status = "Failure";
+                return StatusCode(500, unsuccessResponse);
+            }
+        }
+
         [HttpGet("CoursePriviewGradeWise")]
         public IActionResult CoursePriviewGradeWise(int pagenumber, int perpagerecord, string search, int gradeid)
         {
