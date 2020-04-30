@@ -634,46 +634,11 @@ namespace Training24Admin.Controllers
             try
             {
                 Files newFiles = FilesBusiness.getFilesById(fileid);
-                string bucketName = "";
-                switch (newFiles.FileTypeId)
-                {
-                    case 1:
-                        bucketName = "t24-primary-pdf-storage";
-                        break;
-                    case 2:
-                        bucketName = "t24-primary-video-storage";
-                        break;
-                    case 3:
-                        bucketName = "t24-primary-image-storage";
-                        break;
-                    case 6:
-                        bucketName = "t24-primary-pdf-storage";
-                        break;
-                    case 7:
-                        bucketName = "t24-primary-pdf-storage";
-                        break;
-                    case 8:
-                        bucketName = "t24-primary-pdf-storage";
-                        break;
-                }
-                //TimeSpan timeSpan = TimeSpan.FromHours(24);
+                string bucketName = General.getBucketName(newFiles.FileTypeId);
+
                 TimeSpan timeSpan = TimeSpan.FromMinutes(2);
                 double exp = timeSpan.TotalMilliseconds;
                 string Certificate = Path.GetFileName(hostingEnvironment.WebRootPath + "/training24-28e994f9833c.json");
-                //X509Certificate2 certificate = new X509Certificate2(Certificate, "notasecret", X509KeyStorageFlags.Exportable);
-                //var credential = new ServiceAccountCredential(
-                //                  new ServiceAccountCredential.Initializer("paras-chodavadiya@training24-197210.iam.gserviceaccount.com")
-                //                  {
-                //                      Scopes = new[] { StorageService.Scope.DevstorageReadWrite }
-                //                  }.FromCertificate(certificate));
-                //UrlSigner urlSigner = UrlSigner.FromServiceAccountCredential(credential);
-                //string url = urlSigner.Sign(
-                //                               bucketName,
-                //                               newFiles.FileName,
-                //                               timeSpan,
-                //                               HttpMethod.Get
-                //                          );
-
 
                 UrlSigner urlSigner = UrlSigner.FromServiceAccountPath(Certificate);
                 string url = urlSigner.Sign(
@@ -683,8 +648,7 @@ namespace Training24Admin.Controllers
                                                HttpMethod.Get
                                           );
 
-                var urlDecode = HttpUtility.UrlDecode(url);
-                singnedUrlResponse.url = urlDecode;
+                singnedUrlResponse.url = url;
                 singnedUrlResponse.exp = exp;
 
                 successResponse.data = singnedUrlResponse;
@@ -956,7 +920,7 @@ namespace Training24Admin.Controllers
         }
 
         #region Genrate sign url for upload object in bucket
-        [AllowAnonymous]
+
         [HttpPost("UploadLessonVideo")]
         public async Task<IActionResult> UploadLessonVideo()
         {
@@ -1025,7 +989,6 @@ namespace Training24Admin.Controllers
             }
         }
 
-        [AllowAnonymous]
         [HttpPost("UploadLessonPdf")]
         public async Task<IActionResult> UploadLessonPdf()
         {
@@ -1095,7 +1058,6 @@ namespace Training24Admin.Controllers
             }
         }
 
-        [AllowAnonymous]
         [HttpPost("UploadLessonAssignment")]
         public async Task<IActionResult> UploadLessonAssignment()
         {
@@ -1164,7 +1126,6 @@ namespace Training24Admin.Controllers
             }
         }
 
-        [AllowAnonymous]
         [HttpPost("UploadChapterAssignment")]
         public async Task<IActionResult> UploadChapterAssignment()
         {
@@ -1233,7 +1194,6 @@ namespace Training24Admin.Controllers
             }
         }
 
-        [AllowAnonymous]
         [HttpPost("UploadQuizImage")]
         public async Task<IActionResult> UploadQuestionImage()
         {
@@ -1302,7 +1262,6 @@ namespace Training24Admin.Controllers
             }
         }
 
-        [AllowAnonymous]
         [HttpPost("UploadQuizAnswerImage")]
         public async Task<IActionResult> UploadQuestionAnswerImage()
         {
@@ -1371,7 +1330,6 @@ namespace Training24Admin.Controllers
             }
         }
 
-        [AllowAnonymous]
         [HttpPost("UploadCourseCardImage")]
         public async Task<IActionResult> UploadCourseCardImage()
         {
@@ -1440,7 +1398,6 @@ namespace Training24Admin.Controllers
             }
         }
 
-        [AllowAnonymous]
         [HttpPost("LibraryBookPdf")]
         public async Task<IActionResult> LibraryBookPdf()
         {
@@ -1509,7 +1466,6 @@ namespace Training24Admin.Controllers
             }
         }
 
-        [AllowAnonymous]
         [HttpPost("LibraryBookCardImage")]
         public async Task<IActionResult> LibraryBookCardImage()
         {
@@ -1578,7 +1534,6 @@ namespace Training24Admin.Controllers
             }
         }
 
-        [AllowAnonymous]
         [HttpPost("FeedbackAttachmentFile")]
         public async Task<IActionResult> FeedbackAttachmentFile()
         {
@@ -1647,7 +1602,6 @@ namespace Training24Admin.Controllers
             }
         }
 
-        [AllowAnonymous]
         [HttpPost("SalesDepositDocument")]
         public async Task<IActionResult> SalesDepositDocument()
         {
@@ -1716,7 +1670,6 @@ namespace Training24Admin.Controllers
             }
         }
 
-        [AllowAnonymous]
         [HttpPost("SalesPurchaseReceipt")]
         public async Task<IActionResult> SalesPurchaseReceipt()
         {
@@ -1785,7 +1738,6 @@ namespace Training24Admin.Controllers
             }
         }
 
-        [AllowAnonymous]
         [HttpPost("SalesPurchaseIndividualDetailsDocument")]
         public async Task<IActionResult> SalesPurchaseIndividualDetailsDocument()
         {
@@ -1854,7 +1806,6 @@ namespace Training24Admin.Controllers
             }
         }
 
-        [AllowAnonymous]
         [HttpPost("SalesPurchaseSchoolDetailsDocument")]
         public async Task<IActionResult> SalesPurchaseSchoolDetailsDocument()
         {
@@ -1923,6 +1874,280 @@ namespace Training24Admin.Controllers
             }
         }
 
+        [HttpPost("FileUploadImage")]
+        public async Task<IActionResult> FileUploadImage()
+        {
+            string credential = Path.GetFileName(hostingEnvironment.WebRootPath + "/training24-28e994f9833c.json");
+            SuccessResponse successResponse = new SuccessResponse();
+            UnsuccessResponse unsuccessResponse = new UnsuccessResponse();
+            string mediaLink = "";
+            try
+            {
+                var fileName = Request.Form["fileName"].ToString();
+                var ext = fileName.Substring(fileName.LastIndexOf("."));
+                var extension = ext.ToLower();
+                Guid imageGuid = Guid.NewGuid();
+                fileName = fileName.Split(".")[0] + "_" + imageGuid.ToString() + extension;
+
+                var contentType = Request.Form["contentType"].ToString();
+
+                string bucketName = General.getBucketName(Request.Form["fileTypeId"].ToString());
+
+                TimeSpan timeSpan = TimeSpan.FromHours(1);
+
+                // Create a request template that will be used to create the signed URL.
+                // Create a signed URL which allows the requester to PUT data with the text/plain content-type.
+                //var contentheaders = new Dictionary<string, IEnumerable<string>>
+                //    {
+                //        { "Content-Type", new[] { contentType } }
+                //    };
+                //UrlSigner urlSigner = UrlSigner.FromServiceAccountPath(credential);
+                //string url = await urlSigner.SignAsync(bucketName, fileName, timeSpan, HttpMethod.Put, null);
+
+                UrlSigner.RequestTemplate requestTemplate = UrlSigner.RequestTemplate
+                        .FromBucket(bucketName)
+                        .WithObjectName(fileName)
+                        .WithHttpMethod(HttpMethod.Put)
+                        .WithContentHeaders(new Dictionary<string, IEnumerable<string>>
+                        {
+                                { "Content-Type", new[] { contentType } }
+                        });
+                // Create options specifying for how long the signer URL will be valid.
+                UrlSigner.Options options = UrlSigner.Options.FromDuration(TimeSpan.FromHours(1));
+                // Create a signed URL which allows the requester to PUT data with the text/plain content-type.
+                UrlSigner urlSigner = UrlSigner.FromServiceAccountPath(credential);
+                string url = await urlSigner.SignAsync(requestTemplate, options);
+
+                var urlDecode = HttpUtility.UrlDecode(url);
+
+                var signedurl = new
+                {
+                    signedurl = urlDecode,
+                    filename = fileName
+                };
+
+                successResponse.data = signedurl;
+                successResponse.response_code = 0;
+                successResponse.message = "Url Created";
+                successResponse.status = "Success";
+                return StatusCode(200, successResponse);
+            }
+            catch (Exception ex)
+            {
+
+                unsuccessResponse.response_code = 2;
+                unsuccessResponse.message = ex.Message;
+                unsuccessResponse.status = mediaLink;
+                return StatusCode(500, unsuccessResponse);
+            }
+        }
+
+        [HttpPost("FileUploadPdf")]
+        public async Task<IActionResult> FileUploadPdf()
+        {
+            string credential = Path.GetFileName(hostingEnvironment.WebRootPath + "/training24-28e994f9833c.json");
+            SuccessResponse successResponse = new SuccessResponse();
+            UnsuccessResponse unsuccessResponse = new UnsuccessResponse();
+            string mediaLink = "";
+            try
+            {
+                var fileName = Request.Form["fileName"].ToString();
+                var ext = fileName.Substring(fileName.LastIndexOf("."));
+                var extension = ext.ToLower();
+                Guid imageGuid = Guid.NewGuid();
+                fileName = fileName.Split(".")[0] + "_" + imageGuid.ToString() + extension;
+
+                var contentType = Request.Form["contentType"].ToString();
+
+                string bucketName = General.getBucketName(Request.Form["fileTypeId"].ToString());
+
+                TimeSpan timeSpan = TimeSpan.FromHours(1);
+
+                // Create a request template that will be used to create the signed URL.
+                // Create a signed URL which allows the requester to PUT data with the text/plain content-type.
+                //var contentheaders = new Dictionary<string, IEnumerable<string>>
+                //    {
+                //        { "Content-Type", new[] { contentType } }
+                //    };
+                //UrlSigner urlSigner = UrlSigner.FromServiceAccountPath(credential);
+                //string url = await urlSigner.SignAsync(bucketName, fileName, timeSpan, HttpMethod.Put, null);
+
+                UrlSigner.RequestTemplate requestTemplate = UrlSigner.RequestTemplate
+                        .FromBucket(bucketName)
+                        .WithObjectName(fileName)
+                        .WithHttpMethod(HttpMethod.Put)
+                        .WithContentHeaders(new Dictionary<string, IEnumerable<string>>
+                        {
+                                { "Content-Type", new[] { contentType } }
+                        });
+                // Create options specifying for how long the signer URL will be valid.
+                UrlSigner.Options options = UrlSigner.Options.FromDuration(TimeSpan.FromHours(1));
+                // Create a signed URL which allows the requester to PUT data with the text/plain content-type.
+                UrlSigner urlSigner = UrlSigner.FromServiceAccountPath(credential);
+                string url = await urlSigner.SignAsync(requestTemplate, options);
+
+                var urlDecode = HttpUtility.UrlDecode(url);
+
+                var signedurl = new
+                {
+                    signedurl = urlDecode,
+                    filename = fileName
+                };
+
+                successResponse.data = signedurl;
+                successResponse.response_code = 0;
+                successResponse.message = "Url Created";
+                successResponse.status = "Success";
+                return StatusCode(200, successResponse);
+            }
+            catch (Exception ex)
+            {
+
+                unsuccessResponse.response_code = 2;
+                unsuccessResponse.message = ex.Message;
+                unsuccessResponse.status = mediaLink;
+                return StatusCode(500, unsuccessResponse);
+            }
+        }
+
+        [HttpPost("FileUploadVideo")]
+        public async Task<IActionResult> FileUploadVideo()
+        {
+            string credential = Path.GetFileName(hostingEnvironment.WebRootPath + "/training24-28e994f9833c.json");
+            SuccessResponse successResponse = new SuccessResponse();
+            UnsuccessResponse unsuccessResponse = new UnsuccessResponse();
+            string mediaLink = "";
+            try
+            {
+                var fileName = Request.Form["fileName"].ToString();
+                var ext = fileName.Substring(fileName.LastIndexOf("."));
+                var extension = ext.ToLower();
+                Guid imageGuid = Guid.NewGuid();
+                fileName = fileName.Split(".")[0] + "_" + imageGuid.ToString() + extension;
+
+                var contentType = Request.Form["contentType"].ToString();
+
+                string bucketName = General.getBucketName(Request.Form["fileTypeId"].ToString());
+
+                TimeSpan timeSpan = TimeSpan.FromHours(1);
+
+                // Create a request template that will be used to create the signed URL.
+                // Create a signed URL which allows the requester to PUT data with the text/plain content-type.
+                //var contentheaders = new Dictionary<string, IEnumerable<string>>
+                //    {
+                //        { "Content-Type", new[] { contentType } }
+                //    };
+                //UrlSigner urlSigner = UrlSigner.FromServiceAccountPath(credential);
+                //string url = await urlSigner.SignAsync(bucketName, fileName, timeSpan, HttpMethod.Put, null);
+
+                UrlSigner.RequestTemplate requestTemplate = UrlSigner.RequestTemplate
+                        .FromBucket(bucketName)
+                        .WithObjectName(fileName)
+                        .WithHttpMethod(HttpMethod.Put)
+                        .WithContentHeaders(new Dictionary<string, IEnumerable<string>>
+                        {
+                                { "Content-Type", new[] { contentType } }
+                        });
+                // Create options specifying for how long the signer URL will be valid.
+                UrlSigner.Options options = UrlSigner.Options.FromDuration(TimeSpan.FromHours(1));
+                // Create a signed URL which allows the requester to PUT data with the text/plain content-type.
+                UrlSigner urlSigner = UrlSigner.FromServiceAccountPath(credential);
+                string url = await urlSigner.SignAsync(requestTemplate, options);
+
+                var urlDecode = HttpUtility.UrlDecode(url);
+
+                var signedurl = new
+                {
+                    signedurl = urlDecode,
+                    filename = fileName
+                };
+
+                successResponse.data = signedurl;
+                successResponse.response_code = 0;
+                successResponse.message = "Url Created";
+                successResponse.status = "Success";
+                return StatusCode(200, successResponse);
+            }
+            catch (Exception ex)
+            {
+
+                unsuccessResponse.response_code = 2;
+                unsuccessResponse.message = ex.Message;
+                unsuccessResponse.status = mediaLink;
+                return StatusCode(500, unsuccessResponse);
+            }
+        }
+
+        #endregion
+
+        #region Save file metadata in database
+        [HttpPost("SaveFileMetaData")]
+        public IActionResult SaveFileMetaData()
+        {
+            SuccessResponse successResponse = new SuccessResponse();
+            UnsuccessResponse unsuccessResponse = new UnsuccessResponse();
+            string mediaLink = "";
+            try
+            {
+                //string Authorization = Request.Headers["Authorization"];
+                string Authorization = Request.Headers["id_token"];
+
+                TokenClaims tc = General.GetClaims(Authorization);
+                tc.Id = LessonBusiness.getUserId(tc.sub);
+                if (ModelState.IsValid)
+                {
+                    AddFilesModel FilesModel = new AddFilesModel();
+
+                    if (!string.IsNullOrEmpty(Request.Form["description"].ToString()))
+                        FilesModel.Description = Request.Form["description"];
+
+                    FilesModel.Url = mediaLink;
+                    FilesModel.Name = Request.Form["filename"].ToString();
+                    FilesModel.FileName = Request.Form["filename"].ToString();
+                    FilesModel.FileTypeId = long.Parse(Request.Form["fileTypeId"]);
+
+                    if (!string.IsNullOrEmpty(Request.Form["duration"].ToString()))
+                        FilesModel.Duration = Request.Form["duration"].ToString();
+
+                    if (!string.IsNullOrEmpty(Request.Form["totalpages"]))
+                        FilesModel.TotalPages = int.Parse(Request.Form["totalpages"]);
+
+                    Files newFiles = FilesBusiness.Create(FilesModel, int.Parse(tc.Id));
+
+                    var filetype = FilesBusiness.FileType(newFiles);
+
+                    ResponseFilesModel responseFilesModel = new ResponseFilesModel();
+                    responseFilesModel.Id = newFiles.Id;
+                    responseFilesModel.name = newFiles.Name;
+                    responseFilesModel.url = newFiles.Url;
+                    responseFilesModel.filename = newFiles.FileName;
+                    responseFilesModel.description = newFiles.Description;
+                    responseFilesModel.filetypeid = newFiles.FileTypeId;
+                    responseFilesModel.filesize = newFiles.FileSize;
+                    responseFilesModel.filetypename = filetype.Filetype;
+                    responseFilesModel.duration = newFiles.Duration;
+                    responseFilesModel.totalpages = newFiles.TotalPages;
+
+                    successResponse.data = responseFilesModel;
+                    successResponse.response_code = 0;
+                    successResponse.message = "Files Created";
+                    successResponse.status = "Success";
+                    return StatusCode(200, successResponse);
+                }
+                else
+                {
+                    return StatusCode(406, ModelState);
+                }
+            }
+            catch (Exception ex)
+            {
+
+                unsuccessResponse.response_code = 2;
+                unsuccessResponse.message = ex.Message;
+                unsuccessResponse.status = mediaLink;
+                return StatusCode(500, unsuccessResponse);
+            }
+        }
         #endregion
     }
 }
