@@ -2005,7 +2005,7 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
             //Log.e(Const.LOG_NOON_TAG, "====downloadFilePath===" + downloadFilePath);
 
             try {
-                String str = lessonsModel.getId() + "_" + lessonsModel.getFiles().getId() + "_" + EncryptFileName.replaceFirst(".*-(\\w+).*", "$1") + "_" + filetype + Const.extension;
+                String str = lessonsModel.getId() + "_" + lessonsModel.getFiles().getId() + "_" + EncryptFileName.replace("/","_")  + "_" + filetype + Const.extension;
                 PRDownloader.cleanUp(1);
 
                 //Log.e("COUNTER", "======downloadCount===IF===" + downloadCount);
