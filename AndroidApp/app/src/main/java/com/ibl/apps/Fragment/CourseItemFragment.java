@@ -164,7 +164,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
     Boolean isNotification = false;
     String AddtionalLibrary, AddtionalDiscussions, AddtionalAssignment = "";
     public static ArrayList<DownloadQueueObject> queueArray = new ArrayList<DownloadQueueObject>();
-    public static boolean isdownload = false;
+    public static boolean isdownload = true;
     public static HashMap<String, ArrayList<DownloadQueueObject>> hashMap = new HashMap<>();
     public static ArrayList<String> fileidarray = new ArrayList<>();
     //public static ArrayList<String> fileidarray = new ArrayList<>();
@@ -234,7 +234,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
         queueArray.clear();
         hashMap.clear();
         fileidarray.clear();
-        isdownload = false;
+        isdownload = true;
         coursePriviewArrayList.clear();
         iv = new byte[Const.IV_LENGTH];
         paramSpec = new IvParameterSpec(iv);
