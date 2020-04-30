@@ -54,11 +54,14 @@ export class CommonAPIService {
             );
     }
     
-    putWithFormDataUrl(url, formData) {
-        let userHeaders = _.clone(this._adminHeaders);
-        userHeaders.delete("Content-Type");
+    putWithFormDataUrl(url, file) {
+        let tempHeaders = new HttpHeaders({
+            "Content-Type": file.type
+        });
         return this.http
-            .put<any>(url, formData)
+            .put<any>(url, file, {
+                headers: tempHeaders
+            })
             .pipe(
                 map(response => response),
                 catchError(error => {

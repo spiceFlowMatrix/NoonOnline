@@ -69,7 +69,7 @@ export class LessonService {
             if (['id'].indexOf(key) < 0)
                 formData.append(key, data[key]);
         });
-       return this.commonApiService.postWithFormData('v1/Files/UploadLessonPdf', formData);
+        return this.commonApiService.postWithFormData('v1/Files/UploadLessonPdf', formData);
     }
 
     getLessonAssignmentFileSigned(data) {
@@ -78,7 +78,7 @@ export class LessonService {
             if (['id'].indexOf(key) < 0)
                 formData.append(key, data[key]);
         });
-       return this.commonApiService.postWithFormData('v1/Files/UploadLessonAssignment', formData);
+        return this.commonApiService.postWithFormData('v1/Files/UploadLessonAssignment', formData);
     }
 
     getLesssonVideoSigned(data) {
@@ -87,6 +87,6 @@ export class LessonService {
             if (['id'].indexOf(key) < 0)
                 formData.append(key, data[key]);
         });
-       return this.commonApiService.postWithFormData('v1/Files/UploadLessonVideo', formData);
+        return this.commonApiService.postWithFormData('v1/Files/UploadLessonVideo', formData);
     }
 }
