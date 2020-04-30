@@ -29,4 +29,20 @@ export class LibraryService {
     publishBook(id) {
         return this.commonApiService.put('v1/Library/PublishBook/' + id);
     }
+    getLibraryPdfSigned(data) {
+        let formData = new FormData();
+        Object.keys(data).forEach(key => {
+            if (['id'].indexOf(key) < 0)
+                formData.append(key, data[key]);
+        });
+       return this.commonApiService.postWithFormData('v1/Files/LibraryBookPdf', formData);
+    }
+    getLibraryCardSigned(data) {
+        let formData = new FormData();
+        Object.keys(data).forEach(key => {
+            if (['id'].indexOf(key) < 0)
+                formData.append(key, data[key]);
+        });
+       return this.commonApiService.postWithFormData('v1/Files/LibraryBookCardImage', formData);
+    }
 }

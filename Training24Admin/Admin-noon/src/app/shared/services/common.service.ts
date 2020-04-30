@@ -53,6 +53,23 @@ export class CommonAPIService {
                 })
             );
     }
+    
+    putWithFormDataUrl(url, file) {
+        let tempHeaders = new HttpHeaders({
+            "Content-Type": file.type
+        });
+        return this.http
+            .put<any>(url, file, {
+                headers: tempHeaders
+            })
+            .pipe(
+                map(response => response),
+                catchError(error => {
+                    return throwError(error);
+                })
+            );
+    }
+
     public getAdminHeaders(): HttpHeaders {
         this._adminHeaders = new HttpHeaders({
             Authorization: "Bearer " + localStorage.getItem("access_token"),

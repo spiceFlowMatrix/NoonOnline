@@ -160,4 +160,28 @@ export class PurchasesService {
     removeParent(studentId, parentId) {
         return this.commonApiService.delete('v1/PurchaseDetails/RemoveParentUser?studentid=' + studentId + '&parentid=' + parentId);
     }
+    getReceiptFileSigned(data) {
+        let formData = new FormData();
+        Object.keys(data).forEach(key => {
+            if (['id'].indexOf(key) < 0)
+                formData.append(key, data[key]);
+        });
+       return this.commonApiService.postWithFormData('v1/Files/SalesPurchaseReceipt', formData);
+    }
+    getIndividualDocumentFileSigned(data) {
+        let formData = new FormData();
+        Object.keys(data).forEach(key => {
+            if (['id'].indexOf(key) < 0)
+                formData.append(key, data[key]);
+        });
+       return this.commonApiService.postWithFormData('v1/Files/SalesPurchaseIndividualDetailsDocument', formData);
+    }
+    getSchoolDocumentFileSigned(data) {
+        let formData = new FormData();
+        Object.keys(data).forEach(key => {
+            if (['id'].indexOf(key) < 0)
+                formData.append(key, data[key]);
+        });
+       return this.commonApiService.postWithFormData('v1/Files/SalesPurchaseSchoolDetailsDocument', formData);
+    }
 }
