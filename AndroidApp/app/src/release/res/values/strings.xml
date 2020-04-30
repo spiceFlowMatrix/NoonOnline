@@ -6,7 +6,7 @@
     <string name="com_auth0_database_connection" translatable="false">Username-Password-Authentication</string>
     <string name="com_auth0_scope" translatable="false">openid offline_access</string>
     <string name="BASE_URL" translatable="false">https://coreapidari.noon-online.com/api/v1/</string>
-    <!--Encrypt Decrypt API KEY for 30 days trial  [Valid until: April 30, 2020]-->
+    <!--Encrypt Decrypt API KEY for 30 days trial  [Valid until: May 30, 2020]-->
     <!-- Refere Link http://libeasy.alwaysdata.net/libmedia/license/ -->
-    <string name="YOUR_API_KEY" translatable="false">lXW9sFHf9d8YDIq/56MsL6dl7gTgR9Gwoj7Z0LV2Po2O1yCAClWNnhOe5OJzh8LGR9rLfX1TXeQ8xoxfAQw/916DMzZeqsA2VTHuHVcu8x1CLOJaWDftVARqrV1ZMe0=</string>
+    <string name="YOUR_API_KEY" translatable="false">dNHUsNOrmFnMvXqtvu/7z1t5PvQJ+ZJBcc82PbQ5WpzOkxpAyY1czPJ26wOuQjj/QtC+jEhHtz76SQ5prRc43F6q7Jxe0nmc/zHHwv0u2sLoLMuF8jfEi65qhILzMcQ=</string>
 </resources>

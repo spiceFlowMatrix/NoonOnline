@@ -2568,7 +2568,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                                                                 if (lessonsArrayList.get(finalJ).getLessonfiles().length != 0) {
                                                                     newfileid = lessonsArrayList.get(finalJ).getLessonfiles()[0].getFiles().getId();
                                                                 } else {
-                                                                    newfileid = lessonsArrayList.get(finalJ).getLessonfiles()[lessonsArrayList.get(finalJ).getLessonfiles().length - 1].getFiles().getId();
+//                                                                     newfileid = lessonsArrayList.get(finalJ).getLessonfiles()[lessonsArrayList.get(finalJ).getLessonfiles().length - 1].getFiles().getId();
                                                                 }
 
                                                                 if (getlessionID.equals(lessonID)) {
