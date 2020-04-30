@@ -251,15 +251,14 @@ namespace Trainning24.BL.Business
             return EFCourseRepository.GetById(id);
         }
 
-        public Course Delete(int Id, int DeleterId)
+        public int Delete(int Id, int DeleterId)
         {
             Course Course = new Course();
             Course.Id = Id;
             Course.DeleterUserId = DeleterId;
             int i = EFCourseRepository.Delete(Course);
-            Course deletedCourse = EFCourseRepository.GetById(Id);
-            _logObjectBusiness.AddLogsObject(3, deletedCourse.Id, DeleterId);
-            return deletedCourse;
+            _logObjectBusiness.AddLogsObject(3, Id, DeleterId);
+            return i;
         }
 
         public CoursePreviewModel getCoursePreviewById(long id, string Certificate)

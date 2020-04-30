@@ -439,14 +439,14 @@ public class ProgressReportFragment extends BaseFragment implements View.OnClick
             fragmentProgressReportBinding.tvLastonline.setText("--");
         }
 
-        if (userDetails != null) {
+        /*if (userDetails != null) {
             if (userDetails.isIsallowmap()) {
                 fragmentProgressReportBinding.mapLay.setVisibility(View.VISIBLE);
                 callApiLocationData(userArray);
             } else {
                 fragmentProgressReportBinding.mapLay.setVisibility(View.GONE);
             }
-        }
+        }*/
 
         List<String> monthscategories = new ArrayList<>();
         monthscategories.add(0, Objects.requireNonNull(getActivity()).getResources().getString(R.string.last_one_month));

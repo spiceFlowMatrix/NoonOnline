@@ -48,7 +48,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ApiClient {
     private static Retrofit retrofit = null;
-    private static int REQUEST_TIMEOUT = 60;
+    private static int REQUEST_TIMEOUT = 120;
     private static OkHttpClient okHttpClient;
 
     public static Retrofit getClient(Context context) {
