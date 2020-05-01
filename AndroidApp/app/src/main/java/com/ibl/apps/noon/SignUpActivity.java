@@ -2,6 +2,7 @@ package com.ibl.apps.noon;
 
 import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
@@ -710,17 +711,13 @@ public class SignUpActivity extends BaseActivity implements View.OnClickListener
 
                         Log.e("LOGIN", "---Auth0 onFailure---" + error);
                         //Log.e(Const.LOG_NOON_TAG, "====2===" + error);
-
-
                         //Log.e(Const.LOG_NOON_TAG, "---onFailure--------" + error.getMessage());
                         hideDialog();
 
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-
                                 LocalLogin(email, password, error);
-
                                 //Log.e(Const.LOG_NOON_TAG, error.getMessage());
                                 //Toast.makeText(getApplicationContext(), R.string.validation_email_password_incorrect, Toast.LENGTH_LONG).show();
                             }
@@ -809,7 +806,12 @@ public class SignUpActivity extends BaseActivity implements View.OnClickListener
                     .subscribeWith(new DisposableSingleObserver<UserObject>() {
                         @Override
                         public void onSuccess(UserObject userObject) {
-
+                            SharedPreferences preferences = getSharedPreferences("rolename", MODE_PRIVATE);
+                            SharedPreferences.Editor editor = preferences.edit();
+                            if (editor != null) {
+                                editor.putString("userrolename", userObject.getData().getRoleName().get(0));
+                                editor.apply();
+                            }
                             // Log.e(Const.LOG_NOON_TAG, "====5===" + userObject);
                             new AsyncTask<Void, Void, String>() {
                                 @Override
