@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 
 import { AddCoursesRoutingModule } from './add-courses-routing.module';
 import { AddCoursesComponent } from './add-courses.component';
-import { PageHeaderModule, SharedModule, CommonDialogModule, CourseService, UsersService, GradeService } from '../../../shared';
+import { PageHeaderModule, SharedModule, CommonDialogModule, CourseService, UsersService, GradeService, FileService } from '../../../shared';
 import { NgbModalModule, NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
@@ -17,6 +17,6 @@ import { NgbModalModule, NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap'
         AddCoursesRoutingModule,
     ],
     declarations: [AddCoursesComponent],
-    providers: [CourseService, UsersService, GradeService]
+    providers: [CourseService, UsersService, GradeService,FileService]
 })
 export class AddCoursesModule { }

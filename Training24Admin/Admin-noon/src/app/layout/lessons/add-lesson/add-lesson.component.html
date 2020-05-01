@@ -137,7 +137,7 @@
                             <textarea matInput id="assigndescription" placeholder="Enter description"
                                 [(ngModel)]="assignmentDesc" #assigndescription="ngModel" name="description"></textarea>
                         </mat-form-field>
-                        <div class="col-12 rmpm dropzone" appDrag (files)="assignmentFilesDropped($event)">
+                        <div class="col-12 rmpm dropzone" appDrag (files)="assignmentFileDrop($event)">
                             <div class="text-wrapper">
                                 <div class="centered">Drop your file here</div>
                                 <div class="centered">Or</div>

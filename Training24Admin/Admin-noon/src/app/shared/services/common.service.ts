@@ -58,16 +58,17 @@ export class CommonAPIService {
         let tempHeaders = new HttpHeaders({
             "Content-Type": file.type
         });
-        return this.http
-            .put<any>(url, file, {
-                headers: tempHeaders
+        return this.http.put(url, file, {
+                headers: tempHeaders,
+                observe: "events",
+                reportProgress: true
             })
-            .pipe(
-                map(response => response),
-                catchError(error => {
-                    return throwError(error);
-                })
-            );
+            // .pipe(
+            //     map(response => response),
+            //     catchError(error => {
+            //         return throwError(error);
+            //     })
+            // );
     }
 
     public getAdminHeaders(): HttpHeaders {

@@ -27,13 +27,4 @@ export class ChapterService {
     deleteChapter(id) {
         return this.commonApiService.delete('v1/Chapter/' + id);
     }
-
-    getChapterAssignmentFileSigned(data) {
-        let formData = new FormData();
-        Object.keys(data).forEach(key => {
-            if (['id'].indexOf(key) < 0)
-                formData.append(key, data[key]);
-        });
-       return this.commonApiService.postWithFormData('v1/Files/UploadChapterAssignment', formData);
-    }
 }
