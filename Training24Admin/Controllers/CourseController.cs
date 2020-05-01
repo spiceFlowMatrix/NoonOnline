@@ -126,27 +126,33 @@ namespace Training24Admin.Controllers
 
                         string mediaLink = "";
 
-                        if (file != null)
-                        {
-                            fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
-                            IList<string> AllowedFileExtensions = new List<string> { ".jpg", ".gif", ".png" };
-                            var ext = fileName.Substring(fileName.LastIndexOf("."));
-                            var extension = ext.ToLower();
-                            if (AllowedFileExtensions.Contains(extension))
-                            {
-                                Guid imageGuid = Guid.NewGuid();
-                                fileName = fileName.Split(".")[0] + "_" + imageGuid.ToString() + extension;
+                        //if (file != null)
+                        //{
+                        //    fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
+                        //    IList<string> AllowedFileExtensions = new List<string> { ".jpg", ".gif", ".png" };
+                        //    var ext = fileName.Substring(fileName.LastIndexOf("."));
+                        //    var extension = ext.ToLower();
+                        //    if (AllowedFileExtensions.Contains(extension))
+                        //    {
+                        //        Guid imageGuid = Guid.NewGuid();
+                        //        fileName = fileName.Split(".")[0] + "_" + imageGuid.ToString() + extension;
 
-                                var imageAcl = PredefinedObjectAcl.PublicRead;
-                                var imageObject = await _storageClient.UploadObjectAsync(
-                                    bucket: "edg-primary-course-image-storage",
-                                    objectName: fileName,
-                                    contentType: file.ContentType,
-                                    source: file.OpenReadStream(),
-                                    options: new UploadObjectOptions { PredefinedAcl = imageAcl }
-                                );
-                                mediaLink = imageObject.MediaLink;
-                            }
+                        //        var imageAcl = PredefinedObjectAcl.PublicRead;
+                        //        var imageObject = await _storageClient.UploadObjectAsync(
+                        //            bucket: "edg-primary-course-image-storage",
+                        //            objectName: fileName,
+                        //            contentType: file.ContentType,
+                        //            source: file.OpenReadStream(),
+                        //            options: new UploadObjectOptions { PredefinedAcl = imageAcl }
+                        //        );
+                        //        mediaLink = imageObject.MediaLink;
+                        //    }
+                        //}
+
+                        if (!string.IsNullOrEmpty(Request.Form["filename"].ToString()))
+                        {
+                            var storageObject = _storageClient.GetObject("edg-primary-course-image-storage", Request.Form["filename"].ToString());
+                            mediaLink = storageObject.MediaLink;
                         }
 
                         AddCourseModel CourseModel = new AddCourseModel
@@ -223,38 +229,47 @@ namespace Training24Admin.Controllers
                 {
                     if (tc.RoleName.Contains(General.getRoleType("1")))
                     {
-                        string fileName = "";
-                        IFormFile file = null;
+                        //string fileName = "";
+                        //IFormFile file = null;
 
-                        if (Request.Form.Files.Count != 0)
-                            file = Request.Form.Files[0];
-                        string mediaLink = "";
+                        //if (Request.Form.Files.Count != 0)
+                        //    file = Request.Form.Files[0];
+                        //string mediaLink = "";
                         UpdateCourseModel updateCourseModel = new UpdateCourseModel();
-                        if (file != null)
+                        //if (file != null)
+                        //{
+                        //    fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
+                        //    IList<string> AllowedFileExtensions = new List<string> { ".jpg", ".gif", ".png" };
+                        //    var ext = fileName.Substring(fileName.LastIndexOf("."));
+                        //    var extension = ext.ToLower();
+
+                        //    if (AllowedFileExtensions.Contains(extension))
+                        //    {
+                        //        Guid imageGuid = Guid.NewGuid();
+                        //        fileName = fileName.Split(".")[0] + "_" + imageGuid.ToString() + extension;
+
+                        //        var imageAcl = PredefinedObjectAcl.PublicRead;
+                        //        var imageObject = await _storageClient.UploadObjectAsync(
+                        //            bucket: "edg-primary-course-image-storage",
+                        //            objectName: fileName,
+                        //            contentType: file.ContentType,
+                        //            source: file.OpenReadStream(),
+                        //            options: new UploadObjectOptions { PredefinedAcl = imageAcl }
+                        //        );
+                        //        mediaLink = imageObject.MediaLink;
+                        //        updateCourseModel.image = mediaLink;
+                        //    }
+                        //}
+
+                        //Get Media link for course cover image
+                        string mediaLink = "";
+                        if(!string.IsNullOrEmpty(Request.Form["filename"].ToString()))
                         {
-                            fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
-                            IList<string> AllowedFileExtensions = new List<string> { ".jpg", ".gif", ".png" };
-                            var ext = fileName.Substring(fileName.LastIndexOf("."));
-                            var extension = ext.ToLower();
-
-                            if (AllowedFileExtensions.Contains(extension))
-                            {
-                                Guid imageGuid = Guid.NewGuid();
-                                fileName = fileName.Split(".")[0] + "_" + imageGuid.ToString() + extension;
-
-                                var imageAcl = PredefinedObjectAcl.PublicRead;
-                                var imageObject = await _storageClient.UploadObjectAsync(
-                                    bucket: "edg-primary-course-image-storage",
-                                    objectName: fileName,
-                                    contentType: file.ContentType,
-                                    source: file.OpenReadStream(),
-                                    options: new UploadObjectOptions { PredefinedAcl = imageAcl }
-                                );
-                                mediaLink = imageObject.MediaLink;
-                                updateCourseModel.image = mediaLink;
-                            }
+                            var storageObject = _storageClient.GetObject("edg-primary-course-image-storage", Request.Form["filename"].ToString());
+                            mediaLink = storageObject.MediaLink;
                         }
 
+                        updateCourseModel.image = mediaLink;
                         updateCourseModel.name = Request.Form["name"];
                         updateCourseModel.code = Request.Form["code"];
                         updateCourseModel.description = Request.Form["description"];

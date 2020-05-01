@@ -1347,7 +1347,7 @@ namespace Training24Admin.Controllers
 
                 var contentType = Request.Form["contentType"].ToString();
 
-                string bucketName = General.getBucketName(Request.Form["fileTypeId"].ToString());
+                string bucketName = "edg-primary-course-image-storage";
 
                 TimeSpan timeSpan = TimeSpan.FromHours(1);
 
@@ -1361,13 +1361,13 @@ namespace Training24Admin.Controllers
                 //string url = await urlSigner.SignAsync(bucketName, fileName, timeSpan, HttpMethod.Put, null);
 
                 UrlSigner.RequestTemplate requestTemplate = UrlSigner.RequestTemplate
-            .FromBucket(bucketName)
-            .WithObjectName(fileName)
-            .WithHttpMethod(HttpMethod.Put)
-            .WithContentHeaders(new Dictionary<string, IEnumerable<string>>
-            {
-                                      { "Content-Type", new[] { contentType } }
-            });
+                        .FromBucket(bucketName)
+                        .WithObjectName(fileName)
+                        .WithHttpMethod(HttpMethod.Put)
+                        .WithContentHeaders(new Dictionary<string, IEnumerable<string>>
+                        {
+                              { "Content-Type", new[] { contentType } }
+                        });
                 // Create options specifying for how long the signer URL will be valid.
                 UrlSigner.Options options = UrlSigner.Options.FromDuration(TimeSpan.FromHours(1));
                 // Create a signed URL which allows the requester to PUT data with the text/plain content-type.
@@ -2086,18 +2086,27 @@ namespace Training24Admin.Controllers
         {
             SuccessResponse successResponse = new SuccessResponse();
             UnsuccessResponse unsuccessResponse = new UnsuccessResponse();
+
+            string jsonPath = Path.GetFileName(hostingEnvironment.WebRootPath + "/training24-28e994f9833c.json");
+            var credential = GoogleCredential.FromFile(jsonPath);
+            var storage = StorageClient.Create(credential);
             string mediaLink = "";
             try
             {
                 //string Authorization = Request.Headers["Authorization"];
                 string Authorization = Request.Headers["id_token"];
+                //Get Bucket name from file type id
+                string BucketName = General.getBucketName(Request.Form["fileTypeId"].ToString());
 
                 TokenClaims tc = General.GetClaims(Authorization);
                 tc.Id = LessonBusiness.getUserId(tc.sub);
                 if (ModelState.IsValid)
                 {
-                    AddFilesModel FilesModel = new AddFilesModel();
+                    //Get object from google bucket to get media link
+                    var storageObject = storage.GetObject(BucketName, Request.Form["filename"].ToString());
+                    mediaLink = storageObject.MediaLink;
 
+                    AddFilesModel FilesModel = new AddFilesModel();
                     if (!string.IsNullOrEmpty(Request.Form["description"].ToString()))
                         FilesModel.Description = Request.Form["description"];
 
