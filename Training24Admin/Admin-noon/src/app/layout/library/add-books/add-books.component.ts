@@ -251,11 +251,11 @@ export class AddBooksComponent implements OnInit {
         this.isCallingApi = true;
         let modal = {
             fileTypeId: 1,
-            contentType: event.target.files[0].type,
-            fileName: event.target.files[0].name
+            contentType: event.file.type,
+            fileName: event.file.name
         }
         let reader: any = new FileReader();
-        reader.readAsBinaryString(event.target.files[0]);
+        reader.readAsBinaryString(event.file);
         reader.onloadend = () => {
             var count = reader.result.match(/\/Type[\s]*\/Page[^s]/g).length;
             this.fileModal.totalpages = count.toString();
@@ -264,7 +264,7 @@ export class AddBooksComponent implements OnInit {
         this.allSubscribers.push(this.libraryService.getLibraryPdfSigned(modal).subscribe((res) => {
             this.fileModal.filename = res.data.filename;
             let signUrl = res.data.signedurl;
-            this.fileService.putFileOnBucket(signUrl, event.target.files[0]).subscribe((res: any) => {
+            this.fileService.putFileOnBucket(signUrl, event.file).subscribe((res: any) => {
                 switch (res.type) {
                     case HttpEventType.Sent:
                         this.uploadedPercentage = 0;
@@ -277,7 +277,7 @@ export class AddBooksComponent implements OnInit {
                         this.isCallingApi = false;
                         this.utilService.showInfoToast("", "File uploaded successfully.");
                         console.log(res);
-                        if (event.target.files[0]) {
+                        if (event.file) {
                             // this.file = event.target.files[i];
                             setTimeout(() => {
                                 this.isCallingApi = true;
@@ -346,7 +346,7 @@ export class AddBooksComponent implements OnInit {
     uploadBookCover(event) {
         this.fileModal = {};
         // if (event.target.files[0])
-            this.bookModel.coverimage = event.target.files[0];
+        this.bookModel.coverimage = event.target.files[0];
         this.isCallingApi = true;
         let modal = {
             fileTypeId: 3,
@@ -360,8 +360,9 @@ export class AddBooksComponent implements OnInit {
         reader.readAsDataURL(event.target.files[0]);
         this.allSubscribers.push(this.libraryService.getLibraryCardSigned(modal).subscribe((res) => {
             this.fileModal.filename = res.data.filename;
+            this.fileModal.fileTypeId = "4";
             let signUrl = res.data.signedurl;
-            this.bookModel.coverimage =  res.data.filename;
+            this.bookModel.coverimage = res.data.filename;
             this.fileService.putFileOnBucket(signUrl, event.target.files[0]).subscribe((res: any) => {
                 switch (res.type) {
                     case HttpEventType.Sent:
@@ -373,15 +374,15 @@ export class AddBooksComponent implements OnInit {
                         this.isCallingApi = false;
                         this.utilService.showInfoToast("", "File uploaded successfully.");
                         console.log(res);
-                            // this.file = event.target.files[i];
-                            // this.isCallingApi = true;
-                            // this.allSubscribers.push(this.fileService.SaveFileMetaData(this.fileModal).subscribe((res: any) => {
-                            //     this.isCallingApi = false;
-                            //     this.bookModel.coverimage = res.data.id;
-                            // }, err => {
-                            //     this.isCallingApi = false;
-                            //     this.utilService.showErrorCall(err);
-                            // }));
+                        // this.file = event.target.files[i];
+                        this.isCallingApi = true;
+                        this.allSubscribers.push(this.fileService.SaveFileMetaData(this.fileModal).subscribe((res: any) => {
+                            this.isCallingApi = false;
+                            this.bookModel.coverimage = res.data.id;
+                        }, err => {
+                            this.isCallingApi = false;
+                            this.utilService.showErrorCall(err);
+                        }));
                         break;
                     case 1: {
                         if (
