@@ -34,6 +34,11 @@ public class CourseDatabaseRepository {
         database.courseDao().insertAll(courseImageTables);
     }
 
+
+    public CourseImageTable getCourseImageByGradeUserId(String gradeId, String userId) {
+        return database.courseDao().getCourseImageByGradeUserId(userId, gradeId);
+    }
+
     public byte[] getCourseImage(String userId, String gradeId) {
         return database.courseDao().getCourseImage(userId, gradeId);
     }

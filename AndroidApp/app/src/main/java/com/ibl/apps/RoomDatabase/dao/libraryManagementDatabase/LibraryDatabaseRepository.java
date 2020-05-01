@@ -31,8 +31,13 @@ public class LibraryDatabaseRepository {
         database.libraryDao().insertAll(bookImageTables);
     }
 
+
     public byte[] getLibraryBookImage(String userId, String bookId) {
         return database.libraryDao().getBookImage(userId, bookId);
+    }
+
+    public BookImageTable getLibraryBookUserId(String userId, String bookId) {
+        return database.libraryDao().getBookUserId(userId, bookId);
     }
 
     public void updateAll(List<LibraryObject.Data> ListData, String userId) {

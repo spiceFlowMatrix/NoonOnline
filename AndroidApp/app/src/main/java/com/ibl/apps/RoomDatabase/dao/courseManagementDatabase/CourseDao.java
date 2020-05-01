@@ -33,6 +33,9 @@ public interface CourseDao {
     @Query("SELECT courseImage FROM CourseImageTable WHERE userId = :userId AND gradeId = :gradeId")
     byte[] getCourseImage(String userId, String gradeId);
 
+    @Query("SELECT * FROM CourseImageTable WHERE userId = :userId AND gradeId = :gradeId LIMIT 1")
+    CourseImageTable getCourseImageByGradeUserId(String userId, String gradeId);
+
     @Query("SELECT * FROM CourseImageTable")
     List<CourseImageTable> getImage();
 

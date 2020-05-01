@@ -28,6 +28,10 @@ public interface LibraryDao {
     @Insert
     void insertAll(BookImageTable... bookImageTables);
 
+    @Query("SELECT * FROM BookImageTable WHERE userId = :userId AND bookId = :bookId LIMIT 1")
+    BookImageTable getBookUserId(String userId, String bookId);
+
+
     @Query("SELECT BookImage FROM BookImageTable WHERE userId = :userId AND bookId = :bookId")
     byte[] getBookImage(String userId, String bookId);
 
