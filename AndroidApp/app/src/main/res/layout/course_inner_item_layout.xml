@@ -11,6 +11,7 @@
         android:foreground="?android:attr/selectableItemBackground"
         app:cardBackgroundColor="@color/colorWhite"
         app:cardCornerRadius="0dp"
+        android:focusable="true"
         app:cardElevation="0dp">
 
         <FrameLayout
@@ -102,13 +103,11 @@
 
                     </LinearLayout>
 
-                    <RelativeLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="0.3">
+
 
                         <LinearLayout
-                            android:layout_width="wrap_content"
+                            android:layout_width="0dp"
+                            android:layout_weight="0.3"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center">
 
@@ -117,13 +116,32 @@
                                 android:layout_width="@dimen/_37sdp"
                                 android:layout_height="@dimen/_30sdp">
 
-                                <include
-                                    android:id="@+id/progressBarSpinnerLayout"
-                                    layout="@layout/progressbar_layout"
+                                <RelativeLayout
                                     android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:layout_gravity="center"
-                                    android:visibility="gone" />
+                                    android:layout_height="wrap_content"
+                                    android:paddingStart="0dp"
+                                    android:paddingEnd="3dp">
+
+                                    <include
+                                        android:id="@+id/progressBarSpinnerLayout"
+                                        layout="@layout/progressbar_layout"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:layout_gravity="center"
+                                        android:visibility="gone" />
+
+                                    <TextView
+                                        android:id="@+id/tv_download_count"
+                                        android:layout_width="@dimen/_15sdp"
+                                        android:layout_height="@dimen/_15sdp"
+                                        android:layout_alignParentEnd="true"
+                                        android:background="@drawable/bg_oval"
+                                        android:gravity="center"
+                                        android:text="2"
+                                        android:textColor="@color/colorWhite"
+                                        android:textSize="11sp"
+                                        android:visibility="gone" />
+                                </RelativeLayout>
 
                                 <ImageView
                                     android:id="@+id/imgdownloadContent"
@@ -210,18 +228,7 @@
 
                         </LinearLayout>
 
-                        <TextView
-                            android:id="@+id/tv_download_count"
-                            android:layout_width="@dimen/_15sdp"
-                            android:layout_height="@dimen/_15sdp"
-                            android:layout_alignParentEnd="true"
-                            android:background="@drawable/bg_oval"
-                            android:gravity="center"
-                            android:text="2"
-                            android:textColor="@color/colorWhite"
-                            android:textSize="11sp"
-                            android:visibility="gone" />
-                    </RelativeLayout>
+
                 </LinearLayout>
 
                 <LinearLayout
