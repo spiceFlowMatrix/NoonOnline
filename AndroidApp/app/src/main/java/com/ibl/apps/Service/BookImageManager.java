@@ -4,14 +4,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.JobIntentService;
-import android.util.Log;
 
 import com.ibl.apps.Model.LibraryObject;
 import com.ibl.apps.RoomDatabase.dao.libraryManagementDatabase.LibraryDatabaseRepository;
-import com.ibl.apps.RoomDatabase.database.AppDatabase;
 import com.ibl.apps.RoomDatabase.entity.BookImageTable;
 import com.ibl.apps.noon.R;
 
@@ -68,7 +67,9 @@ public class BookImageManager extends JobIntentService {
                                 bookImageTable.setBookId(libraryObject.getData().get(j).getId());
                                 bookImageTable.setUserId(userId);
                                 bookImageTable.setBookImage(bitmapImage);
-                                libraryDatabaseRepository.insertBookImageTable(bookImageTable);
+                                if (libraryDatabaseRepository.getLibraryBookUserId(userId, bookImageTable.getBookId()) == null) {
+                                    libraryDatabaseRepository.insertBookImageTable(bookImageTable);
+                                }
                             } else {
                                 Bitmap myLogo = BitmapFactory.decodeResource(context.getResources(), R.drawable.noon_logo);
                                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -79,7 +80,9 @@ public class BookImageManager extends JobIntentService {
                                 bookImageTable.setBookId(libraryObject.getData().get(j).getId());
                                 bookImageTable.setUserId(userId);
                                 bookImageTable.setBookImage(bitmapdata);
-                                libraryDatabaseRepository.insertBookImageTable(bookImageTable);
+                                if (libraryDatabaseRepository.getLibraryBookUserId(userId, bookImageTable.getBookId()) == null) {
+                                    libraryDatabaseRepository.insertBookImageTable(bookImageTable);
+                                }
                             }
                         }
                     }

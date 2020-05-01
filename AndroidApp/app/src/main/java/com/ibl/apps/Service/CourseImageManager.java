@@ -7,7 +7,6 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.core.app.JobIntentService;
 
-import com.ibl.apps.CourseManagement.CourseRepository;
 import com.ibl.apps.Model.CourseObject;
 import com.ibl.apps.RoomDatabase.dao.courseManagementDatabase.CourseDatabaseRepository;
 import com.ibl.apps.RoomDatabase.entity.CourseImageTable;
@@ -63,7 +62,10 @@ public class CourseImageManager extends JobIntentService {
                                     courseImageTable.setUserId(userId);
                                     courseImageTable.setCourseImage(bitmapImage);
                                     CourseDatabaseRepository courseDatabaseRepository = new CourseDatabaseRepository();
-                                    courseDatabaseRepository.insertCourseImageTable(courseImageTable);
+
+                                    if (courseDatabaseRepository.getCourseImageByGradeUserId(courseImageTable.getGradeId(), userId) == null) {
+                                        courseDatabaseRepository.insertCourseImageTable(courseImageTable);
+                                    }
                                 }
                             }
                         }
