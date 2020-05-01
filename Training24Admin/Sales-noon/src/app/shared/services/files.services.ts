@@ -31,6 +31,19 @@ export class FileService {
         );;
     }
 
+    putFileOnBucket(url, file) {
+        return this.commonApiService.putWithFormDataUrl(url, file);
+    }
+
+    SaveFileMetaData(data) {
+        let formData = new FormData();
+        Object.keys(data).forEach(key => {
+            if (['id'].indexOf(key) < 0)
+                formData.append(key, data[key]);
+        });
+        return this.commonApiService.postWithFormData('v1/Files/SaveFileMetaData', formData);
+    }
+
     manageFile(data: any, id?: string) {
         let formData = new FormData();
         Object.keys(data).forEach(key => {

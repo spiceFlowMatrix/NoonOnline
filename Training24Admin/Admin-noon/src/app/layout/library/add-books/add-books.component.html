@@ -146,7 +146,7 @@
                         <span class="edit-pic">&nbsp;&nbsp;<i class="fa fa-pencil"
                                 (click)="openFileSelecter('cover')"></i></span>
                         <input type="file" style="display:none;" id="cover" name="cover"
-                            (change)="onPicSelected($event)" accept="image/*">
+                            (change)="uploadBookCover($event)" accept="image/*">
                     </div>
                 </div>
                 <!-- <div class="form-group noon-form ">
@@ -188,5 +188,5 @@
         </div>
     </div>
 </div>
-<noon-addfile-dialog #fileDialog [pdfOnly]="true" (addFileEvent)="manageFile($event)"></noon-addfile-dialog>
+<noon-addfile-dialog #fileDialog [pdfOnly]="true" (addFileEvent)="uploadBookPdf($event)"></noon-addfile-dialog>
 <noon-upload-status #fileUploadStatusDialog [data]="uploadedPercentage"></noon-upload-status>

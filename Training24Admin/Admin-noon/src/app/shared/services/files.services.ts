@@ -32,6 +32,46 @@ export class FileService {
         );
     }
 
+    // getPdfSigned(data) {
+    //     let formData = new FormData();
+    //     Object.keys(data).forEach(key => {
+    //         if (['id'].indexOf(key) < 0)
+    //             formData.append(key, data[key]);
+    //     });
+    //    return this.commonApiService.postWithFormData('v1/Files/UploadLessonPdf', formData);
+    // }
+
+    // getImageSigned(data) {
+    //     let formData = new FormData();
+    //     Object.keys(data).forEach(key => {
+    //         if (['id'].indexOf(key) < 0)
+    //             formData.append(key, data[key]);
+    //     });
+    //    return this.commonApiService.postWithFormData('v1/Files/UploadImagePdf', formData);
+    // }
+
+    // getVideoSigned(data) {
+    //     let formData = new FormData();
+    //     Object.keys(data).forEach(key => {
+    //         if (['id'].indexOf(key) < 0)
+    //             formData.append(key, data[key]);
+    //     });
+    //    return this.commonApiService.postWithFormData('v1/Files/UploadLessonPdf', formData);
+    // }
+
+    putFileOnBucket(url, file) {
+        return this.commonApiService.putWithFormDataUrl(url, file);
+    }
+
+    SaveFileMetaData(data) {
+        let formData = new FormData();
+        Object.keys(data).forEach(key => {
+            if (['id'].indexOf(key) < 0)
+                formData.append(key, data[key]);
+        });
+        return this.commonApiService.postWithFormData('v1/Files/SaveFileMetaData', formData);
+    }
+
     searchGetFileListNew(filterObj?: any) {
         if (!filterObj || (filterObj && !filterObj.search)) {
             return of([]);

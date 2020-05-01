@@ -9,7 +9,8 @@ import {
     QuizService,
     QuestionsService,
     CommonDialogModule,
-    DirectivesModule
+    DirectivesModule,
+    FileService
 } from '../../../shared';
 import { QuillModule } from 'ngx-quill';
 import { MatCommonModule } from '@angular/material/core';
@@ -39,6 +40,6 @@ import { KatexModule } from 'ng-katex';
         AddQuizsRoutingModule,
     ],
     declarations: [AddQuizsComponent],
-    providers: [QuizService, QuestionsService]
+    providers: [QuizService, QuestionsService,FileService]
 })
 export class AddQuizsModule { }

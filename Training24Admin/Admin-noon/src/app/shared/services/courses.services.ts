@@ -96,4 +96,13 @@ getCourseDefination(subname?: string ) {
     lessonOrderChange(data) {
         return this.commonApiService.post('v1/Lesson/LessonOrderChange', data);
     }
+
+    getCourseCardSigned(data) {
+        let formData = new FormData();
+        Object.keys(data).forEach(key => {
+            if (['id'].indexOf(key) < 0)
+                formData.append(key, data[key]);
+        });
+       return this.commonApiService.postWithFormData('v1/Files/UploadCourseCardImage', formData);
+    }
 }

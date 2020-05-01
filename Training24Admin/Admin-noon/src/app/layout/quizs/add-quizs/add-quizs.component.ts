@@ -8,10 +8,12 @@ import {
     UtilService,
     QuizService,
     QuestionsService,
-    DataService
+    DataService,
+    FileService
 } from '../../../shared';
 import * as _ from 'lodash';
 import { KatexOptions } from 'ng-katex';
+import { HttpEventType } from '@angular/common/http';
 
 @Component({
     selector: 'app-add-quizs',
@@ -26,7 +28,7 @@ export class AddQuizsComponent implements OnInit {
     paragraph: string = "";
     options: KatexOptions = {
         displayMode: true,
-      };
+    };
     @ViewChild('manageQuizForm') manageQuizForm: NgForm;
     public quizModel: any = {};
     isEditView: boolean = false;
@@ -41,7 +43,7 @@ export class AddQuizsComponent implements OnInit {
     addQuizQuestionModel: any = {};
     filterQuestionModel: any = {};
     questionIds: any = [];
-    quizid : any;
+    quizid: any;
     questionUploadingIndex: number = 0;
     isQuestionUploading: boolean;
     modalRef: any = null;
@@ -55,6 +57,7 @@ export class AddQuizsComponent implements OnInit {
         public questionsService: QuestionsService,
         public dataService: DataService,
         public modalService: NgbModal,
+        public fileService:FileService,
         public router: Router
     ) {
         this.allSubscribers.push(this.activatedRoute.params.subscribe((params: Params) => {
@@ -101,7 +104,7 @@ export class AddQuizsComponent implements OnInit {
     addQuestion() {
         this.quizQuestionList.push({
             answers: [],
-            files: [],
+            filename: [],
             images: [],
             questiontypeid: 2,
             questiontext: '',
@@ -113,7 +116,7 @@ export class AddQuizsComponent implements OnInit {
     addAnswer(qId) {
         this.quizQuestionList[qId].answers.push({
             answer: '',
-            files: [],
+            filename: [],
             images: [],
             extratext: '',
             iscorrect: false,
@@ -186,34 +189,107 @@ export class AddQuizsComponent implements OnInit {
         switch (type) {
             case 'question':
                 // this.quizQuestionList[qId].files = _.concat(this.quizQuestionList[qId].files.event.target.files);
-                if (!this.quizQuestionList[qId].files)
-                    this.quizQuestionList[qId].files = [];
+                if (!this.quizQuestionList[qId].filename)
+                    this.quizQuestionList[qId].filename = [];
                 if (!this.quizQuestionList[qId].images)
                     this.quizQuestionList[qId].images = [];
 
                 if (event.target.files && event.target.files.length > 0) {
                     for (let index = 0; index < event.target.files.length; index++) {
                         this.getFileUrl(event.target.files[index]).then((res: any) => {
-                            this.quizQuestionList[qId].files.push(res.file);
+                            // this.quizQuestionList[qId].files.push(res. file);
                             this.quizQuestionList[qId].images.push(res.body);
                         });
+                        let modal = {
+                            fileTypeId: 3,
+                            contentType: event.target.files[index].type,
+                            fileName: event.target.files[index].name
+                        }
+                        let fileModal = {
+                            filename: ''
+                        }
+                        this.allSubscribers.push(this.quizService.getQuizQuestionImageSigned(modal).subscribe((res) => {
+                            this.quizQuestionList[qId].filename.push(res.data.filename);
+                            fileModal.filename = res.data.filename;
+                            let signUrl = res.data.signedurl;
+                            this.fileService.putFileOnBucket(signUrl, event.target.files[index]).subscribe((res: any) => {
+                                switch (res.type) {
+                                    case HttpEventType.Sent:
+                                        break;
+                                    case HttpEventType.Response:
+                                        this.isCallingApi = false;
+                                        console.log(res);
+                                        // this.isCallingApi = true;
+                                        // this.allSubscribers.push(this.fileService.SaveFileMetaData(fileModal).subscribe((res: any) => {
+                                        //     this.isCallingApi = false;
+                                        // }, err => {
+                                        //     this.isCallingApi = false;
+                                        //     this.utilService.showErrorCall(err);
+                                        // }));
+                                        break;
+                                    case 1: {
+                                        break;
+                                    }
+                                }
+                            }, err => {
+                                this.isCallingApi = false;
+                                this.utilService.showErrorCall(err);
+                            })
+                        }))
                     }
                 }
                 this.quizQuestionList[qId].isNew = true;
                 break;
 
             case 'answer':
-                if (!this.quizQuestionList[qId].answers[aId].files)
-                    this.quizQuestionList[qId].answers[aId].files = [];
+                if (!this.quizQuestionList[qId].answers[aId].filename)
+                    this.quizQuestionList[qId].answers[aId].filename = [];
                 if (!this.quizQuestionList[qId].answers[aId].images)
                     this.quizQuestionList[qId].answers[aId].images = [];
 
                 if (event.target.files && event.target.files.length > 0) {
                     for (let index = 0; index < event.target.files.length; index++) {
                         this.getFileUrl(event.target.files[index]).then((res: any) => {
-                            this.quizQuestionList[qId].answers[aId].files.push(res.file);
+                            // this.quizQuestionList[qId].answers[aId].files.push(res.file);
                             this.quizQuestionList[qId].answers[aId].images.push(res.body);
+                            
                         });
+                        let modal = {
+                            fileTypeId: 3,
+                            contentType: event.target.files[index].type,
+                            fileName: event.target.files[index].name
+                        }
+                        let fileModal = {
+                            filename: ''
+                        }
+                        this.allSubscribers.push(this.quizService.getQuizAnswerImageSigned(modal).subscribe((res) => {
+                            this.quizQuestionList[qId].answers[aId].filename.push(res.data.filename);
+                            fileModal.filename = res.data.filename;
+                            let signUrl = res.data.signedurl;
+                            this.fileService.putFileOnBucket(signUrl, event.target.files[index]).subscribe((res: any) => {
+                                switch (res.type) {
+                                    case HttpEventType.Sent:
+                                        break;
+                                    case HttpEventType.Response:
+                                        this.isCallingApi = false;
+                                        console.log(res);
+                                        // this.isCallingApi = true;
+                                        // this.allSubscribers.push(this.fileService.SaveFileMetaData(fileModal).subscribe((res: any) => {
+                                        //     this.isCallingApi = false;
+                                        // }, err => {
+                                        //     this.isCallingApi = false;
+                                        //     this.utilService.showErrorCall(err);
+                                        // }));
+                                        break;
+                                    case 1: {
+                                        break;
+                                    }
+                                }
+                            }, err => {
+                                this.isCallingApi = false;
+                                this.utilService.showErrorCall(err);
+                            })
+                        }))
                     }
                 }
                 this.quizQuestionList[qId].isNew = true;
@@ -283,15 +359,15 @@ export class AddQuizsComponent implements OnInit {
                 this.quizQuestionList[qId].answers.splice(aId, 1);
                 break;
             case 'questionfile':
-                if (this.quizQuestionList[qId].files && this.quizQuestionList[qId].files[fileIndex])
-                    this.quizQuestionList[qId].files.splice(fileIndex, 1);
+                if (this.quizQuestionList[qId].filename && this.quizQuestionList[qId].filename[fileIndex])
+                    this.quizQuestionList[qId].filename.splice(fileIndex, 1);
                 if (this.quizQuestionList[qId].images && this.quizQuestionList[qId].images[fileIndex])
                     this.quizQuestionList[qId].images.splice(fileIndex, 1);
                 break;
 
             case 'answerfile':
-                if (this.quizQuestionList[qId].answers[aId].files && this.quizQuestionList[qId].answers[aId].files[fileIndex])
-                    this.quizQuestionList[qId].answers[aId].files.splice(fileIndex, 1);
+                if (this.quizQuestionList[qId].answers[aId].filename && this.quizQuestionList[qId].answers[aId].filename[fileIndex])
+                    this.quizQuestionList[qId].answers[aId].filename.splice(fileIndex, 1);
                 if (this.quizQuestionList[qId].answers[aId].images && this.quizQuestionList[qId].answers[aId].images[fileIndex])
                     this.quizQuestionList[qId].answers[aId].images.splice(fileIndex, 1);
                 break;
@@ -360,8 +436,8 @@ export class AddQuizsComponent implements OnInit {
                 this.formData.append('questions[0].explanation', this.quizQuestionList[index].explanation);
                 this.formData.append('questions[0].ismultianswer', true);
                 for (let fIndex = 0; fIndex < this.quizQuestionList[index].images.length; fIndex++) {
-                    if (this.quizQuestionList[index].files && !this.quizQuestionList[index].images[fIndex].id)
-                        this.formData.append('questions[0].files', this.quizQuestionList[index].files[fIndex]);
+                    if (this.quizQuestionList[index].filename && !this.quizQuestionList[index].images[fIndex].id)
+                        this.formData.append('questions[0].filename', this.quizQuestionList[index].filename[fIndex]);
                 }
                 for (let aIndex = 0; aIndex < this.quizQuestionList[index].answers.length; aIndex++) {
                     if (this.quizQuestionList[index].answers[aIndex].isNew) {
@@ -370,8 +446,8 @@ export class AddQuizsComponent implements OnInit {
                         this.formData.append('questions[0].answers[' + aIndex + '].extraText', this.quizQuestionList[index].answers[aIndex].extratext);
                         this.formData.append('questions[0].answers[' + aIndex + '].isCorrect', this.quizQuestionList[index].answers[aIndex].iscorrect);
                         for (let fIndex = 0; fIndex < this.quizQuestionList[index].answers[aIndex].images.length; fIndex++) {
-                            if (this.quizQuestionList[index].answers[aIndex].files && !this.quizQuestionList[index].answers[aIndex].images[fIndex].id)
-                                this.formData.append('questions[0].answers[' + aIndex + '].files', this.quizQuestionList[index].answers[aIndex].files[fIndex]);
+                            if (this.quizQuestionList[index].answers[aIndex].filename && !this.quizQuestionList[index].answers[aIndex].images[fIndex].id)
+                                this.formData.append('questions[0].answers[' + aIndex + '].filename', this.quizQuestionList[index].answers[aIndex].filename[fIndex]);
                         }
                     }
                 }

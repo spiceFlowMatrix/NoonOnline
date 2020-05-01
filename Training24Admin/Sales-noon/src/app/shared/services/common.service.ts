@@ -208,7 +208,22 @@ export class CommonAPIService {
                 );
         }
     };
-
+    
+    putWithFormDataUrl(url, file) {
+        let tempHeaders = new HttpHeaders({
+            "Content-Type": file.type
+        });
+        return this.http
+            .put<any>(url, file, {
+                headers: tempHeaders
+            })
+            .pipe(
+                map(response => response),
+                catchError(error => {
+                    return throwError(error);
+                })
+            );
+    }
     putWithFormData(url: string, data?: FormData): Observable<any> {
         let userHeaders = _.clone(this._adminHeaders);
         userHeaders.delete('Content-Type')

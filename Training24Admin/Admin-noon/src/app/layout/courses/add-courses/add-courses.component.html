@@ -113,7 +113,7 @@
                         <img src="assets/images/logo.png" *ngIf="!courseModel.image" class="user-avatar" />
                         <img src="{{courseModel.image}}" *ngIf="courseModel.image" class="user-avatar" />
                         <span class="edit-pic">&nbsp;&nbsp;<i class="fa fa-pencil" (click)="openFileSelecter('card')"></i></span>
-                        <input type="file" style="display:none;" id="card" name="card" (change)="onPicSelected($event)"
+                        <input type="file" style="display:none;" id="card" name="card" (change)="uploadCourseCover($event)"
                             accept="image/*">
                     </div>
 

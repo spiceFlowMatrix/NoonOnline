@@ -1,9 +1,10 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router, ActivatedRoute, Params } from '@angular/router';
-import { UtilService, CourseService, UsersService, GradeService } from '../../../shared';
+import { UtilService, CourseService, UsersService, GradeService, FileService } from '../../../shared';
 import * as _ from 'lodash';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { HttpEventType } from '@angular/common/http';
 
 @Component({
     selector: 'app-add-courses',
@@ -20,7 +21,7 @@ export class AddCoursesComponent implements OnInit {
     isEditView: boolean = false;
     isCallingApi: boolean = false;
     isGradesLoading: boolean = false;
-
+    public fileModal: any = {};
     // @ViewChild('assignCourseDialog') assignCourseDialog: any;
     // public filterCourseModel: any = {};
     // public assignCourseModal: any = null;
@@ -35,6 +36,7 @@ export class AddCoursesComponent implements OnInit {
         public gradeService: GradeService,
         public usersService: UsersService,
         public modalService: NgbModal,
+        public fileService:FileService,
         public router: Router
     ) {
         this.allSubscribers.push(this.activatedRoute.params.subscribe((params: Params) => {
@@ -77,7 +79,7 @@ export class AddCoursesComponent implements OnInit {
         this.isGradesLoading = true;
         this.allSubscribers.push(this.gradeService.getGrades().subscribe(res => {
             this.isGradesLoading = false;
-            this.gradeList = res.data;         
+            this.gradeList = res.data;
         }, err => {
             this.isGradesLoading = false;
             this.utilService.showErrorCall(err);
@@ -116,6 +118,67 @@ export class AddCoursesComponent implements OnInit {
             }
             reader.readAsDataURL(event.target.files[0]);
         }
+    }
+    uploadCourseCover(event) {
+        this.fileModal = {};
+        this.isCallingApi = true;
+        let modal = {
+            fileTypeId: 3,
+            contentType: event.target.files[0].type,
+            fileName: event.target.files[0].name
+        }
+        this.courseImageFile = event.target.files[0];
+        var reader = new FileReader();
+        reader.onload = (e: any) => {
+            // this.courseModel.image = e.target.result;
+        }
+        reader.readAsDataURL(event.target.files[0]);
+        this.allSubscribers.push(this.courseService.getCourseCardSigned(modal).subscribe((res) => {
+            this.fileModal.filename = res.data.filename;
+            this.courseModel.filename = res.data.filename;
+            let signUrl = res.data.signedurl;
+            this.fileService.putFileOnBucket(signUrl, event.target.files[0]).subscribe((res: any) => {
+                switch (res.type) {
+                    case HttpEventType.Sent:
+                        // this.uploadedPercentage = 0;
+                        // this.fileUploadStatusDialog.openModal();
+                        this.utilService.showInfoToast("Notification", "Your file upaloding started.");
+                        break;
+                    case HttpEventType.Response:
+                        this.isCallingApi = false;
+                        this.utilService.showInfoToast("", "File uploaded successfully.");
+                        console.log(res);
+                        // this.file = event.target.files[i];
+                        // this.isCallingApi = true;
+                        // this.allSubscribers.push(this.fileService.SaveFileMetaData(this.fileModal).subscribe((res: any) => {
+                        //     this.isCallingApi = false;
+                        //     // this.courseModel.coverimage = res.data.id;
+                        // }, err => {
+                        //     this.isCallingApi = false;
+                        //     this.utilService.showErrorCall(err);
+                        // }));
+                        break;
+                    case 1: {
+                        // if (
+                        //     Math.round(this.uploadedPercentage) !==
+                        //     Math.round(
+                        //         (event["loaded"] / event["total"]) * 100
+                        //     )
+                        // ) {
+                        //     this.uploadedPercentage =
+                        //         (event["loaded"] / event["total"]) * 100;
+                        //     console.log(
+                        //         Math.round(this.uploadedPercentage)
+                        //     );
+                        // }
+                        break;
+                    }
+                }
+            }, err => {
+                this.isCallingApi = false;
+                this.utilService.showErrorCall(err);
+            })
+        }))
     }
 
     ngOnDestroy() {

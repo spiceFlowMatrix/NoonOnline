@@ -33,7 +33,7 @@ import { Observable, merge, of } from "rxjs";
 export class AddBooksComponent implements OnInit {
     @ViewChild("fileDialog") fileDialog: any;
     @ViewChild("fileUploadStatusDialog") fileUploadStatusDialog: any;
-
+    public fileModal: any = {};
     private allSubscribers: Array<any> = [];
     public bookModel: any = {};
     isEditView: boolean = false;
@@ -246,6 +246,166 @@ export class AddBooksComponent implements OnInit {
         );
     }
 
+    uploadBookPdf(event) {
+        this.fileModal = {};
+        this.isCallingApi = true;
+        let modal = {
+            fileTypeId: 1,
+            contentType: event.target.files[0].type,
+            fileName: event.target.files[0].name
+        }
+        let reader: any = new FileReader();
+        reader.readAsBinaryString(event.target.files[0]);
+        reader.onloadend = () => {
+            var count = reader.result.match(/\/Type[\s]*\/Page[^s]/g).length;
+            this.fileModal.totalpages = count.toString();
+            this.fileModal.fileTypeId = "1";
+        }
+        this.allSubscribers.push(this.libraryService.getLibraryPdfSigned(modal).subscribe((res) => {
+            this.fileModal.filename = res.data.filename;
+            let signUrl = res.data.signedurl;
+            this.fileService.putFileOnBucket(signUrl, event.target.files[0]).subscribe((res: any) => {
+                switch (res.type) {
+                    case HttpEventType.Sent:
+                        this.uploadedPercentage = 0;
+                        this.fileUploadStatusDialog.openModal();
+                        this.utilService.showInfoToast("Notification", "Your file upaloding started.");
+                        break;
+                    case HttpEventType.Response:
+                        this.fileDialog.closeModal();
+                        this.fileUploadStatusDialog.closeModal();
+                        this.isCallingApi = false;
+                        this.utilService.showInfoToast("", "File uploaded successfully.");
+                        console.log(res);
+                        if (event.target.files[0]) {
+                            // this.file = event.target.files[i];
+                            setTimeout(() => {
+                                this.isCallingApi = true;
+                                this.allSubscribers.push(this.fileService.SaveFileMetaData(this.fileModal).subscribe((res: any) => {
+                                    this.isCallingApi = false;
+                                    // for (let i = 0; i < res.body.data.length; i++) {
+                                    this.bookModel.fileid = res.data.id;
+                                    this.tempfile = res.data;
+                                    // }
+                                }, err => {
+                                    this.isCallingApi = false;
+                                    this.utilService.showErrorCall(err);
+                                }));
+                            }, 200);
+                        }
+                        break;
+                    case 1: {
+                        if (
+                            Math.round(this.uploadedPercentage) !==
+                            Math.round(
+                                (event["loaded"] / event["total"]) * 100
+                            )
+                        ) {
+                            this.uploadedPercentage =
+                                (event["loaded"] / event["total"]) * 100;
+                            console.log(
+                                Math.round(this.uploadedPercentage)
+                            );
+                        }
+                        break;
+                    }
+                }
+            }, err => {
+                this.isCallingApi = false;
+                this.fileDialog.closeModal();
+                this.fileUploadStatusDialog.closeModal();
+                this.utilService.showErrorCall(err);
+            })
+        }))
+    }
+
+    onPicSelected(event) {
+        if (event.target.files && event.target.files.length > 0) {
+            this.bookModel.coverimage = event.target.files[0];
+            var reader = new FileReader();
+            reader.onload = (e: any) => {
+                this.bookModel.coverurl = e.target.result;
+            }
+            reader.readAsDataURL(event.target.files[0]);
+            let formData = new FormData();
+            formData.append('file', event.target.files[0]);
+            formData.append('fileTypeId', '4');
+            this.isCallingApi = true;
+            this.fileService.uploadCoverImage(formData)
+                .subscribe((data) => {
+                    if (data.status == 'Success' && data.data) {
+                        this.isCallingApi = false;
+                        this.bookModel.coverimage = data.data.id;
+                    }
+                }, err => {
+                    this.isCallingApi = false;
+                    this.utilService.showErrorCall(err);
+                });
+        }
+    }
+    uploadBookCover(event) {
+        this.fileModal = {};
+        // if (event.target.files[0])
+            this.bookModel.coverimage = event.target.files[0];
+        this.isCallingApi = true;
+        let modal = {
+            fileTypeId: 3,
+            contentType: event.target.files[0].type,
+            fileName: event.target.files[0].name
+        }
+        var reader = new FileReader();
+        reader.onload = (e: any) => {
+            this.bookModel.coverurl = e.target.result;
+        }
+        reader.readAsDataURL(event.target.files[0]);
+        this.allSubscribers.push(this.libraryService.getLibraryCardSigned(modal).subscribe((res) => {
+            this.fileModal.filename = res.data.filename;
+            let signUrl = res.data.signedurl;
+            this.bookModel.coverimage =  res.data.filename;
+            this.fileService.putFileOnBucket(signUrl, event.target.files[0]).subscribe((res: any) => {
+                switch (res.type) {
+                    case HttpEventType.Sent:
+                        this.uploadedPercentage = 0;
+                        // this.fileUploadStatusDialog.openModal();
+                        this.utilService.showInfoToast("Notification", "Your file upaloding started.");
+                        break;
+                    case HttpEventType.Response:
+                        this.isCallingApi = false;
+                        this.utilService.showInfoToast("", "File uploaded successfully.");
+                        console.log(res);
+                            // this.file = event.target.files[i];
+                            // this.isCallingApi = true;
+                            // this.allSubscribers.push(this.fileService.SaveFileMetaData(this.fileModal).subscribe((res: any) => {
+                            //     this.isCallingApi = false;
+                            //     this.bookModel.coverimage = res.data.id;
+                            // }, err => {
+                            //     this.isCallingApi = false;
+                            //     this.utilService.showErrorCall(err);
+                            // }));
+                        break;
+                    case 1: {
+                        if (
+                            Math.round(this.uploadedPercentage) !==
+                            Math.round(
+                                (event["loaded"] / event["total"]) * 100
+                            )
+                        ) {
+                            this.uploadedPercentage =
+                                (event["loaded"] / event["total"]) * 100;
+                            console.log(
+                                Math.round(this.uploadedPercentage)
+                            );
+                        }
+                        break;
+                    }
+                }
+            }, err => {
+                this.isCallingApi = false;
+                this.utilService.showErrorCall(err);
+            })
+        }))
+    }
+
     manageFile($event) {
         this.isCallingApi = true;
         this.allSubscribers.push(
@@ -302,30 +462,6 @@ export class AddBooksComponent implements OnInit {
     }
 
 
-    onPicSelected(event) {
-        if (event.target.files && event.target.files.length > 0) {
-            this.bookModel.coverimage = event.target.files[0];
-            var reader = new FileReader();
-            reader.onload = (e: any) => {
-                this.bookModel.coverurl = e.target.result;
-            }
-            reader.readAsDataURL(event.target.files[0]);
-            let formData = new FormData();
-            formData.append('file', event.target.files[0]);
-            formData.append('fileTypeId', '4');
-            this.isCallingApi = true;
-            this.fileService.uploadCoverImage(formData)
-                .subscribe((data) => {
-                    if (data.status == 'Success' && data.data) {
-                        this.isCallingApi = false;
-                        this.bookModel.coverimage = data.data.id;
-                    }
-                }, err => {
-                    this.isCallingApi = false;
-                    this.utilService.showErrorCall(err);
-                });
-        }
-    }
 
     ngOnDestroy() {
         this.allSubscribers.map(value => value.unsubscribe());
