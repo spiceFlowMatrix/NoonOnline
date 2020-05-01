@@ -118,11 +118,11 @@ namespace Training24Admin.Controllers
                 {
                     if (tc.RoleName.Contains(General.getRoleType("1")))
                     {
-                        string fileName = "";
-                        IFormFile file = null;
+                        //string fileName = "";
+                        //IFormFile file = null;
 
-                        if (Request.Form.Files.Count != 0)
-                            file = Request.Form.Files[0];
+                        //if (Request.Form.Files.Count != 0)
+                        //    file = Request.Form.Files[0];
 
                         string mediaLink = "";
 
