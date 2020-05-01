@@ -23,7 +23,7 @@ using Trainning24.BL.ViewModels.Files;
 
 namespace Training24Admin.Controllers
 {
-    
+
     [Route("api/v1/[controller]")]
     [ApiController]
     [Authorize]
@@ -176,7 +176,7 @@ namespace Training24Admin.Controllers
                 {
                     QuestionModel questions = new QuestionModel();
                     questions.id = long.Parse(Request.Form["questions[" + i + "].id"]);
-                    var allFiles = Request.Form.Files.ToList();
+                    // var allFiles = Request.Form.Files.ToList();
 
                     questions.questiontypeid = long.Parse(Request.Form["questions[" + i + "].questiontypeid"]);
                     questions.questiontext = Request.Form["questions[" + i + "].questiontext"];
@@ -202,7 +202,8 @@ namespace Training24Admin.Controllers
 
                     for (int j = 0; j < noanswer; j++)
                     {
-                        if (string.IsNullOrEmpty(Request.Form["questions[" + i + "].answers[" + j + "].answer"])) {
+                        if (string.IsNullOrEmpty(Request.Form["questions[" + i + "].answers[" + j + "].answer"]))
+                        {
                             continue;
                         }
                         QuestionAnswerModel singleanswer = new QuestionAnswerModel();
@@ -225,114 +226,59 @@ namespace Training24Admin.Controllers
                         }
 
                         List<UpdateQuestionFileModel> answerfiles = new List<UpdateQuestionFileModel>();
-                        
+
                         //QuestionAnswerBusiness.AnswerFileRemoving(newQuestionAnswer.Id);
 
                         //uploading answer images
-                        for (int k = 0; k < allFiles.Count; k++)
+                        //for (int k = 0; k < allFiles.Count; k++)
+                        //{
+                        //var singleFile = allFiles[k];
+                        //if (singleFile.Name == "questions[" + i + "].answers[" + j + "].filename")
+                        //{
+                        //string fileName = "";
+                        //IFormFile file = null;
+                        //if (Request.Form.Files.Count != 0)
+                        //    file = Request.Form.Files[k];
+                        //var imageAcl = PredefinedObjectAcl.PublicRead;
+                        //fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
+                        //var ext = fileName.Substring(fileName.LastIndexOf("."));
+                        //var extension = ext.ToLower();
+                        //Guid imageGuid = Guid.NewGuid();
+                        //fileName = fileName.Split(".")[0] + "_" + imageGuid.ToString() + extension;
+                        //string mediaLink = "";
+                        //var imageObject = await storage.UploadObjectAsync(
+                        //    bucket: "t24-primary-image-storage",
+                        //    objectName: fileName,
+                        //    contentType: file.ContentType,
+                        //    source: file.OpenReadStream(),
+                        //    options: new UploadObjectOptions { PredefinedAcl = imageAcl }
+                        //);
+                        //mediaLink = imageObject.MediaLink;
+
+                        if (!string.IsNullOrEmpty(Request.Form["questions[" + i + "].answers[" + j + "].filename"].ToString()))
                         {
-                            var singleFile = allFiles[k];
-                            if (singleFile.Name == "questions[" + i + "].answers[" + j + "].files")
-                            {
-                                string fileName = "";
-                                IFormFile file = null;
-                                if (Request.Form.Files.Count != 0)
-                                    file = Request.Form.Files[k];
-                                var imageAcl = PredefinedObjectAcl.PublicRead;
-                                fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
-                                var ext = fileName.Substring(fileName.LastIndexOf("."));
-                                var extension = ext.ToLower();
-                                Guid imageGuid = Guid.NewGuid();
-                                fileName = fileName.Split(".")[0] + "_" + imageGuid.ToString() + extension;
-                                string mediaLink = "";
-                                var imageObject = await storage.UploadObjectAsync(
-                                    bucket: "t24-primary-image-storage",
-                                    objectName: fileName,
-                                    contentType: file.ContentType,
-                                    source: file.OpenReadStream(),
-                                    options: new UploadObjectOptions { PredefinedAcl = imageAcl }
-                                );
-                                mediaLink = imageObject.MediaLink;
 
-                                AddFilesModel FilesModel = new AddFilesModel();
-                                FilesModel.Url = mediaLink;
-                                FilesModel.Name = fileName;
-                                FilesModel.FileName = fileName;
-                                FilesModel.FileTypeId = 3;
-                                FilesModel.FileSize = file.Length;
-                                //FilesModel.Id = long.Parse(Request.Form["id"]);
-
-                                if (!string.IsNullOrEmpty(Request.Form["duration"]))
-                                    FilesModel.Duration = Request.Form["duration"];
-                                if (!string.IsNullOrEmpty(Request.Form["totalpages"]))
-                                    FilesModel.TotalPages = int.Parse(Request.Form["totalpages"]);
-
-
-                                Files newFiles = new Files();
-                                if (FilesModel.Id == 0)
-                                {
-                                    newFiles = FilesBusiness.Create(FilesModel, int.Parse(tc.Id));
-                                }
-                                else
-                                {
-                                    newFiles = FilesBusiness.Update(FilesModel, int.Parse(tc.Id));
-                                }
-
-                                UpdateQuestionFileModel singleanswerFile = new UpdateQuestionFileModel();
-                                singleanswerFile.fileid = newFiles.Id;
-                                singleanswerFile.Url = newFiles.Url;
-                                answerfiles.Add(singleanswerFile);
-
-                                QuestionAnswerBusiness.AnswerFileMapping(newQuestionAnswer.Id, newFiles.Id);
-                            }
-                        }
-                        singleanswer.images = answerfiles;
-                        answers.Add(singleanswer);
-                    }
-
-                    questions.answers = answers;
-                    addQuestionModel.questions = questions;
-
-
-                    ////uploading question images
-                    for (int j = 0; j < allFiles.Count; j++)
-                    {
-                        var singleFile = allFiles[j];
-                        if (singleFile.Name == "questions[" + i + "].files")
-                        {
-                            string questionfileName = "";
-                            IFormFile questionfile = null;
-                            if (Request.Form.Files.Count != 0)
-                                questionfile = Request.Form.Files[j];
-                            var imageAcl = PredefinedObjectAcl.PublicRead;
-                            questionfileName = ContentDispositionHeaderValue.Parse(questionfile.ContentDisposition).FileName.Trim('"');
-                            var ext = questionfileName.Substring(questionfileName.LastIndexOf("."));
-                            var extension = ext.ToLower();
-                            Guid imageGuid = Guid.NewGuid();
-                            questionfileName = questionfileName.Split(".")[0] + "_" + imageGuid.ToString() + extension;
                             string mediaLink = "";
-                            var imageObject = await storage.UploadObjectAsync(
-                                bucket: "t24-primary-image-storage",
-                                objectName: questionfileName,
-                                contentType: questionfile.ContentType,
-                                source: questionfile.OpenReadStream(),
-                                options: new UploadObjectOptions { PredefinedAcl = imageAcl }
-                            );
-                            mediaLink = imageObject.MediaLink;
+                            var BucketName = General.getBucketName(3);
+
+                            if (!string.IsNullOrEmpty(Request.Form["questions[" + i + "].answers[" + j + "].filename"].ToString()))
+                            {
+                                var storageObject = storage.GetObject(BucketName, Request.Form["questions[" + i + "].answers[" + j + "].filename"].ToString());
+                                mediaLink = storageObject.MediaLink;
+                            }
 
                             AddFilesModel FilesModel = new AddFilesModel();
-                            if (!string.IsNullOrEmpty(Request.Form["description"]))
-                                FilesModel.Description = Request.Form["description"];
                             FilesModel.Url = mediaLink;
-                            FilesModel.Name = questionfileName;
-                            FilesModel.FileName = questionfileName;
+                            FilesModel.Name = Request.Form["questions[" + i + "].answers[" + j + "].filename"].ToString();
+                            FilesModel.FileName = Request.Form["questions[" + i + "].answers[" + j + "].filename"].ToString();
                             FilesModel.FileTypeId = 3;
-                            FilesModel.FileSize = questionfile.Length;                            
+                            //FilesModel.Id = long.Parse(Request.Form["id"]);
 
                             if (!string.IsNullOrEmpty(Request.Form["duration"]))
-                                FilesModel.Duration =  Request.Form["duration"];
+                                FilesModel.Duration = Request.Form["duration"];
                             if (!string.IsNullOrEmpty(Request.Form["totalpages"]))
                                 FilesModel.TotalPages = int.Parse(Request.Form["totalpages"]);
+
 
                             Files newFiles = new Files();
                             if (FilesModel.Id == 0)
@@ -344,14 +290,90 @@ namespace Training24Admin.Controllers
                                 newFiles = FilesBusiness.Update(FilesModel, int.Parse(tc.Id));
                             }
 
-                            UpdateQuestionFileModel singleQuestionFile = new UpdateQuestionFileModel();
-                            singleQuestionFile.fileid = newFiles.Id;
-                            singleQuestionFile.Url = newFiles.Url;
-                            questionfiles.Add(singleQuestionFile);
-
-                            QuestionBusiness.QuestionFileMapping(newQuestion.Id, newFiles.Id);
+                            UpdateQuestionFileModel singleanswerFile = new UpdateQuestionFileModel();
+                            singleanswerFile.fileid = newFiles.Id;
+                            singleanswerFile.Url = newFiles.Url;
+                            answerfiles.Add(singleanswerFile);
+                            QuestionAnswerBusiness.AnswerFileMapping(newQuestionAnswer.Id, newFiles.Id);
                         }
+                        //}
+                        //}
+                        singleanswer.images = answerfiles;
+                        answers.Add(singleanswer);
                     }
+
+                    questions.answers = answers;
+                    addQuestionModel.questions = questions;
+
+
+                    ////uploading question images
+                    //for (int j = 0; j < allFiles.Count; j++)
+                    //{
+                    //var singleFile = allFiles[j];
+                    //if (singleFile.Name == "questions[" + i + "].filename")
+                    //{
+                    //string questionfileName = "";
+                    //IFormFile questionfile = null;
+                    //if (Request.Form.Files.Count != 0)
+                    //    questionfile = Request.Form.Files[j];
+                    //var imageAcl = PredefinedObjectAcl.PublicRead;
+                    //questionfileName = ContentDispositionHeaderValue.Parse(questionfile.ContentDisposition).FileName.Trim('"');
+                    //var ext = questionfileName.Substring(questionfileName.LastIndexOf("."));
+                    //var extension = ext.ToLower();
+                    //Guid imageGuid = Guid.NewGuid();
+                    //questionfileName = questionfileName.Split(".")[0] + "_" + imageGuid.ToString() + extension;
+                    //string mediaLink = "";
+                    //var imageObject = await storage.UploadObjectAsync(
+                    //    bucket: "t24-primary-image-storage",
+                    //    objectName: questionfileName,
+                    //    contentType: questionfile.ContentType,
+                    //    source: questionfile.OpenReadStream(),
+                    //    options: new UploadObjectOptions { PredefinedAcl = imageAcl }
+                    //);
+                    //mediaLink = imageObject.MediaLink;
+                    if (!string.IsNullOrEmpty(Request.Form["questions[" + i + "].filename"].ToString()))
+                    {
+                        string mediaLink = "";
+                        var BucketName = General.getBucketName(3);
+
+                        if (!string.IsNullOrEmpty(Request.Form["questions[" + i + "].filename"].ToString()))
+                        {
+                            var storageObject = storage.GetObject(BucketName, Request.Form["questions[" + i + "].filename"].ToString());
+                            mediaLink = storageObject.MediaLink;
+                        }
+
+                        AddFilesModel FilesModel = new AddFilesModel();
+                        if (!string.IsNullOrEmpty(Request.Form["description"]))
+                            FilesModel.Description = Request.Form["description"];
+                        FilesModel.Url = mediaLink;
+                        FilesModel.Name = Request.Form["questions[" + i + "].filename"].ToString();
+                        FilesModel.FileName = Request.Form["questions[" + i + "].filename"].ToString();
+                        FilesModel.FileTypeId = 3;
+
+                        if (!string.IsNullOrEmpty(Request.Form["duration"]))
+                            FilesModel.Duration = Request.Form["duration"];
+                        if (!string.IsNullOrEmpty(Request.Form["totalpages"]))
+                            FilesModel.TotalPages = int.Parse(Request.Form["totalpages"]);
+
+                        Files newFiles = new Files();
+                        if (FilesModel.Id == 0)
+                        {
+                            newFiles = FilesBusiness.Create(FilesModel, int.Parse(tc.Id));
+                        }
+                        else
+                        {
+                            newFiles = FilesBusiness.Update(FilesModel, int.Parse(tc.Id));
+                        }
+
+                        UpdateQuestionFileModel singleQuestionFile = new UpdateQuestionFileModel();
+                        singleQuestionFile.fileid = newFiles.Id;
+                        singleQuestionFile.Url = newFiles.Url;
+                        questionfiles.Add(singleQuestionFile);
+
+                        QuestionBusiness.QuestionFileMapping(newQuestion.Id, newFiles.Id);
+                    }
+                    //}
+                    //}
                     questions.images = questionfiles;
 
 
@@ -390,7 +412,7 @@ namespace Training24Admin.Controllers
                 }
                 else
                 {
-                   // ResponseQuestionModel responseQuestionModel = new ResponseQuestionModel();
+                    // ResponseQuestionModel responseQuestionModel = new ResponseQuestionModel();
 
                     successResponse.data = quizDetail;
                     successResponse.response_code = 0;

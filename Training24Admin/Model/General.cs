@@ -206,6 +206,64 @@ namespace Training24Admin.Model
             };
             return "";
         }
+
+        public static string getBucketName(string fileTypeId)
+        {
+            string bucketName = "";
+            if (fileTypeId == "1")
+            {
+                bucketName = "t24-primary-pdf-storage";
+            }
+
+            if (fileTypeId == "2")
+            {
+                bucketName = "t24-primary-video-storage";
+            }
+
+            if (fileTypeId == "3")
+            {
+                bucketName = "t24-primary-image-storage";
+            }
+
+            if (fileTypeId == "4")
+            {
+                bucketName = "t24-primary-image-storage";
+            }
+
+            if (fileTypeId == "6" || fileTypeId == "7" || fileTypeId == "8")
+            {
+                bucketName = "t24-primary-pdf-storage";
+            }
+            return bucketName;
+        }
+
+        public static string getBucketName(long fileTypeId)
+        {
+            string bucketName = "";
+
+            switch (fileTypeId)
+            {
+                case 1:
+                    bucketName = "t24-primary-pdf-storage";
+                    break;
+                case 2:
+                    bucketName = "t24-primary-video-storage";
+                    break;
+                case 3:
+                    bucketName = "t24-primary-image-storage";
+                    break;
+                case 6:
+                    bucketName = "t24-primary-pdf-storage";
+                    break;
+                case 7:
+                    bucketName = "t24-primary-pdf-storage";
+                    break;
+                case 8:
+                    bucketName = "t24-primary-pdf-storage";
+                    break;
+            }
+            return bucketName;
+        }
     }
 
     public class MyData
