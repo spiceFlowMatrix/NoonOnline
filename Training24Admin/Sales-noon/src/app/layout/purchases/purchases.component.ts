@@ -4,7 +4,8 @@ import {
     UtilService,
     UsersService,
     PurchasesService,
-    DataService
+    DataService,
+    FileService
 } from "../../shared";
 import { Observable, of, merge, Subject } from "rxjs";
 import {
@@ -27,6 +28,7 @@ import { SalesConfigService } from "../../shared/services/salesconfig.services";
 import { formatDate } from "@angular/common";
 import { locateHostElement } from "@angular/core/src/render3/instructions";
 import { debug } from "util";
+import { HttpEventType } from "@angular/common/http";
 @Component({
     selector: "app-purchases",
     templateUrl: "./purchases.component.html",
@@ -55,6 +57,7 @@ export class PurchasesComponent implements OnInit {
     uploadDetailsubScriber: any;
     purchaseList: Array<any> = [];
     purchaseModel: any = {};
+    public fileModal: any = {};
     purchaseSummary: any = {};
     discountPackage: any = {};
     userModel: any = {};
@@ -114,6 +117,7 @@ export class PurchasesComponent implements OnInit {
         public purchasesService: PurchasesService,
         public dataService: DataService,
         public usersService: UsersService,
+        public fileService: FileService,
         public modalService: NgbModal,
         public changeDetectorRef: ChangeDetectorRef,
         public salesConfigService: SalesConfigService
@@ -1858,14 +1862,84 @@ export class PurchasesComponent implements OnInit {
             );
             return null;
         }
-
-        return {
-            metadataid: this.purchaseModel.metadatadetails.id,
-            totalsubscriptions: validSub.count,
-            totalbaseprice: this.purchaseModel.total_base_price,
-            finalprice: this.purchaseModel.total_amount,
-            files: signed_file
-        };
+        this.fileModal = {};
+        this.isCallingApi = true;
+        let modal = {
+            fileTypeId: 1,
+            contentType: signed_file.type,
+            fileName: signed_file.name
+        }
+        let reader: any = new FileReader();
+        reader.readAsBinaryString(signed_file);
+        reader.onloadend = () => {
+            var count = reader.result.match(/\/Type[\s]*\/Page[^s]/g).length;
+            this.fileModal.totalpages = count.toString();
+            this.fileModal.fileTypeId = "1";
+        }
+        this.allSubscribers.push(this.purchasesService.getReceiptFileSigned(modal).subscribe((res) => {
+            this.fileModal.filename = res.data.filename;
+            let signUrl = res.data.signedurl;
+            this.fileService.putFileOnBucket(signUrl, signed_file).subscribe((res: any) => {
+                switch (res.type) {
+                    case HttpEventType.Sent:
+                        // this.uploadedPercentage = 0;
+                        // this.fileUploadStatusDialog.openModal();
+                        break;
+                    case HttpEventType.Response:
+                        this.isCallingApi = false;
+                        console.log(res);
+                   
+                        // setTimeout(() => {
+                        //     this.isCallingApi = true;
+                        //     this.allSubscribers.push(this.fileService.SaveFileMetaData(this.fileModal).subscribe((res: any) => {
+                        //         this.isCallingApi = false;
+                        //         // for (let i = 0; i < res.body.data.length; i++) {
+                        //         this.bookModel.fileid = res.data.id;
+                        //         this.tempfile = res.data;
+                        //         // }
+                        //     }, err => {
+                        //         this.isCallingApi = false;
+                        //         this.utilService.showErrorCall(err);
+                        //     }));
+                        // }, 200);
+                        break;
+                    case 1: {
+                        // if (
+                        //     Math.round(this.uploadedPercentage) !==
+                        //     Math.round(
+                        //         (event["loaded"] / event["total"]) * 100
+                        //     )
+                        // ) {
+                        //     this.uploadedPercentage =
+                        //         (event["loaded"] / event["total"]) * 100;
+                        //     console.log(
+                        //         Math.round(this.uploadedPercentage)
+                        //     );
+                        // }
+                        break;
+                    }
+                }
+            }, err => {
+                this.isCallingApi = false;
+                // this.fileDialog.closeModal();
+                // this.fileUploadStatusDialog.closeModal();
+                this.utilService.showErrorCall(err);
+            })
+            return {
+                metadataid: this.purchaseModel.metadatadetails.id,
+                totalsubscriptions: validSub.count,
+                totalbaseprice: this.purchaseModel.total_base_price,
+                finalprice: this.purchaseModel.total_amount,
+                files: this.fileModal.filename
+            };
+        }))
+        // return {
+        //     metadataid: this.purchaseModel.metadatadetails.id,
+        //     totalsubscriptions: validSub.count,
+        //     totalbaseprice: this.purchaseModel.total_base_price,
+        //     finalprice: this.purchaseModel.total_amount,
+        //     files: signed_file
+        // };
     }
 
     onScrollDown() {
