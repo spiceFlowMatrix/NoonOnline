@@ -9,7 +9,8 @@ import {
     UtilService,
     UsersService,
     PurchasesService,
-    ProvisionsList
+    ProvisionsList,
+    FileService
 } from "./../../../shared";
 import { Observable, Subject, of, merge } from "rxjs";
 import {
@@ -22,6 +23,7 @@ import {
 } from "rxjs/operators";
 import * as moment from "moment";
 import * as _ from "lodash";
+import { HttpEventType } from "@angular/common/http";
 
 @Component({
     selector: "noon-individual-detail",
@@ -30,6 +32,7 @@ import * as _ from "lodash";
 })
 export class IndividualDetailComponent implements OnInit {
     public allSubscribers: any = [];
+    public fileModal: any = {};
     @ViewChild("manageIndividualDetailForm") manageIndividualDetailForm: any;
     focus$ = new Subject<string>();
     selectedAccount: any = {};
@@ -57,8 +60,9 @@ export class IndividualDetailComponent implements OnInit {
     constructor(
         public utilService: UtilService,
         public usersService: UsersService,
-        public purchasesService: PurchasesService
-    ) {}
+        public purchasesService: PurchasesService,
+        public fileService: FileService
+    ) { }
 
     ngOnInit() {
         this.addNewDetail();
@@ -71,13 +75,13 @@ export class IndividualDetailComponent implements OnInit {
     }
     checkForAgent() {
         this.userRoles = this.utilService.getRole();
-        this.isSalesAgent = _.find(this.userRoles, (o:any)=>{
+        this.isSalesAgent = _.find(this.userRoles, (o: any) => {
             return (o) == 'sales_agent';
-        }) ? true : false;   
-        this.isAdmin = _.find(this.userRoles, (o:any)=>{
+        }) ? true : false;
+        this.isAdmin = _.find(this.userRoles, (o: any) => {
             return (o) == 'sales_admin';
-        }) ? true : false;   
-        
+        }) ? true : false;
+
     }
     ngOnChanges(changes: SimpleChanges) {
         this.studenttazrika = null;
@@ -100,34 +104,34 @@ export class IndividualDetailComponent implements OnInit {
                     this.individualDetails[index]["cities"].push(key);
                 });
 
-                if(this.individualDetails[index].dateofbirth){
+                if (this.individualDetails[index].dateofbirth) {
                     let tempDate = _.clone(moment(this.individualDetails[index].dateofbirth));
-                    this.dob= {
+                    this.dob = {
                         year: tempDate.get("year"),
-                        month: tempDate.get("month")+1,
-                        day: tempDate.get("date")-1
+                        month: tempDate.get("month") + 1,
+                        day: tempDate.get("date") - 1
                     };
-                    
+
                 }
 
-                if(this.individualDetails[index].studenttazkira)
-                for (let i = 0; i < this.individualDetails[index].studenttazkira.length; i++) {
-                 this.studenttazrika = this.individualDetails[index].studenttazkira[i].name;
-                 this.studentDownload = this.individualDetails[index].studenttazkira[i].documenturl;
-                }
+                if (this.individualDetails[index].studenttazkira)
+                    for (let i = 0; i < this.individualDetails[index].studenttazkira.length; i++) {
+                        this.studenttazrika = this.individualDetails[index].studenttazkira[i].name;
+                        this.studentDownload = this.individualDetails[index].studenttazkira[i].documenturl;
+                    }
 
-                if(this.individualDetails[index].parenttazrika)
-                for (let i = 0; i < this.individualDetails[index].parenttazrika.length; i++) {
-                    this.parenttazrika = this.individualDetails[index].parenttazrika[i].name;
-                    this.parentDownload = this.individualDetails[index].parenttazrika[i].documenturl;
-                }
-             
-                if(this.individualDetails[index].previousmarksheets)
-                for (let i = 0; i < this.individualDetails[index].previousmarksheets.length; i++) {
-                 this.previousmarksheets = this.individualDetails[index].previousmarksheets[i].name;
-                 this.marksheetDownload = this.individualDetails[index].previousmarksheets[i].documenturl;
-                 
-                }
+                if (this.individualDetails[index].parenttazrika)
+                    for (let i = 0; i < this.individualDetails[index].parenttazrika.length; i++) {
+                        this.parenttazrika = this.individualDetails[index].parenttazrika[i].name;
+                        this.parentDownload = this.individualDetails[index].parenttazrika[i].documenturl;
+                    }
+
+                if (this.individualDetails[index].previousmarksheets)
+                    for (let i = 0; i < this.individualDetails[index].previousmarksheets.length; i++) {
+                        this.previousmarksheets = this.individualDetails[index].previousmarksheets[i].name;
+                        this.marksheetDownload = this.individualDetails[index].previousmarksheets[i].documenturl;
+
+                    }
             }
         }
     }
@@ -211,28 +215,28 @@ export class IndividualDetailComponent implements OnInit {
         this.allSubscribers.push(
             this.purchasesService.getIndividualDetailById(obj.id).subscribe(
                 res => {
-                    
+
                     this.individualDetails[index] = res.data;
-                    if(this.individualDetails[index].studenttazkira)
-                    for (let index = 0; index < this.individualDetails.length; index++) {
-                    for (let i = 0; i < this.individualDetails[index].studenttazkira.length; i++) {
-                     this.studenttazrika = this.individualDetails[index].studenttazkira[i].name || 'file';                     
-                     this.studentDownload = this.individualDetails[index].studenttazkira[i].documenturl;
-                    }
-    
-                    if(this.individualDetails[index].parenttazrika)
-                    for (let i = 0; i < this.individualDetails[index].parenttazrika.length; i++) {
-                        this.parenttazrika = this.individualDetails[index].parenttazrika[i].name || 'file';
-                        this.parentDownload = this.individualDetails[index].parenttazrika[i].documenturl;
-                    }
-                 
-                    if(this.individualDetails[index].previousmarksheets)
-                    for (let i = 0; i < this.individualDetails[index].previousmarksheets.length; i++) {
-                     this.previousmarksheets = this.individualDetails[index].previousmarksheets[i].name || 'file';
-                     this.marksheetDownload = this.individualDetails[index].previousmarksheets[i].documenturl;
-                     
-                    }
-                }
+                    if (this.individualDetails[index].studenttazkira)
+                        for (let index = 0; index < this.individualDetails.length; index++) {
+                            for (let i = 0; i < this.individualDetails[index].studenttazkira.length; i++) {
+                                this.studenttazrika = this.individualDetails[index].studenttazkira[i].name || 'file';
+                                this.studentDownload = this.individualDetails[index].studenttazkira[i].documenturl;
+                            }
+
+                            if (this.individualDetails[index].parenttazrika)
+                                for (let i = 0; i < this.individualDetails[index].parenttazrika.length; i++) {
+                                    this.parenttazrika = this.individualDetails[index].parenttazrika[i].name || 'file';
+                                    this.parentDownload = this.individualDetails[index].parenttazrika[i].documenturl;
+                                }
+
+                            if (this.individualDetails[index].previousmarksheets)
+                                for (let i = 0; i < this.individualDetails[index].previousmarksheets.length; i++) {
+                                    this.previousmarksheets = this.individualDetails[index].previousmarksheets[i].name || 'file';
+                                    this.marksheetDownload = this.individualDetails[index].previousmarksheets[i].documenturl;
+
+                                }
+                        }
                     if (this.selectedAccount) {
                         this.individualDetails[index].account = _.clone(
                             this.selectedAccount
@@ -250,30 +254,127 @@ export class IndividualDetailComponent implements OnInit {
 
     // onFileSelected($event, key, index) {
     //     console.log($event);
-    
+
     //     this.individualDetails[index][key] = $event.target.files;
     // }
-    onStudentFileSelected($event,index){
+    onStudentFileSelected($event, index) {
         this.studentDownload = null;
         this.studenttazrika = $event.target.files[0].name;
+        if (!this.individualDetails[index].studenttazrikafile)
+            this.individualDetails[index].studenttazrikafile = [];
+
         this.individualDetails[index]['studenttazrika'] = $event.target.files;
+        for (let i = 0; i < $event.target.files.length; i++) {
+            this.fileModal = {};
+            this.isCallingApi = true;
+            let modal = {
+                fileTypeId: 1,
+                contentType: $event.target.files[i].type,
+                fileName: $event.target.files[i].name
+            }
+            let reader: any = new FileReader();
+            reader.readAsBinaryString($event.target.files[i]);
+            reader.onloadend = () => {
+                var count = reader.result.match(/\/Type[\s]*\/Page[^s]/g).length;
+                this.fileModal.totalpages = count.toString();
+                this.fileModal.fileTypeId = "1";
+            }
+            this.allSubscribers.push(this.purchasesService.getIndividualDocumentFileSigned(modal).subscribe((res) => {
+                this.fileModal.filename = res.data.filename;
+                this.individualDetails[index].studenttazrikafile.push(res.data.filename);
+                let signUrl = res.data.signedurl;
+                this.fileService.putFileOnBucket(signUrl, $event.target.files[i]).subscribe((res: any) => {
+                    switch (res.type) {
+                        case HttpEventType.Response:
+                            this.isCallingApi = false;
+                    }
+                }, err => {
+                    this.isCallingApi = false;
+                    this.utilService.showErrorCall(err);
+                })
+            }))
+        }
     }
-    onMarksheetFileSelected($event,index){
+    onMarksheetFileSelected($event, index) {
         this.marksheetDownload = null;
         this.previousmarksheets = $event.target.files[0].name;
         this.individualDetails[index]['previousmarksheets'] = $event.target.files;
+        if (!this.individualDetails[index].previousmarksheetsfile)
+        this.individualDetails[index].previousmarksheetsfile = [];
+        for (let i = 0; i < $event.target.files.length; i++) {
+            this.fileModal = {};
+            this.isCallingApi = true;
+            let modal = {
+                fileTypeId: 1,
+                contentType: $event.target.files[i].type,
+                fileName: $event.target.files[i].name
+            }
+            let reader: any = new FileReader();
+            reader.readAsBinaryString($event.target.files[i]);
+            reader.onloadend = () => {
+                var count = reader.result.match(/\/Type[\s]*\/Page[^s]/g).length;
+                this.fileModal.totalpages = count.toString();
+                this.fileModal.fileTypeId = "1";
+            }
+            this.allSubscribers.push(this.purchasesService.getIndividualDocumentFileSigned(modal).subscribe((res) => {
+                this.fileModal.filename = res.data.filename;
+                this.individualDetails[index].previousmarksheetsfile.push(res.data.filename);
+                let signUrl = res.data.signedurl;
+                this.fileService.putFileOnBucket(signUrl, $event.target.files[i]).subscribe((res: any) => {
+                    switch (res.type) {
+                        case HttpEventType.Response:
+                            this.isCallingApi = false;
+                    }
+                }, err => {
+                    this.isCallingApi = false;
+                    this.utilService.showErrorCall(err);
+                })
+            }))
+        }
     }
 
-    onParentFileSelected($event,index){
+    onParentFileSelected($event, index) {
         this.parentDownload = null;
         this.parenttazrika = $event.target.files[0].name;
         this.individualDetails[index]['parenttazrika'] = $event.target.files;
+        if (!this.individualDetails[index].parenttazrikafile)
+        this.individualDetails[index].parenttazrikafile = [];
+        for (let i = 0; i < $event.target.files.length; i++) {
+            this.fileModal = {};
+            this.isCallingApi = true;
+            let modal = {
+                fileTypeId: 1,
+                contentType: $event.target.files[i].type,
+                fileName: $event.target.files[i].name
+            }
+            let reader: any = new FileReader();
+            reader.readAsBinaryString($event.target.files[i]);
+            reader.onloadend = () => {
+                var count = reader.result.match(/\/Type[\s]*\/Page[^s]/g).length;
+                this.fileModal.totalpages = count.toString();
+                this.fileModal.fileTypeId = "1";
+            }
+            this.allSubscribers.push(this.purchasesService.getIndividualDocumentFileSigned(modal).subscribe((res) => {
+                this.fileModal.filename = res.data.filename;
+                this.individualDetails[index].parenttazrikafile.push(res.data.filename);
+                let signUrl = res.data.signedurl;
+                this.fileService.putFileOnBucket(signUrl, $event.target.files[i]).subscribe((res: any) => {
+                    switch (res.type) {
+                        case HttpEventType.Response:
+                            this.isCallingApi = false;
+                    }
+                }, err => {
+                    this.isCallingApi = false;
+                    this.utilService.showErrorCall(err);
+                })
+            }))
+        }
     }
 
     downloadStudentFiles() {
         window.open(this.studentDownload);
     }
-    
+
     downloadParentFiles() {
         window.open(this.parentDownload);
     }
@@ -284,7 +385,7 @@ export class IndividualDetailComponent implements OnInit {
 
     public getDetail() {
         // console.log(this.individualDetails.dateofbirth);
-        
+
         // this.individualDetails.dateofbirth = 
         // typeof this.individualDetails.dateofbirth == "string"
         //     ? this.individualDetails.dateofbirth
@@ -293,18 +394,18 @@ export class IndividualDetailComponent implements OnInit {
         //           this.individualDetails.dateofbirth["month"],
         //           this.individualDetails.dateofbirth["day"]
         //       ).toISOString();
-        
+
         return this.individualDetails;
     }
     dateSelect(event) {
-        this.individualDetails[0].dateofbirth = 
-        typeof event == "string"
-            ? event
-            : new Date(
-                  event["year"],
-                  event["month"]-1,
-                  event["day"]+1
-              ).toISOString();
+        this.individualDetails[0].dateofbirth =
+            typeof event == "string"
+                ? event
+                : new Date(
+                    event["year"],
+                    event["month"] - 1,
+                    event["day"] + 1
+                ).toISOString();
     }
 
     ngOnDestroy() {
