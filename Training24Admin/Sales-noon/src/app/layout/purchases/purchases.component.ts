@@ -27,7 +27,7 @@ import { NgAnalyzeModulesHost } from "@angular/compiler";
 import { SalesConfigService } from "../../shared/services/salesconfig.services";
 import { formatDate } from "@angular/common";
 import { locateHostElement } from "@angular/core/src/render3/instructions";
-import { debug } from "util";
+import { debug, log } from "util";
 import { HttpEventType } from "@angular/common/http";
 @Component({
     selector: "app-purchases",
@@ -1614,12 +1614,13 @@ export class PurchasesComponent implements OnInit {
     reportFileSelected(event) {
         this.file = event;
         if (event.target && event.target.files) {
-            let model = this.getReceiptModel(event.target.files[0]);
+            let model = this.getUploadReceiptModel(event.target.files[0]);
             // if (!this.letFileUpload) {
             //     this.getErpCredentials();
             // }
             if (model) {
                 // if (this.letFileUpload) {
+                console.log(model)
                 this.isCallingApi = true;
                 this.allSubscribers.push(
                     this.purchasesService
@@ -1862,7 +1863,31 @@ export class PurchasesComponent implements OnInit {
             );
             return null;
         }
+
+        return {
+            metadataid: this.purchaseModel.metadatadetails.id,
+            totalsubscriptions: validSub.count,
+            totalbaseprice: this.purchaseModel.total_base_price,
+            finalprice: this.purchaseModel.total_amount,
+            files: signed_file
+        };
+    }
+    getUploadReceiptModel(signed_file?: any) {
         this.fileModal = {};
+        let validSub: any = this.countValidSubscription();
+        if (
+            !this.purchaseModel.metadatadetails ||
+            (this.purchaseModel.metadatadetails &&
+                !this.purchaseModel.metadatadetails.id) ||
+            validSub.count == 0
+        ) {
+            this.utilService.showErrorToast(
+                "Required",
+                "Please save Metadata/Subscriptions."
+            );
+            return null;
+        }
+        console.log(signed_file);
         this.isCallingApi = true;
         let modal = {
             fileTypeId: 1,
@@ -1881,65 +1906,51 @@ export class PurchasesComponent implements OnInit {
             let signUrl = res.data.signedurl;
             this.fileService.putFileOnBucket(signUrl, signed_file).subscribe((res: any) => {
                 switch (res.type) {
-                    case HttpEventType.Sent:
-                        // this.uploadedPercentage = 0;
-                        // this.fileUploadStatusDialog.openModal();
-                        break;
                     case HttpEventType.Response:
+                        console.log("file uploaded");
                         this.isCallingApi = false;
-                        console.log(res);
-                   
-                        // setTimeout(() => {
-                        //     this.isCallingApi = true;
-                        //     this.allSubscribers.push(this.fileService.SaveFileMetaData(this.fileModal).subscribe((res: any) => {
-                        //         this.isCallingApi = false;
-                        //         // for (let i = 0; i < res.body.data.length; i++) {
-                        //         this.bookModel.fileid = res.data.id;
-                        //         this.tempfile = res.data;
-                        //         // }
-                        //     }, err => {
-                        //         this.isCallingApi = false;
-                        //         this.utilService.showErrorCall(err);
-                        //     }));
-                        // }, 200);
-                        break;
-                    case 1: {
-                        // if (
-                        //     Math.round(this.uploadedPercentage) !==
-                        //     Math.round(
-                        //         (event["loaded"] / event["total"]) * 100
-                        //     )
-                        // ) {
-                        //     this.uploadedPercentage =
-                        //         (event["loaded"] / event["total"]) * 100;
-                        //     console.log(
-                        //         Math.round(this.uploadedPercentage)
-                        //     );
-                        // }
-                        break;
-                    }
+                        let tempModel = {
+                            metadataid: this.purchaseModel.metadatadetails.id,
+                            totalsubscriptions: validSub.count,
+                            totalbaseprice: this.purchaseModel.total_base_price,
+                            finalprice: this.purchaseModel.total_amount,
+                            filename: this.fileModal.filename
+                        };
+                       
+                        this.uploadReceipt(tempModel);
                 }
             }, err => {
                 this.isCallingApi = false;
-                // this.fileDialog.closeModal();
-                // this.fileUploadStatusDialog.closeModal();
                 this.utilService.showErrorCall(err);
             })
-            return {
-                metadataid: this.purchaseModel.metadatadetails.id,
-                totalsubscriptions: validSub.count,
-                totalbaseprice: this.purchaseModel.total_base_price,
-                finalprice: this.purchaseModel.total_amount,
-                files: this.fileModal.filename
-            };
         }))
-        // return {
-        //     metadataid: this.purchaseModel.metadatadetails.id,
-        //     totalsubscriptions: validSub.count,
-        //     totalbaseprice: this.purchaseModel.total_base_price,
-        //     finalprice: this.purchaseModel.total_amount,
-        //     files: signed_file
-        // };
+    }
+
+    uploadReceipt(modal) {
+        this.isCallingApi = true;
+        console.log(modal);
+        this.allSubscribers.push(
+            this.purchasesService
+                .generateSignedReceipt(modal)
+                .subscribe(
+                    res => {
+                        this.letFileUpload = false;
+                        this.isCallingApi = false;
+                        let fIndex = _.findIndex(this.purchaseList, {
+                            id: this.purchaseModel.metadatadetails.id
+                        });
+                        if (fIndex > -1) {
+                            this.purchaseList[fIndex]["status"] =
+                                res.data.status;
+                        }
+                        // this.addTransaction();
+                    },
+                    err => {
+                        this.isCallingApi = false;
+                        this.utilService.showErrorCall(err);
+                    }
+                )
+        );
     }
 
     onScrollDown() {

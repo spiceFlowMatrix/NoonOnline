@@ -16,7 +16,7 @@ import { PurchasesComponent } from './purchases.component';
 import { MetadataComponent } from './metadata/metadata.component';
 import { IndividualDetailComponent } from './individual-detail/individual-detail.component';
 import { SchoolDetailComponent } from './school-detail/school-detail.component';
-import { DirectivesModule, UsersService, CourseService, AgentService, PurchasesService, NgbDateFRParserFormatter } from '../../shared';
+import { DirectivesModule, UsersService, CourseService, AgentService, PurchasesService, NgbDateFRParserFormatter, FileService } from '../../shared';
 import { SelectDropDownModule } from 'ngx-select-dropdown'
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import { AdditionalService } from '../../shared/services/additional.services';
@@ -51,6 +51,7 @@ import { SalesConfigService } from '../../shared/services/salesconfig.services';
     AdditionalService,
     PackageService,
     CourseService,
+    FileService,
     AgentService,
     SalesConfigService,
     PurchasesService,
