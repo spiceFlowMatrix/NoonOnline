@@ -1,9 +1,11 @@
 ﻿using Google.Apis.Auth.OAuth2;
 using Google.Apis.Storage.v1;
 using Google.Cloud.Storage.V1;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Net.Http;
@@ -27,6 +29,7 @@ using Trainning24.BL.ViewModels.LessonFile;
 using Trainning24.BL.ViewModels.StudentLessonProgress;
 using Trainning24.BL.ViewModels.Users;
 using Trainning24.Domain.Entity;
+using Trainning24.Domain.Helper;
 using Trainning24.Repository.EF;
 
 namespace Trainning24.BL.Business
@@ -492,222 +495,401 @@ namespace Trainning24.BL.Business
 
         public CoursePreviewModel getCoursePreviewByIdTest(long id, string Certificate)
         {
-            var coursePreView = (from c in _training24Context.Course
-                                 where c.Id == id && c.IsDeleted != true
-                                 let chapterPreviewModels = (from cpt in _training24Context.Chapter
-                                                             where cpt.CourseId == c.Id && cpt.IsDeleted != true
+            CoursePreviewModel coursePreview = new CoursePreviewModel();
 
-                                                             let chapterQuizPrivewModels = (from cq in _training24Context.chapterQuiz
-                                                                                            join q in _training24Context.Quiz on cq.QuizId equals q.Id
-                                                                                            where cq.ChapterId == cpt.Id && cq.IsDeleted != true && q.IsDeleted != true
-                                                                                            select new QuizPreviewModel()
-                                                                                            {
-                                                                                                id = q.Id,
-                                                                                                name = q.Name,
-                                                                                                code = q.Code,
-                                                                                                numquestions = q.NumQuestions,
-                                                                                                itemorder = q.ItemOrder,
-                                                                                                type = 2
-                                                                                            }).ToList()
-                                                             let assignmentsPrivewModels = (from a in _training24Context.Assignment
-                                                                                            where a.ChapterId == cpt.Id && a.IsDeleted != true
-                                                                                            select new AssignmentPreviewModel
-                                                                                            {
-                                                                                                id = a.Id,
-                                                                                                name = a.Name,
-                                                                                                code = a.Code,
-                                                                                                description = a.Description,
-                                                                                                itemorder = a.ItemOrder,
-                                                                                                type = 3,
-                                                                                            }).ToList()
-                                                             let lessonPrivewModels = (from x in _training24Context.Lesson
-                                                                                       where x.ChapterId == cpt.Id && x.IsDeleted != true
-                                                                                       select new LessonPrivewModel
-                                                                                       {
-                                                                                           id = x.Id,
-                                                                                           name = x.Name,
-                                                                                           code = x.Code,
-                                                                                           description = x.Description,
-                                                                                           itemorder = x.ItemOrder,
-                                                                                           type = 1
-                                                                                       }).ToList()
-                                                             select new ChapterPreviewModel()
-                                                             {
-                                                                 Id = cpt.Id,
-                                                                 Code = cpt.Code,
-                                                                 Name = cpt.Name,
-                                                                 itemorder = cpt.ItemOrder,
-                                                                 quizs = chapterQuizPrivewModels,
-                                                                 assignments = assignmentsPrivewModels,
-                                                                 lessons = lessonPrivewModels.Cast<object>().ToList(),
-                                                             }
-                                                 ).ToList()
-                                 select new CoursePreviewModel
-                                 {
-                                     Id = c.Id,
-                                     Code = c.Code,
-                                     Description = c.Description,
-                                     Name = c.Name,
-                                     Image = !string.IsNullOrEmpty(c.Image) ? c.Image.Contains("t24-primary-image-storage") ? c.Image : LessonBusiness.geturl(c.Image, Certificate) : "",
-                                     chapters = chapterPreviewModels.OrderBy(b => b.itemorder).ToList()
-                                 }).FirstOrDefault();
-            return coursePreView;
+            DBHelper dbHelper = new DBHelper(_training24Context.Database.GetDbConnection().ConnectionString);
+            try
+            {
+                dbHelper.Open();
+                DataTable course = dbHelper.ExcecuteQueryDT("select Id,Code,Name,Image from course where Id=" + id + " AND (IsDeleted!=true OR IsDeleted Is Null)");
+                if (course.Rows.Count == 0)
+                    return coursePreview = null;
+                DataTable chaptor = dbHelper.ExcecuteQueryDT("select Id,Code,Name from chapter where CourseId=" + id + " AND (IsDeleted!=true OR IsDeleted Is Null)");
+                DataTable assignment = dbHelper.ExcecuteQueryDT("select Id,Code,Name,Description, ChapterId from assignment where ChapterId in (select Id from chapter where CourseId=" + id + " AND (IsDeleted!=true OR IsDeleted Is Null)) AND (IsDeleted!=true OR IsDeleted Is Null)");
+                DataTable lession = dbHelper.ExcecuteQueryDT("select Id,Code,Name,Description,ChapterId from lesson where ChapterId in (select Id from chapter where CourseId=" + id + "  AND (IsDeleted!=true OR IsDeleted Is Null)) AND (IsDeleted!=true OR IsDeleted Is Null)");
+                DataTable quizes = dbHelper.ExcecuteQueryDT("select c.ChapterId,q.Id AS chqId, q.NumQuestions, q.Name AS chqname,q.Code as chqCode from chapterquiz c join quiz q on c.quizid=q.id where ChapterId in (select Id from chapter where CourseId=" + id + " AND (IsDeleted!=true OR IsDeleted Is Null)) AND (q.IsDeleted!=true OR q.IsDeleted Is Null)AND (c.IsDeleted!=true OR c.IsDeleted Is Null)");
+                dbHelper.Close();
+
+                List<ChapterPreviewModel> chaptorPreviewList = new List<ChapterPreviewModel>();
+                DataRow cour = course.Rows[0];
+                coursePreview.Id = Convert.ToInt64(cour["Id"].ToString());
+                coursePreview.Code = cour["Code"].ToString();
+                coursePreview.Name = cour["Name"].ToString();
+                string image = cour["Image"].ToString();
+                if (!string.IsNullOrEmpty(image))
+                {
+                    if (image.Contains("t24-primary-image-storage"))
+                        coursePreview.Image = image;
+                    else
+                        coursePreview.Image = LessonBusiness.geturl(image, Certificate);
+                }
+                if (chaptor.Rows.Count != 0)
+                {
+                    foreach (DataRow dr in chaptor.Rows)
+                    {
+                        ChapterPreviewModel chapterPreview = new ChapterPreviewModel();
+                        chapterPreview.Id = Convert.ToInt64(dr["Id"].ToString());
+                        chapterPreview.Code = dr["Code"].ToString();
+                        chapterPreview.Name = dr["Name"].ToString();
+
+                        List<QuizPreviewModel> lstquizPreviewModel = new List<QuizPreviewModel>();
+                        if (quizes.Rows.Count != 0)
+                        {
+                            foreach (DataRow chquiz in quizes.Rows)
+                            {
+                                if (Convert.ToInt64(chquiz["ChapterId"].ToString()) == Convert.ToInt64(dr["Id"].ToString()))
+                                {
+                                    QuizPreviewModel quizPreviewModel = new QuizPreviewModel();
+
+                                    quizPreviewModel.id = Convert.ToInt64(chquiz["chqId"].ToString());
+                                    quizPreviewModel.name = chquiz["chqname"].ToString();
+                                    quizPreviewModel.code = chquiz["chqCode"].ToString();
+                                    quizPreviewModel.type = 1;
+                                    quizPreviewModel.numquestions = Convert.ToInt32(chquiz["NumQuestions"].ToString());
+                                    lstquizPreviewModel.Add(quizPreviewModel);
+                                }
+                            }
+                            chapterPreview.quizs = lstquizPreviewModel.Count > 0 ? lstquizPreviewModel : null;
+                        }
+                        else
+                        {
+                            chapterPreview.quizs = null;
+                        }
+                        List<AssignmentPreviewModel> assignmentPreviewModel = new List<AssignmentPreviewModel>();
+                        if (assignment.Rows.Count > 0)
+                        {
+                            foreach (DataRow assig in assignment.Rows)
+                            {
+                                if (Convert.ToInt64(assig["ChapterId"].ToString()) == Convert.ToInt64(dr["Id"].ToString()))
+                                {
+                                    AssignmentPreviewModel assignmentModel = new AssignmentPreviewModel();
+                                    assignmentModel.id = Convert.ToInt64(assig["Id"].ToString());
+                                    assignmentModel.name = assig["Name"].ToString();
+                                    assignmentModel.code = assig["Code"].ToString();
+                                    assignmentModel.description = assig["Description"].ToString();
+                                    assignmentModel.type = 3;
+                                    assignmentPreviewModel.Add(assignmentModel);
+                                }
+                            }
+                            chapterPreview.assignments = assignmentPreviewModel.Count > 0 ? assignmentPreviewModel : null;
+                        }
+                        else
+                        {
+                            chapterPreview.assignments = null;
+                        }
+                        List<LessonPrivewModel> lessonPrivewModels = new List<LessonPrivewModel>();
+                        if (lession.Rows.Count != 0)
+                        {
+                            foreach (DataRow less in lession.Rows)
+                            {
+                                if (Convert.ToInt64(less["ChapterId"].ToString()) == Convert.ToInt64(dr["Id"].ToString()))
+                                {
+                                    LessonPrivewModel lessonPrivewModel = new LessonPrivewModel();
+                                    lessonPrivewModel.id = Convert.ToInt64(less["Id"].ToString());
+                                    lessonPrivewModel.name = less["Name"].ToString();
+                                    lessonPrivewModel.code = less["Code"].ToString();
+                                    lessonPrivewModel.description = less["Description"].ToString();
+                                    lessonPrivewModel.type = 1;
+                                    lessonPrivewModels.Add(lessonPrivewModel);
+                                }
+
+                            }
+                            List<object> listobj = lessonPrivewModels.Cast<object>().ToList();
+                            chapterPreview.lessons = lessonPrivewModels.Count > 0 ? listobj : null;
+                        }
+                        else
+                        {
+                            chapterPreview.lessons = null;
+                        }
+                        chaptorPreviewList.Add(chapterPreview);
+                    }
+                    coursePreview.chapters = chaptorPreviewList;
+                }
+                else
+                {
+                    coursePreview.chapters = chaptorPreviewList;
+                }
+            }
+            catch (Exception ex)
+            {
+                dbHelper.Close();
+                throw ex;
+            }
+            finally
+            {
+                dbHelper.Dispose();
+            }
+            return coursePreview;
         }
 
 
         public CoursePreviewModel getCoursePreviewByIdTest(long id, long studentid, string Certificate)
         {
-            var coursePreView = (from c in _training24Context.Course
-                                 where c.Id == id && c.IsDeleted != true
-                                 let chapterPreviewModels = (from cpt in _training24Context.Chapter
-                                                             where cpt.CourseId == c.Id && cpt.IsDeleted != true
+            CoursePreviewModel coursePreview = new CoursePreviewModel();
+            DBHelper dbHelper = new DBHelper(_training24Context.Database.GetDbConnection().ConnectionString);
+            try
+            {
+                dbHelper.Open();
+                DataTable course = dbHelper.ExcecuteQueryDT("select Id,Code,Name,Image from course where Id=" + id + " AND (IsDeleted!=true OR IsDeleted Is Null)");
+                if (course.Rows.Count == 0)
+                    return coursePreview = null;
+                DataTable chaptor = dbHelper.ExcecuteQueryDT("select Id,Code,Name from chapter where CourseId=" + id + " AND (IsDeleted!=true OR IsDeleted Is Null)");
+                DataTable assignment = dbHelper.ExcecuteQueryDT("select Id,Code,Name,Description, ChapterId from assignment where ChapterId in (select Id from chapter where CourseId=" + id + " AND (IsDeleted!=true OR IsDeleted Is Null)) AND (IsDeleted!=true OR IsDeleted Is Null)");
+                DataTable lession = dbHelper.ExcecuteQueryDT("select Id,Code,Name,Description,ChapterId from lesson where ChapterId in (select Id from chapter where CourseId=" + id + "  AND (IsDeleted!=true OR IsDeleted Is Null)) AND (IsDeleted!=true OR IsDeleted Is Null)");
+                DataTable quizes = dbHelper.ExcecuteQueryDT("select c.ChapterId,q.Id AS chqId, q.NumQuestions, q.Name AS chqname,q.Code as chqCode from chapterquiz c join quiz q on c.quizid=q.id where ChapterId in (select Id from chapter where CourseId=" + id + " AND (IsDeleted!=true OR IsDeleted Is Null)) AND (q.IsDeleted!=true OR q.IsDeleted Is Null)AND (c.IsDeleted!=true OR c.IsDeleted Is Null)");
+                List<string> assignmentList = new List<string>();
+                List<string> lessionList = new List<string>();
+                List<string> lessionAssignmentList = new List<string>();
+                DataTable assignmentFiles = new DataTable();
+                DataTable lessionFiles = new DataTable();
+                DataTable lessionAssignments = new DataTable();
+                DataTable lessonAssignmentFiles = new DataTable();
+                if (assignment.Rows.Count != 0)
+                {
+                    foreach (DataRow assig in assignment.Rows)
+                    {
+                        assignmentList.Add(assig["Id"].ToString());
+                    }
 
-                                                             let chapterQuizPrivewModels = (from cq in _training24Context.chapterQuiz
-                                                                                            join q in _training24Context.Quiz on cq.QuizId equals q.Id
-                                                                                            where cq.ChapterId == cpt.Id && cq.IsDeleted != true && q.IsDeleted != true
-                                                                                            select new QuizPreviewModel()
-                                                                                            {
-                                                                                                id = q.Id,
-                                                                                                name = q.Name,
-                                                                                                code = q.Code,
-                                                                                                numquestions = q.NumQuestions,
-                                                                                                itemorder = q.ItemOrder,
-                                                                                                type = 2
-                                                                                            }).ToList()
-                                                             let assignmentsPrivewModels = (from a in _training24Context.Assignment
-                                                                                            where a.ChapterId == cpt.Id && a.IsDeleted != true
-                                                                                            let chapterAssigmentFiles = (from laf in _training24Context.AssignmentFile
-                                                                                                                         where laf.AssignmentId == a.Id && laf.IsDeleted != true
-                                                                                                                         let assignmentFilesPreviewModel = (from f in _training24Context.Files
-                                                                                                                                                            join ft in _training24Context.FileTypes on f.FileTypeId equals ft.Id
-                                                                                                                                                            where f.Id == laf.FileId && f.IsDeleted != true && ft.IsDeleted != true
-                                                                                                                                                            select new ResponseFilesModel()
-                                                                                                                                                            {
-                                                                                                                                                                Id = f.Id,
-                                                                                                                                                                name = f.Name,
-                                                                                                                                                                url = LessonBusiness.geturl(f.Url, Certificate),
-                                                                                                                                                                filename = f.FileName,
-                                                                                                                                                                filetypeid = f.FileTypeId,
-                                                                                                                                                                description = f.Description,
-                                                                                                                                                                filetypename = ft.Filetype,
-                                                                                                                                                                filesize = f.FileSize,
-                                                                                                                                                                duration = f.Duration,
-                                                                                                                                                                totalpages = f.TotalPages,
-                                                                                                                                                            }).FirstOrDefault()
-                                                                                                                         select new ResponseAssignmentFileModel
-                                                                                                                         {
-                                                                                                                             id = laf.Id,
-                                                                                                                             files = assignmentFilesPreviewModel
-                                                                                                                         }).ToList()
-                                                                                            select new AssignmentPreviewModel
-                                                                                            {
-                                                                                                id = a.Id,
-                                                                                                name = a.Name,
-                                                                                                code = a.Code,
-                                                                                                description = a.Description,
-                                                                                                assignmentfiles = chapterAssigmentFiles //AssignmentBusiness.GetAssignmentFilesByAssignmentId(a.Id, Certificate)
-                                                                                            }).ToList()
-                                                             let lessonPrivewModels = (from x in _training24Context.Lesson
-                                                                                       where x.ChapterId == cpt.Id && x.IsDeleted != true
-                                                                                       let lessonFilesPreviewModel = (from lf in _training24Context.LessonFile
-                                                                                                                      where lf.LessionId == x.Id && lf.IsDeleted != true
-                                                                                                                      let filesPreviewModel = (from f in _training24Context.Files
-                                                                                                                                               join ft in _training24Context.FileTypes on f.FileTypeId equals ft.Id
-                                                                                                                                               where lf.FileId == f.Id && f.IsDeleted != true && ft.IsDeleted != true
-                                                                                                                                               select new ResponseFilesModel()
-                                                                                                                                               {
-                                                                                                                                                   Id = f.Id,
-                                                                                                                                                   name = f.Name,
-                                                                                                                                                   url = LessonBusiness.geturl(f.Url, Certificate),
-                                                                                                                                                   filename = f.FileName,
-                                                                                                                                                   filetypeid = f.FileTypeId,
-                                                                                                                                                   description = f.Description,
-                                                                                                                                                   filetypename = ft.Filetype,
-                                                                                                                                                   filesize = f.FileSize,
-                                                                                                                                                   duration = f.Duration,
-                                                                                                                                                   totalpages = f.TotalPages,
-                                                                                                                                               }).FirstOrDefault()
-                                                                                                                      let studentLessonProgressModel = (from lp in _training24Context.StudentLessonProgress
-                                                                                                                                                        where lp.LessonId == x.Id && lp.StudentId == studentid && lp.IsDeleted != true
-                                                                                                                                                        select new ResponseStudentLessonProgressModel
-                                                                                                                                                        {
-                                                                                                                                                            id = lp.Id,
-                                                                                                                                                            lessonid = lp.LessonId,
-                                                                                                                                                            lessonstatus = lp.LessonStatus,
-                                                                                                                                                            studentid = lp.StudentId,
-                                                                                                                                                            lessonprogress = lp.LessonProgress
-                                                                                                                                                        }).SingleOrDefault()
-                                                                                                                      select new ResponseLessonFileModel
-                                                                                                                      {
-                                                                                                                          id = lf.Id,
-                                                                                                                          files = filesPreviewModel,
-                                                                                                                          progress = studentLessonProgressModel
-                                                                                                                      }).ToList()
-                                                                                       let responseLessionAssignmentDTO = (from la in _training24Context.LessonAssignments
-                                                                                                                           where la.LessonId == x.Id && la.IsDeleted != true
-                                                                                                                           let lessonAssigmentFiles = (from laf in _training24Context.LessonAssignmentFiles
-                                                                                                                                                       where laf.AssignmentId == la.Id && laf.IsDeleted != true
-                                                                                                                                                       let assignmentFilesPreviewModel = (from f in _training24Context.Files
-                                                                                                                                                                                          join ft in _training24Context.FileTypes on f.FileTypeId equals ft.Id
-                                                                                                                                                                                          where f.Id == laf.FileId && f.IsDeleted != true && ft.IsDeleted != true
-                                                                                                                                                                                          select new ResponseFilesModel()
-                                                                                                                                                                                          {
-                                                                                                                                                                                              Id = f.Id,
-                                                                                                                                                                                              name = f.Name,
-                                                                                                                                                                                              url = LessonBusiness.geturl(f.Url, Certificate),
-                                                                                                                                                                                              filename = f.FileName,
-                                                                                                                                                                                              filetypeid = f.FileTypeId,
-                                                                                                                                                                                              description = f.Description,
-                                                                                                                                                                                              filetypename = ft.Filetype,
-                                                                                                                                                                                              filesize = f.FileSize,
-                                                                                                                                                                                              duration = f.Duration,
-                                                                                                                                                                                              totalpages = f.TotalPages,
-                                                                                                                                                                                          }).FirstOrDefault()
-                                                                                                                                                       select new ResponseLessonAssignmentFileDTO
-                                                                                                                                                       {
-                                                                                                                                                           id = laf.Id,
-                                                                                                                                                           files = assignmentFilesPreviewModel
-                                                                                                                                                       }).ToList()
-                                                                                                                           select new ResponseLessionAssignmentDTO
-                                                                                                                           {
-                                                                                                                               id = Convert.ToInt32(la.Id),
-                                                                                                                               name = la.Name,
-                                                                                                                               code = la.Code,
-                                                                                                                               description = la.Description,
-                                                                                                                               assignmentfiles = lessonAssigmentFiles
-                                                                                                                           }).FirstOrDefault()
+                    if (assignmentList != null)
+                        assignmentFiles = dbHelper.ExcecuteQueryDT("select af.Id as AssignmentFileId,af.AssignmentId, f.Id, f.Name, f.Url, f.FileName, f.FileTypeId, f.FileSize, f.Duration,f.Description, f.Totalpages, ft.Filetype from files f join assignmentfile af on f.Id= af.FileId  join filetypes as ft on f.FileTypeId = ft.Id where af.AssignmentId in (" + string.Join(',', assignmentList.ToArray()
+                            ) + ") AND (f.IsDeleted!=true OR f.IsDeleted Is Null) AND (af.IsDeleted!=true OR af.IsDeleted Is Null)");
+                }
+                if (lession.Rows.Count != 0)
+                {
+                    foreach (DataRow less in lession.Rows)
+                    {
+                        lessionList.Add(less["Id"].ToString());
+                    }
+                    if (lessionFiles != null)
+                        lessionFiles = dbHelper.ExcecuteQueryDT("select af.Id as LessionFileId, af.LessionId, f.Id, f.Name, f.Url, f.FileName, f.FileTypeId, f.FileSize, f.Duration, f.Totalpages,f.Description,ft.Filetype from files f join lessonfile af on f.Id= af.FileId  join filetypes as ft on f.FileTypeId = ft.Id where af.LessionId in (" + string.Join(',', lessionList.ToArray()
+                            ) + ") AND (f.IsDeleted!=true OR f.IsDeleted Is Null) AND (af.IsDeleted!=true OR af.IsDeleted Is Null)");
+                }
+                if (lession.Rows.Count != 0)
+                {
+                    if (lessionFiles != null)
+                        lessionAssignments = dbHelper.ExcecuteQueryDT("Select Id,Code,Name,Description,LessonId from lessonassignments as la where la.LessonId in (" + string.Join(',', lessionList.ToArray()
+                            ) + ") AND (la.IsDeleted!=true OR la.IsDeleted Is Null)");
+                    foreach (DataRow lesassig in lessionAssignments.Rows)
+                    {
+                        lessionAssignmentList.Add(lesassig["Id"].ToString());
+                    }
 
-                                                                                       select new LessonPrivewModel
-                                                                                       {
-                                                                                           id = x.Id,
-                                                                                           name = x.Name,
-                                                                                           code = x.Code,
-                                                                                           description = x.Description,
-                                                                                           itemorder = x.ItemOrder,
-                                                                                           lessonfiles = lessonFilesPreviewModel,
-                                                                                           assignment = responseLessionAssignmentDTO
-                                                                                       }).ToList()
-                                                             select new ChapterPreviewModel()
-                                                             {
-                                                                 Id = cpt.Id,
-                                                                 Code = cpt.Code,
-                                                                 Name = cpt.Name,
-                                                                 itemorder = cpt.ItemOrder,
-                                                                 quizs = chapterQuizPrivewModels,
-                                                                 assignments = assignmentsPrivewModels,
-                                                                 lessons = lessonPrivewModels.Cast<object>().ToList(),
-                                                             }
-                                                 ).ToList()
-                                 select new CoursePreviewModel
-                                 {
-                                     Id = c.Id,
-                                     Code = c.Code,
-                                     Description = c.Description,
-                                     Name = c.Name,
-                                     Image = !string.IsNullOrEmpty(c.Image) ? c.Image.Contains("t24-primary-image-storage") ? c.Image : LessonBusiness.geturl(c.Image, Certificate) : "",
-                                     chapters = chapterPreviewModels.OrderBy(b => b.itemorder).ToList()
-                                 }).FirstOrDefault();
-            return coursePreView;
+                    if (lessionAssignmentList != null)
+                        lessonAssignmentFiles = dbHelper.ExcecuteQueryDT("select af.Id as LessonAssignmentFileId,af.AssignmentId, f.Id, f.Name, f.Url, f.FileName, f.FileTypeId,  f.FileSize,f.Description, f.Duration, f.Totalpages,ft.Filetype from files f join lessonassignmentfiles  af on f.Id= af.FileId  join filetypes as ft on f.FileTypeId = ft.Id where af.AssignmentId in (" + string.Join(',', lessionAssignmentList.ToArray()
+                            ) + ") AND (f.IsDeleted!=true OR f.IsDeleted Is Null) AND (af.IsDeleted!=true OR af.IsDeleted Is Null)");
+
+                    dbHelper.Close();
+                }
+                List<ChapterPreviewModel> chaptorPreviewList = new List<ChapterPreviewModel>();
+                DataRow cour = course.Rows[0];
+                coursePreview.Id = Convert.ToInt64(cour["Id"].ToString());
+                coursePreview.Code = cour["Code"].ToString();
+                coursePreview.Name = cour["Name"].ToString();
+                string image = cour["Image"].ToString();
+                if (!string.IsNullOrEmpty(image))
+                {
+                    if (image.Contains("t24-primary-image-storage"))
+                        coursePreview.Image = image;
+                    else
+                        coursePreview.Image = LessonBusiness.geturl(image, Certificate);
+                }
+                if (chaptor.Rows.Count != 0)
+                {
+                    foreach (DataRow dr in chaptor.Rows)
+                    {
+                        ChapterPreviewModel chapterPreview = new ChapterPreviewModel();
+                        chapterPreview.Id = Convert.ToInt64(dr["Id"].ToString());
+                        chapterPreview.Code = dr["Code"].ToString();
+                        chapterPreview.Name = dr["Name"].ToString();
+
+                        List<QuizPreviewModel> lstquizPreviewModel = new List<QuizPreviewModel>();
+                        if (quizes.Rows.Count != 0)
+                        {
+                            foreach (DataRow chquiz in quizes.Rows)
+                            {
+                                if (Convert.ToInt64(chquiz["ChapterId"].ToString()) == Convert.ToInt64(dr["Id"].ToString()))
+                                {
+                                    QuizPreviewModel quizPreviewModel = new QuizPreviewModel();
+
+                                    quizPreviewModel.id = Convert.ToInt64(chquiz["chqId"].ToString());
+                                    quizPreviewModel.name = chquiz["chqname"].ToString();
+                                    quizPreviewModel.code = chquiz["chqCode"].ToString();
+                                    quizPreviewModel.type = 2;
+                                    quizPreviewModel.numquestions = Convert.ToInt32(chquiz["NumQuestions"].ToString());
+                                    lstquizPreviewModel.Add(quizPreviewModel);
+
+                                }
+                            }
+                            chapterPreview.quizs = lstquizPreviewModel.Count > 0 ? lstquizPreviewModel : null;
+                        }
+                        else
+                        {
+                            chapterPreview.quizs = null;
+                        }
+                        List<AssignmentPreviewModel> assignmentPreviewModel = new List<AssignmentPreviewModel>();
+                        if (assignment.Rows.Count > 0)
+                        {
+
+                            foreach (DataRow assig in assignment.Rows)
+                            {
+                                if (Convert.ToInt64(assig["ChapterId"].ToString()) == Convert.ToInt64(dr["Id"].ToString()))
+                                {
+                                    AssignmentPreviewModel assignmentModel = new AssignmentPreviewModel();
+                                    assignmentModel.id = Convert.ToInt64(assig["Id"].ToString());
+                                    assignmentModel.name = assig["Name"].ToString();
+                                    assignmentModel.code = assig["Code"].ToString();
+                                    assignmentModel.description = assig["Description"].ToString();
+                                    assignmentModel.type = 3;
+                                    List<ResponseAssignmentFileModel> AssignmentFileList = new List<ResponseAssignmentFileModel>();
+                                    foreach (DataRow af in assignmentFiles.Rows)
+                                    {
+
+                                        if (Convert.ToInt64(af["AssignmentId"].ToString()) == Convert.ToInt64(assig["Id"].ToString()))
+                                        {
+                                            ResponseAssignmentFileModel responseAssignmentFileModel = new ResponseAssignmentFileModel();
+                                            ResponseFilesModel responseFilesModel = new ResponseFilesModel();
+                                            responseFilesModel.Id = Convert.ToInt64(af["Id"].ToString());
+                                            responseFilesModel.name = af["Name"].ToString();
+                                            if (!string.IsNullOrEmpty(af["Url"].ToString()))
+                                                responseFilesModel.url = LessonBusiness.geturl(af["Url"].ToString(), Certificate);
+                                            //responseFilesModel.url = newFiles.Url;
+                                            responseFilesModel.filename = af["FileName"].ToString();
+                                            responseFilesModel.filetypeid = Convert.ToInt32(af["FileTypeId"].ToString());
+                                            responseFilesModel.description = af["Description"].ToString();
+                                            responseFilesModel.filetypename = af["Filetype"].ToString();
+                                            responseFilesModel.filesize = Convert.ToInt64(af["FileSize"].ToString());
+                                            responseFilesModel.duration = af["Duration"].ToString();
+                                            responseFilesModel.totalpages = Convert.ToInt32(af["Totalpages"].ToString());
+
+                                            responseAssignmentFileModel.id = Convert.ToInt64(af["AssignmentFileId"].ToString());
+                                            responseAssignmentFileModel.files = responseFilesModel;
+                                            AssignmentFileList.Add(responseAssignmentFileModel);
+
+                                        }
+                                    }
+                                    assignmentModel.assignmentfiles = AssignmentFileList;
+                                    assignmentPreviewModel.Add(assignmentModel);
+                                }
+                            }
+
+                            chapterPreview.assignments = assignmentPreviewModel.Count > 0 ? assignmentPreviewModel : null;
+                        }
+                        else
+                        {
+                            chapterPreview.assignments = null;
+                        }
+                        List<LessonPrivewModel> lessonPrivewModels = new List<LessonPrivewModel>();
+                        if (lession.Rows.Count != 0)
+                        {
+                            foreach (DataRow less in lession.Rows)
+                            {
+                                if (Convert.ToInt64(less["ChapterId"].ToString()) == Convert.ToInt64(dr["Id"].ToString()))
+                                {
+                                    LessonPrivewModel lessonPrivewModel = new LessonPrivewModel();
+                                    lessonPrivewModel.id = Convert.ToInt64(less["Id"].ToString());
+                                    lessonPrivewModel.name = less["Name"].ToString();
+                                    lessonPrivewModel.code = less["Code"].ToString();
+                                    lessonPrivewModel.description = less["Description"].ToString();
+                                    lessonPrivewModel.type = 1;
+                                    List<ResponseLessonFileModel> lessonFileList = new List<ResponseLessonFileModel>();
+                                    foreach (DataRow lf in lessionFiles.Rows)
+                                    {
+
+                                        if (Convert.ToInt64(lf["LessionId"].ToString()) == Convert.ToInt64(less["Id"].ToString()))
+                                        {
+                                            ResponseLessonFileModel responseAssignmentFileModel = new ResponseLessonFileModel();
+                                            ResponseFilesModel responseFilesModel = new ResponseFilesModel();
+                                            responseFilesModel.Id = Convert.ToInt64(lf["Id"].ToString());
+                                            responseFilesModel.name = lf["Name"].ToString();
+                                            if (!string.IsNullOrEmpty(lf["Url"].ToString()))
+                                                responseFilesModel.url = LessonBusiness.geturl(lf["Url"].ToString(), Certificate);
+                                            //responseFilesModel.url = newFiles.Url;
+                                            responseFilesModel.filename = lf["FileName"].ToString();
+                                            responseFilesModel.filetypeid = Convert.ToInt32(lf["FileTypeId"].ToString());
+                                            responseFilesModel.description = lf["Description"].ToString();
+                                            responseFilesModel.filetypename = lf["Filetype"].ToString();
+                                            responseFilesModel.filesize = Convert.ToInt64(lf["FileSize"].ToString());
+                                            responseFilesModel.duration = lf["Duration"].ToString();
+                                            responseFilesModel.totalpages = Convert.ToInt32(lf["Totalpages"].ToString());
+
+                                            responseAssignmentFileModel.id = Convert.ToInt64(lf["LessionFileId"].ToString());
+                                            responseAssignmentFileModel.files = responseFilesModel;
+                                            lessonFileList.Add(responseAssignmentFileModel);
+
+                                        }
+                                    }
+                                    lessonPrivewModel.lessonfiles = lessonFileList;// LessonBusiness.GetLessionFilesByLessionId(x.Id, studentid, Certificate),
+                                    ResponseLessionAssignmentDTO responseLessionAssignmentDTO = new ResponseLessionAssignmentDTO();
+                                    foreach (DataRow la in lessionAssignments.Rows)
+                                    {
+                                        if (Convert.ToInt64(la["LessonId"].ToString()) == Convert.ToInt64(less["Id"].ToString()))
+                                        {
+                                            responseLessionAssignmentDTO.id = Convert.ToInt32(la["Id"].ToString());
+                                            responseLessionAssignmentDTO.name = la["Name"].ToString();
+                                            responseLessionAssignmentDTO.code = la["Code"].ToString();
+                                            responseLessionAssignmentDTO.description = la["Description"].ToString();
+                                            List<ResponseLessonAssignmentFileDTO> AssignmentFileList = new List<ResponseLessonAssignmentFileDTO>();
+                                            foreach (DataRow af in lessonAssignmentFiles.Rows)
+                                            {
+                                                if (Convert.ToInt64(af["AssignmentId"].ToString()) == Convert.ToInt64(la["Id"].ToString()))
+                                                {
+                                                    ResponseLessonAssignmentFileDTO responseAssignmentFileModel = new ResponseLessonAssignmentFileDTO();
+                                                    ResponseFilesModel responseFilesModel = new ResponseFilesModel();
+                                                    responseFilesModel.Id = Convert.ToInt64(af["Id"].ToString());
+                                                    responseFilesModel.name = af["Name"].ToString();
+                                                    string url = af["Url"].ToString();
+                                                    if (!string.IsNullOrEmpty(url))
+                                                        responseFilesModel.url = LessonBusiness.geturl(url, Certificate);
+                                                    //responseFilesModel.url = newFiles.Url;
+                                                    responseFilesModel.filename = af["FileName"].ToString();
+                                                    responseFilesModel.filetypeid = Convert.ToInt32(af["FileTypeId"].ToString());
+                                                    responseFilesModel.description = af["Description"].ToString();
+                                                    responseFilesModel.filetypename = af["Filetype"].ToString();
+                                                    responseFilesModel.filesize = Convert.ToInt64(af["FileSize"].ToString());
+                                                    responseFilesModel.duration = af["Duration"].ToString();
+                                                    responseFilesModel.totalpages = Convert.ToInt32(af["Totalpages"].ToString());
+
+                                                    responseAssignmentFileModel.id = Convert.ToInt64(af["AssignmentId"].ToString());
+                                                    responseAssignmentFileModel.files = responseFilesModel;
+                                                    AssignmentFileList.Add(responseAssignmentFileModel);
+
+                                                }
+                                            }
+                                            responseLessionAssignmentDTO.assignmentfiles = AssignmentFileList;
+                                        }
+                                    }
+                                    lessonPrivewModel.assignment = responseLessionAssignmentDTO;
+                                    lessonPrivewModels.Add(lessonPrivewModel);
+                                }
+
+                            }
+                            List<object> listobj = lessonPrivewModels.Cast<object>().ToList();
+                            chapterPreview.lessons = lessonPrivewModels.Count > 0 ? listobj : null;
+                        }
+                        else
+                        {
+                            chapterPreview.lessons = null;
+                        }
+                        chaptorPreviewList.Add(chapterPreview);
+                    }
+                    coursePreview.chapters = chaptorPreviewList;
+                }
+                else
+                {
+                    coursePreview.chapters = chaptorPreviewList;
+                }
+            }
+            catch (Exception ex)
+            {
+                dbHelper.Close();
+                throw ex;
+            }
+            finally
+            {
+                dbHelper.Dispose();
+            }
+            return coursePreview;
         }
 
         public List<ResponseGradeModel> GetGradeByCourseId(long id)
@@ -884,6 +1066,188 @@ namespace Trainning24.BL.Business
                 total = coursePriviewGradeWiseModelstest.Count();
             }
 
+            return coursePriviewGradeWiseModelstest;
+        }
+
+        public object getCoursePriviewGradeWiseTest(long id, PaginationModel paginationModel, string Certificate, out int total)
+        {
+            List<CoursePriviewGradeWiseModel> coursePriviewGradeWiseModels = new List<CoursePriviewGradeWiseModel>();
+            List<CoursePriviewGradeWiseModel> coursePriviewGradeWiseModelstest = new List<CoursePriviewGradeWiseModel>();
+            DBHelper dbHelper = new DBHelper(_training24Context.Database.GetDbConnection().ConnectionString);
+            try
+            {
+                dbHelper.Open();
+                DataTable usercourselist = dbHelper.ExcecuteQueryDT("SELECT Id,UserId,CourseId,StartDate,EndDate FROM `usercourse` as uc WHERE   uc.UserId = " + id + "  AND (uc.IsDeleted!=true OR uc.IsDeleted Is Null) AND (uc.IsExpire!=true OR uc.IsExpire Is Null)");
+                List<string> CourseIdList = new List<string>();
+                DataTable courselist = new DataTable();
+                DataTable courseGradeslist = new DataTable();
+                if (usercourselist.Rows.Count != 0)
+                {
+                    foreach (DataRow usercourse in usercourselist.Rows)
+                    {
+                        CourseIdList.Add(usercourse["CourseId"].ToString());
+                    }
+                    if (CourseIdList.Count > 0)
+                    {
+                        courselist = dbHelper.ExcecuteQueryDT("select Id,Code,Name,Image,Description from course where Id in (" + string.Join(',', CourseIdList.ToArray()
+                             ) + ")AND (IsDeleted!=true OR IsDeleted Is Null)");
+                        courseGradeslist = dbHelper.ExcecuteQueryDT("select cg.Id as cgId,cg.CourseId,cg.Gradeid,g.Id,g.Name,g.SchoolId,g.Description from CourseGrade as cg join grade as g  where CourseId in (" + string.Join(',', CourseIdList.ToArray()) + ") AND (cg.IsDeleted!=true OR cg.IsDeleted Is Null)AND (g.IsDeleted!=true OR g.IsDeleted Is Null)");
+                    }
+                }
+                dbHelper.Close();
+                if (usercourselist.Rows.Count == 0)
+                {
+                    total = coursePriviewGradeWiseModelstest.Count();
+                    return coursePriviewGradeWiseModelstest = null;
+                }
+                foreach (DataRow usercourse in usercourselist.Rows)
+                {
+                    if (courselist.Rows.Count != 0)
+                    {
+                        foreach (DataRow course in courselist.Rows)
+                        {
+                            if (Convert.ToInt64(course["Id"].ToString()) == Convert.ToInt64(usercourse["CourseId"].ToString()))
+                            {
+                                foreach (DataRow cgrade in courseGradeslist.Rows)
+                                {
+                                    if (Convert.ToInt64(cgrade["CourseId"].ToString()) == Convert.ToInt64(usercourse["CourseId"].ToString()))
+                                    {
+                                        List<GradeWiseCoursePriviewModel> coursePriviewModelList = new List<GradeWiseCoursePriviewModel>();
+                                        GradeWiseCoursePriviewModel coursePriviewModel = new GradeWiseCoursePriviewModel();
+                                        coursePriviewModel.id = Convert.ToInt64(course["Id"].ToString());
+                                        coursePriviewModel.code = course["Code"].ToString();
+                                        coursePriviewModel.description = course["Description"].ToString();
+                                        if (!string.IsNullOrEmpty(course["Image"].ToString()))
+                                        {
+                                            if (course["Image"].ToString().Contains("t24-primary-image-storage"))
+                                                coursePriviewModel.image = course["Image"].ToString();
+                                            else
+                                                coursePriviewModel.image = LessonBusiness.geturl(course["Image"].ToString(), Certificate);
+                                        }
+                                        coursePriviewModel.name = course["Name"].ToString();
+                                        coursePriviewModel.startdate = usercourse["StartDate"].ToString();
+                                        coursePriviewModel.enddate = usercourse["EndDate"].ToString();
+                                        coursePriviewModelList.Add(coursePriviewModel);
+                                        CoursePriviewGradeWiseModel coursePriview = new CoursePriviewGradeWiseModel();
+                                        coursePriview.id = Convert.ToInt64(cgrade["Id"].ToString());
+                                        coursePriview.name = cgrade["Name"].ToString();
+                                        coursePriview.courses = coursePriviewModelList;
+                                        CoursePriviewGradeWiseModel cp = coursePriviewGradeWiseModels.Find(b => b.id == Convert.ToInt64(cgrade["Id"].ToString()));
+                                        if (cp == null)
+                                        {
+                                            coursePriviewGradeWiseModels.Add(coursePriview);
+                                        }
+                                        else
+                                        {
+                                            cp.courses.Add(coursePriviewModel);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                coursePriviewGradeWiseModelstest = coursePriviewGradeWiseModels;
+                total = coursePriviewGradeWiseModelstest.Count();
+                if (paginationModel.pagenumber != 0 && paginationModel.perpagerecord != 0 && paginationModel.roleid != 0)
+                {
+                    coursePriviewGradeWiseModelstest = coursePriviewGradeWiseModelstest.Where(b => b.id == paginationModel.roleid).ToList();
+                    total = coursePriviewGradeWiseModelstest.Count();
+                    coursePriviewGradeWiseModelstest = coursePriviewGradeWiseModelstest.Skip(paginationModel.perpagerecord * (paginationModel.pagenumber - 1)).
+                    Take(paginationModel.perpagerecord).
+                    ToList();
+                    if (!string.IsNullOrEmpty(paginationModel.search))
+                    {
+                        foreach (var take in coursePriviewGradeWiseModelstest.ToList())
+                        {
+                            bool t1 = take.id.ToString() == paginationModel.search;
+                            bool t2 = take.name.ToLower() == paginationModel.search.ToLower();
+                            if (t1 == true || t2 == true)
+                                continue;
+                            foreach (var coursetake in take.courses.ToList())
+                            {
+                                bool t3 = coursetake.name.ToLower() == paginationModel.search.ToLower();
+                                bool t4 = coursetake.description.ToLower() == paginationModel.search.ToLower();
+                                if (t3 == true || t4 == true)
+                                    continue;
+                                else
+                                    take.courses.Remove(coursetake);
+                            }
+                            if (take.courses.Count == 0)
+                            {
+                                coursePriviewGradeWiseModelstest.Remove(take);
+                            }
+                        }
+                    }
+                }
+                if (paginationModel.pagenumber != 0 && paginationModel.perpagerecord != 0)
+                {
+                    coursePriviewGradeWiseModelstest = coursePriviewGradeWiseModelstest.Skip(paginationModel.perpagerecord * (paginationModel.pagenumber - 1)).
+                    Take(paginationModel.perpagerecord).
+                    ToList();
+                    if (!string.IsNullOrEmpty(paginationModel.search))
+                    {
+                        foreach (var take in coursePriviewGradeWiseModelstest.ToList())
+                        {
+                            bool t1 = take.id.ToString() == paginationModel.search;
+                            bool t2 = take.name.ToLower() == paginationModel.search.ToLower();
+                            if (t1 == true || t2 == true)
+                                continue;
+                            foreach (var coursetake in take.courses.ToList())
+                            {
+                                bool t3 = coursetake.name.ToLower() == paginationModel.search.ToLower();
+                                bool t4 = coursetake.description.ToLower() == paginationModel.search.ToLower();
+                                if (t3 == true || t4 == true)
+                                    continue;
+                                else
+                                    take.courses.Remove(coursetake);
+                            }
+                            if (take.courses.Count == 0)
+                            {
+                                coursePriviewGradeWiseModelstest.Remove(take);
+                            }
+                        }
+                    }
+                }
+                if (!string.IsNullOrEmpty(paginationModel.search))
+                {
+                    foreach (var take in coursePriviewGradeWiseModelstest.ToList())
+                    {
+                        bool t1 = take.id.ToString() == paginationModel.search;
+                        bool t2 = take.name.ToLower() == paginationModel.search.ToLower();
+                        if (t1 == true || t2 == true)
+                            continue;
+                        foreach (var coursetake in take.courses.ToList())
+                        {
+                            bool t3 = coursetake.name.ToLower() == paginationModel.search.ToLower();
+                            bool t4 = coursetake.description.ToLower() == paginationModel.search.ToLower();
+                            if (t3 == true || t4 == true)
+                                continue;
+                            else
+                                take.courses.Remove(coursetake);
+                        }
+                        if (take.courses.Count == 0)
+                        {
+                            coursePriviewGradeWiseModelstest.Remove(take);
+                        }
+                    }
+                }
+                if (paginationModel.roleid != 0)
+                {
+                    coursePriviewGradeWiseModelstest = coursePriviewGradeWiseModelstest.Where(b => b.id == paginationModel.roleid).
+                                                       ToList();
+                    total = coursePriviewGradeWiseModelstest.Count();
+                }
+            }
+            catch (Exception ex)
+            {
+                dbHelper.Close();
+                throw ex;
+            }
+            finally
+            {
+                dbHelper.Dispose();
+            }
             return coursePriviewGradeWiseModelstest;
         }
 
@@ -1305,6 +1669,186 @@ namespace Trainning24.BL.Business
                 total = coursePriviewGradeWiseModelstest.Count();
             }
 
+            return coursePriviewGradeWiseModelstest;
+        }
+
+        public object getTrialCoursePriviewGradeWiseTest(long id, PaginationModel paginationModel, string Certificate, out int total)
+        {
+            List<CoursePriviewGradeWiseModel> coursePriviewGradeWiseModels = new List<CoursePriviewGradeWiseModel>();
+            List<CoursePriviewGradeWiseModel> coursePriviewGradeWiseModelstest = new List<CoursePriviewGradeWiseModel>();
+            DBHelper dbHelper = new DBHelper(_training24Context.Database.GetDbConnection().ConnectionString);
+            try
+            {
+                dbHelper.Open();
+                DataTable usercourselist = dbHelper.ExcecuteQueryDT("SELECT Id,Name,Code,Description ,Image,PassMark FROM `Course` as uc WHERE  (uc.IsDeleted!=true OR uc.IsDeleted Is Null) AND (uc.istrial = true)");
+                List<string> CourseIdList = new List<string>();
+                DataTable courselist = new DataTable();
+                DataTable courseGradeslist = new DataTable();
+                if (usercourselist.Rows.Count != 0)
+                {
+                    foreach (DataRow usercourse in usercourselist.Rows)
+                    {
+                        CourseIdList.Add(usercourse["Id"].ToString());
+                    }
+                    if (CourseIdList.Count > 0)
+                    {
+                        courselist = dbHelper.ExcecuteQueryDT("select Id,Code,Name,Image,Description from course where Id in (" + string.Join(',', CourseIdList.ToArray()
+                             ) + ")AND (IsDeleted!=true OR IsDeleted Is Null)");
+                        courseGradeslist = dbHelper.ExcecuteQueryDT("select cg.Id as cgId,cg.CourseId,cg.Gradeid,g.Id,g.Name,g.SchoolId,g.Description from CourseGrade as cg join grade as g  where CourseId in (" + string.Join(',', CourseIdList.ToArray()) + ") AND (cg.IsDeleted!=true OR cg.IsDeleted Is Null)AND (g.IsDeleted!=true OR g.IsDeleted Is Null)");
+                    }
+                }
+                dbHelper.Close();
+                if (usercourselist.Rows.Count == 0)
+                {
+                    total = coursePriviewGradeWiseModelstest.Count();
+                    return coursePriviewGradeWiseModelstest = null;
+                }
+                foreach (DataRow usercourse in usercourselist.Rows)
+                {
+                    if (courselist.Rows.Count != 0)
+                    {
+                        foreach (DataRow course in courselist.Rows)
+                        {
+                            if (Convert.ToInt64(course["Id"].ToString()) == Convert.ToInt64(usercourse["Id"].ToString()))
+                            {
+                                foreach (DataRow cgrade in courseGradeslist.Rows)
+                                {
+                                    if (Convert.ToInt64(cgrade["CourseId"].ToString()) == Convert.ToInt64(usercourse["Id"].ToString()))
+                                    {
+                                        List<GradeWiseCoursePriviewModel> coursePriviewModelList = new List<GradeWiseCoursePriviewModel>();
+                                        GradeWiseCoursePriviewModel coursePriviewModel = new GradeWiseCoursePriviewModel();
+                                        coursePriviewModel.id = Convert.ToInt64(course["Id"].ToString());
+                                        coursePriviewModel.code = course["Code"].ToString();
+                                        coursePriviewModel.description = course["Description"].ToString();
+                                        if (!string.IsNullOrEmpty(course["Image"].ToString()))
+                                        {
+                                            if (course["Image"].ToString().Contains("t24-primary-image-storage"))
+                                                coursePriviewModel.image = course["Image"].ToString();
+                                            else
+                                                coursePriviewModel.image = LessonBusiness.geturl(course["Image"].ToString(), Certificate);
+                                        }
+                                        coursePriviewModel.name = course["Name"].ToString();
+                                        coursePriviewModelList.Add(coursePriviewModel);
+                                        CoursePriviewGradeWiseModel coursePriview = new CoursePriviewGradeWiseModel();
+                                        coursePriview.id = Convert.ToInt64(cgrade["Id"].ToString());
+                                        coursePriview.name = cgrade["Name"].ToString();
+                                        coursePriview.courses = coursePriviewModelList;
+                                        CoursePriviewGradeWiseModel cp = coursePriviewGradeWiseModels.Find(b => b.id == Convert.ToInt64(cgrade["Id"].ToString()));
+                                        if (cp == null)
+                                        {
+                                            coursePriviewGradeWiseModels.Add(coursePriview);
+                                        }
+                                        else
+                                        {
+                                            cp.courses.Add(coursePriviewModel);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                coursePriviewGradeWiseModelstest = coursePriviewGradeWiseModels;
+                total = coursePriviewGradeWiseModelstest.Count();
+                if (paginationModel.pagenumber != 0 && paginationModel.perpagerecord != 0 && paginationModel.roleid != 0)
+                {
+                    coursePriviewGradeWiseModelstest = coursePriviewGradeWiseModelstest.Where(b => b.id == paginationModel.roleid).ToList();
+                    total = coursePriviewGradeWiseModelstest.Count();
+                    coursePriviewGradeWiseModelstest = coursePriviewGradeWiseModelstest.Skip(paginationModel.perpagerecord * (paginationModel.pagenumber - 1)).
+                    Take(paginationModel.perpagerecord).
+                    ToList();
+                    if (!string.IsNullOrEmpty(paginationModel.search))
+                    {
+                        foreach (var take in coursePriviewGradeWiseModelstest.ToList())
+                        {
+                            bool t1 = take.id.ToString() == paginationModel.search;
+                            bool t2 = take.name.ToLower() == paginationModel.search.ToLower();
+                            if (t1 == true || t2 == true)
+                                continue;
+                            foreach (var coursetake in take.courses.ToList())
+                            {
+                                bool t3 = coursetake.name.ToLower() == paginationModel.search.ToLower();
+                                bool t4 = coursetake.description.ToLower() == paginationModel.search.ToLower();
+                                if (t3 == true || t4 == true)
+                                    continue;
+                                else
+                                    take.courses.Remove(coursetake);
+                            }
+                            if (take.courses.Count == 0)
+                            {
+                                coursePriviewGradeWiseModelstest.Remove(take);
+                            }
+                        }
+                    }
+                }
+                if (paginationModel.pagenumber != 0 && paginationModel.perpagerecord != 0)
+                {
+                    coursePriviewGradeWiseModelstest = coursePriviewGradeWiseModelstest.Skip(paginationModel.perpagerecord * (paginationModel.pagenumber - 1)).
+                    Take(paginationModel.perpagerecord).
+                    ToList();
+                    if (!string.IsNullOrEmpty(paginationModel.search))
+                    {
+                        foreach (var take in coursePriviewGradeWiseModelstest.ToList())
+                        {
+                            bool t1 = take.id.ToString() == paginationModel.search;
+                            bool t2 = take.name.ToLower() == paginationModel.search.ToLower();
+                            if (t1 == true || t2 == true)
+                                continue;
+                            foreach (var coursetake in take.courses.ToList())
+                            {
+                                bool t3 = coursetake.name.ToLower() == paginationModel.search.ToLower();
+                                bool t4 = coursetake.description.ToLower() == paginationModel.search.ToLower();
+                                if (t3 == true || t4 == true)
+                                    continue;
+                                else
+                                    take.courses.Remove(coursetake);
+                            }
+                            if (take.courses.Count == 0)
+                            {
+                                coursePriviewGradeWiseModelstest.Remove(take);
+                            }
+                        }
+                    }
+                }
+                if (!string.IsNullOrEmpty(paginationModel.search))
+                {
+                    foreach (var take in coursePriviewGradeWiseModelstest.ToList())
+                    {
+                        bool t1 = take.id.ToString() == paginationModel.search;
+                        bool t2 = take.name.ToLower() == paginationModel.search.ToLower();
+                        if (t1 == true || t2 == true)
+                            continue;
+                        foreach (var coursetake in take.courses.ToList())
+                        {
+                            bool t3 = coursetake.name.ToLower() == paginationModel.search.ToLower();
+                            bool t4 = coursetake.description.ToLower() == paginationModel.search.ToLower();
+                            if (t3 == true || t4 == true)
+                                continue;
+                            else
+                                take.courses.Remove(coursetake);
+                        }
+                        if (take.courses.Count == 0)
+                        {
+                            coursePriviewGradeWiseModelstest.Remove(take);
+                        }
+                    }
+                }
+                if (paginationModel.roleid != 0)
+                {
+                    coursePriviewGradeWiseModelstest = coursePriviewGradeWiseModelstest.Where(b => b.id == paginationModel.roleid).
+                                                       ToList();
+                    total = coursePriviewGradeWiseModelstest.Count();
+                }
+            }
+            catch (Exception ex)
+            {
+                dbHelper.Close();
+                throw ex;
+            }
+            finally
+            {
+                dbHelper.Dispose();
+            }
             return coursePriviewGradeWiseModelstest;
         }
     }
