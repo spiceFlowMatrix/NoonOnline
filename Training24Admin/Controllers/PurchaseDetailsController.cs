@@ -147,34 +147,38 @@ namespace Training24Admin.Controllers
                     var storage = StorageClient.Create(credential);
                     string mediaLink = "";
 
-                    string fileName = "";
-                    IFormFile file = null;
-                    if (Request.Form.Files.Count != 0)
-                        file = Request.Form.Files[0];
+                    //string fileName = "";
+                    //IFormFile file = null;
+                    //if (Request.Form.Files.Count != 0)
+                    //    file = Request.Form.Files[0];
 
-                    var imageAcl = PredefinedObjectAcl.PublicRead;
+                    //var imageAcl = PredefinedObjectAcl.PublicRead;
 
-                    fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
-                    var ext = fileName.Substring(fileName.LastIndexOf("."));
-                    var extension = ext.ToLower();
-                    fileName = fileName.Split(".")[0] + "_" + IndividualDetailsBusiness.ReturnCode() + extension;
+                    //fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
+                    //var ext = fileName.Substring(fileName.LastIndexOf("."));
+                    //var extension = ext.ToLower();
+                    //fileName = fileName.Split(".")[0] + "_" + IndividualDetailsBusiness.ReturnCode() + extension;
 
 
-                    var imageObject = await storage.UploadObjectAsync(
-                        bucket: "t24-primary-pdf-storage",
-                        objectName: fileName,
-                        contentType: file.ContentType,
-                        source: file.OpenReadStream(),
-                        options: new UploadObjectOptions { PredefinedAcl = imageAcl }
-                    );
-                    mediaLink = imageObject.MediaLink;
+                    //var imageObject = await storage.UploadObjectAsync(
+                    //    bucket: "t24-primary-pdf-storage",
+                    //    objectName: fileName,
+                    //    contentType: file.ContentType,
+                    //    source: file.OpenReadStream(),
+                    //    options: new UploadObjectOptions { PredefinedAcl = imageAcl }
+                    //);
+                    string BucketName = General.getBucketName("1");
+                    if (!string.IsNullOrEmpty(Request.Form["filename"].ToString()))
+                    {
+                        var storageObject = storage.GetObject(BucketName, Request.Form["filename"].ToString());
+                        mediaLink = storageObject.MediaLink;
+                    }
 
                     AddFilesModel FilesModel = new AddFilesModel();
                     FilesModel.Url = mediaLink;
-                    FilesModel.Name = fileName;
-                    FilesModel.FileName = fileName;
+                    FilesModel.Name = Request.Form["filename"].ToString();
+                    FilesModel.FileName = Request.Form["filename"].ToString();
                     FilesModel.FileTypeId = 1;
-                    FilesModel.FileSize = file.Length;
                     Files newFiles = FilesBusiness.Create(FilesModel, int.Parse(tc.Id));
                     IndividualDetailsBusiness.CreatePurchageUpload(new PurchageUpload { PdfFile = newFiles.Id, PurchageId = subscriptionMetadata.PurchageId }, int.Parse(tc.Id));
 
