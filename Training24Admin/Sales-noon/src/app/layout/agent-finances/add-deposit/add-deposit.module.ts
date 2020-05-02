@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { NgbDatepickerModule } from '@ng-bootstrap/ng-bootstrap';
 import { AddDepositRoutingModule } from './add-deposit-routing.module';
 import { AddDepositComponent } from './add-deposit.component';
-import { PageHeaderModule, CommonDialogModule, SharedModule, AgentService } from '../../../shared';
+import { PageHeaderModule, CommonDialogModule, SharedModule, AgentService, FileService } from '../../../shared';
 
 @NgModule({
     imports: [
@@ -15,6 +15,6 @@ import { PageHeaderModule, CommonDialogModule, SharedModule, AgentService } from
         AddDepositRoutingModule
     ],
     declarations: [AddDepositComponent],
-    providers: [AgentService]
+    providers: [AgentService,FileService]
 })
 export class AddDepositModule { }

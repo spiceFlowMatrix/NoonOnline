@@ -61,7 +61,7 @@
                         <button type="button" class="btn btn-primary" (click)="openFileSelecter('documents')">Select
                             file</button>
                         <input type="file" multiple="true" style="display:none;" id="documents" name="documents"
-                            (change)="onFileSelected($event)">
+                            (change)="onFileSelected($event)" accept="application/pdf">
                         <div class="row mt-1">
                             <label class="control-label col-sm-4" *ngFor="let document of agentDepositModel.documentid;let i=index;">
                                 <span class="doc-name" title="{{document.name}}">{{document.name}}</span>
