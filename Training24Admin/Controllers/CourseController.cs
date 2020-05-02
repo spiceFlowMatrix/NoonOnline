@@ -1018,6 +1018,58 @@ namespace Training24Admin.Controllers
             }
         }
 
+        [HttpGet("CoursePriviewGradeWiseTest")]
+        public IActionResult CoursePriviewGradeWiseTest(int pagenumber, int perpagerecord, string search, int gradeid)
+        {
+            PaginationModel paginationModel = new PaginationModel();
+            paginationModel.pagenumber = pagenumber;
+            paginationModel.perpagerecord = perpagerecord;
+            paginationModel.search = search;
+            paginationModel.roleid = gradeid;
+            PaginationResponse successResponse = new PaginationResponse();
+            UnsuccessResponse unsuccessResponse = new UnsuccessResponse();
+            try
+            {
+                string Authorization = Request.Headers["id_token"];
+                //get claims after decoding id_token 
+                TokenClaims tc = General.GetClaims(Authorization);
+                tc.Id = LessonBusiness.getUserId(tc.sub);
+
+                string Certificate = Path.GetFileName(hostingEnvironment.WebRootPath + "/training24-28e994f9833c.json"); //xxx
+
+                CourseBusiness.updateTrailCourse(long.Parse(tc.Id));
+                var user = _usersBusiness.GetUserbyId(long.Parse(tc.Id));
+                object coursePreview = null;
+                if (user.istrial)
+                {
+                    var days = (DateTime.Now.Date - Convert.ToDateTime(user.CreationTime, CultureInfo.InvariantCulture).Date).Days;
+                    if (days < 15)
+                    {
+                        coursePreview = CourseBusiness.getTrialCoursePriviewGradeWiseTest(long.Parse(tc.Id.ToString()), paginationModel, Certificate, out int total);
+                        successResponse.totalcount = total;
+                    }
+                }
+                else
+                {
+                    coursePreview = CourseBusiness.getCoursePriviewGradeWiseTest(long.Parse(tc.Id.ToString()), paginationModel, Certificate, out int total);
+                    successResponse.totalcount = total;
+                }
+
+                successResponse.data = coursePreview;
+                successResponse.response_code = 0;
+                successResponse.message = "Course detail";
+                successResponse.status = "Success";
+                return StatusCode(200, successResponse);
+            }
+            catch (Exception ex)
+            {
+                unsuccessResponse.response_code = 2;
+                unsuccessResponse.message = ex.Message;
+                unsuccessResponse.status = "Failure";
+                return StatusCode(500, unsuccessResponse);
+            }
+        }
+
         [HttpGet("ConvertedGeneratedUrl")]
         public IActionResult ConvertedGeneratedUrl()
         {

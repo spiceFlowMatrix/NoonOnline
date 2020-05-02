@@ -1069,6 +1069,188 @@ namespace Trainning24.BL.Business
             return coursePriviewGradeWiseModelstest;
         }
 
+        public object getCoursePriviewGradeWiseTest(long id, PaginationModel paginationModel, string Certificate, out int total)
+        {
+            List<CoursePriviewGradeWiseModel> coursePriviewGradeWiseModels = new List<CoursePriviewGradeWiseModel>();
+            List<CoursePriviewGradeWiseModel> coursePriviewGradeWiseModelstest = new List<CoursePriviewGradeWiseModel>();
+            DBHelper dbHelper = new DBHelper(_training24Context.Database.GetDbConnection().ConnectionString);
+            try
+            {
+                dbHelper.Open();
+                DataTable usercourselist = dbHelper.ExcecuteQueryDT("SELECT Id,UserId,CourseId,StartDate,EndDate FROM `usercourse` as uc WHERE   uc.UserId = " + id + "  AND (uc.IsDeleted!=true OR uc.IsDeleted Is Null) AND (uc.IsExpire!=true OR uc.IsExpire Is Null)");
+                List<string> CourseIdList = new List<string>();
+                DataTable courselist = new DataTable();
+                DataTable courseGradeslist = new DataTable();
+                if (usercourselist.Rows.Count != 0)
+                {
+                    foreach (DataRow usercourse in usercourselist.Rows)
+                    {
+                        CourseIdList.Add(usercourse["CourseId"].ToString());
+                    }
+                    if (CourseIdList.Count > 0)
+                    {
+                        courselist = dbHelper.ExcecuteQueryDT("select Id,Code,Name,Image,Description from course where Id in (" + string.Join(',', CourseIdList.ToArray()
+                             ) + ")AND (IsDeleted!=true OR IsDeleted Is Null)");
+                        courseGradeslist = dbHelper.ExcecuteQueryDT("select cg.Id as cgId,cg.CourseId,cg.Gradeid,g.Id,g.Name,g.SchoolId,g.Description from CourseGrade as cg join grade as g  where CourseId in (" + string.Join(',', CourseIdList.ToArray()) + ") AND (cg.IsDeleted!=true OR cg.IsDeleted Is Null)AND (g.IsDeleted!=true OR g.IsDeleted Is Null)");
+                    }
+                }
+                dbHelper.Close();
+                if (usercourselist.Rows.Count == 0)
+                {
+                    total = coursePriviewGradeWiseModelstest.Count();
+                    return coursePriviewGradeWiseModelstest = null;
+                }
+                foreach (DataRow usercourse in usercourselist.Rows)
+                {
+                    if (courselist.Rows.Count != 0)
+                    {
+                        foreach (DataRow course in courselist.Rows)
+                        {
+                            if (Convert.ToInt64(course["Id"].ToString()) == Convert.ToInt64(usercourse["CourseId"].ToString()))
+                            {
+                                foreach (DataRow cgrade in courseGradeslist.Rows)
+                                {
+                                    if (Convert.ToInt64(cgrade["CourseId"].ToString()) == Convert.ToInt64(usercourse["CourseId"].ToString()))
+                                    {
+                                        List<GradeWiseCoursePriviewModel> coursePriviewModelList = new List<GradeWiseCoursePriviewModel>();
+                                        GradeWiseCoursePriviewModel coursePriviewModel = new GradeWiseCoursePriviewModel();
+                                        coursePriviewModel.id = Convert.ToInt64(course["Id"].ToString());
+                                        coursePriviewModel.code = course["Code"].ToString();
+                                        coursePriviewModel.description = course["Description"].ToString();
+                                        if (!string.IsNullOrEmpty(course["Image"].ToString()))
+                                        {
+                                            if (course["Image"].ToString().Contains("t24-primary-image-storage"))
+                                                coursePriviewModel.image = course["Image"].ToString();
+                                            else
+                                                coursePriviewModel.image = LessonBusiness.geturl(course["Image"].ToString(), Certificate);
+                                        }
+                                        coursePriviewModel.name = course["Name"].ToString();
+                                        coursePriviewModel.startdate = usercourse["StartDate"].ToString();
+                                        coursePriviewModel.enddate = usercourse["EndDate"].ToString();
+                                        coursePriviewModelList.Add(coursePriviewModel);
+                                        CoursePriviewGradeWiseModel coursePriview = new CoursePriviewGradeWiseModel();
+                                        coursePriview.id = Convert.ToInt64(cgrade["Id"].ToString());
+                                        coursePriview.name = cgrade["Name"].ToString();
+                                        coursePriview.courses = coursePriviewModelList;
+                                        CoursePriviewGradeWiseModel cp = coursePriviewGradeWiseModels.Find(b => b.id == Convert.ToInt64(cgrade["Id"].ToString()));
+                                        if (cp == null)
+                                        {
+                                            coursePriviewGradeWiseModels.Add(coursePriview);
+                                        }
+                                        else
+                                        {
+                                            cp.courses.Add(coursePriviewModel);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                coursePriviewGradeWiseModelstest = coursePriviewGradeWiseModels;
+                total = coursePriviewGradeWiseModelstest.Count();
+                if (paginationModel.pagenumber != 0 && paginationModel.perpagerecord != 0 && paginationModel.roleid != 0)
+                {
+                    coursePriviewGradeWiseModelstest = coursePriviewGradeWiseModelstest.Where(b => b.id == paginationModel.roleid).ToList();
+                    total = coursePriviewGradeWiseModelstest.Count();
+                    coursePriviewGradeWiseModelstest = coursePriviewGradeWiseModelstest.Skip(paginationModel.perpagerecord * (paginationModel.pagenumber - 1)).
+                    Take(paginationModel.perpagerecord).
+                    ToList();
+                    if (!string.IsNullOrEmpty(paginationModel.search))
+                    {
+                        foreach (var take in coursePriviewGradeWiseModelstest.ToList())
+                        {
+                            bool t1 = take.id.ToString() == paginationModel.search;
+                            bool t2 = take.name.ToLower() == paginationModel.search.ToLower();
+                            if (t1 == true || t2 == true)
+                                continue;
+                            foreach (var coursetake in take.courses.ToList())
+                            {
+                                bool t3 = coursetake.name.ToLower() == paginationModel.search.ToLower();
+                                bool t4 = coursetake.description.ToLower() == paginationModel.search.ToLower();
+                                if (t3 == true || t4 == true)
+                                    continue;
+                                else
+                                    take.courses.Remove(coursetake);
+                            }
+                            if (take.courses.Count == 0)
+                            {
+                                coursePriviewGradeWiseModelstest.Remove(take);
+                            }
+                        }
+                    }
+                }
+                if (paginationModel.pagenumber != 0 && paginationModel.perpagerecord != 0)
+                {
+                    coursePriviewGradeWiseModelstest = coursePriviewGradeWiseModelstest.Skip(paginationModel.perpagerecord * (paginationModel.pagenumber - 1)).
+                    Take(paginationModel.perpagerecord).
+                    ToList();
+                    if (!string.IsNullOrEmpty(paginationModel.search))
+                    {
+                        foreach (var take in coursePriviewGradeWiseModelstest.ToList())
+                        {
+                            bool t1 = take.id.ToString() == paginationModel.search;
+                            bool t2 = take.name.ToLower() == paginationModel.search.ToLower();
+                            if (t1 == true || t2 == true)
+                                continue;
+                            foreach (var coursetake in take.courses.ToList())
+                            {
+                                bool t3 = coursetake.name.ToLower() == paginationModel.search.ToLower();
+                                bool t4 = coursetake.description.ToLower() == paginationModel.search.ToLower();
+                                if (t3 == true || t4 == true)
+                                    continue;
+                                else
+                                    take.courses.Remove(coursetake);
+                            }
+                            if (take.courses.Count == 0)
+                            {
+                                coursePriviewGradeWiseModelstest.Remove(take);
+                            }
+                        }
+                    }
+                }
+                if (!string.IsNullOrEmpty(paginationModel.search))
+                {
+                    foreach (var take in coursePriviewGradeWiseModelstest.ToList())
+                    {
+                        bool t1 = take.id.ToString() == paginationModel.search;
+                        bool t2 = take.name.ToLower() == paginationModel.search.ToLower();
+                        if (t1 == true || t2 == true)
+                            continue;
+                        foreach (var coursetake in take.courses.ToList())
+                        {
+                            bool t3 = coursetake.name.ToLower() == paginationModel.search.ToLower();
+                            bool t4 = coursetake.description.ToLower() == paginationModel.search.ToLower();
+                            if (t3 == true || t4 == true)
+                                continue;
+                            else
+                                take.courses.Remove(coursetake);
+                        }
+                        if (take.courses.Count == 0)
+                        {
+                            coursePriviewGradeWiseModelstest.Remove(take);
+                        }
+                    }
+                }
+                if (paginationModel.roleid != 0)
+                {
+                    coursePriviewGradeWiseModelstest = coursePriviewGradeWiseModelstest.Where(b => b.id == paginationModel.roleid).
+                                                       ToList();
+                    total = coursePriviewGradeWiseModelstest.Count();
+                }
+            }
+            catch (Exception ex)
+            {
+                dbHelper.Close();
+                throw ex;
+            }
+            finally
+            {
+                dbHelper.Dispose();
+            }
+            return coursePriviewGradeWiseModelstest;
+        }
+
         public object GetAllDetails(long id, string search, string[] filter, string[] bygrade, string Certificate)
         {
             GetAllDetailsModel getAllDetailsModel = new GetAllDetailsModel();
@@ -1487,6 +1669,186 @@ namespace Trainning24.BL.Business
                 total = coursePriviewGradeWiseModelstest.Count();
             }
 
+            return coursePriviewGradeWiseModelstest;
+        }
+
+        public object getTrialCoursePriviewGradeWiseTest(long id, PaginationModel paginationModel, string Certificate, out int total)
+        {
+            List<CoursePriviewGradeWiseModel> coursePriviewGradeWiseModels = new List<CoursePriviewGradeWiseModel>();
+            List<CoursePriviewGradeWiseModel> coursePriviewGradeWiseModelstest = new List<CoursePriviewGradeWiseModel>();
+            DBHelper dbHelper = new DBHelper(_training24Context.Database.GetDbConnection().ConnectionString);
+            try
+            {
+                dbHelper.Open();
+                DataTable usercourselist = dbHelper.ExcecuteQueryDT("SELECT Id,Name,Code,Description ,Image,PassMark FROM `Course` as uc WHERE  (uc.IsDeleted!=true OR uc.IsDeleted Is Null) AND (uc.istrial = true)");
+                List<string> CourseIdList = new List<string>();
+                DataTable courselist = new DataTable();
+                DataTable courseGradeslist = new DataTable();
+                if (usercourselist.Rows.Count != 0)
+                {
+                    foreach (DataRow usercourse in usercourselist.Rows)
+                    {
+                        CourseIdList.Add(usercourse["Id"].ToString());
+                    }
+                    if (CourseIdList.Count > 0)
+                    {
+                        courselist = dbHelper.ExcecuteQueryDT("select Id,Code,Name,Image,Description from course where Id in (" + string.Join(',', CourseIdList.ToArray()
+                             ) + ")AND (IsDeleted!=true OR IsDeleted Is Null)");
+                        courseGradeslist = dbHelper.ExcecuteQueryDT("select cg.Id as cgId,cg.CourseId,cg.Gradeid,g.Id,g.Name,g.SchoolId,g.Description from CourseGrade as cg join grade as g  where CourseId in (" + string.Join(',', CourseIdList.ToArray()) + ") AND (cg.IsDeleted!=true OR cg.IsDeleted Is Null)AND (g.IsDeleted!=true OR g.IsDeleted Is Null)");
+                    }
+                }
+                dbHelper.Close();
+                if (usercourselist.Rows.Count == 0)
+                {
+                    total = coursePriviewGradeWiseModelstest.Count();
+                    return coursePriviewGradeWiseModelstest = null;
+                }
+                foreach (DataRow usercourse in usercourselist.Rows)
+                {
+                    if (courselist.Rows.Count != 0)
+                    {
+                        foreach (DataRow course in courselist.Rows)
+                        {
+                            if (Convert.ToInt64(course["Id"].ToString()) == Convert.ToInt64(usercourse["Id"].ToString()))
+                            {
+                                foreach (DataRow cgrade in courseGradeslist.Rows)
+                                {
+                                    if (Convert.ToInt64(cgrade["CourseId"].ToString()) == Convert.ToInt64(usercourse["Id"].ToString()))
+                                    {
+                                        List<GradeWiseCoursePriviewModel> coursePriviewModelList = new List<GradeWiseCoursePriviewModel>();
+                                        GradeWiseCoursePriviewModel coursePriviewModel = new GradeWiseCoursePriviewModel();
+                                        coursePriviewModel.id = Convert.ToInt64(course["Id"].ToString());
+                                        coursePriviewModel.code = course["Code"].ToString();
+                                        coursePriviewModel.description = course["Description"].ToString();
+                                        if (!string.IsNullOrEmpty(course["Image"].ToString()))
+                                        {
+                                            if (course["Image"].ToString().Contains("t24-primary-image-storage"))
+                                                coursePriviewModel.image = course["Image"].ToString();
+                                            else
+                                                coursePriviewModel.image = LessonBusiness.geturl(course["Image"].ToString(), Certificate);
+                                        }
+                                        coursePriviewModel.name = course["Name"].ToString();
+                                        coursePriviewModelList.Add(coursePriviewModel);
+                                        CoursePriviewGradeWiseModel coursePriview = new CoursePriviewGradeWiseModel();
+                                        coursePriview.id = Convert.ToInt64(cgrade["Id"].ToString());
+                                        coursePriview.name = cgrade["Name"].ToString();
+                                        coursePriview.courses = coursePriviewModelList;
+                                        CoursePriviewGradeWiseModel cp = coursePriviewGradeWiseModels.Find(b => b.id == Convert.ToInt64(cgrade["Id"].ToString()));
+                                        if (cp == null)
+                                        {
+                                            coursePriviewGradeWiseModels.Add(coursePriview);
+                                        }
+                                        else
+                                        {
+                                            cp.courses.Add(coursePriviewModel);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                coursePriviewGradeWiseModelstest = coursePriviewGradeWiseModels;
+                total = coursePriviewGradeWiseModelstest.Count();
+                if (paginationModel.pagenumber != 0 && paginationModel.perpagerecord != 0 && paginationModel.roleid != 0)
+                {
+                    coursePriviewGradeWiseModelstest = coursePriviewGradeWiseModelstest.Where(b => b.id == paginationModel.roleid).ToList();
+                    total = coursePriviewGradeWiseModelstest.Count();
+                    coursePriviewGradeWiseModelstest = coursePriviewGradeWiseModelstest.Skip(paginationModel.perpagerecord * (paginationModel.pagenumber - 1)).
+                    Take(paginationModel.perpagerecord).
+                    ToList();
+                    if (!string.IsNullOrEmpty(paginationModel.search))
+                    {
+                        foreach (var take in coursePriviewGradeWiseModelstest.ToList())
+                        {
+                            bool t1 = take.id.ToString() == paginationModel.search;
+                            bool t2 = take.name.ToLower() == paginationModel.search.ToLower();
+                            if (t1 == true || t2 == true)
+                                continue;
+                            foreach (var coursetake in take.courses.ToList())
+                            {
+                                bool t3 = coursetake.name.ToLower() == paginationModel.search.ToLower();
+                                bool t4 = coursetake.description.ToLower() == paginationModel.search.ToLower();
+                                if (t3 == true || t4 == true)
+                                    continue;
+                                else
+                                    take.courses.Remove(coursetake);
+                            }
+                            if (take.courses.Count == 0)
+                            {
+                                coursePriviewGradeWiseModelstest.Remove(take);
+                            }
+                        }
+                    }
+                }
+                if (paginationModel.pagenumber != 0 && paginationModel.perpagerecord != 0)
+                {
+                    coursePriviewGradeWiseModelstest = coursePriviewGradeWiseModelstest.Skip(paginationModel.perpagerecord * (paginationModel.pagenumber - 1)).
+                    Take(paginationModel.perpagerecord).
+                    ToList();
+                    if (!string.IsNullOrEmpty(paginationModel.search))
+                    {
+                        foreach (var take in coursePriviewGradeWiseModelstest.ToList())
+                        {
+                            bool t1 = take.id.ToString() == paginationModel.search;
+                            bool t2 = take.name.ToLower() == paginationModel.search.ToLower();
+                            if (t1 == true || t2 == true)
+                                continue;
+                            foreach (var coursetake in take.courses.ToList())
+                            {
+                                bool t3 = coursetake.name.ToLower() == paginationModel.search.ToLower();
+                                bool t4 = coursetake.description.ToLower() == paginationModel.search.ToLower();
+                                if (t3 == true || t4 == true)
+                                    continue;
+                                else
+                                    take.courses.Remove(coursetake);
+                            }
+                            if (take.courses.Count == 0)
+                            {
+                                coursePriviewGradeWiseModelstest.Remove(take);
+                            }
+                        }
+                    }
+                }
+                if (!string.IsNullOrEmpty(paginationModel.search))
+                {
+                    foreach (var take in coursePriviewGradeWiseModelstest.ToList())
+                    {
+                        bool t1 = take.id.ToString() == paginationModel.search;
+                        bool t2 = take.name.ToLower() == paginationModel.search.ToLower();
+                        if (t1 == true || t2 == true)
+                            continue;
+                        foreach (var coursetake in take.courses.ToList())
+                        {
+                            bool t3 = coursetake.name.ToLower() == paginationModel.search.ToLower();
+                            bool t4 = coursetake.description.ToLower() == paginationModel.search.ToLower();
+                            if (t3 == true || t4 == true)
+                                continue;
+                            else
+                                take.courses.Remove(coursetake);
+                        }
+                        if (take.courses.Count == 0)
+                        {
+                            coursePriviewGradeWiseModelstest.Remove(take);
+                        }
+                    }
+                }
+                if (paginationModel.roleid != 0)
+                {
+                    coursePriviewGradeWiseModelstest = coursePriviewGradeWiseModelstest.Where(b => b.id == paginationModel.roleid).
+                                                       ToList();
+                    total = coursePriviewGradeWiseModelstest.Count();
+                }
+            }
+            catch (Exception ex)
+            {
+                dbHelper.Close();
+                throw ex;
+            }
+            finally
+            {
+                dbHelper.Dispose();
+            }
             return coursePriviewGradeWiseModelstest;
         }
     }
