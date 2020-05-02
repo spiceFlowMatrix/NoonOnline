@@ -1887,7 +1887,6 @@ export class PurchasesComponent implements OnInit {
             );
             return null;
         }
-        console.log(signed_file);
         this.isCallingApi = true;
         let modal = {
             fileTypeId: 1,

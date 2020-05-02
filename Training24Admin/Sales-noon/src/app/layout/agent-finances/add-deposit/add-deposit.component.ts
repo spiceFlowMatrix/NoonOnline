@@ -1,10 +1,11 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router, ActivatedRoute, Params } from '@angular/router';
-import { UtilService, AgentService } from '../../../shared';
+import { UtilService, AgentService, FileService } from '../../../shared';
 import * as _ from 'lodash';
 import * as moment from 'moment';
-import {NgbCalendar, NgbDateStruct} from '@ng-bootstrap/ng-bootstrap';
+import { NgbCalendar, NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
+import { HttpEventType } from '@angular/common/http';
 @Component({
     selector: 'app-add-deposit',
     templateUrl: './add-deposit.component.html',
@@ -25,6 +26,7 @@ export class AddDepositComponent implements OnInit {
         public utilService: UtilService,
         public agentService: AgentService,
         public router: Router,
+        public fileService:FileService,
         private calendar: NgbCalendar
     ) {
         this.allSubscribers.push(this.activatedRoute.params.subscribe((params: Params) => {
@@ -43,7 +45,7 @@ export class AddDepositComponent implements OnInit {
         setTimeout(() => {
             this.getAgents();
         }, 500);
-        this.agentDepositModel.depositdate =  this.calendar.getToday();              
+        this.agentDepositModel.depositdate = this.calendar.getToday();
     }
 
     getAgents() {
@@ -63,7 +65,7 @@ export class AddDepositComponent implements OnInit {
             this.agentDepositModel = _.clone(res.data);
             let tempDate = moment(this.agentDepositModel.depositdate);
             this.agentDepositModel.depositdate = {
-                'year':tempDate.get('year'),'month':tempDate.get('month'), 'day':tempDate.get('date')
+                'year': tempDate.get('year'), 'month': tempDate.get('month'), 'day': tempDate.get('date')
             }
         }, err => {
             this.isCallingApi = false;
@@ -89,9 +91,45 @@ export class AddDepositComponent implements OnInit {
     onFileSelected($event) {
         if (!this.agentDepositModel.documentid)
             this.agentDepositModel.documentid = [];
+          if(!this.agentDepositModel.filename) {
+                    this.agentDepositModel.filename = []
+                }
         for (let index = 0; index < $event.target.files.length; index++) {
-            this.agentDepositModel.documentid.push($event.target.files[index]);
-        }             
+            this.isCallingApi = true;
+            let modal = {
+                fileTypeId: 1,
+                contentType: $event.target.files[index].type,
+                fileName: $event.target.files[index].name
+            }
+            let fileModal = {
+                totalpages: "",
+                fileTypeId: "",
+                filename: ""
+            }
+            let reader: any = new FileReader();
+            reader.readAsBinaryString($event.target.files[index]);
+            reader.onloadend = () => {
+                var count = reader.result.match(/\/Type[\s]*\/Page[^s]/g).length;
+                fileModal.totalpages = count.toString();
+                fileModal.fileTypeId = "1";
+            }
+            this.allSubscribers.push(this.agentService.getSupportDocumentFileSigned(modal).subscribe((res) => {
+                fileModal.filename = res.data.filename;
+                this.agentDepositModel.filename.push(res.data.filename);
+                this.agentDepositModel.documentid.push($event.target.files[index]);
+                let signUrl = res.data.signedurl;
+                this.fileService.putFileOnBucket(signUrl, $event.target.files[index]).subscribe((res: any) => {
+                    switch (res.type) {
+                        case HttpEventType.Response:
+                            this.isCallingApi = false;
+
+                    }
+                }, err => {
+                    this.isCallingApi = false;
+                    this.utilService.showErrorCall(err);
+                })
+            }))
+        }
     }
 
     ngOnDestroy() {
