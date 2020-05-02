@@ -63,35 +63,42 @@ namespace Training24Admin.Controllers
 
                 if (ModelState.IsValid)
                 {
-                    var allFiles = Request.Form.Files.ToList();
+                    var filesnameList = Request.Form["filename"].ToString();
+                    string[] allFiles = filesnameList.Split(',');
+
                     Deposit Deposit = new Deposit();
                     Deposit.DepositAmount = decimal.Parse(Request.Form["depositamount"]);
                     Deposit.DepositDate = Request.Form["depositdate"];
                     Deposit.SalesAgentId = long.Parse(Request.Form["salesagentid"]);
 
-                    for (int k = 0; k < allFiles.Count; k++)
+                    foreach (var filename in allFiles)
                     {
-                        string fileName = "";
-                        IFormFile file = null;
-                        if (Request.Form.Files.Count != 0)
-                            file = Request.Form.Files[k];
-                        var imageAcl = PredefinedObjectAcl.PublicRead;
-                        fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
-                        var ext = fileName.Substring(fileName.LastIndexOf("."));
-                        var extension = ext.ToLower();
-                        Guid imageGuid = Guid.NewGuid();
-                        fileName = fileName.Split(".")[0] + "_" + imageGuid.ToString() + extension;
+                        //string fileName = "";
+                        //IFormFile file = null;
+                        //if (Request.Form.Files.Count != 0)
+                        //    file = Request.Form.Files[k];
+                        //var imageAcl = PredefinedObjectAcl.PublicRead;
+                        //fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
+                        //var ext = fileName.Substring(fileName.LastIndexOf("."));
+                        //var extension = ext.ToLower();
+                        //Guid imageGuid = Guid.NewGuid();
+                        //fileName = fileName.Split(".")[0] + "_" + imageGuid.ToString() + extension;
                         string mediaLink = "";
-                        var imageObject = await storage.UploadObjectAsync(
-                            bucket: "t24-primary-pdf-storage",
-                            objectName: fileName,
-                            contentType: file.ContentType,
-                            source: file.OpenReadStream(),
-                            options: new UploadObjectOptions { PredefinedAcl = imageAcl }
-                        );
-                        mediaLink = imageObject.MediaLink;
+                        //var imageObject = await storage.UploadObjectAsync(
+                        //    bucket: "t24-primary-pdf-storage",
+                        //    objectName: fileName,
+                        //    contentType: file.ContentType,
+                        //    source: file.OpenReadStream(),
+                        //    options: new UploadObjectOptions { PredefinedAcl = imageAcl }
+                        //);
+                        string BucketName = General.getBucketName("1");
+                        if (!string.IsNullOrEmpty(filename))
+                        {
+                            var storageObject = storage.GetObject(BucketName, filename);
+                            mediaLink = storageObject.MediaLink;
+                        }
 
-                        DocumentDetails documentDetails = IndividualDetailsBusiness.CreateDocumentDetails(new DocumentDetails { DocumentUrl = mediaLink, name = fileName }, int.Parse(tc.Id));
+                        DocumentDetails documentDetails = IndividualDetailsBusiness.CreateDocumentDetails(new DocumentDetails { DocumentUrl = mediaLink, name = filename }, int.Parse(tc.Id));
 
                         if (string.IsNullOrEmpty(Deposit.DocumentIds))
                         {
@@ -383,9 +390,9 @@ namespace Training24Admin.Controllers
         {
             PaginationModel paginationModel = new PaginationModel
             {
-                pagenumber = pagenumber, 
+                pagenumber = pagenumber,
                 perpagerecord = perpagerecord,
-                search = search 
+                search = search
             };
 
             PaginationResponse successResponse = new PaginationResponse();
