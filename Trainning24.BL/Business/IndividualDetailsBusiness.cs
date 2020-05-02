@@ -95,12 +95,14 @@ namespace Trainning24.BL.Business
             obj.Village = ind.Village;
             obj.MaritalStatusId = ind.MaritalStatusId;
             obj.Nationality = ind.Nationality;
-            obj.ParentTazrika = ind.ParentTazrika;
+            if (!string.IsNullOrEmpty(ind.ParentTazrika))
+                obj.ParentTazrika = ind.ParentTazrika;
             obj.PassportNumber = ind.PassportNumber;
             obj.PermanentAddress = ind.PermanentAddress;
             obj.Phone = ind.Phone;
             obj.PlaceOfBirth = ind.PlaceOfBirth;
-            obj.PreviousMarksheets = ind.PreviousMarksheets;
+            if (!string.IsNullOrEmpty(ind.PreviousMarksheets))
+                obj.PreviousMarksheets = ind.PreviousMarksheets;
             obj.ProvinceId = ind.ProvinceId;
             obj.RefferedBy = ind.RefferedBy;
             obj.Remarks = ind.Remarks;
@@ -108,7 +110,8 @@ namespace Trainning24.BL.Business
             obj.SexId = ind.SexId;
             obj.StudentCode = ind.StudentCode;
             obj.StudentName = ind.StudentName;
-            obj.StudentTazkira = ind.StudentTazkira;
+            if (!string.IsNullOrEmpty(ind.StudentTazkira))
+                obj.StudentTazkira = ind.StudentTazkira;
 
             EFIndividualDetails.Update(obj);
 
@@ -194,11 +197,13 @@ namespace Trainning24.BL.Business
             obj.NumberOfTeacherFemale = sd.NumberOfTeacherFemale;
             obj.NumberOfTeacherMale = sd.NumberOfTeacherMale;
             obj.PowerAddressId = sd.RegisterationPaper;
-            obj.RegisterationPaper = sd.RegisterationPaper;
+            if (!string.IsNullOrEmpty(sd.RegisterationPaper))
+                obj.RegisterationPaper = sd.RegisterationPaper;
             obj.RegisterNumber = sd.RegisterNumber;
             obj.Routers = sd.Routers;
             obj.SchoolAddress = sd.SchoolAddress;
-            obj.SchoolLicense = sd.SchoolLicense;
+            if (!string.IsNullOrEmpty(sd.SchoolLicense))
+                obj.SchoolLicense = sd.SchoolLicense;
             obj.SchoolName = sd.SchoolName;
             obj.SchoolTypeId = sd.SchoolTypeId;
             obj.SectionTypeId = sd.SectionTypeId;

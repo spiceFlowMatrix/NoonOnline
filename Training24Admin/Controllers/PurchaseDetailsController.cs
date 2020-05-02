@@ -1124,67 +1124,156 @@ namespace Training24Admin.Controllers
                         IndividualDetails.MaritalStatusId = Request.Form["maritalstatusid"];
                         IndividualDetails.Remarks = Request.Form["remarks"];
 
-                        var allFiles = Request.Form.Files.ToList();
-                        for (int k = 0; k < allFiles.Count; k++)
+                        var studentfile = Request.Form["studenttazrikafile"].ToString();
+                        string[] studenttazrikafiles = null;
+                        if (!string.IsNullOrWhiteSpace(studentfile))
+                            studenttazrikafiles = studentfile.Split(',');
+
+                        if (studenttazrikafiles != null)
                         {
-                            string fileName = "";
-                            IFormFile file = null;
-                            if (Request.Form.Files.Count != 0)
-                                file = Request.Form.Files[k];
-                            var imageAcl = PredefinedObjectAcl.PublicRead;
-                            fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
-                            var ext = fileName.Substring(fileName.LastIndexOf("."));
-                            var extension = ext.ToLower();
-                            Guid imageGuid = Guid.NewGuid();
-                            fileName = fileName.Split(".")[0] + "_" + imageGuid.ToString() + extension;
-                            string mediaLink = "";
-                            var imageObject = await storage.UploadObjectAsync(
-                                bucket: "t24-primary-pdf-storage",
-                                objectName: fileName,
-                                contentType: file.ContentType,
-                                source: file.OpenReadStream(),
-                                options: new UploadObjectOptions { PredefinedAcl = imageAcl }
-                            );
-                            mediaLink = imageObject.MediaLink;
-
-                            DocumentDetails documentDetails = IndividualDetailsBusiness.CreateDocumentDetails(new DocumentDetails { DocumentUrl = mediaLink, name = fileName }, int.Parse(tc.Id));
-
-                            var singleFile = allFiles[k];
-                            switch (singleFile.Name)
+                            foreach (var studenttazrikafile in studenttazrikafiles)
                             {
-                                case "studenttazrika":
-                                    if (string.IsNullOrEmpty(IndividualDetails.StudentTazkira))
-                                    {
-                                        IndividualDetails.StudentTazkira = documentDetails.Id.ToString();
-                                    }
-                                    else
-                                    {
-                                        IndividualDetails.StudentTazkira = "," + documentDetails.Id;
-                                    }
-                                    break;
-                                case "parenttazrika":
-                                    if (string.IsNullOrEmpty(IndividualDetails.ParentTazrika))
-                                    {
-                                        IndividualDetails.ParentTazrika = documentDetails.Id.ToString();
-                                    }
-                                    else
-                                    {
-                                        IndividualDetails.ParentTazrika += "," + documentDetails.Id;
-                                    }
-                                    break;
-                                case "previousmarksheets":
-                                    if (string.IsNullOrEmpty(IndividualDetails.PreviousMarksheets))
-                                    {
-                                        IndividualDetails.PreviousMarksheets = documentDetails.Id.ToString();
-                                    }
-                                    else
-                                    {
-                                        IndividualDetails.PreviousMarksheets += "," + documentDetails.Id;
-                                    }
-                                    break;
-                            }
+                                string mediaLink = "";
+                                string BucketName = General.getBucketName("1");
+                                if (!string.IsNullOrEmpty(studenttazrikafile))
+                                {
+                                    var storageObject = storage.GetObject(BucketName, studenttazrikafile);
+                                    mediaLink = storageObject.MediaLink;
+                                }
 
+                                DocumentDetails documentDetails = IndividualDetailsBusiness.CreateDocumentDetails(new DocumentDetails { DocumentUrl = mediaLink, name = studenttazrikafile }, int.Parse(tc.Id));
+
+                                if (string.IsNullOrEmpty(IndividualDetails.StudentTazkira))
+                                {
+                                    IndividualDetails.StudentTazkira = documentDetails.Id.ToString();
+                                }
+                                else
+                                {
+                                    IndividualDetails.StudentTazkira += "," + documentDetails.Id;
+                                }
+                            }
                         }
+
+                        var parentfile = Request.Form["parenttazrikafile"].ToString();
+                        string[] parenttazrikafiles = null;
+                        if (!string.IsNullOrWhiteSpace(parentfile))
+                            parenttazrikafiles = parentfile.Split(',');
+
+                        if (parenttazrikafiles != null)
+                        {
+                            foreach (var parenttazrikafile in parenttazrikafiles)
+                            {
+                                string mediaLink = "";
+                                string BucketName = General.getBucketName("1");
+                                if (!string.IsNullOrEmpty(parenttazrikafile))
+                                {
+                                    var storageObject = storage.GetObject(BucketName, parenttazrikafile);
+                                    mediaLink = storageObject.MediaLink;
+                                }
+
+                                DocumentDetails documentDetails = IndividualDetailsBusiness.CreateDocumentDetails(new DocumentDetails { DocumentUrl = mediaLink, name = parenttazrikafile }, int.Parse(tc.Id));
+
+                                if (string.IsNullOrEmpty(IndividualDetails.ParentTazrika))
+                                {
+                                    IndividualDetails.ParentTazrika = documentDetails.Id.ToString();
+                                }
+                                else
+                                {
+                                    IndividualDetails.ParentTazrika += "," + documentDetails.Id;
+                                }
+                            }
+                        }
+
+                        var marksheetfile = Request.Form["previousmarksheetsfile"].ToString();
+                        string[] previousmarksheetsfiles = null;
+                        if (!string.IsNullOrWhiteSpace(marksheetfile))
+                            previousmarksheetsfiles = marksheetfile.Split(',');
+
+                        if (previousmarksheetsfiles != null)
+                        {
+                            foreach (var previousmarksheetsfile in previousmarksheetsfiles)
+                            {
+                                string mediaLink = "";
+                                string BucketName = General.getBucketName("1");
+                                if (!string.IsNullOrEmpty(previousmarksheetsfile))
+                                {
+                                    var storageObject = storage.GetObject(BucketName, previousmarksheetsfile);
+                                    mediaLink = storageObject.MediaLink;
+                                }
+
+                                DocumentDetails documentDetails = IndividualDetailsBusiness.CreateDocumentDetails(new DocumentDetails { DocumentUrl = mediaLink, name = previousmarksheetsfile }, int.Parse(tc.Id));
+
+                                if (string.IsNullOrEmpty(IndividualDetails.PreviousMarksheets))
+                                {
+                                    IndividualDetails.PreviousMarksheets = documentDetails.Id.ToString();
+                                }
+                                else
+                                {
+                                    IndividualDetails.PreviousMarksheets += "," + documentDetails.Id;
+                                }
+                            }
+                        }
+                        //var allFiles = Request.Form.Files.ToList();
+                        //for (int k = 0; k < allFiles.Count; k++)
+                        //{
+                        //    string fileName = "";
+                        //    IFormFile file = null;
+                        //    if (Request.Form.Files.Count != 0)
+                        //        file = Request.Form.Files[k];
+                        //    var imageAcl = PredefinedObjectAcl.PublicRead;
+                        //    fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
+                        //    var ext = fileName.Substring(fileName.LastIndexOf("."));
+                        //    var extension = ext.ToLower();
+                        //    Guid imageGuid = Guid.NewGuid();
+                        //    fileName = fileName.Split(".")[0] + "_" + imageGuid.ToString() + extension;
+                        //    string mediaLink = "";
+                        //    var imageObject = await storage.UploadObjectAsync(
+                        //        bucket: "t24-primary-pdf-storage",
+                        //        objectName: fileName,
+                        //        contentType: file.ContentType,
+                        //        source: file.OpenReadStream(),
+                        //        options: new UploadObjectOptions { PredefinedAcl = imageAcl }
+                        //    );
+                        //    mediaLink = imageObject.MediaLink;
+
+                        //    DocumentDetails documentDetails = IndividualDetailsBusiness.CreateDocumentDetails(new DocumentDetails { DocumentUrl = mediaLink, name = fileName }, int.Parse(tc.Id));
+
+                        //    var singleFile = allFiles[k];
+                        //    switch (singleFile.Name)
+                        //    {
+                        //        case "studenttazrika":
+                        //            if (string.IsNullOrEmpty(IndividualDetails.StudentTazkira))
+                        //            {
+                        //                IndividualDetails.StudentTazkira = documentDetails.Id.ToString();
+                        //            }
+                        //            else
+                        //            {
+                        //                IndividualDetails.StudentTazkira = "," + documentDetails.Id;
+                        //            }
+                        //            break;
+                        //        case "parenttazrika":
+                        //            if (string.IsNullOrEmpty(IndividualDetails.ParentTazrika))
+                        //            {
+                        //                IndividualDetails.ParentTazrika = documentDetails.Id.ToString();
+                        //            }
+                        //            else
+                        //            {
+                        //                IndividualDetails.ParentTazrika += "," + documentDetails.Id;
+                        //            }
+                        //            break;
+                        //        case "previousmarksheets":
+                        //            if (string.IsNullOrEmpty(IndividualDetails.PreviousMarksheets))
+                        //            {
+                        //                IndividualDetails.PreviousMarksheets = documentDetails.Id.ToString();
+                        //            }
+                        //            else
+                        //            {
+                        //                IndividualDetails.PreviousMarksheets += "," + documentDetails.Id;
+                        //            }
+                        //            break;
+                        //    }
+
+                        //}
 
                         IndividualDetails individualDetails = IndividualDetailsBusiness.Create(IndividualDetails, int.Parse(tc.Id));
 
@@ -1371,67 +1460,158 @@ namespace Training24Admin.Controllers
                         IndividualDetails.MaritalStatusId = Request.Form["maritalstatusid"];
                         IndividualDetails.Remarks = Request.Form["remarks"];
 
-                        var allFiles = Request.Form.Files.ToList();
-                        for (int k = 0; k < allFiles.Count; k++)
+
+                        var studentfile = Request.Form["studenttazrikafile"].ToString();
+                        string[] studenttazrikafiles = null;
+                        if (!string.IsNullOrWhiteSpace(studentfile))
+                            studenttazrikafiles = studentfile.Split(',');
+
+                        if (studenttazrikafiles != null)
                         {
-                            string fileName = "";
-                            IFormFile file = null;
-                            if (Request.Form.Files.Count != 0)
-                                file = Request.Form.Files[k];
-                            var imageAcl = PredefinedObjectAcl.PublicRead;
-                            fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
-                            var ext = fileName.Substring(fileName.LastIndexOf("."));
-                            var extension = ext.ToLower();
-                            Guid imageGuid = Guid.NewGuid();
-                            fileName = fileName.Split(".")[0] + "_" + imageGuid.ToString() + extension;
-                            string mediaLink = "";
-                            var imageObject = await storage.UploadObjectAsync(
-                                bucket: "t24-primary-pdf-storage",
-                                objectName: fileName,
-                                contentType: file.ContentType,
-                                source: file.OpenReadStream(),
-                                options: new UploadObjectOptions { PredefinedAcl = imageAcl }
-                            );
-                            mediaLink = imageObject.MediaLink;
-
-                            DocumentDetails documentDetails = IndividualDetailsBusiness.CreateDocumentDetails(new DocumentDetails { DocumentUrl = mediaLink, name = fileName }, int.Parse(tc.Id));
-
-                            var singleFile = allFiles[k];
-                            switch (singleFile.Name)
+                            foreach (var studenttazrikafile in studenttazrikafiles)
                             {
-                                case "studenttazrika":
-                                    if (string.IsNullOrEmpty(IndividualDetails.StudentTazkira))
-                                    {
-                                        IndividualDetails.StudentTazkira = documentDetails.Id.ToString();
-                                    }
-                                    else
-                                    {
-                                        IndividualDetails.StudentTazkira = "," + documentDetails.Id;
-                                    }
-                                    break;
-                                case "parenttazrika":
-                                    if (string.IsNullOrEmpty(IndividualDetails.ParentTazrika))
-                                    {
-                                        IndividualDetails.ParentTazrika = documentDetails.Id.ToString();
-                                    }
-                                    else
-                                    {
-                                        IndividualDetails.ParentTazrika += "," + documentDetails.Id;
-                                    }
-                                    break;
-                                case "previousmarksheets":
-                                    if (string.IsNullOrEmpty(IndividualDetails.PreviousMarksheets))
-                                    {
-                                        IndividualDetails.PreviousMarksheets = documentDetails.Id.ToString();
-                                    }
-                                    else
-                                    {
-                                        IndividualDetails.PreviousMarksheets += "," + documentDetails.Id;
-                                    }
-                                    break;
-                            }
+                                string mediaLink = "";
+                                string BucketName = General.getBucketName("1");
+                                if (!string.IsNullOrEmpty(studenttazrikafile))
+                                {
+                                    var storageObject = storage.GetObject(BucketName, studenttazrikafile);
+                                    mediaLink = storageObject.MediaLink;
+                                }
 
+                                DocumentDetails documentDetails = IndividualDetailsBusiness.CreateDocumentDetails(new DocumentDetails { DocumentUrl = mediaLink, name = studenttazrikafile }, int.Parse(tc.Id));
+
+                                if (string.IsNullOrEmpty(IndividualDetails.StudentTazkira))
+                                {
+                                    IndividualDetails.StudentTazkira = documentDetails.Id.ToString();
+                                }
+                                else
+                                {
+                                    IndividualDetails.StudentTazkira += "," + documentDetails.Id;
+                                }
+                            }
                         }
+
+                        var parentfile = Request.Form["parenttazrikafile"].ToString();
+                        string[] parenttazrikafiles = null;
+                        if (!string.IsNullOrWhiteSpace(parentfile))
+                            parenttazrikafiles = parentfile.Split(',');
+
+                        if (parenttazrikafiles != null)
+                        {
+                            foreach (var parenttazrikafile in parenttazrikafiles)
+                            {
+                                string mediaLink = "";
+                                string BucketName = General.getBucketName("1");
+                                if (!string.IsNullOrEmpty(parenttazrikafile))
+                                {
+                                    var storageObject = storage.GetObject(BucketName, parenttazrikafile);
+                                    mediaLink = storageObject.MediaLink;
+                                }
+
+                                DocumentDetails documentDetails = IndividualDetailsBusiness.CreateDocumentDetails(new DocumentDetails { DocumentUrl = mediaLink, name = parenttazrikafile }, int.Parse(tc.Id));
+
+                                if (string.IsNullOrEmpty(IndividualDetails.ParentTazrika))
+                                {
+                                    IndividualDetails.ParentTazrika = documentDetails.Id.ToString();
+                                }
+                                else
+                                {
+                                    IndividualDetails.ParentTazrika += "," + documentDetails.Id;
+                                }
+                            }
+                        }
+
+                        var marksheetfile = Request.Form["previousmarksheetsfile"].ToString();
+                        string[] previousmarksheetsfiles = null;
+                        if (!string.IsNullOrWhiteSpace(marksheetfile))
+                            previousmarksheetsfiles = marksheetfile.Split(',');
+
+                        if (previousmarksheetsfiles != null)
+                        {
+                            foreach (var previousmarksheetsfile in previousmarksheetsfiles)
+                            {
+                                string mediaLink = "";
+                                string BucketName = General.getBucketName("1");
+                                if (!string.IsNullOrEmpty(previousmarksheetsfile))
+                                {
+                                    var storageObject = storage.GetObject(BucketName, previousmarksheetsfile);
+                                    mediaLink = storageObject.MediaLink;
+                                }
+
+                                DocumentDetails documentDetails = IndividualDetailsBusiness.CreateDocumentDetails(new DocumentDetails { DocumentUrl = mediaLink, name = previousmarksheetsfile }, int.Parse(tc.Id));
+
+                                if (string.IsNullOrEmpty(IndividualDetails.PreviousMarksheets))
+                                {
+                                    IndividualDetails.PreviousMarksheets = documentDetails.Id.ToString();
+                                }
+                                else
+                                {
+                                    IndividualDetails.PreviousMarksheets += "," + documentDetails.Id;
+                                }
+                            }
+                        }
+
+                        //var allFiles = Request.Form.Files.ToList();
+                        //for (int k = 0; k < allFiles.Count; k++)
+                        //{
+                        //    string fileName = "";
+                        //    IFormFile file = null;
+                        //    if (Request.Form.Files.Count != 0)
+                        //        file = Request.Form.Files[k];
+                        //    var imageAcl = PredefinedObjectAcl.PublicRead;
+                        //    fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
+                        //    var ext = fileName.Substring(fileName.LastIndexOf("."));
+                        //    var extension = ext.ToLower();
+                        //    Guid imageGuid = Guid.NewGuid();
+                        //    fileName = fileName.Split(".")[0] + "_" + imageGuid.ToString() + extension;
+                        //    string mediaLink = "";
+                        //    var imageObject = await storage.UploadObjectAsync(
+                        //        bucket: "t24-primary-pdf-storage",
+                        //        objectName: fileName,
+                        //        contentType: file.ContentType,
+                        //        source: file.OpenReadStream(),
+                        //        options: new UploadObjectOptions { PredefinedAcl = imageAcl }
+                        //    );
+                        //    mediaLink = imageObject.MediaLink;
+
+                        //    DocumentDetails documentDetails = IndividualDetailsBusiness.CreateDocumentDetails(new DocumentDetails { DocumentUrl = mediaLink, name = fileName }, int.Parse(tc.Id));
+
+                        //    var singleFile = allFiles[k];
+                        //    switch (singleFile.Name)
+                        //    {
+                        //        case "studenttazrika":
+                        //            if (string.IsNullOrEmpty(IndividualDetails.StudentTazkira))
+                        //            {
+                        //                IndividualDetails.StudentTazkira = documentDetails.Id.ToString();
+                        //            }
+                        //            else
+                        //            {
+                        //                IndividualDetails.StudentTazkira = "," + documentDetails.Id;
+                        //            }
+                        //            break;
+                        //        case "parenttazrika":
+                        //            if (string.IsNullOrEmpty(IndividualDetails.ParentTazrika))
+                        //            {
+                        //                IndividualDetails.ParentTazrika = documentDetails.Id.ToString();
+                        //            }
+                        //            else
+                        //            {
+                        //                IndividualDetails.ParentTazrika += "," + documentDetails.Id;
+                        //            }
+                        //            break;
+                        //        case "previousmarksheets":
+                        //            if (string.IsNullOrEmpty(IndividualDetails.PreviousMarksheets))
+                        //            {
+                        //                IndividualDetails.PreviousMarksheets = documentDetails.Id.ToString();
+                        //            }
+                        //            else
+                        //            {
+                        //                IndividualDetails.PreviousMarksheets += "," + documentDetails.Id;
+                        //            }
+                        //            break;
+                        //    }
+
+                        //}
 
                         IndividualDetails.Id = id;
 
@@ -1886,57 +2066,117 @@ namespace Training24Admin.Controllers
                         SchoolDetails.Routers = Request.Form["routers"];
                         SchoolDetails.Dongles = Request.Form["dongles"];
 
-                        var allFiles = Request.Form.Files.ToList();
-                        for (int k = 0; k < allFiles.Count; k++)
+                        var schoollicense = Request.Form["schoollicensefile"].ToString();
+                        string[] schoollicensefiles = null;
+                        if (!string.IsNullOrWhiteSpace(schoollicense))
+                            schoollicensefiles = schoollicense.Split(',');
+
+                        if (schoollicensefiles != null)
                         {
-                            string fileName = "";
-                            IFormFile file = null;
-                            if (Request.Form.Files.Count != 0)
-                                file = Request.Form.Files[k];
-                            var imageAcl = PredefinedObjectAcl.PublicRead;
-                            fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
-                            var ext = fileName.Substring(fileName.LastIndexOf("."));
-                            var extension = ext.ToLower();
-                            Guid imageGuid = Guid.NewGuid();
-                            fileName = fileName.Split(".")[0] + "_" + imageGuid.ToString() + extension;
-                            string mediaLink = "";
-                            var imageObject = await storage.UploadObjectAsync(
-                                bucket: "t24-primary-pdf-storage",
-                                objectName: fileName,
-                                contentType: file.ContentType,
-                                source: file.OpenReadStream(),
-                                options: new UploadObjectOptions { PredefinedAcl = imageAcl }
-                            );
-                            mediaLink = imageObject.MediaLink;
-
-                            DocumentDetails documentDetails = IndividualDetailsBusiness.CreateDocumentDetails(new DocumentDetails { DocumentUrl = mediaLink, name = fileName }, int.Parse(tc.Id));
-
-                            var singleFile = allFiles[k];
-                            switch (singleFile.Name)
+                            foreach (var schoollicensefile in schoollicensefiles)
                             {
-                                case "schoollicense":
-                                    if (string.IsNullOrEmpty(SchoolDetails.SchoolLicense))
-                                    {
-                                        SchoolDetails.SchoolLicense = documentDetails.Id.ToString();
-                                    }
-                                    else
-                                    {
-                                        SchoolDetails.SchoolLicense += "," + documentDetails.Id;
-                                    }
+                                string mediaLink = "";
+                                string BucketName = General.getBucketName("1");
+                                if (!string.IsNullOrEmpty(schoollicensefile))
+                                {
+                                    var storageObject = storage.GetObject(BucketName, schoollicensefile);
+                                    mediaLink = storageObject.MediaLink;
+                                }
 
-                                    break;
-                                case "registerationpaper":
-                                    if (string.IsNullOrEmpty(SchoolDetails.RegisterationPaper))
-                                    {
-                                        SchoolDetails.RegisterationPaper = documentDetails.Id.ToString();
-                                    }
-                                    else
-                                    {
-                                        SchoolDetails.RegisterationPaper += "," + documentDetails.Id;
-                                    }
-                                    break;
+                                DocumentDetails documentDetails = IndividualDetailsBusiness.CreateDocumentDetails(new DocumentDetails { DocumentUrl = mediaLink, name = schoollicensefile }, int.Parse(tc.Id));
+
+                                if (string.IsNullOrEmpty(SchoolDetails.SchoolLicense))
+                                {
+                                    SchoolDetails.SchoolLicense = documentDetails.Id.ToString();
+                                }
+                                else
+                                {
+                                    SchoolDetails.SchoolLicense += "," + documentDetails.Id;
+                                }
                             }
                         }
+
+                        var registerationpaper = Request.Form["registerationpaperfile"].ToString();
+                        string[] registerationpaperfiles = null;
+                        if (!string.IsNullOrWhiteSpace(registerationpaper))
+                            registerationpaperfiles = registerationpaper.Split(',');
+
+                        if (schoollicensefiles != null)
+                        {
+                            foreach (var registerationpaperfile in registerationpaperfiles)
+                            {
+                                string mediaLink = "";
+                                string BucketName = General.getBucketName("1");
+                                if (!string.IsNullOrEmpty(registerationpaperfile))
+                                {
+                                    var storageObject = storage.GetObject(BucketName, registerationpaperfile);
+                                    mediaLink = storageObject.MediaLink;
+                                }
+
+                                DocumentDetails documentDetails = IndividualDetailsBusiness.CreateDocumentDetails(new DocumentDetails { DocumentUrl = mediaLink, name = registerationpaperfile }, int.Parse(tc.Id));
+
+                                if (string.IsNullOrEmpty(SchoolDetails.RegisterationPaper))
+                                {
+                                    SchoolDetails.RegisterationPaper = documentDetails.Id.ToString();
+                                }
+                                else
+                                {
+                                    SchoolDetails.RegisterationPaper += "," + documentDetails.Id;
+                                }
+                            }
+                        }
+
+                        //var allFiles = Request.Form.Files.ToList();
+                        //for (int k = 0; k < allFiles.Count; k++)
+                        //{
+                        //    string fileName = "";
+                        //    IFormFile file = null;
+                        //    if (Request.Form.Files.Count != 0)
+                        //        file = Request.Form.Files[k];
+                        //    var imageAcl = PredefinedObjectAcl.PublicRead;
+                        //    fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
+                        //    var ext = fileName.Substring(fileName.LastIndexOf("."));
+                        //    var extension = ext.ToLower();
+                        //    Guid imageGuid = Guid.NewGuid();
+                        //    fileName = fileName.Split(".")[0] + "_" + imageGuid.ToString() + extension;
+                        //    string mediaLink = "";
+                        //    var imageObject = await storage.UploadObjectAsync(
+                        //        bucket: "t24-primary-pdf-storage",
+                        //        objectName: fileName,
+                        //        contentType: file.ContentType,
+                        //        source: file.OpenReadStream(),
+                        //        options: new UploadObjectOptions { PredefinedAcl = imageAcl }
+                        //    );
+                        //    mediaLink = imageObject.MediaLink;
+
+                        //    DocumentDetails documentDetails = IndividualDetailsBusiness.CreateDocumentDetails(new DocumentDetails { DocumentUrl = mediaLink, name = fileName }, int.Parse(tc.Id));
+
+                        //    var singleFile = allFiles[k];
+                        //    switch (singleFile.Name)
+                        //    {
+                        //        case "schoollicense":
+                        //            if (string.IsNullOrEmpty(SchoolDetails.SchoolLicense))
+                        //            {
+                        //                SchoolDetails.SchoolLicense = documentDetails.Id.ToString();
+                        //            }
+                        //            else
+                        //            {
+                        //                SchoolDetails.SchoolLicense += "," + documentDetails.Id;
+                        //            }
+
+                        //            break;
+                        //        case "registerationpaper":
+                        //            if (string.IsNullOrEmpty(SchoolDetails.RegisterationPaper))
+                        //            {
+                        //                SchoolDetails.RegisterationPaper = documentDetails.Id.ToString();
+                        //            }
+                        //            else
+                        //            {
+                        //                SchoolDetails.RegisterationPaper += "," + documentDetails.Id;
+                        //            }
+                        //            break;
+                        //    }
+                        //}
 
                         SchoolDetails schoolDetails = IndividualDetailsBusiness.CreateSchoolDetails(SchoolDetails, int.Parse(tc.Id));
 
@@ -2063,57 +2303,117 @@ namespace Training24Admin.Controllers
                         SchoolDetails.Routers = Request.Form["routers"];
                         SchoolDetails.Dongles = Request.Form["dongles"];
 
-                        var allFiles = Request.Form.Files.ToList();
-                        for (int k = 0; k < allFiles.Count; k++)
+                        var schoollicense = Request.Form["schoollicensefile"].ToString();
+                        string[] schoollicensefiles = null;
+                        if (!string.IsNullOrWhiteSpace(schoollicense))
+                            schoollicensefiles = schoollicense.Split(',');
+
+                        if (schoollicensefiles != null)
                         {
-                            string fileName = "";
-                            IFormFile file = null;
-                            if (Request.Form.Files.Count != 0)
-                                file = Request.Form.Files[k];
-                            var imageAcl = PredefinedObjectAcl.PublicRead;
-                            fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
-                            var ext = fileName.Substring(fileName.LastIndexOf("."));
-                            var extension = ext.ToLower();
-                            Guid imageGuid = Guid.NewGuid();
-                            fileName = fileName.Split(".")[0] + "_" + imageGuid.ToString() + extension;
-                            string mediaLink = "";
-                            var imageObject = await storage.UploadObjectAsync(
-                                bucket: "t24-primary-pdf-storage",
-                                objectName: fileName,
-                                contentType: file.ContentType,
-                                source: file.OpenReadStream(),
-                                options: new UploadObjectOptions { PredefinedAcl = imageAcl }
-                            );
-                            mediaLink = imageObject.MediaLink;
-
-                            DocumentDetails documentDetails = IndividualDetailsBusiness.CreateDocumentDetails(new DocumentDetails { DocumentUrl = mediaLink, name = fileName }, int.Parse(tc.Id));
-
-                            var singleFile = allFiles[k];
-                            switch (singleFile.Name)
+                            foreach (var schoollicensefile in schoollicensefiles)
                             {
-                                case "schoollicense":
-                                    if (string.IsNullOrEmpty(SchoolDetails.SchoolLicense))
-                                    {
-                                        SchoolDetails.SchoolLicense = documentDetails.Id.ToString();
-                                    }
-                                    else
-                                    {
-                                        SchoolDetails.SchoolLicense += "," + documentDetails.Id;
-                                    }
+                                string mediaLink = "";
+                                string BucketName = General.getBucketName("1");
+                                if (!string.IsNullOrEmpty(schoollicensefile))
+                                {
+                                    var storageObject = storage.GetObject(BucketName, schoollicensefile);
+                                    mediaLink = storageObject.MediaLink;
+                                }
 
-                                    break;
-                                case "registerationpaper":
-                                    if (string.IsNullOrEmpty(SchoolDetails.RegisterationPaper))
-                                    {
-                                        SchoolDetails.RegisterationPaper = documentDetails.Id.ToString();
-                                    }
-                                    else
-                                    {
-                                        SchoolDetails.RegisterationPaper += "," + documentDetails.Id;
-                                    }
-                                    break;
+                                DocumentDetails documentDetails = IndividualDetailsBusiness.CreateDocumentDetails(new DocumentDetails { DocumentUrl = mediaLink, name = schoollicensefile }, int.Parse(tc.Id));
+
+                                if (string.IsNullOrEmpty(SchoolDetails.SchoolLicense))
+                                {
+                                    SchoolDetails.SchoolLicense = documentDetails.Id.ToString();
+                                }
+                                else
+                                {
+                                    SchoolDetails.SchoolLicense += "," + documentDetails.Id;
+                                }
                             }
                         }
+
+                        var registerationpaper = Request.Form["registerationpaperfile"].ToString();
+                        string[] registerationpaperfiles = null;
+                        if (!string.IsNullOrWhiteSpace(registerationpaper))
+                            registerationpaperfiles = registerationpaper.Split(',');
+
+                        if (schoollicensefiles != null)
+                        {
+                            foreach (var registerationpaperfile in registerationpaperfiles)
+                            {
+                                string mediaLink = "";
+                                string BucketName = General.getBucketName("1");
+                                if (!string.IsNullOrEmpty(registerationpaperfile))
+                                {
+                                    var storageObject = storage.GetObject(BucketName, registerationpaperfile);
+                                    mediaLink = storageObject.MediaLink;
+                                }
+
+                                DocumentDetails documentDetails = IndividualDetailsBusiness.CreateDocumentDetails(new DocumentDetails { DocumentUrl = mediaLink, name = registerationpaperfile }, int.Parse(tc.Id));
+
+                                if (string.IsNullOrEmpty(SchoolDetails.RegisterationPaper))
+                                {
+                                    SchoolDetails.RegisterationPaper = documentDetails.Id.ToString();
+                                }
+                                else
+                                {
+                                    SchoolDetails.RegisterationPaper += "," + documentDetails.Id;
+                                }
+                            }
+                        }
+
+                        //var allFiles = Request.Form.Files.ToList();
+                        //for (int k = 0; k < allFiles.Count; k++)
+                        //{
+                        //    string fileName = "";
+                        //    IFormFile file = null;
+                        //    if (Request.Form.Files.Count != 0)
+                        //        file = Request.Form.Files[k];
+                        //    var imageAcl = PredefinedObjectAcl.PublicRead;
+                        //    fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
+                        //    var ext = fileName.Substring(fileName.LastIndexOf("."));
+                        //    var extension = ext.ToLower();
+                        //    Guid imageGuid = Guid.NewGuid();
+                        //    fileName = fileName.Split(".")[0] + "_" + imageGuid.ToString() + extension;
+                        //    string mediaLink = "";
+                        //    var imageObject = await storage.UploadObjectAsync(
+                        //        bucket: "t24-primary-pdf-storage",
+                        //        objectName: fileName,
+                        //        contentType: file.ContentType,
+                        //        source: file.OpenReadStream(),
+                        //        options: new UploadObjectOptions { PredefinedAcl = imageAcl }
+                        //    );
+                        //    mediaLink = imageObject.MediaLink;
+
+                        //    DocumentDetails documentDetails = IndividualDetailsBusiness.CreateDocumentDetails(new DocumentDetails { DocumentUrl = mediaLink, name = fileName }, int.Parse(tc.Id));
+
+                        //    var singleFile = allFiles[k];
+                        //    switch (singleFile.Name)
+                        //    {
+                        //        case "schoollicense":
+                        //            if (string.IsNullOrEmpty(SchoolDetails.SchoolLicense))
+                        //            {
+                        //                SchoolDetails.SchoolLicense = documentDetails.Id.ToString();
+                        //            }
+                        //            else
+                        //            {
+                        //                SchoolDetails.SchoolLicense += "," + documentDetails.Id;
+                        //            }
+
+                        //            break;
+                        //        case "registerationpaper":
+                        //            if (string.IsNullOrEmpty(SchoolDetails.RegisterationPaper))
+                        //            {
+                        //                SchoolDetails.RegisterationPaper = documentDetails.Id.ToString();
+                        //            }
+                        //            else
+                        //            {
+                        //                SchoolDetails.RegisterationPaper += "," + documentDetails.Id;
+                        //            }
+                        //            break;
+                        //    }
+                        //}
 
 
                         SchoolDetails.Id = id;
