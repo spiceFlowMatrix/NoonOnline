@@ -1,10 +1,11 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router, ActivatedRoute, Params } from '@angular/router';
-import { UtilService, AgentService, UsersService } from '../../../shared';
+import { UtilService, AgentService, UsersService, FileService } from '../../../shared';
 import * as _ from 'lodash';
 import * as moment from 'moment';
 import {NgbCalendar, NgbDateStruct} from '@ng-bootstrap/ng-bootstrap';
+import { HttpEventType } from '@angular/common/http';
 @Component({
     selector: 'app-add-deposits',
     templateUrl: './add-deposits.component.html',
@@ -18,6 +19,7 @@ export class AddDepositsComponent implements OnInit {
     public model: any = {};
     public agents: any = [];
     isEditView: boolean = false;
+    documentid: any = [];
     isCallingApi: boolean = false;
 
     constructor(
@@ -25,6 +27,7 @@ export class AddDepositsComponent implements OnInit {
         public utilService: UtilService,
         public agentService: AgentService,
         public router: Router,
+        public fileService: FileService,
         public userService: UsersService,
         private calendar: NgbCalendar
     ) {
@@ -101,11 +104,46 @@ export class AddDepositsComponent implements OnInit {
     }
 
     onFileSelected($event) {
-        if (!this.agentDepositModel.documentid)
-            this.agentDepositModel.documentid = [];
+   
+        if (!this.agentDepositModel.filename) {
+            this.agentDepositModel.filename = []
+        }
         for (let index = 0; index < $event.target.files.length; index++) {
-            this.agentDepositModel.documentid.push($event.target.files[index]);
-        }             
+            this.isCallingApi = true;
+            let modal = {
+                fileTypeId: 1,
+                contentType: $event.target.files[index].type,
+                fileName: $event.target.files[index].name
+            }
+            let fileModal = {
+                totalpages: "",
+                fileTypeId: "",
+                filename: ""
+            }
+            let reader: any = new FileReader();
+            reader.readAsBinaryString($event.target.files[index]);
+            reader.onloadend = () => {
+                var count = reader.result.match(/\/Type[\s]*\/Page[^s]/g).length;
+                fileModal.totalpages = count.toString();
+                fileModal.fileTypeId = "1";
+            }
+            this.allSubscribers.push(this.agentService.getSupportDocumentFileSigned(modal).subscribe((res) => {
+                fileModal.filename = res.data.filename;
+                this.agentDepositModel.filename.push(res.data.filename);
+                this.documentid.push($event.target.files[index]);
+                let signUrl = res.data.signedurl;
+                this.fileService.putFileOnBucket(signUrl, $event.target.files[index]).subscribe((res: any) => {
+                    switch (res.type) {
+                        case HttpEventType.Response:
+                            this.isCallingApi = false;
+
+                    }
+                }, err => {
+                    this.isCallingApi = false;
+                    this.utilService.showErrorCall(err);
+                })
+            }))
+        }
     }
 
     ngOnDestroy() {

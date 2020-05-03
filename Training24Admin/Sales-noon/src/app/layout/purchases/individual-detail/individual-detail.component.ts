@@ -56,7 +56,9 @@ export class IndividualDetailComponent implements OnInit {
     isSalesAgent: boolean = false;
     isAdmin: boolean = false;
     dob: any;
-
+    marksheetFile: any = [];
+    parentFile: any = [];
+    studenttazFile: any = [];
     constructor(
         public utilService: UtilService,
         public usersService: UsersService,
@@ -257,13 +259,14 @@ export class IndividualDetailComponent implements OnInit {
 
     //     this.individualDetails[index][key] = $event.target.files;
     // }
+
     onStudentFileSelected($event, index) {
         this.studentDownload = null;
         this.studenttazrika = $event.target.files[0].name;
         if (!this.individualDetails[index].studenttazrikafile)
             this.individualDetails[index].studenttazrikafile = [];
 
-        this.individualDetails[index]['studenttazrika'] = $event.target.files;
+        this.studenttazFile= $event.target.files;
         for (let i = 0; i < $event.target.files.length; i++) {
             this.fileModal = {};
             this.isCallingApi = true;
@@ -295,10 +298,12 @@ export class IndividualDetailComponent implements OnInit {
             }))
         }
     }
+   
     onMarksheetFileSelected($event, index) {
         this.marksheetDownload = null;
         this.previousmarksheets = $event.target.files[0].name;
-        this.individualDetails[index]['previousmarksheets'] = $event.target.files;
+   //     this.individualDetails[index]['previousmarksheets'] = $event.target.files;
+        this.marksheetFile = $event.target.files;
         if (!this.individualDetails[index].previousmarksheetsfile)
         this.individualDetails[index].previousmarksheetsfile = [];
         for (let i = 0; i < $event.target.files.length; i++) {
@@ -336,7 +341,8 @@ export class IndividualDetailComponent implements OnInit {
     onParentFileSelected($event, index) {
         this.parentDownload = null;
         this.parenttazrika = $event.target.files[0].name;
-        this.individualDetails[index]['parenttazrika'] = $event.target.files;
+        this.parentFile = $event.target.files;
+       // this.individualDetails[index]['parenttazrika'] = $event.target.files;
         if (!this.individualDetails[index].parenttazrikafile)
         this.individualDetails[index].parenttazrikafile = [];
         for (let i = 0; i < $event.target.files.length; i++) {
