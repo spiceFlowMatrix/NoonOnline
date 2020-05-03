@@ -495,7 +495,7 @@ assembleProductionDari:
     - cp dari_values_strings.xml app/src/main/res/values/strings.xml
     # We store this binary file in a variable as hex with this command, `xxd -p gitter-android-app.jks`
     # Then we convert the hex back to a binary file
-    - echo -n "${signing_jks_file_hex}" | xxd -r -p - > noon-android-app.jks
+    - echo -n "${signing_jks_file_hex}" | xxd -r -p - > app/noon-android-app.jks
     - echo ${android_secret_properties} | base64 -d > secrets.properties
     - ./gradlew clean
     - ./gradlew signingReport
@@ -503,7 +503,7 @@ assembleProductionDari:
     - cp -r app/build/outputs/ dariBuildOutputs
   after_script:
     - cd AndroidApp/
-    - rm -f noon-android-app.jks || true
+    - rm -f app/noon-android-app.jks || true
     - rm -f secret.properties || true
     - rm -rf app/build/outputs/
     - rm -f app/src/main/res/raw/noonssl.crt
