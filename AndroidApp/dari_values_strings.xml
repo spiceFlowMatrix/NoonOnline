@@ -234,7 +234,7 @@
     <string name="ValidationGender">جنس را وارد کنید</string>
     <string name="validation_enterBirthdate">لطفن تاریخ تولد را انتخاب کنید</string>
     <string name="grade">صنف</string>
-    <string name="how_did_you_hear_about_us">چگونه از موجودیت برنامه تعلیمات آنلاین (ن) آگاه شدید؟</string>
+    <string name="how_did_you_hear_about_us">چگونه از موجودیت برنامه تعلیمات (ن) آگاه شدید؟</string>
     <string name="ValidationProvince">لطفا ولایت را انتخاب کنید</string>
     <string name="ValidationCity">لطفا شهر را انتخاب کنید</string>
     <string name="ValidationGrade">لطفا صنف را انتخاب کنید</string>
@@ -246,7 +246,7 @@
     <string name="social_media">شبکه‌های اجتماعی</string>
     <string name="billboard">تابلو تبلیغاتی</string>
     <string name="sales_agent">نماینده فروشات</string>
-    <string name="ValidationAboutus">لطفا انتخاب کنید که چگونه از موجودیت تعلیمات آنلاین ن با خبر شدید</string>
+    <string name="ValidationAboutus">لطفا انتخاب کنید که چگونه از موجودیت تعلیمات ن با خبر شدید</string>
 
     <string name="grade_6">ششم</string>
     <string name="grade_7">هفتم</string>
@@ -349,7 +349,7 @@
     <string name="private_mode">نمایش تنها بحث‌های خصوصی</string>
 
     <!--Terms & Conditions-->
-    <string name="accept_terms_conditions">اپلکیشن تعلمات آنلاین ن را قبول دارم&#160;</string>
+    <string name="accept_terms_conditions">اپلکیشن تعلمات ن را قبول دارم&#160;</string>
     <string name="terms_conditions">شرایط&#160;</string>
     <string name="accept_term_condition">لطفا شرایط را قبول کنید</string>
     <string name="by_acknowledged">برنامه را قبول میکنید.</string>

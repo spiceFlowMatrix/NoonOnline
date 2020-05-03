@@ -234,7 +234,7 @@
     <string name="ValidationGender">جنیست انتخاب کړی</string>
     <string name="validation_enterBirthdate">د زیږېدو نیټه وټاکئ</string>
     <string name="grade">ټولګی</string>
-    <string name="how_did_you_hear_about_us">د (ن) انلاین زده کړو د پروګرام له شتون څخه څرنګه خبر شوئ؟</string>
+    <string name="how_did_you_hear_about_us">د (ن) زده کړو د پروګرام له شتون څخه څرنګه خبر شوئ؟</string>
     <string name="ValidationProvince">مهربانی وکړی ولایت انتخاب کړی</string>
     <string name="ValidationCity">مهربانی وکړی ښار/ولسوالی انتخاب کړی</string>
     <string name="ValidationGrade">مهربانی وکړی ټولګی انتخاب کړی</string>
@@ -246,7 +246,7 @@
     <string name="social_media">ټولنیز شبکې</string>
     <string name="billboard">بلبورډ</string>
     <string name="sales_agent">د (ن) د پلور استازي</string>
-    <string name="ValidationAboutus">مهربانی وکړی انتخاب کړی چی د (ن) انلاین زده کړو د پروګرام له شتون څخه څرنګه خبر شوئ؟</string>
+    <string name="ValidationAboutus">مهربانی وکړی انتخاب کړی چی د (ن) زده کړو د پروګرام له شتون څخه څرنګه خبر شوئ؟</string>
 
     <string name="grade_6">شپږم</string>
     <string name="grade_7">اووم</string>
@@ -350,7 +350,7 @@
     <string name="private_mode">یوازې شخصي خصوصی وګورئ</string>
 
     <!--Terms & Conditions-->
-    <string name="accept_terms_conditions">د ن آنلاین زده کړې منم&#160;</string>
+    <string name="accept_terms_conditions">د ن زده کړې منم&#160;</string>
     <string name="terms_conditions">شرایط&#160;</string>
     <string name="accept_term_condition">مهربانی وکړی شرایط ومنئ.</string>
     <string name="by_acknowledged">د ن زده‌کړې منئ.</string>
