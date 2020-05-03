@@ -497,9 +497,11 @@ assembleProductionDari:
     # Then we convert the hex back to a binary file
     - echo -n "${signing_jks_file_hex}" | xxd -r -p - > noon-android-app.jks
     - echo ${android_secret_properties} | base64 -d > secrets.properties
+    - ./gradlew clean
     - ./gradlew assembleRelease
     - cp -r app/build/outputs/ dariBuildOutputs
   after_script:
+    - ./gradlew signingReport
     - rm -f noon-android-app.jks || true
     - rm -f secret.properties || true
     - rm -rf app/build/outputs/
