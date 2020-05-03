@@ -472,7 +472,7 @@ initiateProduction:
 
 assembleProductionDari:
   extends: .buildAndroidJob
-  stage: buildDariApps
+  stage: buildDariAppsProdProduction
   environment:
     name: production/dari
   script:
