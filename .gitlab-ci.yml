@@ -501,6 +501,7 @@ assembleProductionDari:
     - ./gradlew assembleRelease
     - cp -r app/build/outputs/ dariBuildOutputs
   after_script:
+    - cd AndroidApp/
     - ./gradlew signingReport
     - rm -f noon-android-app.jks || true
     - rm -f secret.properties || true
