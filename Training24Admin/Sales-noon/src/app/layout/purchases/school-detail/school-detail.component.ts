@@ -28,6 +28,8 @@ export class SchoolDetailComponent implements OnInit {
     focus$ = new Subject<string>();
     selectedAccount: any = {};
     public fileModal: any = {};
+    schoollicense: any = [];
+    registerationpaper: any = [];
     @ViewChild("manageSchoolDetailForm") manageSchoolDetailForm: any;
 
     @Input("data")
@@ -139,8 +141,13 @@ export class SchoolDetailComponent implements OnInit {
         );
     }
 
-    onFileSelected($event, key,newKey) {
-        this.schoolDetailModel[key] = $event.target.files;
+    onFileSelected($event, key, newKey) {
+        if (key === 'schoollicense') {
+            this.schoollicense = $event.target.files;
+        } else {
+            this.registerationpaper = $event.target.files;
+        }
+       
         if (!this.schoolDetailModel[newKey])
         this.schoolDetailModel[newKey] = [];
         for (let i = 0; i < $event.target.files.length; i++) {
