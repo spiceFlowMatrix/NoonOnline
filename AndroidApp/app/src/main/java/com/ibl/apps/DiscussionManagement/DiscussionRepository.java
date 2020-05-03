@@ -48,7 +48,7 @@ public class DiscussionRepository implements DiscussionApiService {
 
     @Override
     public Single<DiscussionsDetails> DiscussionsDetails(String topicId) {
-        return null;
+        return discussionApiService.DiscussionsDetails(topicId);
     }
 
     @Override
