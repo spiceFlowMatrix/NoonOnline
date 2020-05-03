@@ -498,11 +498,11 @@ assembleProductionDari:
     - echo -n "${signing_jks_file_hex}" | xxd -r -p - > noon-android-app.jks
     - echo ${android_secret_properties} | base64 -d > secrets.properties
     - ./gradlew clean
+    - ./gradlew signingReport
     - ./gradlew assembleRelease
     - cp -r app/build/outputs/ dariBuildOutputs
   after_script:
     - cd AndroidApp/
-    - ./gradlew signingReport
     - rm -f noon-android-app.jks || true
     - rm -f secret.properties || true
     - rm -rf app/build/outputs/

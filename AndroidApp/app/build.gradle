@@ -18,17 +18,6 @@ def secretProperties = new Properties()
 if (secretsPropertiesFile.exists()) {
     secretProperties.load(new FileInputStream(secretsPropertiesFile))
 }
-// Otherwise read from environment variables, this happens in CI
-else {
-    // TODO: R&D on configuring auth0 integration with application through here instead of strings.xml
-    // secretProperties.setProperty("oauth_client_id", "\"${System.getenv('oauth_client_id')}\"")
-    // secretProperties.setProperty("oauth_client_secret", "\"${System.getenv('oauth_client_secret')}\"")
-    // secretProperties.setProperty("oauth_redirect_uri", "\"${System.getenv('oauth_redirect_uri')}\"")
-    secretProperties.setProperty("google_project_id", "\"${System.getenv('google_project_id') ?: "null"}\"")
-    secretProperties.setProperty("signing_keystore_password", "${System.getenv('signing_keystore_password')}")
-    secretProperties.setProperty("signing_key_password", "${System.getenv('signing_key_password')}")
-    secretProperties.setProperty("signing_key_alias", "${System.getenv('signing_key_alias')}")
-}
 
 repositories {
     maven { url 'https://maven.fabric.io/public' }
@@ -56,22 +45,15 @@ android {
         vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         manifestPlaceholders = [auth0Domain: "@string/com_auth0_domain", auth0Scheme: "@string/app_scheme"]
-
-        // Build configurations
-        buildConfigField("String", "oauth_client_id", "${secretProperties['oauth_client_id']}")
-        buildConfigField("String", "oauth_client_secret", "${secretProperties['oauth_client_secret']}")
-        buildConfigField("String", "oauth_redirect_uri", "${secretProperties['oauth_redirect_uri']}")
-        buildConfigField("String", "google_project_id", "${secretProperties['google_project_id']}" ?: "null")
     }
     signingConfigs {
         release {
             // You need to specify either an absolute path or include the
             // keystore file in the same directory as the build.gradle file.
-            storeFile file("../noon-android-app.jks")
-            storePassword "${secretProperties['signing_keystore_password']}"
-            keyAlias "${secretProperties['signing_key_alias']}"
-            keyPassword "${secretProperties['signing_key_password']}"
-            
+            storeFile file(secretProperties['signing_keystore_file'])
+            storePassword secretProperties['signing_keystore_password']
+            keyAlias secretProperties['signing_key_alias']
+            keyPassword secretProperties['signing_key_password']
         }
     }
     buildTypes {
