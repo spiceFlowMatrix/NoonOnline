@@ -213,7 +213,7 @@
     <string name="gender">جنسیت</string>
     <string name="birthplace_optional">د زیږېدو ځای (اختیاری)</string>
     <string name="village_area">ناحیه/کلی</string>
-    <string name="school">د ښوونځی نوم</string>
+    <string name="school">ښوونځی</string>
     <string name="contact_information">د اړیکې معلومات</string>
     <string name="birthday">د زیږېدو نیټه</string>
     <string name="tazkira_number_optional">د پیژندپاڼه شمیره (اختیاری)</string>
