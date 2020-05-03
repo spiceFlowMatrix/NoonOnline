@@ -469,3 +469,39 @@ initiateProduction:
     - echo "Initiating Production Deployment"
   when: manual
   allow_failure: false
+
+assembleProductionDari:
+  extends: .buildAndroidJob
+  stage: buildDariApps
+  environment:
+    name: production/dari
+  script:
+    - rm -f app/src/main/res/raw/noonssl.crt
+    # We encode the noonssl.crt file in base64 by applying `base64 -w 0 FILENAME.ts` command on it and then supply it as ANDROID_SSL_CRT_BASE64 environmet variable
+    - echo ${ANDROID_SSL_CRT_BASE64} | base64 -d > app/src/main/res/raw/noonssl.crt
+    ## Begin script for dari version
+    # We encode the google-services.json file in base64 by applying `base64 -w 0 FILENAME.ts` command on it and then supply it as ANDROID_GOOGLE_SERVICES_JSON environmet variable
+    - rm -f app/google-services.json
+    - echo ${DARI_ANDROID_GOOGLE_SERVICES_JSON} | base64 -d > app/google-services.json
+    # We encode the configs_strings_template.xml file in base64 by applying `base64 -w 0 FILENAME.ts` command on it and then supply it as DARI_ANDROID_APP_CONFIG_VALUES environmet variable
+    - rm configs_strings_template.xml
+    - echo ${DARI_ANDROID_APP_CONFIG_VALUES} | base64 -d > configs_strings_template.xml
+    - sed -i 's@---BASE_URL_value_from_ci---@'"$DARI_PROD_ENV_URL"'@' configs_strings_template.xml
+    # Copy in the config strings
+    - rm app/src/release/res/values/strings.xml
+    - cp configs_strings_template.xml app/src/release/res/values/strings.xml
+    # Copy in the resources strings
+    - rm app/src/main/res/values/strings.xml
+    - cp dari_values_strings.xml app/src/main/res/values/strings.xml
+    # We store this binary file in a variable as hex with this command, `xxd -p gitter-android-app.jks`
+    # Then we convert the hex back to a binary file
+    - echo "$signing_jks_file_hex" | xxd -r -p - > android-signing-keystore.jks
+    - ./gradlew assembleRelease
+    - cp -r app/build/outputs/ dariBuildOutputs
+  after_script:
+    - rm -f android-signing-keystore.jks || true
+    - rm -rf app/build/outputs/
+    - rm -f app/src/main/res/raw/noonssl.crt
+  artifacts:
+    paths:
+      - AndroidApp/dariBuildOutputs/
