@@ -58,7 +58,7 @@ public class ParentSpinnerModel {
         @Expose
         private String email;
         @Expose
-        private Object fullName;
+        private String fullName;
         @Expose
         private Long id;
         @Expose
@@ -86,11 +86,11 @@ public class ParentSpinnerModel {
             this.email = email;
         }
 
-        public Object getFullName() {
+        public String getFullName() {
             return fullName;
         }
 
-        public void setFullName(Object fullName) {
+        public void setFullName(String fullName) {
             this.fullName = fullName;
         }
 
