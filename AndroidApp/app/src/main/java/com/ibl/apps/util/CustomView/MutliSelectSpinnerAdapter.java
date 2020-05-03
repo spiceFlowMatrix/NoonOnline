@@ -7,11 +7,6 @@ package com.ibl.apps.util.CustomView;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
-import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
-import androidx.appcompat.widget.AppCompatCheckBox;
-import androidx.recyclerview.widget.RecyclerView.Adapter;
-import androidx.recyclerview.widget.RecyclerView.ViewHolder;
 import android.text.SpannableString;
 import android.text.style.TextAppearanceSpan;
 import android.view.LayoutInflater;
@@ -21,6 +16,11 @@ import android.widget.CompoundButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.widget.AppCompatCheckBox;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.RecyclerView.Adapter;
+import androidx.recyclerview.widget.RecyclerView.ViewHolder;
 
 import com.ibl.apps.Model.parent.ParentSpinnerModel;
 import com.ibl.apps.noon.NoonApplication;
@@ -52,7 +52,11 @@ class MutliSelectSpinnerAdapter extends Adapter<MutliSelectSpinnerAdapter.MultiS
             if (!this.mSearchQuery.equals("") && this.mSearchQuery.length() > 1) {
                 this.setHighlightedText(position, holder.dialog_name_item);
             } else {
-                holder.dialog_name_item.setText((this.mDataSet.get(position)).getUsername());
+                if (this.mDataSet.get(position) != null && this.mDataSet.get(position).getUsername() != null && !this.mDataSet.get(position).getUsername().isEmpty()) {
+                    holder.dialog_name_item.setText((this.mDataSet.get(position)).getUsername());
+                } else {
+                    holder.dialog_name_item.setText((this.mDataSet.get(position)).getFullName());
+                }
             }
         } else {
             if (this.mDataSet.get(position) != null && this.mDataSet.get(position).getUsername() != null && !this.mDataSet.get(position).getUsername().isEmpty()) {
@@ -221,8 +225,16 @@ class MutliSelectSpinnerAdapter extends Adapter<MutliSelectSpinnerAdapter.MultiS
 
     private boolean checkForSelection(ParentSpinnerModel.Data id) {
         for (int i = 0; i < selectedIdsForCallback.size(); ++i) {
-            if (id.getUsername().equals(selectedIdsForCallback.get(i).getUsername())) {
-                return true;
+            if (id.getUsername() != null && selectedIdsForCallback.get(i).getUsername() != null) {
+                if (id.getUsername().equals(selectedIdsForCallback.get(i).getUsername())) {
+                    return true;
+                }
+            } else {
+                if (id.getFullName() != null && selectedIdsForCallback.get(i).getFullName() != null) {
+                    if (id.getFullName().equals(selectedIdsForCallback.get(i).getFullName())) {
+                        return true;
+                    }
+                }
             }
         }
 
