@@ -554,6 +554,8 @@ assembleProductionPashto:
     - rm configs_strings_template.xml
     - echo ${PASHTO_ANDROID_APP_CONFIG_VALUES} | base64 -d > configs_strings_template.xml
     - sed -i 's@---BASE_URL_value_from_ci---@'"$PASHTO_PROD_ENV_URL"'@' configs_strings_template.xml
+    # We need to make sure the correct applicationId is used in build.gradle when building the pashto version of the application
+    - sed -i 's@applicationId "com.app.training24.noon"@applicationId "com.app.training24.noonpashto"@' app/build.gradle
     # Copy in the config strings
     - rm app/src/release/res/values/strings.xml
     - cp configs_strings_template.xml app/src/release/res/values/strings.xml
