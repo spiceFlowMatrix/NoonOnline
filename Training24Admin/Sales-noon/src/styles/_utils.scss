@@ -166,6 +166,8 @@ img.course-avatar {
 
 .ngx-dropdown-list-container {
     z-index: 999 !important;
+    overflow: scroll;
+    max-height: 300px;
 }
 
 /* added to mirrorContainer (default = body) while dragging */
