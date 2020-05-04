@@ -87,6 +87,8 @@ assembleDebugDari:
     # Copy in the resources strings
     - rm app/src/main/res/values/strings.xml
     - cp dari_values_strings.xml app/src/main/res/values/strings.xml
+    - touch app/noon-android-app.jks
+    - ./gradlew clean
     - ./gradlew assembleDebug
     - cp -r app/build/outputs/ dariBuildOutputs
   after_script:
@@ -122,6 +124,8 @@ assembleDebugPashto:
     # Copy in the resources strings
     - rm app/src/main/res/values/strings.xml
     - cp pashto_values_strings.xml app/src/main/res/values/strings.xml
+    - touch app/noon-android-app.jks
+    - ./gradlew clean
     - ./gradlew assembleDebug
     - cp -r app/build/outputs/ pashtoBuildOutputs
   after_script:
