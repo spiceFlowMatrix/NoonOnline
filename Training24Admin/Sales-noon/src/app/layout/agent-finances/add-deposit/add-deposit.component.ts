@@ -20,6 +20,7 @@ export class AddDepositComponent implements OnInit {
     public agents: any = [];
     isEditView: boolean = false;
     isCallingApi: boolean = false;
+    documentid: any = [];
 
     constructor(
         private activatedRoute: ActivatedRoute,
@@ -89,8 +90,6 @@ export class AddDepositComponent implements OnInit {
     }
 
     onFileSelected($event) {
-        if (!this.agentDepositModel.documentid)
-            this.agentDepositModel.documentid = [];
           if(!this.agentDepositModel.filename) {
                     this.agentDepositModel.filename = []
                 }
@@ -116,7 +115,7 @@ export class AddDepositComponent implements OnInit {
             this.allSubscribers.push(this.agentService.getSupportDocumentFileSigned(modal).subscribe((res) => {
                 fileModal.filename = res.data.filename;
                 this.agentDepositModel.filename.push(res.data.filename);
-                this.agentDepositModel.documentid.push($event.target.files[index]);
+                this.documentid.push($event.target.files[index]);
                 let signUrl = res.data.signedurl;
                 this.fileService.putFileOnBucket(signUrl, $event.target.files[index]).subscribe((res: any) => {
                     switch (res.type) {
