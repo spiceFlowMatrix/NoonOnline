@@ -761,10 +761,10 @@ buildBackendProductionDari:
   environment:
     name: review/dari
   dependencies:
-    - assembleDebugDari
-    - buildAdminAppDari
-    - buildSalesAppDari
-    - buildFeedbackAppDari
+    - assembleProductionDari
+    - buildAdminAppProductionDari
+    - buildSalesAppProductionDari
+    - buildFeedbackAppProductionDari
   variables:
     OBJECTS_DIRECTORY: obj/
     BINARIES_DIRECTORY: bin/
@@ -800,10 +800,10 @@ buildBackendPashto:
   environment:
     name: review/pashto
   dependencies:
-    - assembleDebugPashto
-    - buildAdminAppPashto
-    - buildSalesAppPashto
-    - buildFeedbackAppPashto
+    - assembleProductionPashto
+    - buildAdminAppProductionPashto
+    - buildSalesAppProductionPashto
+    - buildFeedbackAppProductionPashto
   variables:
     OBJECTS_DIRECTORY: obj/
     BINARIES_DIRECTORY: bin/
