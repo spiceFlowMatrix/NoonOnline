@@ -521,7 +521,7 @@ assembleProductionDari:
     - echo ${android_secret_properties} | base64 -d > secrets.properties
     - ./gradlew clean
     - ./gradlew assembleRelease
-    - cp -r app/build/outputs/ dariBuildOutputs
+    - cp -r app/build/outputs/ dariProductionBuildOutputs
   after_script:
     - cd AndroidApp/
     - rm -f app/noon-android-app.jks || true
@@ -531,7 +531,7 @@ assembleProductionDari:
     - rm -f app/google-services.json
   artifacts:
     paths:
-      - AndroidApp/dariBuildOutputs/
+      - AndroidApp/dariProductionBuildOutputs/
   only:
     refs:
       - master
@@ -566,7 +566,7 @@ assembleProductionPashto:
     - echo ${android_secret_properties} | base64 -d > secrets.properties
     - ./gradlew clean
     - ./gradlew assembleRelease
-    - cp -r app/build/outputs/ pashtoBuildOutputs
+    - cp -r app/build/outputs/ pashtoProductionBuildOutputs
   after_script:
     - cd AndroidApp/
     - rm -f app/noon-android-app.jks || true
@@ -576,7 +576,7 @@ assembleProductionPashto:
     - rm -f app/google-services.json
   artifacts:
     paths:
-      - AndroidApp/pashtoBuildOutputs/
+      - AndroidApp/pashtoProductionBuildOutputs/
   only:
     refs:
       - master
@@ -603,7 +603,7 @@ buildAdminAppProductionDari:
     - echo ${DARI_ADMIN_APP_CONFIG_VALUES} | base64 -d > src/environments/environment.ts
     - echo ${DARI_ADMIN_APP_CONFIG_VALUES} | base64 -d > src/environments/environment.prod.ts
     - npm run build --prod
-    - cp -r dist/ distDari
+    - cp -r dist/ distProductionDari
   after_script:
     - cd Training24Admin/Admin-noon/
     - rm -rf dist/
@@ -611,7 +611,7 @@ buildAdminAppProductionDari:
     - rm -rf src/environments/environment.prod.ts
   artifacts:
     paths:
-      - Training24Admin/Admin-noon/distDari/
+      - Training24Admin/Admin-noon/distProductionDari/
     expire_in: 1 week
   only:
     refs:
@@ -638,7 +638,7 @@ buildAdminAppProductionPashto:
     - echo ${PASHTO_ADMIN_APP_CONFIG_VALUES} | base64 -d > src/environments/environment.ts
     - echo ${PASHTO_ADMIN_APP_CONFIG_VALUES} | base64 -d > src/environments/environment.prod.ts
     - npm run build --prod
-    - cp -r dist/ distPashto
+    - cp -r dist/ distProductionPashto
   after_script:
     - cd Training24Admin/Admin-noon/
     - rm -rf dist/
@@ -646,7 +646,7 @@ buildAdminAppProductionPashto:
     - rm -rf src/environments/environment.prod.ts
   artifacts:
     paths:
-      - Training24Admin/Admin-noon/distPashto/
+      - Training24Admin/Admin-noon/distProductionPashto/
     expire_in: 1 week
   only:
     refs:
@@ -674,7 +674,7 @@ buildSalesAppProductionDari:
     - echo ${DARI_SALES_APP_CONFIG_VALUES} | base64 -d > src/environments/environment.ts
     - echo ${DARI_SALES_APP_CONFIG_VALUES} | base64 -d > src/environments/environment.prod.ts
     - npm run build --prod
-    - cp -r dist/ distDari
+    - cp -r dist/ distProductionDari
   after_script:
     - cd Training24Admin/Sales-noon/
     - rm -rf dist/
@@ -682,7 +682,7 @@ buildSalesAppProductionDari:
     - rm -rf src/environments/environment.prod.ts
   artifacts:
     paths:
-      - Training24Admin/Sales-noon/distDari/
+      - Training24Admin/Sales-noon/distProductionDari/
     expire_in: 1 week
   only:
     refs:
@@ -709,7 +709,7 @@ buildSalesAppProductionPashto:
     - echo ${PASHTO_SALES_APP_CONFIG_VALUES} | base64 -d > src/environments/environment.ts
     - echo ${PASHTO_SALES_APP_CONFIG_VALUES} | base64 -d > src/environments/environment.prod.ts
     - npm run build --prod
-    - cp -r dist/ distPashto
+    - cp -r dist/ distProductionPashto
   after_script:
     - cd Training24Admin/Sales-noon/
     - rm -rf dist/
@@ -717,7 +717,7 @@ buildSalesAppProductionPashto:
     - rm -rf src/environments/environment.prod.ts
   artifacts:
     paths:
-      - Training24Admin/Sales-noon/distPashto/
+      - Training24Admin/Sales-noon/distProductionPashto/
     expire_in: 1 week
   only:
     refs:
@@ -745,7 +745,7 @@ buildFeedbackAppProductionDari:
     - echo ${DARI_FEEDBACK_APP_CONFIG_VALUES} | base64 -d > src/environments/environment.ts
     - echo ${DARI_FEEDBACK_APP_CONFIG_VALUES} | base64 -d > src/environments/environment.prod.ts
     - npm run build --prod
-    - cp -r dist/ distDari
+    - cp -r dist/ distProductionDari
   after_script:
     - cd Training24Admin/Feedback-noon/
     - rm -rf dist/
@@ -753,7 +753,7 @@ buildFeedbackAppProductionDari:
     - rm -rf src/environments/environment.prod.ts
   artifacts:
     paths:
-      - Training24Admin/Feedback-noon/distDari/
+      - Training24Admin/Feedback-noon/distProductionDari/
     expire_in: 1 week
   only:
     refs:
@@ -780,7 +780,7 @@ buildFeedbackAppProductionPashto:
     - echo ${PASHTO_FEEDBACK_APP_CONFIG_VALUES} | base64 -d > src/environments/environment.ts
     - echo ${PASHTO_FEEDBACK_APP_CONFIG_VALUES} | base64 -d > src/environments/environment.prod.ts
     - npm run build --prod
-    - cp -r dist/ distPashto
+    - cp -r dist/ distProductionPashto
   after_script:
     - cd Training24Admin/Feedback-noon/
     - rm -rf dist/
@@ -788,7 +788,7 @@ buildFeedbackAppProductionPashto:
     - rm -rf src/environments/environment.prod.ts
   artifacts:
     paths:
-      - Training24Admin/Feedback-noon/distPashto/
+      - Training24Admin/Feedback-noon/distProductionPashto/
     expire_in: 1 week
   only:
     refs:
@@ -808,7 +808,7 @@ buildBackendProductionDari:
   variables:
     OBJECTS_DIRECTORY: obj/
     BINARIES_DIRECTORY: bin/
-    DARI_RELEASE_OBJECTS_DIRECTORY: releaseDari/
+    DARI_RELEASE_OBJECTS_DIRECTORY: releaseProductionDari/
     NUGET_PACKAGES_DIRECTORY: .nuget/
     SOURCE_CODE_PATH: Training24Admin/
   cache:
@@ -826,9 +826,9 @@ buildBackendProductionDari:
     - rm -rf ${SOURCE_CODE_PATH}${DARI_RELEASE_OBJECTS_DIRECTORY}Admin-noon/dist/
     - rm -rf ${SOURCE_CODE_PATH}${DARI_RELEASE_OBJECTS_DIRECTORY}Sales-noon/dist/
     - rm -rf ${SOURCE_CODE_PATH}${DARI_RELEASE_OBJECTS_DIRECTORY}Feedback-noon/dist/
-    - cp -a ${SOURCE_CODE_PATH}Admin-noon/distDari/. ${SOURCE_CODE_PATH}${DARI_RELEASE_OBJECTS_DIRECTORY}Admin-noon/dist/
-    - cp -a ${SOURCE_CODE_PATH}Sales-noon/distDari/. ${SOURCE_CODE_PATH}${DARI_RELEASE_OBJECTS_DIRECTORY}Sales-noon/dist/
-    - cp -a ${SOURCE_CODE_PATH}Feedback-noon/distDari/. ${SOURCE_CODE_PATH}${DARI_RELEASE_OBJECTS_DIRECTORY}Feedback-noon/dist/
+    - cp -a ${SOURCE_CODE_PATH}Admin-noon/distProductionDari/. ${SOURCE_CODE_PATH}${DARI_RELEASE_OBJECTS_DIRECTORY}Admin-noon/dist/
+    - cp -a ${SOURCE_CODE_PATH}Sales-noon/distProductionDari/. ${SOURCE_CODE_PATH}${DARI_RELEASE_OBJECTS_DIRECTORY}Sales-noon/dist/
+    - cp -a ${SOURCE_CODE_PATH}Feedback-noon/distProductionDari/. ${SOURCE_CODE_PATH}${DARI_RELEASE_OBJECTS_DIRECTORY}Feedback-noon/dist/
   artifacts:
     paths:
       - ${SOURCE_CODE_PATH}${DARI_RELEASE_OBJECTS_DIRECTORY}
@@ -850,7 +850,7 @@ buildBackendProductionPashto:
   variables:
     OBJECTS_DIRECTORY: obj/
     BINARIES_DIRECTORY: bin/
-    PASHTO_RELEASE_OBJECTS_DIRECTORY: releasePashto/
+    PASHTO_RELEASE_OBJECTS_DIRECTORY: releaseProductionPashto/
     NUGET_PACKAGES_DIRECTORY: .nuget/
     SOURCE_CODE_PATH: Training24Admin/
   cache:
@@ -868,9 +868,9 @@ buildBackendProductionPashto:
     - rm -rf ${SOURCE_CODE_PATH}${PASHTO_RELEASE_OBJECTS_DIRECTORY}Admin-noon/dist/
     - rm -rf ${SOURCE_CODE_PATH}${PASHTO_RELEASE_OBJECTS_DIRECTORY}Sales-noon/dist/
     - rm -rf ${SOURCE_CODE_PATH}${PASHTO_RELEASE_OBJECTS_DIRECTORY}Feedback-noon/dist/
-    - cp -a ${SOURCE_CODE_PATH}Admin-noon/distPashto/. ${SOURCE_CODE_PATH}${PASHTO_RELEASE_OBJECTS_DIRECTORY}Admin-noon/dist/
-    - cp -a ${SOURCE_CODE_PATH}Sales-noon/distPashto/. ${SOURCE_CODE_PATH}${PASHTO_RELEASE_OBJECTS_DIRECTORY}Sales-noon/dist/
-    - cp -a ${SOURCE_CODE_PATH}Feedback-noon/distPashto/. ${SOURCE_CODE_PATH}${PASHTO_RELEASE_OBJECTS_DIRECTORY}Feedback-noon/dist/
+    - cp -a ${SOURCE_CODE_PATH}Admin-noon/distProductionPashto/. ${SOURCE_CODE_PATH}${PASHTO_RELEASE_OBJECTS_DIRECTORY}Admin-noon/dist/
+    - cp -a ${SOURCE_CODE_PATH}Sales-noon/distProductionPashto/. ${SOURCE_CODE_PATH}${PASHTO_RELEASE_OBJECTS_DIRECTORY}Sales-noon/dist/
+    - cp -a ${SOURCE_CODE_PATH}Feedback-noon/distProductionPashto/. ${SOURCE_CODE_PATH}${PASHTO_RELEASE_OBJECTS_DIRECTORY}Feedback-noon/dist/
   artifacts:
     paths:
       - ${SOURCE_CODE_PATH}${PASHTO_RELEASE_OBJECTS_DIRECTORY}
@@ -890,7 +890,7 @@ publishWebHostableContainerProductionDari:
   stage: containerizeWebProduction
   script:
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
-    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/dariversion.Dockerfile --destination $NOON_WEB_IMAGE_DARI_PROD
+    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/dariProd.Dockerfile --destination $NOON_WEB_IMAGE_DARI_PROD
   only:
     refs:
       - master
@@ -906,7 +906,7 @@ publishWebHostableContainerProductionPashto:
   stage: containerizeWebProduction
   script:
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
-    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/pashtoversion.Dockerfile --destination $NOON_WEB_IMAGE_PASHTO_PROD
+    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/pashtoProd.Dockerfile --destination $NOON_WEB_IMAGE_PASHTO_PROD
   only:
     refs:
       - master
