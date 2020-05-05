@@ -263,7 +263,7 @@ namespace Training24Admin.Controllers
 
                         //Get Media link for course cover image
                         string mediaLink = "";
-                        if(!string.IsNullOrEmpty(Request.Form["filename"].ToString()))
+                        if (!string.IsNullOrEmpty(Request.Form["filename"].ToString()))
                         {
                             var storageObject = _storageClient.GetObject("edg-primary-course-image-storage", Request.Form["filename"].ToString());
                             mediaLink = storageObject.MediaLink;
@@ -960,7 +960,7 @@ namespace Training24Admin.Controllers
             catch (Exception ex)
             {
                 unsuccessResponse.response_code = 2;
-                unsuccessResponse.message = ex.Message;
+                unsuccessResponse.message = getErrorMassage(ex, ex.Message);
                 unsuccessResponse.status = "Failure";
                 return StatusCode(500, unsuccessResponse);
             }
@@ -1064,7 +1064,7 @@ namespace Training24Admin.Controllers
             catch (Exception ex)
             {
                 unsuccessResponse.response_code = 2;
-                unsuccessResponse.message = ex.Message;
+                unsuccessResponse.message = getErrorMassage(ex, ex.Message);
                 unsuccessResponse.status = "Failure";
                 return StatusCode(500, unsuccessResponse);
             }
@@ -1180,5 +1180,14 @@ namespace Training24Admin.Controllers
             }
         }
 
+        private string getErrorMassage(Exception ex, string msg)
+        {
+            string message = msg;
+            if (ex.InnerException != null)
+            {
+                return message += ", InnerException " + this.getErrorMassage(ex.InnerException, ex.InnerException.Message);
+            }
+            return message;
+        }
     }
 }

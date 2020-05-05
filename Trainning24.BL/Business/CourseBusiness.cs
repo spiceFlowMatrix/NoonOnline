@@ -497,7 +497,7 @@ namespace Trainning24.BL.Business
         {
             CoursePreviewModel coursePreview = new CoursePreviewModel();
 
-            DBHelper dbHelper = new DBHelper(_training24Context.Database.GetDbConnection().ConnectionString);
+            DBHelper dbHelper = new DBHelper(getconnectionstring());
             try
             {
                 dbHelper.Open();
@@ -626,7 +626,7 @@ namespace Trainning24.BL.Business
         public CoursePreviewModel getCoursePreviewByIdTest(long id, long studentid, string Certificate)
         {
             CoursePreviewModel coursePreview = new CoursePreviewModel();
-            DBHelper dbHelper = new DBHelper(_training24Context.Database.GetDbConnection().ConnectionString);
+            DBHelper dbHelper = new DBHelper(getconnectionstring());
             try
             {
                 dbHelper.Open();
@@ -1073,11 +1073,11 @@ namespace Trainning24.BL.Business
         {
             List<CoursePriviewGradeWiseModel> coursePriviewGradeWiseModels = new List<CoursePriviewGradeWiseModel>();
             List<CoursePriviewGradeWiseModel> coursePriviewGradeWiseModelstest = new List<CoursePriviewGradeWiseModel>();
-            DBHelper dbHelper = new DBHelper(_training24Context.Database.GetDbConnection().ConnectionString);
+            DBHelper dbHelper = new DBHelper(getconnectionstring());
             try
             {
                 dbHelper.Open();
-                DataTable usercourselist = dbHelper.ExcecuteQueryDT("SELECT Id,UserId,CourseId,StartDate,EndDate FROM `usercourse` as uc WHERE   uc.UserId = " + id + "  AND (uc.IsDeleted!=true OR uc.IsDeleted Is Null) AND (uc.IsExpire!=true OR uc.IsExpire Is Null)");
+                DataTable usercourselist = dbHelper.ExcecuteQueryDT("SELECT Id,UserId,CourseId,StartDate,EndDate FROM `UserCourse` as uc WHERE   uc.UserId = " + id + "  AND (uc.IsDeleted!=true OR uc.IsDeleted Is Null) AND (uc.IsExpire!=true OR uc.IsExpire Is Null)");
                 List<string> CourseIdList = new List<string>();
                 DataTable courselist = new DataTable();
                 DataTable courseGradeslist = new DataTable();
@@ -1089,9 +1089,9 @@ namespace Trainning24.BL.Business
                     }
                     if (CourseIdList.Count > 0)
                     {
-                        courselist = dbHelper.ExcecuteQueryDT("select Id,Code,Name,Image,Description from course where Id in (" + string.Join(',', CourseIdList.ToArray()
+                        courselist = dbHelper.ExcecuteQueryDT("select Id,Code,Name,Image,Description from Course where Id in (" + string.Join(',', CourseIdList.ToArray()
                              ) + ")AND (IsDeleted!=true OR IsDeleted Is Null)");
-                        courseGradeslist = dbHelper.ExcecuteQueryDT("select cg.Id as cgId,cg.CourseId,cg.Gradeid,g.Id,g.Name,g.SchoolId,g.Description from CourseGrade as cg join grade as g  where CourseId in (" + string.Join(',', CourseIdList.ToArray()) + ") AND (cg.IsDeleted!=true OR cg.IsDeleted Is Null)AND (g.IsDeleted!=true OR g.IsDeleted Is Null)");
+                        courseGradeslist = dbHelper.ExcecuteQueryDT("select cg.Id as cgId,cg.CourseId,cg.Gradeid,g.Id,g.Name,g.SchoolId,g.Description from CourseGrade as cg join Grade as g  where CourseId in (" + string.Join(',', CourseIdList.ToArray()) + ") AND (cg.IsDeleted!=true OR cg.IsDeleted Is Null)AND (g.IsDeleted!=true OR g.IsDeleted Is Null)");
                     }
                 }
                 dbHelper.Close();
@@ -1676,7 +1676,7 @@ namespace Trainning24.BL.Business
         {
             List<CoursePriviewGradeWiseModel> coursePriviewGradeWiseModels = new List<CoursePriviewGradeWiseModel>();
             List<CoursePriviewGradeWiseModel> coursePriviewGradeWiseModelstest = new List<CoursePriviewGradeWiseModel>();
-            DBHelper dbHelper = new DBHelper(_training24Context.Database.GetDbConnection().ConnectionString);
+            DBHelper dbHelper = new DBHelper(getconnectionstring());
             try
             {
                 dbHelper.Open();
@@ -1692,9 +1692,9 @@ namespace Trainning24.BL.Business
                     }
                     if (CourseIdList.Count > 0)
                     {
-                        courselist = dbHelper.ExcecuteQueryDT("select Id,Code,Name,Image,Description from course where Id in (" + string.Join(',', CourseIdList.ToArray()
+                        courselist = dbHelper.ExcecuteQueryDT("select Id,Code,Name,Image,Description from Course where Id in (" + string.Join(',', CourseIdList.ToArray()
                              ) + ")AND (IsDeleted!=true OR IsDeleted Is Null)");
-                        courseGradeslist = dbHelper.ExcecuteQueryDT("select cg.Id as cgId,cg.CourseId,cg.Gradeid,g.Id,g.Name,g.SchoolId,g.Description from CourseGrade as cg join grade as g  where CourseId in (" + string.Join(',', CourseIdList.ToArray()) + ") AND (cg.IsDeleted!=true OR cg.IsDeleted Is Null)AND (g.IsDeleted!=true OR g.IsDeleted Is Null)");
+                        courseGradeslist = dbHelper.ExcecuteQueryDT("select cg.Id as cgId,cg.CourseId,cg.Gradeid,g.Id,g.Name,g.SchoolId,g.Description from CourseGrade as cg join Grade as g  where CourseId in (" + string.Join(',', CourseIdList.ToArray()) + ") AND (cg.IsDeleted!=true OR cg.IsDeleted Is Null)AND (g.IsDeleted!=true OR g.IsDeleted Is Null)");
                     }
                 }
                 dbHelper.Close();
@@ -1850,6 +1850,12 @@ namespace Trainning24.BL.Business
                 dbHelper.Dispose();
             }
             return coursePriviewGradeWiseModelstest;
+        }
+
+        public string getconnectionstring()
+        {
+            //return Environment.GetEnvironmentVariable("ASPNET_DB_CONNECTIONSTRING").ToString().Replace("SslMode=Required", "SslMode=none").Replace("SSL Mode=Required", "SSL Mode=none");
+            return "server=35.204.80.96;user id=root;password=B@llastW!ll5565;database=daristaging;SslMode=none;Convert Zero Datetime=true;CharSet=utf8;";
         }
     }
 }
