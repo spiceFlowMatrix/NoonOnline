@@ -651,7 +651,7 @@ namespace Trainning24.BL.Business
                         assignmentList.Add(assig["Id"].ToString());
                     }
 
-                    if (assignmentList != null)
+                    if (assignmentList.Count > 0)
                         assignmentFiles = dbHelper.ExcecuteQueryDT("select af.Id as AssignmentFileId,af.AssignmentId, f.Id, f.Name, f.Url, f.FileName, f.FileTypeId, f.FileSize, f.Duration,f.Description, f.Totalpages, ft.Filetype from Files f join AssignmentFile af on f.Id= af.FileId  join FileTypes as ft on f.FileTypeId = ft.Id where af.AssignmentId in (" + string.Join(',', assignmentList.ToArray()
                             ) + ") AND (f.IsDeleted!=true OR f.IsDeleted Is Null) AND (af.IsDeleted!=true OR af.IsDeleted Is Null)");
                 }
@@ -661,13 +661,13 @@ namespace Trainning24.BL.Business
                     {
                         lessionList.Add(less["Id"].ToString());
                     }
-                    if (lessionFiles != null)
+                    if (lessionList.Count > 0)
                         lessionFiles = dbHelper.ExcecuteQueryDT("select af.Id as LessionFileId, af.LessionId, f.Id, f.Name, f.Url, f.FileName, f.FileTypeId, f.FileSize, f.Duration, f.Totalpages,f.Description,ft.Filetype from Files f join LessonFile af on f.Id= af.FileId  join FileTypes as ft on f.FileTypeId = ft.Id where af.LessionId in (" + string.Join(',', lessionList.ToArray()
                             ) + ") AND (f.IsDeleted!=true OR f.IsDeleted Is Null) AND (af.IsDeleted!=true OR af.IsDeleted Is Null)");
                 }
                 if (lession.Rows.Count != 0)
                 {
-                    if (lessionFiles != null)
+                    if (lessionList.Count > 0)
                         lessionAssignments = dbHelper.ExcecuteQueryDT("Select Id,Code,Name,Description,LessonId from LessonAssignments as la where la.LessonId in (" + string.Join(',', lessionList.ToArray()
                             ) + ") AND (la.IsDeleted!=true OR la.IsDeleted Is Null)");
                     foreach (DataRow lesassig in lessionAssignments.Rows)
@@ -675,7 +675,7 @@ namespace Trainning24.BL.Business
                         lessionAssignmentList.Add(lesassig["Id"].ToString());
                     }
 
-                    if (lessionAssignmentList != null)
+                    if (lessionAssignmentList.Count > 0)
                         lessonAssignmentFiles = dbHelper.ExcecuteQueryDT("select af.Id as LessonAssignmentFileId,af.AssignmentId, f.Id, f.Name, f.Url, f.FileName, f.FileTypeId,  f.FileSize,f.Description, f.Duration, f.Totalpages,ft.Filetype from Files f join LessonAssignmentFiles  af on f.Id= af.FileId  join FileTypes as ft on f.FileTypeId = ft.Id where af.AssignmentId in (" + string.Join(',', lessionAssignmentList.ToArray()
                             ) + ") AND (f.IsDeleted!=true OR f.IsDeleted Is Null) AND (af.IsDeleted!=true OR af.IsDeleted Is Null)");
 
