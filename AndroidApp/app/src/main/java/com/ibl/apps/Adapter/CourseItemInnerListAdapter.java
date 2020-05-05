@@ -1242,14 +1242,14 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
 
                 String EncryptFileName = downloadQueueObjects.get(i).getLessonsModel().getFiles().getFilename();
                 String filetype = downloadQueueObjects.get(i).getLessonsModel().getFiles().getFiletypename();
-                String fileName = downloadQueueObjects.get(i).getLessonsModel().getId() + "_" + downloadQueueObjects.get(i).getLessonsModel().getFiles().getId() + "_" + EncryptFileName.substring(EncryptFileName.lastIndexOf('-') + 1);
+                String fileName = downloadQueueObjects.get(i).getLessonsModel().getId() + "_" + downloadQueueObjects.get(i).getLessonsModel().getFiles().getId() + "_" + EncryptFileName.substring(EncryptFileName.lastIndexOf('-') + 1).replace("/", "_");
                 String downloadFilePath = Const.destPath + userIdSlash + fileName;
 
                 try {
                     String str = downloadQueueObjects.get(i).getLessonsModel().getId() + "_" + downloadQueueObjects.get(i).getLessonsModel().getFiles().getId() + "_" + EncryptFileName.replaceFirst(".*-(\\w+).*", "$1") + "_" + filetype + Const.extension;
                     PRDownloader.cleanUp(1);
 
-                    //Log.e("COUNTER", "======downloadCount===IF===" + downloadCount);
+                    //Log.e("COUNTER", "======downloadCount===IF===" + downloadCount);r
 
                     int finalDownloadId = downloadId;
                     int finalI = i;
@@ -1998,7 +1998,7 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
 
             String EncryptFileName = lessonsModel.getFiles().getFilename();
             String filetype = lessonsModel.getFiles().getFiletypename();
-            String fileName = lessonsModel.getId() + "_" + lessonsModel.getFiles().getId() + "_" + EncryptFileName.substring(EncryptFileName.lastIndexOf('-') + 1);
+            String fileName = lessonsModel.getId() + "_" + lessonsModel.getFiles().getId() + "_" + EncryptFileName.substring(EncryptFileName.lastIndexOf('-') + 1).replace("/", "_");
 
             String downloadFilePath = Const.destPath + userIdSlash + fileName;
 
