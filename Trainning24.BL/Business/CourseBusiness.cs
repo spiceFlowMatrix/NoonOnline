@@ -1854,8 +1854,7 @@ namespace Trainning24.BL.Business
 
         public string getconnectionstring()
         {
-            //return Environment.GetEnvironmentVariable("ASPNET_DB_CONNECTIONSTRING").ToString().Replace("SslMode=Required", "SslMode=none").Replace("SSL Mode=Required", "SSL Mode=none");
-            return "server=35.204.80.96;user id=root;password=B@llastW!ll5565;database=daristaging;SslMode=none;Convert Zero Datetime=true;CharSet=utf8;";
+            return Environment.GetEnvironmentVariable("ASPNET_DB_CONNECTIONSTRING");
         }
     }
 }

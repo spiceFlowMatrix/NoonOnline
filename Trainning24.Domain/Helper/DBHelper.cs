@@ -52,12 +52,12 @@ namespace Trainning24.Domain.Helper
 
                     Open();
                 }
-                throw new Exception("Cannot connect to server.", e);
+                throw  e;
             }
             catch (Exception ex)
             {
                 _connection.Close();
-                throw new Exception("Cannot connect to server.", ex);
+                throw ex;
             }
         }
 
