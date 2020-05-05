@@ -445,7 +445,7 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
                     }
 
                     //Log.e("FILES00", "----files---" + directory);
-                    String str = lessonsModel.getId() + "_" + lessonsModel.getFiles().getId() + "_" + lessonsModel.getFiles().getFilename().replace("/", "_") + "_" + lessonsModel.getFiles().getFiletypename() + Const.extension;
+                    String str = lessonsModel.getId() + "_" + lessonsModel.getFiles().getId() + "_" + lessonsModel.getFiles().getFilename().replaceFirst(".*-(\\w+).*", "$1") + "_" + lessonsModel.getFiles().getFiletypename() + Const.extension;
                     File file = new File(Const.destPath + userIdSlash, str);
                     //Log.e("FILES00", "----files-str--" + str);
                     if (file.exists()) {
@@ -779,7 +779,7 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
                         lessonsModel = lessonfiles.get(lessonfiles.size() - 1);
                     }*/
 
-                        String str = lessonsModel.getId() + "_" + lessonsModel.getFiles().getId() + "_" + lessonsModel.getFiles().getFilename().replace("/", "_") + "_" + lessonsModel.getFiles().getFiletypename() + Const.extension;
+                        String str = lessonsModel.getId() + "_" + lessonsModel.getFiles().getId() + "_" + lessonsModel.getFiles().getFilename().replaceFirst(".*-(\\w+).*", "$1") + "_" + lessonsModel.getFiles().getFiletypename() + Const.extension;
                         File file = new File(Const.destPath + userIdSlash, str);
                         if (file.exists()) {
                             file.delete();
@@ -833,7 +833,7 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
                             lessonsModel = lessonfiles.get(lessonfiles.size() - 1);
                         }*/
 
-                            String str = lessonsModel.getId() + "_" + lessonsModel.getFiles().getId() + "_" + lessonsModel.getFiles().getFilename().replace("/", "_")+ "_" + lessonsModel.getFiles().getFiletypename() + Const.extension;
+                            String str = lessonsModel.getId() + "_" + lessonsModel.getFiles().getId() + "_" + lessonsModel.getFiles().getFilename().replaceFirst(".*-(\\w+).*", "$1") + "_" + lessonsModel.getFiles().getFiletypename() + Const.extension;
                             File file = new File(Const.destPath + userIdSlash, str);
                             if (file.exists()) {
                                 file.delete();
@@ -940,7 +940,7 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
 
 
                     lessonsModel = lessonfiles.get(i);
-                    String str = lessonsModel.getId() + "_" + lessonsModel.getFiles().getId() + "_" + lessonsModel.getFiles().getFilename().replace("/", "_")+ "_" + lessonsModel.getFiles().getFiletypename() + Const.extension;
+                    String str = lessonsModel.getId() + "_" + lessonsModel.getFiles().getId() + "_" + lessonsModel.getFiles().getFilename().replaceFirst(".*-(\\w+).*", "$1") + "_" + lessonsModel.getFiles().getFiletypename() + Const.extension;
                     try {
                         File file = null;
                       /*  if (str.contains("/")) {
@@ -1240,16 +1240,16 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
 
             for (int i = 0; i < signedUrl.size(); i++) {
 
-                String EncryptFileName = downloadQueueObjects.get(i).getLessonsModel().getFiles().getFilename().replace("/","_");
+                String EncryptFileName = downloadQueueObjects.get(i).getLessonsModel().getFiles().getFilename();
                 String filetype = downloadQueueObjects.get(i).getLessonsModel().getFiles().getFiletypename();
-                String fileName = downloadQueueObjects.get(i).getLessonsModel().getId() + "_" + downloadQueueObjects.get(i).getLessonsModel().getFiles().getId() + "_" + EncryptFileName.substring(EncryptFileName.lastIndexOf('-') + 1);
+                String fileName = downloadQueueObjects.get(i).getLessonsModel().getId() + "_" + downloadQueueObjects.get(i).getLessonsModel().getFiles().getId() + "_" + EncryptFileName.substring(EncryptFileName.lastIndexOf('-') + 1).replace("/", "_");
                 String downloadFilePath = Const.destPath + userIdSlash + fileName;
 
                 try {
-                    String str = downloadQueueObjects.get(i).getLessonsModel().getId() + "_" + downloadQueueObjects.get(i).getLessonsModel().getFiles().getId() + "_" + EncryptFileName+ "_" + filetype + Const.extension;
+                    String str = downloadQueueObjects.get(i).getLessonsModel().getId() + "_" + downloadQueueObjects.get(i).getLessonsModel().getFiles().getId() + "_" + EncryptFileName.replaceFirst(".*-(\\w+).*", "$1") + "_" + filetype + Const.extension;
                     PRDownloader.cleanUp(1);
 
-                    //Log.e("COUNTER", "======downloadCount===IF===" + downloadCount);
+                    //Log.e("COUNTER", "======downloadCount===IF===" + downloadCount);r
 
                     int finalDownloadId = downloadId;
                     int finalI = i;
@@ -1651,7 +1651,7 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
                 String selectedVideoPath = encryptDecryptObject.getSelectedVideoPath();
                 String filename = encryptDecryptObject.getFilename();
                 inFile = new File(selectedVideoPath);
-                outFile = new File(selectedVideoPath.substring(0, selectedVideoPath.lastIndexOf("/")) + "/" + filename.replace("/", "_"));
+                outFile = new File(selectedVideoPath.substring(0, selectedVideoPath.lastIndexOf("/")) + "/" + filename);
                 EncrypterDecryptAlgo.encrypt(key, paramSpec, new FileInputStream(inFile), new FileOutputStream(outFile));
                 inFile.delete();
                 BaseActivity.freeMemory(ctx);
@@ -1998,14 +1998,14 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
 
             String EncryptFileName = lessonsModel.getFiles().getFilename();
             String filetype = lessonsModel.getFiles().getFiletypename();
-            String fileName = lessonsModel.getId() + "_" + lessonsModel.getFiles().getId() + "_" + EncryptFileName.substring(EncryptFileName.lastIndexOf('-') + 1);
+            String fileName = lessonsModel.getId() + "_" + lessonsModel.getFiles().getId() + "_" + EncryptFileName.substring(EncryptFileName.lastIndexOf('-') + 1).replace("/", "_");
 
             String downloadFilePath = Const.destPath + userIdSlash + fileName;
 
             //Log.e(Const.LOG_NOON_TAG, "====downloadFilePath===" + downloadFilePath);
 
             try {
-                String str = lessonsModel.getId() + "_" + lessonsModel.getFiles().getId() + "_" + EncryptFileName.replace("/","_")  + "_" + filetype + Const.extension;
+                String str = lessonsModel.getId() + "_" + lessonsModel.getFiles().getId() + "_" + EncryptFileName.replaceFirst(".*-(\\w+).*", "$1") + "_" + filetype + Const.extension;
                 PRDownloader.cleanUp(1);
 
                 //Log.e("COUNTER", "======downloadCount===IF===" + downloadCount);
