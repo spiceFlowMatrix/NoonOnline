@@ -960,7 +960,7 @@ namespace Training24Admin.Controllers
             catch (Exception ex)
             {
                 unsuccessResponse.response_code = 2;
-                unsuccessResponse.message = getErrorMassage(ex, ex.Message);
+                unsuccessResponse.message = ex.Message;
                 unsuccessResponse.status = "Failure";
                 return StatusCode(500, unsuccessResponse);
             }
@@ -1064,7 +1064,7 @@ namespace Training24Admin.Controllers
             catch (Exception ex)
             {
                 unsuccessResponse.response_code = 2;
-                unsuccessResponse.message = getErrorMassage(ex, ex.Message);
+                unsuccessResponse.message = ex.Message;
                 unsuccessResponse.status = "Failure";
                 return StatusCode(500, unsuccessResponse);
             }
