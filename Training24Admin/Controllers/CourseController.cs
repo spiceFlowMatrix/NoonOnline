@@ -862,8 +862,8 @@ namespace Training24Admin.Controllers
             }
         }
 
-        [HttpGet("CoursePriview/{id}/{studentid?}")]
-        public IActionResult CoursePriview(long id, long studentid)
+        [HttpGet("CoursePriviewTest/{id}/{studentid?}")]
+        public IActionResult CoursePriviewTest(long id, long studentid)
         {
             SuccessResponse successResponse = new SuccessResponse();
             UnsuccessResponse unsuccessResponse = new UnsuccessResponse();
@@ -914,8 +914,8 @@ namespace Training24Admin.Controllers
             }
         }
 
-        [HttpGet("CoursePriviewTest/{id}/{studentid?}")]
-        public IActionResult CoursePriviewTest(long id, long studentid)
+        [HttpGet("CoursePriview/{id}/{studentid?}")]
+        public IActionResult CoursePriview(long id, long studentid)
         {
             SuccessResponse successResponse = new SuccessResponse();
             UnsuccessResponse unsuccessResponse = new UnsuccessResponse();
@@ -966,8 +966,8 @@ namespace Training24Admin.Controllers
             }
         }
 
-        [HttpGet("CoursePriviewGradeWise")]
-        public IActionResult CoursePriviewGradeWise(int pagenumber, int perpagerecord, string search, int gradeid)
+        [HttpGet("CoursePriviewGradeWiseTest")]
+        public IActionResult CoursePriviewGradeWiseTest(int pagenumber, int perpagerecord, string search, int gradeid)
         {
             PaginationModel paginationModel = new PaginationModel();
             paginationModel.pagenumber = pagenumber;
@@ -1018,8 +1018,8 @@ namespace Training24Admin.Controllers
             }
         }
 
-        [HttpGet("CoursePriviewGradeWiseTest")]
-        public IActionResult CoursePriviewGradeWiseTest(int pagenumber, int perpagerecord, string search, int gradeid)
+        [HttpGet("CoursePriviewGradeWise")]
+        public IActionResult CoursePriviewGradeWise(int pagenumber, int perpagerecord, string search, int gradeid)
         {
             PaginationModel paginationModel = new PaginationModel();
             paginationModel.pagenumber = pagenumber;
@@ -1180,14 +1180,5 @@ namespace Training24Admin.Controllers
             }
         }
 
-        private string getErrorMassage(Exception ex, string msg)
-        {
-            string message = msg;
-            if (ex.InnerException != null)
-            {
-                return message += ", InnerException " + this.getErrorMassage(ex.InnerException, ex.InnerException.Message);
-            }
-            return message;
-        }
     }
 }

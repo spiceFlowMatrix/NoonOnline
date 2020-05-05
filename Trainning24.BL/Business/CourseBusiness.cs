@@ -1089,9 +1089,9 @@ namespace Trainning24.BL.Business
                     }
                     if (CourseIdList.Count > 0)
                     {
+                        courseGradeslist = dbHelper.ExcecuteQueryDT("select cg.Id as cgId,cg.CourseId,cg.Gradeid,g.Id,g.Name,g.SchoolId,g.Description from CourseGrade as cg join Grade as g on cg.Gradeid = g.Id  where cg.CourseId in (" + string.Join(',', CourseIdList.ToArray()) + ") AND (cg.IsDeleted!=true OR cg.IsDeleted Is Null)");
                         courselist = dbHelper.ExcecuteQueryDT("select Id,Code,Name,Image,Description from Course where Id in (" + string.Join(',', CourseIdList.ToArray()
                              ) + ")AND (IsDeleted!=true OR IsDeleted Is Null)");
-                        courseGradeslist = dbHelper.ExcecuteQueryDT("select cg.Id as cgId,cg.CourseId,cg.Gradeid,g.Id,g.Name,g.SchoolId,g.Description from CourseGrade as cg join Grade as g  where CourseId in (" + string.Join(',', CourseIdList.ToArray()) + ") AND (cg.IsDeleted!=true OR cg.IsDeleted Is Null)AND (g.IsDeleted!=true OR g.IsDeleted Is Null)");
                     }
                 }
                 dbHelper.Close();
@@ -1694,7 +1694,7 @@ namespace Trainning24.BL.Business
                     {
                         courselist = dbHelper.ExcecuteQueryDT("select Id,Code,Name,Image,Description from Course where Id in (" + string.Join(',', CourseIdList.ToArray()
                              ) + ")AND (IsDeleted!=true OR IsDeleted Is Null)");
-                        courseGradeslist = dbHelper.ExcecuteQueryDT("select cg.Id as cgId,cg.CourseId,cg.Gradeid,g.Id,g.Name,g.SchoolId,g.Description from CourseGrade as cg join Grade as g  where CourseId in (" + string.Join(',', CourseIdList.ToArray()) + ") AND (cg.IsDeleted!=true OR cg.IsDeleted Is Null)AND (g.IsDeleted!=true OR g.IsDeleted Is Null)");
+                        courseGradeslist = dbHelper.ExcecuteQueryDT("select cg.Id as cgId,cg.CourseId,cg.Gradeid,g.Id,g.Name,g.SchoolId,g.Description from CourseGrade as cg join Grade as g on cg.Gradeid = g.Id  where CourseId in (" + string.Join(',', CourseIdList.ToArray()) + ") AND (cg.IsDeleted!=true OR cg.IsDeleted Is Null)AND (g.IsDeleted!=true OR g.IsDeleted Is Null)");
                     }
                 }
                 dbHelper.Close();
@@ -1854,7 +1854,8 @@ namespace Trainning24.BL.Business
 
         public string getconnectionstring()
         {
-            return Environment.GetEnvironmentVariable("ASPNET_DB_CONNECTIONSTRING");
+            //return Environment.GetEnvironmentVariable("ASPNET_DB_CONNECTIONSTRING");
+            return "server=35.204.80.96;user id=root;password=B@llastW!ll5565;database=daristaging;SslMode=none;Convert Zero Datetime=true;CharSet=utf8;";
         }
     }
 }
