@@ -501,13 +501,13 @@ namespace Trainning24.BL.Business
             try
             {
                 dbHelper.Open();
-                DataTable course = dbHelper.ExcecuteQueryDT("select Id,Code,Name,Image from course where Id=" + id + " AND (IsDeleted!=true OR IsDeleted Is Null)");
+                DataTable course = dbHelper.ExcecuteQueryDT("select Id,Code,Name,Image from Course where Id=" + id + " AND (IsDeleted!=true OR IsDeleted Is Null)");
                 if (course.Rows.Count == 0)
                     return coursePreview = null;
-                DataTable chaptor = dbHelper.ExcecuteQueryDT("select Id,Code,Name from chapter where CourseId=" + id + " AND (IsDeleted!=true OR IsDeleted Is Null)");
-                DataTable assignment = dbHelper.ExcecuteQueryDT("select Id,Code,Name,Description, ChapterId from assignment where ChapterId in (select Id from chapter where CourseId=" + id + " AND (IsDeleted!=true OR IsDeleted Is Null)) AND (IsDeleted!=true OR IsDeleted Is Null)");
-                DataTable lession = dbHelper.ExcecuteQueryDT("select Id,Code,Name,Description,ChapterId from lesson where ChapterId in (select Id from chapter where CourseId=" + id + "  AND (IsDeleted!=true OR IsDeleted Is Null)) AND (IsDeleted!=true OR IsDeleted Is Null)");
-                DataTable quizes = dbHelper.ExcecuteQueryDT("select c.ChapterId,q.Id AS chqId, q.NumQuestions, q.Name AS chqname,q.Code as chqCode from chapterquiz c join quiz q on c.quizid=q.id where ChapterId in (select Id from chapter where CourseId=" + id + " AND (IsDeleted!=true OR IsDeleted Is Null)) AND (q.IsDeleted!=true OR q.IsDeleted Is Null)AND (c.IsDeleted!=true OR c.IsDeleted Is Null)");
+                DataTable chaptor = dbHelper.ExcecuteQueryDT("select Id,Code,Name from Chapter where CourseId=" + id + " AND (IsDeleted!=true OR IsDeleted Is Null)");
+                DataTable assignment = dbHelper.ExcecuteQueryDT("select Id,Code,Name,Description, ChapterId from Assignment where ChapterId in (select Id from Chapter where CourseId=" + id + " AND (IsDeleted!=true OR IsDeleted Is Null)) AND (IsDeleted!=true OR IsDeleted Is Null)");
+                DataTable lession = dbHelper.ExcecuteQueryDT("select Id,Code,Name,Description,ChapterId from Lesson where ChapterId in (select Id from Chapter where CourseId=" + id + "  AND (IsDeleted!=true OR IsDeleted Is Null)) AND (IsDeleted!=true OR IsDeleted Is Null)");
+                DataTable quizes = dbHelper.ExcecuteQueryDT("select c.ChapterId,q.Id AS chqId, q.NumQuestions, q.Name AS chqname,q.Code as chqCode from ChapterQuiz c join Quiz q on c.quizid=q.id where ChapterId in (select Id from Chapter where CourseId=" + id + " AND (IsDeleted!=true OR IsDeleted Is Null)) AND (q.IsDeleted!=true OR q.IsDeleted Is Null)AND (c.IsDeleted!=true OR c.IsDeleted Is Null)");
                 dbHelper.Close();
 
                 List<ChapterPreviewModel> chaptorPreviewList = new List<ChapterPreviewModel>();
@@ -630,13 +630,13 @@ namespace Trainning24.BL.Business
             try
             {
                 dbHelper.Open();
-                DataTable course = dbHelper.ExcecuteQueryDT("select Id,Code,Name,Image from course where Id=" + id + " AND (IsDeleted!=true OR IsDeleted Is Null)");
+                DataTable course = dbHelper.ExcecuteQueryDT("select Id,Code,Name,Image from Course where Id=" + id + " AND (IsDeleted!=true OR IsDeleted Is Null)");
                 if (course.Rows.Count == 0)
                     return coursePreview = null;
-                DataTable chaptor = dbHelper.ExcecuteQueryDT("select Id,Code,Name from chapter where CourseId=" + id + " AND (IsDeleted!=true OR IsDeleted Is Null)");
-                DataTable assignment = dbHelper.ExcecuteQueryDT("select Id,Code,Name,Description, ChapterId from assignment where ChapterId in (select Id from chapter where CourseId=" + id + " AND (IsDeleted!=true OR IsDeleted Is Null)) AND (IsDeleted!=true OR IsDeleted Is Null)");
-                DataTable lession = dbHelper.ExcecuteQueryDT("select Id,Code,Name,Description,ChapterId from lesson where ChapterId in (select Id from chapter where CourseId=" + id + "  AND (IsDeleted!=true OR IsDeleted Is Null)) AND (IsDeleted!=true OR IsDeleted Is Null)");
-                DataTable quizes = dbHelper.ExcecuteQueryDT("select c.ChapterId,q.Id AS chqId, q.NumQuestions, q.Name AS chqname,q.Code as chqCode from chapterquiz c join quiz q on c.quizid=q.id where ChapterId in (select Id from chapter where CourseId=" + id + " AND (IsDeleted!=true OR IsDeleted Is Null)) AND (q.IsDeleted!=true OR q.IsDeleted Is Null)AND (c.IsDeleted!=true OR c.IsDeleted Is Null)");
+                DataTable chaptor = dbHelper.ExcecuteQueryDT("select Id,Code,Name from Chapter where CourseId=" + id + " AND (IsDeleted!=true OR IsDeleted Is Null)");
+                DataTable assignment = dbHelper.ExcecuteQueryDT("select Id,Code,Name,Description, ChapterId from Assignment where ChapterId in (select Id from Chapter where CourseId=" + id + " AND (IsDeleted!=true OR IsDeleted Is Null)) AND (IsDeleted!=true OR IsDeleted Is Null)");
+                DataTable lession = dbHelper.ExcecuteQueryDT("select Id,Code,Name,Description,ChapterId from Lesson where ChapterId in (select Id from Chapter where CourseId=" + id + "  AND (IsDeleted!=true OR IsDeleted Is Null)) AND (IsDeleted!=true OR IsDeleted Is Null)");
+                DataTable quizes = dbHelper.ExcecuteQueryDT("select c.ChapterId,q.Id AS chqId, q.NumQuestions, q.Name AS chqname,q.Code as chqCode from ChapterQuiz c join quiz q on c.quizid=q.id where ChapterId in (select Id from Chapter where CourseId=" + id + " AND (IsDeleted!=true OR IsDeleted Is Null)) AND (q.IsDeleted!=true OR q.IsDeleted Is Null)AND (c.IsDeleted!=true OR c.IsDeleted Is Null)");
                 List<string> assignmentList = new List<string>();
                 List<string> lessionList = new List<string>();
                 List<string> lessionAssignmentList = new List<string>();
@@ -652,7 +652,7 @@ namespace Trainning24.BL.Business
                     }
 
                     if (assignmentList != null)
-                        assignmentFiles = dbHelper.ExcecuteQueryDT("select af.Id as AssignmentFileId,af.AssignmentId, f.Id, f.Name, f.Url, f.FileName, f.FileTypeId, f.FileSize, f.Duration,f.Description, f.Totalpages, ft.Filetype from files f join assignmentfile af on f.Id= af.FileId  join filetypes as ft on f.FileTypeId = ft.Id where af.AssignmentId in (" + string.Join(',', assignmentList.ToArray()
+                        assignmentFiles = dbHelper.ExcecuteQueryDT("select af.Id as AssignmentFileId,af.AssignmentId, f.Id, f.Name, f.Url, f.FileName, f.FileTypeId, f.FileSize, f.Duration,f.Description, f.Totalpages, ft.Filetype from files f join Assignmentfile af on f.Id= af.FileId  join FileTypes as ft on f.FileTypeId = ft.Id where af.AssignmentId in (" + string.Join(',', assignmentList.ToArray()
                             ) + ") AND (f.IsDeleted!=true OR f.IsDeleted Is Null) AND (af.IsDeleted!=true OR af.IsDeleted Is Null)");
                 }
                 if (lession.Rows.Count != 0)
@@ -662,13 +662,13 @@ namespace Trainning24.BL.Business
                         lessionList.Add(less["Id"].ToString());
                     }
                     if (lessionFiles != null)
-                        lessionFiles = dbHelper.ExcecuteQueryDT("select af.Id as LessionFileId, af.LessionId, f.Id, f.Name, f.Url, f.FileName, f.FileTypeId, f.FileSize, f.Duration, f.Totalpages,f.Description,ft.Filetype from files f join lessonfile af on f.Id= af.FileId  join filetypes as ft on f.FileTypeId = ft.Id where af.LessionId in (" + string.Join(',', lessionList.ToArray()
+                        lessionFiles = dbHelper.ExcecuteQueryDT("select af.Id as LessionFileId, af.LessionId, f.Id, f.Name, f.Url, f.FileName, f.FileTypeId, f.FileSize, f.Duration, f.Totalpages,f.Description,ft.Filetype from files f join LessonFile af on f.Id= af.FileId  join FileTypes as ft on f.FileTypeId = ft.Id where af.LessionId in (" + string.Join(',', lessionList.ToArray()
                             ) + ") AND (f.IsDeleted!=true OR f.IsDeleted Is Null) AND (af.IsDeleted!=true OR af.IsDeleted Is Null)");
                 }
                 if (lession.Rows.Count != 0)
                 {
                     if (lessionFiles != null)
-                        lessionAssignments = dbHelper.ExcecuteQueryDT("Select Id,Code,Name,Description,LessonId from lessonassignments as la where la.LessonId in (" + string.Join(',', lessionList.ToArray()
+                        lessionAssignments = dbHelper.ExcecuteQueryDT("Select Id,Code,Name,Description,LessonId from LessonAssignments as la where la.LessonId in (" + string.Join(',', lessionList.ToArray()
                             ) + ") AND (la.IsDeleted!=true OR la.IsDeleted Is Null)");
                     foreach (DataRow lesassig in lessionAssignments.Rows)
                     {
@@ -676,7 +676,7 @@ namespace Trainning24.BL.Business
                     }
 
                     if (lessionAssignmentList != null)
-                        lessonAssignmentFiles = dbHelper.ExcecuteQueryDT("select af.Id as LessonAssignmentFileId,af.AssignmentId, f.Id, f.Name, f.Url, f.FileName, f.FileTypeId,  f.FileSize,f.Description, f.Duration, f.Totalpages,ft.Filetype from files f join lessonassignmentfiles  af on f.Id= af.FileId  join filetypes as ft on f.FileTypeId = ft.Id where af.AssignmentId in (" + string.Join(',', lessionAssignmentList.ToArray()
+                        lessonAssignmentFiles = dbHelper.ExcecuteQueryDT("select af.Id as LessonAssignmentFileId,af.AssignmentId, f.Id, f.Name, f.Url, f.FileName, f.FileTypeId,  f.FileSize,f.Description, f.Duration, f.Totalpages,ft.Filetype from files f join LessonAssignmentFiles  af on f.Id= af.FileId  join FileTypes as ft on f.FileTypeId = ft.Id where af.AssignmentId in (" + string.Join(',', lessionAssignmentList.ToArray()
                             ) + ") AND (f.IsDeleted!=true OR f.IsDeleted Is Null) AND (af.IsDeleted!=true OR af.IsDeleted Is Null)");
 
                     dbHelper.Close();
