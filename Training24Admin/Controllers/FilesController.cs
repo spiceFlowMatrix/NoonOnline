@@ -636,7 +636,7 @@ namespace Training24Admin.Controllers
                 Files newFiles = FilesBusiness.getFilesById(fileid);
                 string bucketName = General.getBucketName(newFiles.FileTypeId);
 
-                TimeSpan timeSpan = TimeSpan.FromMinutes(2);
+                TimeSpan timeSpan = TimeSpan.FromHours(1);
                 double exp = timeSpan.TotalMilliseconds;
                 string Certificate = Path.GetFileName(hostingEnvironment.WebRootPath + "/training24-28e994f9833c.json");
 
