@@ -634,21 +634,21 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
         }
 
 
-        disposable.add(lessonRepository.getLessonProgressSync(array).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(new DisposableSingleObserver<RestResponse>() {
-                    @Override
-                    public void onSuccess(RestResponse restResponse) {
-                        if (restResponse.getResponse_code().equals("0")) {
-                            lessonProgressList.clear();
-                        }
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Log.e("onError", "===callApiSyncLessonProgress===: " + e.getMessage());
-                    }
-                }));
+//        disposable.add(lessonRepository.getLessonProgressSync(array).subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribeWith(new DisposableSingleObserver<RestResponse>() {
+//                    @Override
+//                    public void onSuccess(RestResponse restResponse) {
+//                        if (restResponse.getResponse_code().equals("0")) {
+//                            lessonProgressList.clear();
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onError(Throwable e) {
+//                        Log.e("onError", "===callApiSyncLessonProgress===: " + e.getMessage());
+//                    }
+//                }));
     }
 
     private void callApiSyncChapter(ArrayList<ChapterProgress> chapterprogress) {
@@ -669,21 +669,21 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
 
         }
 
-        disposable.add(lessonRepository.getChapterProgressSync(array).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(new DisposableSingleObserver<RestResponse>() {
-                    @Override
-                    public void onSuccess(RestResponse restResponse) {
-                        if (restResponse.getResponse_code().equals("0")) {
-                            chapterProgressList.clear();
-                        }
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Log.e("onError", "===callApiSyncChapter===: " + e.getMessage());
-                    }
-                }));
+//        disposable.add(lessonRepository.getChapterProgressSync(array).subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribeWith(new DisposableSingleObserver<RestResponse>() {
+//                    @Override
+//                    public void onSuccess(RestResponse restResponse) {
+//                        if (restResponse.getResponse_code().equals("0")) {
+//                            chapterProgressList.clear();
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onError(Throwable e) {
+//                        Log.e("onError", "===callApiSyncChapter===: " + e.getMessage());
+//                    }
+//                }));
     }
 
     private void callApiSyncFiles(ArrayList<FileProgress> fileProgressList) {
@@ -705,21 +705,21 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
             }
         }
 
-        disposable.add(lessonRepository.getFileProgressSync(array).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(new DisposableSingleObserver<RestResponse>() {
-                    @Override
-                    public void onSuccess(RestResponse restResponse) {
-                        if (restResponse.getResponse_code().equals("0")) {
-                            fileProgressList.clear();
-                        }
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Log.e("onError", "====callApiSyncFiles=====: " + e.getMessage());
-                    }
-                }));
+//        disposable.add(lessonRepository.getFileProgressSync(array).subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribeWith(new DisposableSingleObserver<RestResponse>() {
+//                    @Override
+//                    public void onSuccess(RestResponse restResponse) {
+//                        if (restResponse.getResponse_code().equals("0")) {
+//                            fileProgressList.clear();
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onError(Throwable e) {
+//                        Log.e("onError", "====callApiSyncFiles=====: " + e.getMessage());
+//                    }
+//                }));
     }
 
     private void callApiSyncQuiz(ArrayList<QuizProgress> quizProgress) {
@@ -740,21 +740,21 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
             }
         }
 
-        disposable.add(quizRepository.getQuizProgressSync(array).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(new DisposableSingleObserver<RestResponse>() {
-                    @Override
-                    public void onSuccess(RestResponse restResponse) {
-                        if (restResponse.getResponse_code().equals("0")) {
-                            quizProgressList.clear();
-                        }
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Log.e("onError", "====callApiSyncQuiz====: " + e.getMessage());
-                    }
-                }));
+//        disposable.add(quizRepository.getQuizProgressSync(array).subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribeWith(new DisposableSingleObserver<RestResponse>() {
+//                    @Override
+//                    public void onSuccess(RestResponse restResponse) {
+//                        if (restResponse.getResponse_code().equals("0")) {
+//                            quizProgressList.clear();
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onError(Throwable e) {
+//                        Log.e("onError", "====callApiSyncQuiz====: " + e.getMessage());
+//                    }
+//                }));
     }
 
     @Override
@@ -2000,21 +2000,21 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
 
 
                                         CompositeDisposable disposable = new CompositeDisposable();
-                                        disposable.add(quizRepository.getUserQuizResultSync(array).subscribeOn(Schedulers.io())
-                                                .observeOn(AndroidSchedulers.mainThread())
-                                                .subscribeWith(new DisposableSingleObserver<RestResponse>() {
-                                                    @Override
-                                                    public void onSuccess(RestResponse restresponse) {
-                                                        if (restresponse.getResponse_code().equals("0")) {
-                                                            Log.e("onSuccess", "onSuccess: " + restresponse.toString());
-                                                        }
-                                                    }
-
-                                                    @Override
-                                                    public void onError(Throwable e) {
-                                                        Log.e("onError", "onError: " + e.getMessage());
-                                                    }
-                                                }));
+//                                        disposable.add(quizRepository.getUserQuizResultSync(array).subscribeOn(Schedulers.io())
+//                                                .observeOn(AndroidSchedulers.mainThread())
+//                                                .subscribeWith(new DisposableSingleObserver<RestResponse>() {
+//                                                    @Override
+//                                                    public void onSuccess(RestResponse restresponse) {
+//                                                        if (restresponse.getResponse_code().equals("0")) {
+//                                                            Log.e("onSuccess", "onSuccess: " + restresponse.toString());
+//                                                        }
+//                                                    }
+//
+//                                                    @Override
+//                                                    public void onError(Throwable e) {
+//                                                        Log.e("onError", "onError: " + e.getMessage());
+//                                                    }
+//                                                }));
                                     }
                                 } else {
                                     QuizUserResult quizUserResult = new QuizUserResult();
@@ -2047,21 +2047,21 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
 
 
                                     CompositeDisposable disposable = new CompositeDisposable();
-                                    disposable.add(quizRepository.getUserQuizResultSync(array).subscribeOn(Schedulers.io())
-                                            .observeOn(AndroidSchedulers.mainThread())
-                                            .subscribeWith(new DisposableSingleObserver<RestResponse>() {
-                                                @Override
-                                                public void onSuccess(RestResponse restresponse) {
-                                                    if (restresponse.getResponse_code().equals("0")) {
-                                                        Log.e("onSuccess", "onSuccess: " + restresponse.toString());
-                                                    }
-                                                }
-
-                                                @Override
-                                                public void onError(Throwable e) {
-                                                    Log.e("onError", "onError: " + e.getMessage());
-                                                }
-                                            }));
+//                                    disposable.add(quizRepository.getUserQuizResultSync(array).subscribeOn(Schedulers.io())
+//                                            .observeOn(AndroidSchedulers.mainThread())
+//                                            .subscribeWith(new DisposableSingleObserver<RestResponse>() {
+//                                                @Override
+//                                                public void onSuccess(RestResponse restresponse) {
+//                                                    if (restresponse.getResponse_code().equals("0")) {
+//                                                        Log.e("onSuccess", "onSuccess: " + restresponse.toString());
+//                                                    }
+//                                                }
+//
+//                                                @Override
+//                                                public void onError(Throwable e) {
+//                                                    Log.e("onError", "onError: " + e.getMessage());
+//                                                }
+//                                            }));
                                 }
 
 
@@ -2099,21 +2099,21 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                                         }
 
                                         CompositeDisposable disposable = new CompositeDisposable();
-                                        disposable.add(quizRepository.getUserQuizResultSync(array).subscribeOn(Schedulers.io())
-                                                .observeOn(AndroidSchedulers.mainThread())
-                                                .subscribeWith(new DisposableSingleObserver<RestResponse>() {
-                                                    @Override
-                                                    public void onSuccess(RestResponse restresponse) {
-                                                        if (restresponse.getResponse_code().equals("0")) {
-                                                            Log.e("onSuccess", "onSuccess: " + restresponse.toString());
-                                                        }
-                                                    }
-
-                                                    @Override
-                                                    public void onError(Throwable e) {
-                                                        Log.e("onError", "onError: " + e.getMessage());
-                                                    }
-                                                }));
+//                                        disposable.add(quizRepository.getUserQuizResultSync(array).subscribeOn(Schedulers.io())
+//                                                .observeOn(AndroidSchedulers.mainThread())
+//                                                .subscribeWith(new DisposableSingleObserver<RestResponse>() {
+//                                                    @Override
+//                                                    public void onSuccess(RestResponse restresponse) {
+//                                                        if (restresponse.getResponse_code().equals("0")) {
+//                                                            Log.e("onSuccess", "onSuccess: " + restresponse.toString());
+//                                                        }
+//                                                    }
+//
+//                                                    @Override
+//                                                    public void onError(Throwable e) {
+//                                                        Log.e("onError", "onError: " + e.getMessage());
+//                                                    }
+//                                                }));
                                     }
                                 } else {
                                     QuizUserResult quizUserResult = new QuizUserResult();
@@ -2146,21 +2146,21 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
 
 
                                     CompositeDisposable disposable = new CompositeDisposable();
-                                    disposable.add(quizRepository.getUserQuizResultSync(array).subscribeOn(Schedulers.io())
-                                            .observeOn(AndroidSchedulers.mainThread())
-                                            .subscribeWith(new DisposableSingleObserver<RestResponse>() {
-                                                @Override
-                                                public void onSuccess(RestResponse restresponse) {
-                                                    if (restresponse.getResponse_code().equals("0")) {
-                                                        Log.e("onSuccess", "onSuccess: " + restresponse.toString());
-                                                    }
-                                                }
-
-                                                @Override
-                                                public void onError(Throwable e) {
-                                                    Log.e("onError", "onError: " + e.getMessage());
-                                                }
-                                            }));
+//                                    disposable.add(quizRepository.getUserQuizResultSync(array).subscribeOn(Schedulers.io())
+//                                            .observeOn(AndroidSchedulers.mainThread())
+//                                            .subscribeWith(new DisposableSingleObserver<RestResponse>() {
+//                                                @Override
+//                                                public void onSuccess(RestResponse restresponse) {
+//                                                    if (restresponse.getResponse_code().equals("0")) {
+//                                                        Log.e("onSuccess", "onSuccess: " + restresponse.toString());
+//                                                    }
+//                                                }
+//
+//                                                @Override
+//                                                public void onError(Throwable e) {
+//                                                    Log.e("onError", "onError: " + e.getMessage());
+//                                                }
+//                                            }));
                                 }
 
                             }

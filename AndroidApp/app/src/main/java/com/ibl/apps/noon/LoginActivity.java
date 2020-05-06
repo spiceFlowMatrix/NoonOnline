@@ -605,7 +605,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                             }.execute();
 
                             openActivity(MainDashBoardActivity.class);
-                            callApiGetSyncRecords(userId);
+//                            callApiGetSyncRecords(userId);
                             finish();
                         }
 
