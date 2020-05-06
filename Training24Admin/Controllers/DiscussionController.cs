@@ -970,7 +970,7 @@ namespace Training24Admin.Controllers
                 SingnedUrlResponse singnedUrlResponse = new SingnedUrlResponse();
                 DiscussionFiles newFiles = discussionFilesBusiness.getFilesById(fileid);
                 string bucketName = _filesSettings.Value.DiscussionBucket;
-                TimeSpan timeSpan = TimeSpan.FromMinutes(2);
+                TimeSpan timeSpan = TimeSpan.FromHours(1);
                 double exp = timeSpan.TotalMilliseconds;
 
                 string Certificate = Path.GetFileName(hostingEnvironment.WebRootPath + _filesSettings.Value.CredentialFile);
@@ -1089,7 +1089,7 @@ namespace Training24Admin.Controllers
                 SingnedUrlResponse singnedUrlResponse = new SingnedUrlResponse();
                 DiscussionCommentFiles newFiles = discussionCommentFilesBusiness.getFilesById(fileid);
                 string bucketName = _filesSettings.Value.DiscussionBucket;
-                TimeSpan timeSpan = TimeSpan.FromMinutes(2);
+                TimeSpan timeSpan = TimeSpan.FromHours(1);
                 double exp = timeSpan.TotalMilliseconds;
 
                 string Certificate = Path.GetFileName(hostingEnvironment.WebRootPath + _filesSettings.Value.CredentialFile);
