@@ -74,7 +74,11 @@ export class AddAgentComponent implements OnInit {
             this.router.navigate(['/agents/agents-list']);
         }, err => {
             this.isCallingApi = false;
-            this.utilService.showErrorCall(err);
+            if(err.error.Password[0] === "PasswordIsRequired") {
+                this.utilService.showPasswordToast();
+            }else {
+                this.utilService.showErrorCall(err);
+            }
         }));
     }
 
