@@ -1,9 +1,5 @@
 package com.ibl.apps.noon;
 
-import androidx.lifecycle.Lifecycle;
-import androidx.lifecycle.LifecycleObserver;
-import androidx.lifecycle.OnLifecycleEvent;
-import androidx.lifecycle.ProcessLifecycleOwner;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.IntentFilter;
@@ -13,10 +9,15 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Handler;
+import android.util.Log;
+
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleObserver;
+import androidx.lifecycle.OnLifecycleEvent;
+import androidx.lifecycle.ProcessLifecycleOwner;
 import androidx.multidex.MultiDex;
 import androidx.multidex.MultiDexApplication;
-import androidx.appcompat.app.AppCompatDelegate;
-import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
 import com.downloader.PRDownloader;
@@ -25,12 +26,8 @@ import com.droidnet.DroidNet;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
-import com.ibl.apps.CourseManagement.CourseRepository;
 import com.ibl.apps.Model.SyncTimeTracking;
-import com.ibl.apps.Network.ApiClient;
-import com.ibl.apps.Network.ApiService;
 import com.ibl.apps.RoomDatabase.dao.courseManagementDatabase.CourseDatabaseRepository;
-import com.ibl.apps.RoomDatabase.database.AppDatabase;
 import com.ibl.apps.RoomDatabase.entity.SyncTimeTrackingObject;
 import com.ibl.apps.Service.NetworkChangeReceiver;
 import com.ibl.apps.UserCredentialsManagement.UserRepository;
@@ -80,8 +77,8 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
         super.onCreate();
         Fabric.with(this, new Crashlytics());
 
-        CallApiForSpendApp();
-        callApiForInterval();
+        //CallApiForSpendApp();
+        //callApiForInterval();
         //callLogfiles();
         // Enabling database for resume support even after the application is killed:
         PRDownloaderConfig config = PRDownloaderConfig.newBuilder()
