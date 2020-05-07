@@ -18,7 +18,7 @@ export class UtilService {
 		private authenticationService: AuthenticationService
 	) {
 
-	}	
+	}
 	setUserRoles(res) {
 		this.userRoles = res;
 	}
@@ -29,6 +29,10 @@ export class UtilService {
 
 	showErrorToast(title: string = 'Something went wrong.', message: string = "Please, try again later.") {
 		this.toastr.error(message, title);
+	}
+
+	showPasswordToast() {
+		this.toastr.error("Password Is Required", "Error", { disableTimeOut: true });
 	}
 
 	showErrorWarning(title: string = 'Something went wrong.', message: string = "Please, try again later.") {
