@@ -263,11 +263,13 @@ namespace Trainning24.BL.Business
                 foreach (var file in questionFiles)
                 {
                     Files singleFile = FilesBusiness.getFilesById(file.FileId);
-                    UpdateQuestionFileModel updateQuestionFileModel = new UpdateQuestionFileModel();
-                    updateQuestionFileModel.fileid = singleFile.Id;
-                    updateQuestionFileModel.Url = singleFile.Url;
-                    images.Add(updateQuestionFileModel);
-
+                    if (singleFile != null)
+                    {
+                        UpdateQuestionFileModel updateQuestionFileModel = new UpdateQuestionFileModel();
+                        updateQuestionFileModel.fileid = singleFile.Id;
+                        updateQuestionFileModel.Url = singleFile.Url;
+                        images.Add(updateQuestionFileModel);
+                    }
                 }
 
                 questionModel.images = images;
@@ -289,10 +291,13 @@ namespace Trainning24.BL.Business
                     foreach (var file in answerFiles)
                     {
                         Files singleFile = FilesBusiness.getFilesById(file.FileId);
-                        UpdateQuestionFileModel updateQuestionFileModel = new UpdateQuestionFileModel();
-                        updateQuestionFileModel.fileid = singleFile.Id;
-                        updateQuestionFileModel.Url = singleFile.Url;
-                        ansfiles.Add(updateQuestionFileModel);
+                        if (singleFile != null)
+                        {
+                            UpdateQuestionFileModel updateQuestionFileModel = new UpdateQuestionFileModel();
+                            updateQuestionFileModel.fileid = singleFile.Id;
+                            updateQuestionFileModel.Url = singleFile.Url;
+                            ansfiles.Add(updateQuestionFileModel);
+                        }
 
                     }
 
