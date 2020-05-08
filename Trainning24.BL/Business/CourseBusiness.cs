@@ -507,15 +507,15 @@ namespace Trainning24.BL.Business
                 DataTable chaptor = dbHelper.ExcecuteQueryDT("select Id,Code,Name,Itemorder from Chapter where CourseId=" + id + " AND (IsDeleted!=true OR IsDeleted Is Null)");
                 DataTable assignment = dbHelper.ExcecuteQueryDT("select Id,Code,Name,Description, Itemorder,ChapterId from Assignment where ChapterId in (select Id from Chapter where CourseId=" + id + " AND (IsDeleted!=true OR IsDeleted Is Null)) AND (IsDeleted!=true OR IsDeleted Is Null)");
                 DataTable lession = dbHelper.ExcecuteQueryDT("select Id,Code,Name,Description,ChapterId,Itemorder from Lesson where ChapterId in (select Id from Chapter where CourseId=" + id + "  AND (IsDeleted!=true OR IsDeleted Is Null)) AND (IsDeleted!=true OR IsDeleted Is Null)");
-                DataTable quizes = dbHelper.ExcecuteQueryDT("select c.ChapterId,q.Id AS chqId, q.NumQuestions, q.Itemorder as Itemorder ,q.Name AS chqname,q.Code as chqCode from chapterQuiz c join Quiz q on c.quizid=q.id where ChapterId in (select Id from Chapter where CourseId=" + id + " AND (IsDeleted!=true OR IsDeleted Is Null)) AND (q.IsDeleted!=true OR q.IsDeleted Is Null)AND (c.IsDeleted!=true OR c.IsDeleted Is Null)");
+                DataTable quizes = dbHelper.ExcecuteQueryDT("select c.ChapterId,q.Id AS chqId, q.NumQuestions, c.Itemorder as Itemorder ,q.Name AS chqname,q.Code as chqCode from chapterQuiz c join Quiz q on c.quizid=q.id where ChapterId in (select Id from Chapter where CourseId=" + id + " AND (IsDeleted!=true OR IsDeleted Is Null)) AND (q.IsDeleted!=true OR q.IsDeleted Is Null)AND (c.IsDeleted!=true OR c.IsDeleted Is Null)");
                 dbHelper.Close();
 
                 List<ChapterPreviewModel> chaptorPreviewList = new List<ChapterPreviewModel>();
                 DataRow cour = course.Rows[0];
                 coursePreview.Id = Convert.ToInt64(cour["Id"].ToString());
                 coursePreview.Code = cour["Code"].ToString();
-                coursePreview.Name = cour["Name"].ToString(); 
-                coursePreview.Description = cour["Description"].ToString(); 
+                coursePreview.Name = cour["Name"].ToString();
+                coursePreview.Description = cour["Description"].ToString();
                 string image = cour["Image"].ToString();
                 if (!string.IsNullOrEmpty(image))
                 {
@@ -532,7 +532,7 @@ namespace Trainning24.BL.Business
                         chapterPreview.Id = Convert.ToInt64(dr["Id"].ToString());
                         chapterPreview.Code = dr["Code"].ToString();
                         chapterPreview.Name = dr["Name"].ToString();
-                        chapterPreview.itemorder =Convert.ToInt32( dr["Itemorder"].ToString());
+                        chapterPreview.itemorder = Convert.ToInt32(dr["Itemorder"].ToString());
 
                         List<QuizPreviewModel> lstquizPreviewModel = new List<QuizPreviewModel>();
                         if (quizes.Rows.Count != 0)
@@ -546,13 +546,14 @@ namespace Trainning24.BL.Business
                                     quizPreviewModel.id = Convert.ToInt64(chquiz["chqId"].ToString());
                                     quizPreviewModel.name = chquiz["chqname"].ToString();
                                     quizPreviewModel.code = chquiz["chqCode"].ToString();
-                                    quizPreviewModel.itemorder = Convert.ToInt32( chquiz["Itemorder"].ToString());
-                                    quizPreviewModel.type = 1;
+                                    quizPreviewModel.itemorder = Convert.ToInt32(chquiz["Itemorder"].ToString());
+                                    quizPreviewModel.type = 2;
                                     quizPreviewModel.numquestions = Convert.ToInt32(chquiz["NumQuestions"].ToString());
                                     lstquizPreviewModel.Add(quizPreviewModel);
                                 }
                             }
-                            chapterPreview.quizs = lstquizPreviewModel.Count > 0 ? lstquizPreviewModel.OrderBy(b=>b.itemorder).ToList() : null;
+                            //chapterPreview.quizs = lstquizPreviewModel.Count > 0 ? lstquizPreviewModel.OrderBy(b => b.itemorder).ToList() : null;
+                            lstquizPreviewModel = lstquizPreviewModel.Count > 0 ? lstquizPreviewModel.OrderBy(b => b.itemorder).ToList() : null;
                         }
                         else
                         {
@@ -570,12 +571,13 @@ namespace Trainning24.BL.Business
                                     assignmentModel.name = assig["Name"].ToString();
                                     assignmentModel.code = assig["Code"].ToString();
                                     assignmentModel.description = assig["Description"].ToString();
-                                    assignmentModel.itemorder= Convert.ToInt32(assig["Itemorder"].ToString());
+                                    assignmentModel.itemorder = Convert.ToInt32(assig["Itemorder"].ToString());
                                     assignmentModel.type = 3;
                                     assignmentPreviewModel.Add(assignmentModel);
                                 }
                             }
-                            chapterPreview.assignments = assignmentPreviewModel.Count > 0 ? assignmentPreviewModel.OrderBy(b => b.itemorder).ToList() : null;
+                            assignmentPreviewModel = assignmentPreviewModel.Count > 0 ? assignmentPreviewModel.OrderBy(b => b.itemorder).ToList() : null;
+                            //chapterPreview.assignments = assignmentPreviewModel.Count > 0 ? assignmentPreviewModel.OrderBy(b => b.itemorder).ToList() : null;
                         }
                         else
                         {
@@ -592,7 +594,7 @@ namespace Trainning24.BL.Business
                                     lessonPrivewModel.id = Convert.ToInt64(less["Id"].ToString());
                                     lessonPrivewModel.name = less["Name"].ToString();
                                     lessonPrivewModel.code = less["Code"].ToString();
-                                    lessonPrivewModel.itemorder =Convert.ToInt32( less["Itemorder"].ToString());
+                                    lessonPrivewModel.itemorder = Convert.ToInt32(less["Itemorder"].ToString());
                                     lessonPrivewModel.description = less["Description"].ToString();
                                     lessonPrivewModel.type = 1;
                                     lessonPrivewModels.Add(lessonPrivewModel);
@@ -600,11 +602,20 @@ namespace Trainning24.BL.Business
 
                             }
                             List<object> listobj = lessonPrivewModels.OrderBy(b => b.itemorder).ToList().Cast<object>().ToList();
+                            if (lstquizPreviewModel != null && lstquizPreviewModel.Count != 0)
+                                listobj.AddRange(lstquizPreviewModel);
+                            if (assignmentPreviewModel != null && assignmentPreviewModel.Count != 0)
+                                listobj.AddRange(assignmentPreviewModel);
                             chapterPreview.lessons = lessonPrivewModels.Count > 0 ? listobj : null;
                         }
                         else
                         {
-                            chapterPreview.lessons = null;
+                            List<object> listobj = lessonPrivewModels.Cast<object>().ToList();
+                            if (lstquizPreviewModel != null && lstquizPreviewModel.Count != 0)
+                                listobj.AddRange(lstquizPreviewModel);
+                            if (assignmentPreviewModel != null && assignmentPreviewModel.Count != 0)
+                                listobj.AddRange(assignmentPreviewModel);
+                            chapterPreview.lessons = listobj;
                         }
                         chaptorPreviewList.Add(chapterPreview);
                     }
@@ -641,7 +652,7 @@ namespace Trainning24.BL.Business
                 DataTable chaptor = dbHelper.ExcecuteQueryDT("select Id,Code,Name,ItemOrder from Chapter where CourseId=" + id + " AND (IsDeleted!=true OR IsDeleted Is Null)");
                 DataTable assignment = dbHelper.ExcecuteQueryDT("select Id,Code,Name,Description, ChapterId,ItemOrder from Assignment where ChapterId in (select Id from Chapter where CourseId=" + id + " AND (IsDeleted!=true OR IsDeleted Is Null)) AND (IsDeleted!=true OR IsDeleted Is Null)");
                 DataTable lession = dbHelper.ExcecuteQueryDT("select Id,Code,Name,Description,ChapterId,ItemOrder from Lesson where ChapterId in (select Id from Chapter where CourseId=" + id + "  AND (IsDeleted!=true OR IsDeleted Is Null)) AND (IsDeleted!=true OR IsDeleted Is Null)");
-                DataTable quizes = dbHelper.ExcecuteQueryDT("select c.ChapterId,q.Id AS chqId, q.NumQuestions, q.Name AS chqname, q.ItemOrder as ItemOrder,q.Code as chqCode from chapterQuiz c join Quiz q on c.quizid=q.id where ChapterId in (select Id from Chapter where CourseId=" + id + " AND (IsDeleted!=true OR IsDeleted Is Null)) AND (q.IsDeleted!=true OR q.IsDeleted Is Null)AND (c.IsDeleted!=true OR c.IsDeleted Is Null)");
+                DataTable quizes = dbHelper.ExcecuteQueryDT("select c.ChapterId,q.Id AS chqId, q.NumQuestions, q.Name AS chqname, c.ItemOrder as ItemOrder,q.Code as chqCode from chapterQuiz c join Quiz q on c.quizid=q.id where ChapterId in (select Id from Chapter where CourseId=" + id + " AND (IsDeleted!=true OR IsDeleted Is Null)) AND (q.IsDeleted!=true OR q.IsDeleted Is Null)AND (c.IsDeleted!=true OR c.IsDeleted Is Null)");
                 List<string> assignmentList = new List<string>();
                 List<string> lessionList = new List<string>();
                 List<string> lessionAssignmentList = new List<string>();
@@ -722,14 +733,15 @@ namespace Trainning24.BL.Business
                                     quizPreviewModel.id = Convert.ToInt64(chquiz["chqId"].ToString());
                                     quizPreviewModel.name = chquiz["chqname"].ToString();
                                     quizPreviewModel.code = chquiz["chqCode"].ToString();
-                                    quizPreviewModel.itemorder =Convert.ToInt32( chquiz["Itemorder"].ToString());
+                                    quizPreviewModel.itemorder = Convert.ToInt32(chquiz["Itemorder"].ToString());
                                     quizPreviewModel.type = 2;
                                     quizPreviewModel.numquestions = Convert.ToInt32(chquiz["NumQuestions"].ToString());
                                     lstquizPreviewModel.Add(quizPreviewModel);
 
                                 }
                             }
-                            chapterPreview.quizs = lstquizPreviewModel.Count > 0 ? lstquizPreviewModel.OrderBy(b=>b.itemorder).ToList() : null;
+                            //  chapterPreview.quizs = lstquizPreviewModel.Count > 0 ? lstquizPreviewModel.OrderBy(b => b.itemorder).ToList() : null;
+                            lstquizPreviewModel = lstquizPreviewModel.Count > 0 ? lstquizPreviewModel.OrderBy(b => b.itemorder).ToList() : null;
                         }
                         else
                         {
@@ -748,7 +760,7 @@ namespace Trainning24.BL.Business
                                     assignmentModel.name = assig["Name"].ToString();
                                     assignmentModel.code = assig["Code"].ToString();
                                     assignmentModel.description = assig["Description"].ToString();
-                                    assignmentModel.itemorder = Convert.ToInt32( assig["Itemorder"].ToString());
+                                    assignmentModel.itemorder = Convert.ToInt32(assig["Itemorder"].ToString());
                                     assignmentModel.type = 3;
                                     List<ResponseAssignmentFileModel> AssignmentFileList = new List<ResponseAssignmentFileModel>();
                                     foreach (DataRow af in assignmentFiles.Rows)
@@ -782,7 +794,7 @@ namespace Trainning24.BL.Business
                                 }
                             }
 
-                            chapterPreview.assignments = assignmentPreviewModel.Count > 0 ? assignmentPreviewModel.OrderBy(b=>b.itemorder).ToList() : null;
+                            chapterPreview.assignments = assignmentPreviewModel.Count > 0 ? assignmentPreviewModel.OrderBy(b => b.itemorder).ToList() : null;
                         }
                         else
                         {
@@ -800,7 +812,7 @@ namespace Trainning24.BL.Business
                                     lessonPrivewModel.name = less["Name"].ToString();
                                     lessonPrivewModel.code = less["Code"].ToString();
                                     lessonPrivewModel.description = less["Description"].ToString();
-                                    lessonPrivewModel.itemorder =Convert.ToInt32( less["Itemorder"].ToString());
+                                    lessonPrivewModel.itemorder = Convert.ToInt32(less["Itemorder"].ToString());
                                     lessonPrivewModel.type = 1;
                                     List<ResponseLessonFileModel> lessonFileList = new List<ResponseLessonFileModel>();
                                     foreach (DataRow lf in lessionFiles.Rows)
@@ -869,21 +881,26 @@ namespace Trainning24.BL.Business
                                             responseLessionAssignmentDTO.assignmentfiles = AssignmentFileList;
                                         }
                                     }
-                                    lessonPrivewModel.assignment = responseLessionAssignmentDTO.id> 0? responseLessionAssignmentDTO:null;
+                                    lessonPrivewModel.assignment = responseLessionAssignmentDTO.id > 0 ? responseLessionAssignmentDTO : null;
                                     lessonPrivewModels.Add(lessonPrivewModel);
                                 }
 
                             }
-                            List<object> listobj = lessonPrivewModels.OrderBy(b=>b.itemorder).ToList().Cast<object>().ToList();
+                            List<object> listobj = lessonPrivewModels.OrderBy(b => b.itemorder).ToList().Cast<object>().ToList();
+                            if (lstquizPreviewModel != null && lstquizPreviewModel.Count != 0)
+                                listobj.AddRange(lstquizPreviewModel);
                             chapterPreview.lessons = lessonPrivewModels.Count > 0 ? listobj : null;
                         }
                         else
                         {
-                            chapterPreview.lessons = null;
+                            List<object> listobj = lessonPrivewModels.Cast<object>().ToList();
+                            if (lstquizPreviewModel != null && lstquizPreviewModel.Count != 0)
+                                listobj.AddRange(lstquizPreviewModel);
+                            chapterPreview.lessons = listobj;
                         }
                         chaptorPreviewList.Add(chapterPreview);
                     }
-                    coursePreview.chapters = chaptorPreviewList.OrderBy(b=>b.itemorder).ToList();
+                    coursePreview.chapters = chaptorPreviewList.OrderBy(b => b.itemorder).ToList();
                 }
                 else
                 {
