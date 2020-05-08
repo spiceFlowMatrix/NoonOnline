@@ -1,10 +1,10 @@
 package com.ibl.apps.Model.assignment;
 
 public class StudentDetailData {
-    int id;
-    String name;
-    int submissions;
-    int status;
+    private int id;
+    private String name;
+    private int submissions;
+    private int status;
 
     public int getId() {
         return id;

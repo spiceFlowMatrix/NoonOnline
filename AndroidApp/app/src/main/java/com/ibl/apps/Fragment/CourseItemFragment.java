@@ -27,6 +27,7 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.downloader.Error;
@@ -59,7 +60,6 @@ import com.ibl.apps.Model.CoursePriviewObject;
 import com.ibl.apps.Model.DownloadQueueObject;
 import com.ibl.apps.Model.ProgressItem;
 import com.ibl.apps.Model.QuizMainObject;
-import com.ibl.apps.Model.RestResponse;
 import com.ibl.apps.QuizManament.QuizRepository;
 import com.ibl.apps.RoomDatabase.dao.courseManagementDatabase.CourseDatabaseRepository;
 import com.ibl.apps.RoomDatabase.dao.lessonManagementDatabase.LessonDatabaseRepository;
@@ -72,6 +72,7 @@ import com.ibl.apps.RoomDatabase.entity.QuizProgress;
 import com.ibl.apps.RoomDatabase.entity.QuizUserResult;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
 import com.ibl.apps.noon.AssignmentDetailActivity;
+import com.ibl.apps.noon.ChapterActivity;
 import com.ibl.apps.noon.NoonApplication;
 import com.ibl.apps.noon.R;
 import com.ibl.apps.noon.databinding.CourselessonLayoutBinding;
@@ -180,6 +181,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
     private QuizDatabaseRepository quizDatabaseRepository;
     private CourseDatabaseRepository courseDatabaseRepository;
     private LessonDatabaseRepository lessonDatabaseRepository;
+    Observer<Integer> observer;
 
     public CourseItemFragment() {
         // Required empty public constructor
@@ -217,14 +219,36 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
         super.onViewStateRestored(savedInstanceState);
     }
 
+    private boolean isVisible = false;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         fragmentCourseItemLayoutBinding = DataBindingUtil.inflate(inflater, R.layout.courselesson_layout, container, false);
+        observer = new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer integer) {
+
+                if (getFragmentManager() != null && integer == 0) {
+                    fragmentCourseItemLayoutBinding.videoViewer.videoViewLay.setVisibility(View.GONE);
+                    fragmentCourseItemLayoutBinding.chapterViewLayout.chapterMainView.setVisibility(View.GONE);
+                    fragmentCourseItemLayoutBinding.quizViewLayout.quizViewer.setVisibility(View.GONE);
+                    fragmentCourseItemLayoutBinding.textPdfAssignmentLay.setVisibility(View.GONE);
+                    fragmentCourseItemLayoutBinding.appbarCourseChapter.setVisibility(View.VISIBLE);
+                    setUp(fragmentCourseItemLayoutBinding.getRoot());
+                    PRDownloader.cancelAll();
+                    ChapterActivity.pageNo1.setValue(-1);
+                }
+
+            }
+        };
+        ChapterActivity.pageNo1.observe(getViewLifecycleOwner(), observer);
         return fragmentCourseItemLayoutBinding.getRoot();
     }
 
+
     @Override
     protected void setUp(View view) {
+
         lessonRepository = new LessonRepository();
         quizRepository = new QuizRepository();
         quizDatabaseRepository = new QuizDatabaseRepository();
@@ -269,11 +293,16 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
             }
 
         }).execute();
-
-
         setOnClickListener();
     }
 
+    @Override
+    public void onDestroy() {
+        if (observer != null) {
+            ChapterActivity.pageNo1.removeObserver(observer);
+        }
+        super.onDestroy();
+    }
 
     public void setOnClickListener() {
         //fragmentCourseItemLayoutBinding.pdfViewLayout.FullScreenImage.setOnClickListener(this);
@@ -508,7 +537,6 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                     }
 
                     hideDialog();
-
                     return null;
                 }
             }, coursePriviewObject, false).execute();
@@ -518,7 +546,6 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
 
     private void CallApiCoursePriviewList() {
         try {
-
             showDialog(getString(R.string.loading));
             disposable.add(lessonRepository.fetchCoursePriview(GradeId, userId)
                     .subscribeOn(Schedulers.io())
@@ -526,7 +553,6 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                     .subscribeWith(new DisposableSingleObserver<CoursePriviewObject>() {
                         @Override
                         public void onSuccess(CoursePriviewObject coursePriviewObject) {
-
                             coursePriviewObject.setUserId(userId);
                             courseItemListAdapter = new CourseItemListAdapter(getActivity(), coursePriviewArrayList, CourseItemFragment.this, GradeId, userDetailsObject, ActivityFlag, LessonID, QuizID, isNotification, CourseItemFragment.this, CourseName);
                             fragmentCourseItemLayoutBinding.rcVerticalLayout.rcVertical.setAdapter(courseItemListAdapter);
@@ -552,7 +578,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                                         showNetworkAlert(getActivity());
                                     }
                                     //  courseItemListAdapter.notifyDataSetChanged();
-                                    Log.e("notifyDataSetChanged", "getCoursePriviewObject: ");
+                                    Log.e("notifyChanged--1", "getCoursePriviewObject: ");
                                     hideDialog();
                                     return null;
                                 }
@@ -2799,7 +2825,13 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
-        getFragmentManager().beginTransaction().detach(this).attach(this).commit();
-        PRDownloader.cancelAll();
+        if (isVisibleToUser && ChapterActivity.pageNo == 0) {
+            if (getFragmentManager() != null) {
+
+
+            }
+        }
+
     }
+
 }
