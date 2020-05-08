@@ -3,13 +3,15 @@ package com.ibl.apps.noon;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-import androidx.viewpager.widget.ViewPager;
 import android.view.MenuItem;
 import android.view.View;
 
+import androidx.annotation.NonNull;
+import androidx.lifecycle.MutableLiveData;
+import androidx.viewpager.widget.ViewPager;
+
 import com.downloader.PRDownloader;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.gson.Gson;
 import com.ibl.apps.Adapter.ViewPagerAdapter;
 import com.ibl.apps.Base.BaseActivity;
@@ -20,9 +22,9 @@ import com.ibl.apps.Interface.BackInterface;
 import com.ibl.apps.Interface.ToolbarHideInterface;
 import com.ibl.apps.Model.CourseObject;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
+import com.ibl.apps.noon.databinding.ChapterMainBinding;
 import com.ibl.apps.util.Const;
 import com.ibl.apps.util.PrefUtils;
-import com.ibl.apps.noon.databinding.ChapterMainBinding;
 
 import java.util.Objects;
 
@@ -53,6 +55,8 @@ public class ChapterActivity extends BaseActivity implements View.OnClickListene
     private int dislikeCount;
     private boolean isLiked;
     private boolean isDisliked;
+    public static int pageNo = -1;
+    public static MutableLiveData<Integer> pageNo1 = new MutableLiveData<>();
 
     @Override
     protected int getContentView() {
@@ -70,6 +74,7 @@ public class ChapterActivity extends BaseActivity implements View.OnClickListene
             public UserDetails getLocalUserDetails(UserDetails userDetails) {
                 if (userDetails != null) {
                     userDetailsObject = userDetails;
+                    //chapterMainBinding.fragmentViewpager.setOffscreenPageLimit(0);
                     setupViewPager(chapterMainBinding.fragmentViewpager);
                 }
                 return null;
@@ -83,15 +88,20 @@ public class ChapterActivity extends BaseActivity implements View.OnClickListene
 
                         switch (item.getItemId()) {
                             case R.id.action_item1:
+                                pageNo = 0;
                                 chapterMainBinding.fragmentViewpager.setCurrentItem(0);
                                 break;
                             case R.id.action_item3:
+                                pageNo = 1;
                                 chapterMainBinding.fragmentViewpager.setCurrentItem(1);
                                 break;
                             case R.id.action_item4:
+                                pageNo = 2;
                                 chapterMainBinding.fragmentViewpager.setCurrentItem(2);
                                 break;
+
                         }
+                        pageNo1.setValue(pageNo);
                         return false;
                     }
                 });
@@ -100,6 +110,8 @@ public class ChapterActivity extends BaseActivity implements View.OnClickListene
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
+                pageNo = position;
+//                pageNo1.postValue(pageNo);
                 switch (position) {
                     case 0:
                         break;
@@ -209,7 +221,6 @@ public class ChapterActivity extends BaseActivity implements View.OnClickListene
         bundle.putBoolean(Const.isNotification, isNotification);
 
         courseItemFragment.setArguments(bundle);
-
         libraryFragment.setArguments(bundle);
         discussionsFragment.setArguments(bundle);
 //        assignmentFragment.setArguments(bundle);
@@ -275,6 +286,7 @@ public class ChapterActivity extends BaseActivity implements View.OnClickListene
             finishActivity();
         }
     }
+
 
     @Override
     public void toolbarHide(Context ctx, boolean flag, String LessonName) {
