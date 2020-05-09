@@ -65,7 +65,7 @@ export class AddLessonComponent implements OnInit {
     pdfFilesList: any = [];
     videoFilesList: any = [];
     filterVideo: any;
-
+    signUrl: any;
     constructor(
         private activatedRoute: ActivatedRoute,
         public utilService: UtilService,
@@ -312,23 +312,126 @@ export class AddLessonComponent implements OnInit {
             })
         }
     }
+    async putFileOnBucket(element, type, page?: any, duration?: any, id?: any, name?: any) {
 
+        this.fileService.putFileOnBucket(this.signUrl, element).subscribe((res: any) => {
+            switch (res.type) {
+                case HttpEventType.Sent:
+                    this.uploadedPercentage = 0;
+                    this.showAssignmentProgress = true;
+                    this.utilService.showInfoToast("Notification", "Your file upaloding started.");
+                    break;
+                case HttpEventType.Response:
+                    this.mode = "buffer";
+                    this.showAssignmentProgress = false;
+                    console.log(this.assignModal);
+                    switch (type) {
+                        case "pdf":
+                            let pdfmodal = {
+                                fileTypeId: id,
+                                filename: name,
+                                totalpages: page
+                            }
+                            this.SaveFileMetaData(pdfmodal);
+                            break;
+                        case "video":
+                            let videomodal = {
+                                fileTypeId: id,
+                                filename: name,
+                                duration: duration
+                            }
+                            this.SaveFileMetaData(videomodal);
+                            break;
+                        case "image":
+                            let imagemodal = {
+                                fileTypeId: id,
+                                filename: name,
+                            }
+                            this.SaveFileMetaData(imagemodal);
+                            break;
+                        case "csv":
+                            let csvmodal = {
+                                fileTypeId: id,
+                                filename: name,
+                            }
+                            this.SaveFileMetaData(csvmodal);
+                            break;
+                        case "docs":
+                            let docsmodal = {
+                                fileTypeId: id,
+                                filename: name,
+                            }
+                            this.SaveFileMetaData(docsmodal);
+                            break;
+                        case "ppt":
+                            let pptmodal = {
+                                fileTypeId: id,
+                                filename: name,
+                            }
+                            this.SaveFileMetaData(pptmodal);
+                            break;
+                        default:
+                            break;
+
+                    }
+                    break;
+                case 1: {
+                    if (Math.round(this.uploadedPercentage) !== Math.round(event['loaded'] / event['total'] * 100)) {
+                        this.uploadedPercentage = event['loaded'] / event['total'] * 100;
+                        if (this.uploadedPercentage == 100) {
+                            this.mode = "indeterminate";
+                        }
+                    }
+                    console.log(res.type);
+                    break;
+                }
+            }
+        }, err => {
+            this.isCallingApi = false;
+            this.showAssignmentProgress = false;
+            this.utilService.showErrorCall(err);
+        })
+    }
+    SaveFileMetaData(modal) {
+        this.allSubscribers.push(this.fileService.SaveFileMetaData(modal).subscribe((res: any) => {
+            this.isCallingApi = false;
+            // for (let i = 0; i < res.body.data.length; i++) {
+            let fileModal = {
+                filetypeid: res.data.filetypeid,
+                filetypename: res.data.filetypename,
+                id: res.data.id,
+                name: res.data.name
+            }
+            this.isCallingApi = false;
+            this.assignFilesId.push(res.data.id);
+            this.assignmentfiles.push(res.data);
+            this.tempfiles.push(res.data);
+            this.utilService.showInfoToast("", "File uploaded successfully.");
+            // }
+        }, err => {
+            this.isCallingApi = false;
+            this.utilService.showErrorCall(err);
+        }));
+    }
     assignmentFileDrop(files: FileHandle[]): void {
         this.assignModal = {};
         let temp: any = [];
-        for (let j = 0; j < files.length; j++) {
-            temp.push(files[j].file)
-        }
+        let tempFiles = [];
         let assignfiles = [];
         let re = /(?:\.([^.]+))?$/;
-        for (let i = 0; i < temp.length; i++) {
+        for (let i = 0; i < files.length; i++) {
+            tempFiles.push(files[i].file)
+        }
+        tempFiles.forEach(element => {
             let ext = "";
-            ext = re.exec(temp[i].name)[1];
-            assignfiles.push(temp[i]);
-            if (temp[i].type === "application/pdf") {
+            this.signUrl = "";
+            this.assignModal.filename = "";
+            ext = re.exec(element.name)[1];
+            assignfiles.push(element);
+            if (element.type === "application/pdf") {
                 this.assignModal = {};
                 let reader: any = new FileReader();
-                reader.readAsBinaryString(temp[i]);
+                reader.readAsBinaryString(element);
                 reader.onloadend = () => {
                     var count = reader.result.match(/\/Type[\s]*\/Page[^s]/g).length;
                     this.assignModal.totalpages = count.toString();
@@ -336,787 +439,244 @@ export class AddLessonComponent implements OnInit {
                 }
                 let modal = {
                     fileTypeId: 1,
-                    contentType: files[i].file.type,
-                    fileName: files[i].file.name
+                    contentType: element.type,
+                    fileName: element.name
                 }
                 this.isCallingApi = true;
-                this.lessonService.getLessonAssignmentFileSigned(modal).subscribe((res) => {
-                    console.log(res);
+                this.signUrl = "";
+                this.lessonService.getLessonAssignmentFileSigned(modal).subscribe(async (res) => {
                     this.assignModal.filename = res.data.filename;
-                    let signUrl = res.data.signedurl;
-                    this.fileService.putFileOnBucket(signUrl, files[i].file).subscribe((res: any) => {
-                        switch (res.type) {
-                            case HttpEventType.Sent:
-                                this.uploadedPercentage = 0;
-                                this.showAssignmentProgress = true;
-                                this.utilService.showInfoToast("Notification", "Your file upaloding started.");
-                                break;
-                            case HttpEventType.Response:
-                                this.mode = "buffer";
-                                if (i === temp.length - 1) {
-                                    this.showAssignmentProgress = false;
-                                    this.isCallingApi = false;
-                                    this.utilService.showInfoToast("", "File uploaded successfully.");
-                                }
-                                console.log(res);
-                                if (files[i].file) {
-                                    this.file = files[i].file;
-                                    setTimeout(() => {
-                                        this.isCallingApi = true;
-                                        this.allSubscribers.push(this.fileService.SaveFileMetaData(this.assignModal).subscribe((res: any) => {
-                                            this.isCallingApi = false;
-                                            // for (let i = 0; i < res.body.data.length; i++) {
-                                            this.assignFilesId.push(res.data.id);
-                                            this.assignmentfiles.push(res.data);
-                                            this.tempfiles.push(res.data);
-                                            // }
-                                        }, err => {
-                                            this.isCallingApi = false;
-                                            this.utilService.showErrorCall(err);
-                                        }));
-                                    }, 200);
-                                }
-                                break;
-                            case 1: {
-                                if (Math.round(this.uploadedPercentage) !== Math.round(event['loaded'] / event['total'] * 100)) {
-                                    this.uploadedPercentage = event['loaded'] / event['total'] * 100;
-                                    if (this.uploadedPercentage == 100) {
-                                        this.mode = "indeterminate";
-                                    }
-                                }
-                                break;
-                            }
-                        }
-                    }, err => {
-                        this.isCallingApi = false;
-                        this.showAssignmentProgress = false;
-                        this.utilService.showErrorCall(err);
-                    })
-                })
+                    this.signUrl = res.data.signedurl;
+                    if (this.signUrl) {
+                        await this.putFileOnBucket(element, "pdf", this.assignModal.totalpages, "", "1", res.data.filename);
+                    }
+                });
             }
-            else if (temp[i].type === "video/mp4" || temp[i].type === "video/webm") {
+            else if (element.type === "video/mp4" || element.type === "video/webm") {
                 this.assignModal = {};
+                this.signUrl = "";
                 let fileInput: any = document.getElementById('mynAllVideo');
-                fileInput.src = URL.createObjectURL(temp[i]);
+                fileInput.src = URL.createObjectURL(element);
                 fileInput.onloadeddata = (e) => {
                     this.assignModal.duration = fileInput.duration.toString();
                     this.assignModal.fileTypeId = "2";
                 };
                 let modal = {
                     fileTypeId: 2,
-                    contentType: files[i].file.type,
-                    fileName: files[i].file.name
+                    contentType: element.type,
+                    fileName: element.name
                 }
-                this.lessonService.getLessonAssignmentFileSigned(modal).subscribe((res) => {
-                    console.log(res);
+                this.lessonService.getLessonAssignmentFileSigned(modal).subscribe(async (res) => {
                     this.assignModal.filename = res.data.filename;
-                    let signUrl = res.data.signedurl;
-                    this.fileService.putFileOnBucket(signUrl, files[i].file).subscribe((res: any) => {
-                        switch (res.type) {
-                            case HttpEventType.Sent:
-                                this.uploadedPercentage = 0;
-                                this.showAssignmentProgress = true;
-                                this.utilService.showInfoToast("Notification", "Your file upaloding started.");
-                                break;
-                            case HttpEventType.Response:
-                                this.mode = "buffer";
-                                if (i === temp.length - 1) {
-                                    this.showAssignmentProgress = false;
-                                    this.isCallingApi = false;
-                                    this.utilService.showInfoToast("", "File uploaded successfully.");
-                                }
-                                console.log(res);
-                                if (files[i].file) {
-                                    this.file = files[i].file;
-                                    setTimeout(() => {
-                                        this.isCallingApi = true;
-                                        this.allSubscribers.push(this.fileService.SaveFileMetaData(this.assignModal).subscribe((res: any) => {
-                                            this.isCallingApi = false;
-                                            // for (let i = 0; i < res.body.data.length; i++) {
-                                            this.assignFilesId.push(res.data.id);
-                                            this.assignmentfiles.push(res.data);
-                                            this.tempfiles.push(res.data);
-                                            // }
-                                        }, err => {
-                                            this.isCallingApi = false;
-                                            this.utilService.showErrorCall(err);
-                                        }));
-                                    }, 200);
-                                }
-                                break;
-                            case 1: {
-                                if (Math.round(this.uploadedPercentage) !== Math.round(event['loaded'] / event['total'] * 100)) {
-                                    this.uploadedPercentage = event['loaded'] / event['total'] * 100;
-                                    if (this.uploadedPercentage == 100) {
-                                        this.mode = "indeterminate";
-                                    }
-                                }
-                                break;
-                            }
-                        }
-                    }, err => {
-                        this.isCallingApi = false;
-                        this.showAssignmentProgress = false;
-                        this.utilService.showErrorCall(err);
-                    })
-                })
+                    this.signUrl = res.data.signedurl;
+                    if (this.signUrl) {
+                        await this.putFileOnBucket(element, "video", "", this.assignModal.duration, "2", res.data.filename);
+                    }
+                });
             }
-            else if (temp[i].type === "image/png" || temp[i].type === "image/jpeg") {
+            else if (element.type === "image/png" || element.type === "image/jpeg") {
                 this.assignModal = {};
+                this.signUrl = "";
                 this.assignModal.fileTypeId = "3"
                 let modal = {
                     fileTypeId: 3,
-                    contentType: files[i].file.type,
-                    fileName: files[i].file.name
+                    contentType: element.type,
+                    fileName: element.name
                 }
-                this.lessonService.getLessonAssignmentFileSigned(modal).subscribe((res) => {
-                    console.log(res);
+                this.lessonService.getLessonAssignmentFileSigned(modal).subscribe(async (res) => {
                     this.assignModal.filename = res.data.filename;
-                    let signUrl = res.data.signedurl;
-                    this.fileService.putFileOnBucket(signUrl, files[i].file).subscribe((res: any) => {
-                        switch (res.type) {
-                            case HttpEventType.Sent:
-                                this.uploadedPercentage = 0;
-                                this.showAssignmentProgress = true;
-                                this.utilService.showInfoToast("Notification", "Your file upaloding started.");
-                                break;
-                            case HttpEventType.Response:
-                                this.mode = "buffer";
-                                if (i === temp.length - 1) {
-                                    this.showAssignmentProgress = false;
-                                    this.isCallingApi = false;
-                                    this.utilService.showInfoToast("", "File uploaded successfully.");
-                                }
-                                console.log(res);
-                                if (files[i].file) {
-                                    this.file = files[i].file;
-                                    setTimeout(() => {
-                                        this.isCallingApi = true;
-                                        this.allSubscribers.push(this.fileService.SaveFileMetaData(this.assignModal).subscribe((res: any) => {
-                                            this.isCallingApi = false;
-                                            // for (let i = 0; i < res.body.data.length; i++) {
-                                            this.assignFilesId.push(res.data.id);
-                                            this.assignmentfiles.push(res.data);
-                                            this.tempfiles.push(res.data);
-                                            // }
-                                        }, err => {
-                                            this.isCallingApi = false;
-                                            this.utilService.showErrorCall(err);
-                                        }));
-                                    }, 200);
-                                }
-                                break;
-                            case 1: {
-                                if (Math.round(this.uploadedPercentage) !== Math.round(event['loaded'] / event['total'] * 100)) {
-                                    this.uploadedPercentage = event['loaded'] / event['total'] * 100;
-                                    if (this.uploadedPercentage == 100) {
-                                        this.mode = "indeterminate";
-                                    }
-                                }
-                                break;
-                            }
-                        }
-                    }, err => {
-                        this.isCallingApi = false;
-                        this.showAssignmentProgress = false;
-                        this.utilService.showErrorCall(err);
-                    })
-                })
+                    this.signUrl = res.data.signedurl;
+                    if (this.signUrl) {
+                        await this.putFileOnBucket(element, "image", "", "", "3", res.data.filename);
+                    }
+                });
             }
             else if (ext === "xlsx" || ext === "xls" || ext === "csv" || ext == "dbf" || ext === "dif" || ext === "ods" || ext === "prn" || ext === "slk" || ext === "xla" || ext === "xlam" || ext === "xlsb" || ext === "xlsm" || ext === "xlt" || ext === "xltm" || ext === "xltx" || ext === "xlw") {
                 this.assignModal = {};
                 this.assignModal.fileTypeId = "6";
                 let modal = {
                     fileTypeId: 6,
-                    contentType: files[i].file.type,
-                    fileName: files[i].file.name
+                    contentType: element.type,
+                    fileName: element.name
                 }
-                this.lessonService.getLessonAssignmentFileSigned(modal).subscribe((res) => {
-                    console.log(res);
+                this.lessonService.getLessonAssignmentFileSigned(modal).subscribe(async (res) => {
                     this.assignModal.filename = res.data.filename;
-                    let signUrl = res.data.signedurl;
-                    this.fileService.putFileOnBucket(signUrl, files[i].file).subscribe((res: any) => {
-                        switch (res.type) {
-                            case HttpEventType.Sent:
-                                this.uploadedPercentage = 0;
-                                this.showAssignmentProgress = true;
-                                this.utilService.showInfoToast("Notification", "Your file upaloding started.");
-                                break;
-                            case HttpEventType.Response:
-                                this.mode = "buffer";
-                                if (i === temp.length - 1) {
-                                    this.showAssignmentProgress = false;
-                                    this.isCallingApi = false;
-                                    this.utilService.showInfoToast("", "File uploaded successfully.");
-                                }
-                                console.log(res);
-                                if (files[i].file) {
-                                    this.file = files[i].file;
-                                    setTimeout(() => {
-                                        this.isCallingApi = true;
-                                        this.allSubscribers.push(this.fileService.SaveFileMetaData(this.assignModal).subscribe((res: any) => {
-                                            this.isCallingApi = false;
-                                            // for (let i = 0; i < res.body.data.length; i++) {
-                                            this.assignFilesId.push(res.data.id);
-                                            this.assignmentfiles.push(res.data);
-                                            this.tempfiles.push(res.data);
-                                            // }
-                                        }, err => {
-                                            this.isCallingApi = false;
-                                            this.utilService.showErrorCall(err);
-                                        }));
-                                    }, 200);
-                                }
-                                break;
-                            case 1: {
-                                if (Math.round(this.uploadedPercentage) !== Math.round(event['loaded'] / event['total'] * 100)) {
-                                    this.uploadedPercentage = event['loaded'] / event['total'] * 100;
-                                    if (this.uploadedPercentage == 100) {
-                                        this.mode = "indeterminate";
-                                    }
-                                }
-                                break;
-                            }
-                        }
-                    }, err => {
-                        this.isCallingApi = false;
-                        this.showAssignmentProgress = false;
-                        this.utilService.showErrorCall(err);
-                    })
-                })
+                    this.signUrl = res.data.signedurl;
+                    if (this.signUrl) {
+                        await this.putFileOnBucket(element, "csv", "", "", "6", res.data.filename);
+                    }
+                });
             }
             else if (ext === "docs" || ext === "docx" || ext === "doc" || ext === "docm" || ext === "dot" || ext === "dotm" || ext === "dotx" || ext === "odt" || ext === "rtf" || ext === "txt" || ext === "wps" || ext === "xml" || ext === "xps") {
                 this.assignModal = {};
                 this.assignModal.fileTypeId = "7";
                 let modal = {
                     fileTypeId: 7,
-                    contentType: files[i].file.type,
-                    fileName: files[i].file.name
+                    contentType: element.type,
+                    fileName: element.name
                 }
-                this.lessonService.getLessonAssignmentFileSigned(modal).subscribe((res) => {
-                    console.log(res);
+                this.lessonService.getLessonAssignmentFileSigned(modal).subscribe(async (res) => {
                     this.assignModal.filename = res.data.filename;
-                    let signUrl = res.data.signedurl;
-                    this.fileService.putFileOnBucket(signUrl, files[i].file).subscribe((res: any) => {
-                        switch (res.type) {
-                            case HttpEventType.Sent:
-                                this.uploadedPercentage = 0;
-                                this.showAssignmentProgress = true;
-                                this.utilService.showInfoToast("Notification", "Your file upaloding started.");
-                                break;
-                            case HttpEventType.Response:
-                                this.mode = "buffer";
-                                if (i === temp.length - 1) {
-                                    this.showAssignmentProgress = false;
-                                    this.isCallingApi = false;
-                                    this.utilService.showInfoToast("", "File uploaded successfully.");
-                                }
-                                console.log(res);
-                                if (files[i].file) {
-                                    this.file = files[i].file;
-                                    setTimeout(() => {
-                                        this.isCallingApi = true;
-                                        this.allSubscribers.push(this.fileService.SaveFileMetaData(this.assignModal).subscribe((res: any) => {
-                                            this.isCallingApi = false;
-                                            // for (let i = 0; i < res.body.data.length; i++) {
-                                            this.assignFilesId.push(res.data.id);
-                                            this.assignmentfiles.push(res.data);
-                                            this.tempfiles.push(res.data);
-                                            // }
-                                        }, err => {
-                                            this.isCallingApi = false;
-                                            this.utilService.showErrorCall(err);
-                                        }));
-                                    }, 200);
-                                }
-                                break;
-                            case 1: {
-                                if (Math.round(this.uploadedPercentage) !== Math.round(event['loaded'] / event['total'] * 100)) {
-                                    this.uploadedPercentage = event['loaded'] / event['total'] * 100;
-                                    if (this.uploadedPercentage == 100) {
-                                        this.mode = "indeterminate";
-                                    }
-                                }
-                                break;
-                            }
-                        }
-                    }, err => {
-                        this.isCallingApi = false;
-                        this.showAssignmentProgress = false;
-                        this.utilService.showErrorCall(err);
-                    })
-                })
+                    this.signUrl = res.data.signedurl;
+                    if (this.signUrl) {
+                        await this.putFileOnBucket(element, "docs", "", "", "7", res.data.filename);
+                    }
+                });
             }
             else if (ext === "pptx" || ext === "ppt" || ext === "pptm" || ext === "potx" || ext === "potm" || ext === "odp") {
                 this.assignModal = {};
                 this.assignModal.fileTypeId = "8";
                 let modal = {
                     fileTypeId: 8,
-                    contentType: files[i].file.type,
-                    fileName: files[i].file.name
+                    contentType: element.type,
+                    fileName: element.name
                 }
-                this.lessonService.getLessonAssignmentFileSigned(modal).subscribe((res) => {
-                    console.log(res);
+                this.lessonService.getLessonAssignmentFileSigned(modal).subscribe(async (res) => {
                     this.assignModal.filename = res.data.filename;
-                    let signUrl = res.data.signedurl;
-                    this.fileService.putFileOnBucket(signUrl, files[i].file).subscribe((res: any) => {
-                        switch (res.type) {
-                            case HttpEventType.Sent:
-                                this.uploadedPercentage = 0;
-                                this.showAssignmentProgress = true;
-                                this.utilService.showInfoToast("Notification", "Your file upaloding started.");
-                                break;
-                            case HttpEventType.Response:
-                                this.mode = "buffer";
-                                if (i === temp.length - 1) {
-                                    this.showAssignmentProgress = false;
-                                    this.isCallingApi = false;
-                                    this.utilService.showInfoToast("", "File uploaded successfully.");
-                                }
-                                console.log(res);
-                                if (files[i].file) {
-                                    this.file = files[i].file;
-                                    setTimeout(() => {
-                                        this.isCallingApi = true;
-                                        this.allSubscribers.push(this.fileService.SaveFileMetaData(this.assignModal).subscribe((res: any) => {
-                                            this.isCallingApi = false;
-                                            // for (let i = 0; i < res.body.data.length; i++) {
-                                            this.assignFilesId.push(res.data.id);
-                                            this.assignmentfiles.push(res.data);
-                                            this.tempfiles.push(res.data);
-                                            // }
-                                        }, err => {
-                                            this.isCallingApi = false;
-                                            this.utilService.showErrorCall(err);
-                                        }));
-                                    }, 200);
-                                }
-                                break;
-                            case 1: {
-                                if (Math.round(this.uploadedPercentage) !== Math.round(event['loaded'] / event['total'] * 100)) {
-                                    this.uploadedPercentage = event['loaded'] / event['total'] * 100;
-                                    if (this.uploadedPercentage == 100) {
-                                        this.mode = "indeterminate";
-                                    }
-                                }
-                                break;
-                            }
-                        }
-                    }, err => {
-                        this.isCallingApi = false;
-                        this.showAssignmentProgress = false;
-                        this.utilService.showErrorCall(err);
-                    })
-                })
+                    this.signUrl = res.data.signedurl;
+                    if (this.signUrl) {
+                        await this.putFileOnBucket(element, "ppt", "", "", "8", res.data.filename);
+                    }
+                });
             }
             else {
                 this.utilService.showErrorToast("wrong File Extension")
             }
-        }
+        });
     }
+
     assignmentfileSelected(event) {
         this.assignModal = {};
-        if (event.target.files && event.target.files.length > 0) {
-            // let tempcount = new Array(event.target.files.length).fill("");
-            // let tempduration = new Array(event.target.files.length).fill("");
-            // let tempdescription = new Array(event.target.files.length).fill("");
-            // let tempfiletypeId = new Array(event.target.files.length).fill("");
-            let files = []
-            let re = /(?:\.([^.]+))?$/;
-            for (let i = 0; i < event.target.files.length; i++) {
-                let ext = "";
-                ext = re.exec(event.target.files[i].name)[1];
-                files.push(event.target.files[i]);
-                if (event.target.files[i].type === "application/pdf") {
-                    this.assignModal = {};
-                    let reader: any = new FileReader();
-                    reader.readAsBinaryString(event.target.files[i]);
-                    reader.onloadend = () => {
-                        var count = reader.result.match(/\/Type[\s]*\/Page[^s]/g).length;
-                        this.assignModal.totalpages = count.toString();
-                        this.assignModal.fileTypeId = "1";
-                    }
-                    let modal = {
-                        fileTypeId: 1,
-                        contentType: event.target.files[i].type,
-                        fileName: event.target.files[i].name
-                    }
-                    this.isCallingApi = true;
-                    this.lessonService.getLessonAssignmentFileSigned(modal).subscribe((res) => {
-                        console.log(res);
-                        this.assignModal.filename = res.data.filename;
-                        let signUrl = res.data.signedurl;
-                        this.fileService.putFileOnBucket(signUrl, event.target.files[i]).subscribe((res: any) => {
-                            switch (res.type) {
-                                case HttpEventType.Sent:
-                                    this.uploadedPercentage = 0;
-                                    this.showAssignmentProgress = true;
-                                    this.utilService.showInfoToast("Notification", "Your file upaloding started.");
-                                    break;
-                                case HttpEventType.Response:
-                                    this.mode = "buffer";
-                                    if (i === event.target.files.length - 1) {
-                                        this.showAssignmentProgress = false;
-                                        this.isCallingApi = false;
-                                        this.utilService.showInfoToast("", "File uploaded successfully.");
-                                    }
-                                    console.log(res);
-                                    if (event.target.files[i]) {
-                                        this.file = event.target.files[i];
-                                        setTimeout(() => {
-                                            this.isCallingApi = true;
-                                            this.allSubscribers.push(this.fileService.SaveFileMetaData(this.assignModal).subscribe((res: any) => {
-                                                this.isCallingApi = false;
-                                                // for (let i = 0; i < res.body.data.length; i++) {
-                                                this.assignFilesId.push(res.data.id);
-                                                this.assignmentfiles.push(res.data);
-                                                this.tempfiles.push(res.data);
-                                                // }
-                                            }, err => {
-                                                this.isCallingApi = false;
-                                                this.utilService.showErrorCall(err);
-                                            }));
-                                        }, 200);
-                                    }
-                                    break;
-                                case 1: {
-                                    if (Math.round(this.uploadedPercentage) !== Math.round(event['loaded'] / event['total'] * 100)) {
-                                        this.uploadedPercentage = event['loaded'] / event['total'] * 100;
-                                        if (this.uploadedPercentage == 100) {
-                                            this.mode = "indeterminate";
-                                        }
-                                    }
-                                    break;
-                                }
-                            }
-                        }, err => {
-                            this.isCallingApi = false;
-                            this.showAssignmentProgress = false;
-                            this.utilService.showErrorCall(err);
-                        })
-                    })
-                }
-                else if (event.target.files[i].type === "video/mp4" || event.target.files[i].type === "video/webm") {
-                    this.assignModal = {};
-                    let fileInput: any = document.getElementById('mynAllVideo');
-                    fileInput.src = URL.createObjectURL(event.target.files[i]);
-                    fileInput.onloadeddata = (e) => {
-                        this.assignModal.duration = fileInput.duration.toString();
-                        this.assignModal.fileTypeId = "2";
-                    };
-                    let modal = {
-                        fileTypeId: 2,
-                        contentType: event.target.files[i].type,
-                        fileName: event.target.files[i].name
-                    }
-                    this.lessonService.getLessonAssignmentFileSigned(modal).subscribe((res) => {
-                        console.log(res);
-                        this.assignModal.filename = res.data.filename;
-                        let signUrl = res.data.signedurl;
-                        this.fileService.putFileOnBucket(signUrl, event.target.files[i]).subscribe((res: any) => {
-                            switch (res.type) {
-                                case HttpEventType.Sent:
-                                    this.uploadedPercentage = 0;
-                                    this.showAssignmentProgress = true;
-                                    this.utilService.showInfoToast("Notification", "Your file upaloding started.");
-                                    break;
-                                case HttpEventType.Response:
-                                    this.mode = "buffer";
-                                    if (i === event.target.files.length - 1) {
-                                        this.showAssignmentProgress = false;
-                                        this.isCallingApi = false;
-                                        this.utilService.showInfoToast("", "File uploaded successfully.");
-                                    }
-                                    console.log(res);
-                                    if (event.target.files[i]) {
-                                        this.file = event.target.files[i];
-                                        setTimeout(() => {
-                                            this.isCallingApi = true;
-                                            this.allSubscribers.push(this.fileService.SaveFileMetaData(this.assignModal).subscribe((res: any) => {
-                                                this.isCallingApi = false;
-                                                // for (let i = 0; i < res.body.data.length; i++) {
-                                                this.assignFilesId.push(res.data.id);
-                                                this.assignmentfiles.push(res.data);
-                                                this.tempfiles.push(res.data);
-                                                // }
-                                            }, err => {
-                                                this.isCallingApi = false;
-                                                this.utilService.showErrorCall(err);
-                                            }));
-                                        }, 200);
-                                    }
-                                    break;
-                                case 1: {
-                                    if (Math.round(this.uploadedPercentage) !== Math.round(event['loaded'] / event['total'] * 100)) {
-                                        this.uploadedPercentage = event['loaded'] / event['total'] * 100;
-                                        if (this.uploadedPercentage == 100) {
-                                            this.mode = "indeterminate";
-                                        }
-                                    }
-                                    break;
-                                }
-                            }
-                        }, err => {
-                            this.isCallingApi = false;
-                            this.showAssignmentProgress = false;
-                            this.utilService.showErrorCall(err);
-                        })
-                    })
-                }
-                else if (event.target.files[i].type === "image/png" || event.target.files[i].type === "image/jpeg") {
-                    this.assignModal = {};
-                    this.assignModal.fileTypeId = "3"
-                    let modal = {
-                        fileTypeId: 3,
-                        contentType: event.target.files[i].type,
-                        fileName: event.target.files[i].name
-                    }
-                    this.lessonService.getLessonAssignmentFileSigned(modal).subscribe((res) => {
-                        console.log(res);
-                        this.assignModal.filename = res.data.filename;
-                        let signUrl = res.data.signedurl;
-                        this.fileService.putFileOnBucket(signUrl, event.target.files[i]).subscribe((res: any) => {
-                            switch (res.type) {
-                                case HttpEventType.Sent:
-                                    this.uploadedPercentage = 0;
-                                    this.showAssignmentProgress = true;
-                                    this.utilService.showInfoToast("Notification", "Your file upaloding started.");
-                                    break;
-                                case HttpEventType.Response:
-                                    this.mode = "buffer";
-                                    if (i === event.target.files.length - 1) {
-                                        this.showAssignmentProgress = false;
-                                        this.isCallingApi = false;
-                                        this.utilService.showInfoToast("", "File uploaded successfully.");
-                                    }
-                                    console.log(res);
-                                    if (event.target.files[i]) {
-                                        this.file = event.target.files[i];
-                                        setTimeout(() => {
-                                            this.isCallingApi = true;
-                                            this.allSubscribers.push(this.fileService.SaveFileMetaData(this.assignModal).subscribe((res: any) => {
-                                                this.isCallingApi = false;
-                                                // for (let i = 0; i < res.body.data.length; i++) {
-                                                this.assignFilesId.push(res.data.id);
-                                                this.assignmentfiles.push(res.data);
-                                                this.tempfiles.push(res.data);
-                                                // }
-                                            }, err => {
-                                                this.isCallingApi = false;
-                                                this.utilService.showErrorCall(err);
-                                            }));
-                                        }, 200);
-                                    }
-                                    break;
-                                case 1: {
-                                    if (Math.round(this.uploadedPercentage) !== Math.round(event['loaded'] / event['total'] * 100)) {
-                                        this.uploadedPercentage = event['loaded'] / event['total'] * 100;
-                                        if (this.uploadedPercentage == 100) {
-                                            this.mode = "indeterminate";
-                                        }
-                                    }
-                                    break;
-                                }
-                            }
-                        }, err => {
-                            this.isCallingApi = false;
-                            this.showAssignmentProgress = false;
-                            this.utilService.showErrorCall(err);
-                        })
-                    })
-                }
-                else if (ext === "xlsx" || ext === "xls" || ext === "csv" || ext == "dbf" || ext === "dif" || ext === "ods" || ext === "prn" || ext === "slk" || ext === "xla" || ext === "xlam" || ext === "xlsb" || ext === "xlsm" || ext === "xlt" || ext === "xltm" || ext === "xltx" || ext === "xlw") {
-                    this.assignModal = {};
-                    this.assignModal.fileTypeId = "6";
-                    let modal = {
-                        fileTypeId: 6,
-                        contentType: event.target.files[i].type,
-                        fileName: event.target.files[i].name
-                    }
-                    this.lessonService.getLessonAssignmentFileSigned(modal).subscribe((res) => {
-                        console.log(res);
-                        this.assignModal.filename = res.data.filename;
-                        let signUrl = res.data.signedurl;
-                        this.fileService.putFileOnBucket(signUrl, event.target.files[i]).subscribe((res: any) => {
-                            switch (res.type) {
-                                case HttpEventType.Sent:
-                                    this.uploadedPercentage = 0;
-                                    this.showAssignmentProgress = true;
-                                    this.utilService.showInfoToast("Notification", "Your file upaloding started.");
-                                    break;
-                                case HttpEventType.Response:
-                                    this.mode = "buffer";
-                                    if (i === event.target.files.length - 1) {
-                                        this.showAssignmentProgress = false;
-                                        this.isCallingApi = false;
-                                        this.utilService.showInfoToast("", "File uploaded successfully.");
-                                    }
-                                    console.log(res);
-                                    if (event.target.files[i]) {
-                                        this.file = event.target.files[i];
-                                        setTimeout(() => {
-                                            this.isCallingApi = true;
-                                            this.allSubscribers.push(this.fileService.SaveFileMetaData(this.assignModal).subscribe((res: any) => {
-                                                this.isCallingApi = false;
-                                                // for (let i = 0; i < res.body.data.length; i++) {
-                                                this.assignFilesId.push(res.data.id);
-                                                this.assignmentfiles.push(res.data);
-                                                this.tempfiles.push(res.data);
-                                                // }
-                                            }, err => {
-                                                this.isCallingApi = false;
-                                                this.utilService.showErrorCall(err);
-                                            }));
-                                        }, 200);
-                                    }
-                                    break;
-                                case 1: {
-                                    if (Math.round(this.uploadedPercentage) !== Math.round(event['loaded'] / event['total'] * 100)) {
-                                        this.uploadedPercentage = event['loaded'] / event['total'] * 100;
-                                        if (this.uploadedPercentage == 100) {
-                                            this.mode = "indeterminate";
-                                        }
-                                    }
-                                    break;
-                                }
-                            }
-                        }, err => {
-                            this.isCallingApi = false;
-                            this.showAssignmentProgress = false;
-                            this.utilService.showErrorCall(err);
-                        })
-                    })
-                }
-                else if (ext === "docs" || ext === "docx" || ext === "doc" || ext === "docm" || ext === "dot" || ext === "dotm" || ext === "dotx" || ext === "odt" || ext === "rtf" || ext === "txt" || ext === "wps" || ext === "xml" || ext === "xps") {
-                    this.assignModal = {};
-                    this.assignModal.fileTypeId = "7";
-                    let modal = {
-                        fileTypeId: 7,
-                        contentType: event.target.files[i].type,
-                        fileName: event.target.files[i].name
-                    }
-                    this.lessonService.getLessonAssignmentFileSigned(modal).subscribe((res) => {
-                        console.log(res);
-                        this.assignModal.filename = res.data.filename;
-                        let signUrl = res.data.signedurl;
-                        this.fileService.putFileOnBucket(signUrl, event.target.files[i]).subscribe((res: any) => {
-                            switch (res.type) {
-                                case HttpEventType.Sent:
-                                    this.uploadedPercentage = 0;
-                                    this.showAssignmentProgress = true;
-                                    this.utilService.showInfoToast("Notification", "Your file upaloding started.");
-                                    break;
-                                case HttpEventType.Response:
-                                    this.mode = "buffer";
-                                    if (i === event.target.files.length - 1) {
-                                        this.showAssignmentProgress = false;
-                                        this.isCallingApi = false;
-                                        this.utilService.showInfoToast("", "File uploaded successfully.");
-                                    }
-                                    console.log(res);
-                                    if (event.target.files[i]) {
-                                        this.file = event.target.files[i];
-                                        setTimeout(() => {
-                                            this.isCallingApi = true;
-                                            this.allSubscribers.push(this.fileService.SaveFileMetaData(this.assignModal).subscribe((res: any) => {
-                                                this.isCallingApi = false;
-                                                // for (let i = 0; i < res.body.data.length; i++) {
-                                                this.assignFilesId.push(res.data.id);
-                                                this.assignmentfiles.push(res.data);
-                                                this.tempfiles.push(res.data);
-                                                // }
-                                            }, err => {
-                                                this.isCallingApi = false;
-                                                this.utilService.showErrorCall(err);
-                                            }));
-                                        }, 200);
-                                    }
-                                    break;
-                                case 1: {
-                                    if (Math.round(this.uploadedPercentage) !== Math.round(event['loaded'] / event['total'] * 100)) {
-                                        this.uploadedPercentage = event['loaded'] / event['total'] * 100;
-                                        if (this.uploadedPercentage == 100) {
-                                            this.mode = "indeterminate";
-                                        }
-                                    }
-                                    break;
-                                }
-                            }
-                        }, err => {
-                            this.isCallingApi = false;
-                            this.showAssignmentProgress = false;
-                            this.utilService.showErrorCall(err);
-                        })
-                    })
-                }
-                else if (ext === "pptx" || ext === "ppt" || ext === "pptm" || ext === "potx" || ext === "potm" || ext === "odp") {
-                    this.assignModal = {};
-                    this.assignModal.fileTypeId = "8";
-                    let modal = {
-                        fileTypeId: 8,
-                        contentType: event.target.files[i].type,
-                        fileName: event.target.files[i].name
-                    }
-                    this.lessonService.getLessonAssignmentFileSigned(modal).subscribe((res) => {
-                        console.log(res);
-                        this.assignModal.filename = res.data.filename;
-                        let signUrl = res.data.signedurl;
-                        this.fileService.putFileOnBucket(signUrl, event.target.files[i]).subscribe((res: any) => {
-                            switch (res.type) {
-                                case HttpEventType.Sent:
-                                    this.uploadedPercentage = 0;
-                                    this.showAssignmentProgress = true;
-                                    this.utilService.showInfoToast("Notification", "Your file upaloding started.");
-                                    break;
-                                case HttpEventType.Response:
-                                    this.mode = "buffer";
-                                    if (i === event.target.files.length - 1) {
-                                        this.showAssignmentProgress = false;
-                                        this.isCallingApi = false;
-                                        this.utilService.showInfoToast("", "File uploaded successfully.");
-                                    }
-                                    console.log(res);
-                                    if (event.target.files[i]) {
-                                        this.file = event.target.files[i];
-                                        setTimeout(() => {
-                                            this.isCallingApi = true;
-                                            this.allSubscribers.push(this.fileService.SaveFileMetaData(this.assignModal).subscribe((res: any) => {
-                                                this.isCallingApi = false;
-                                                // for (let i = 0; i < res.body.data.length; i++) {
-                                                this.assignFilesId.push(res.data.id);
-                                                this.assignmentfiles.push(res.data);
-                                                this.tempfiles.push(res.data);
-                                                // }
-                                            }, err => {
-                                                this.isCallingApi = false;
-                                                this.utilService.showErrorCall(err);
-                                            }));
-                                        }, 200);
-                                    }
-                                    break;
-                                case 1: {
-                                    if (Math.round(this.uploadedPercentage) !== Math.round(event['loaded'] / event['total'] * 100)) {
-                                        this.uploadedPercentage = event['loaded'] / event['total'] * 100;
-                                        if (this.uploadedPercentage == 100) {
-                                            this.mode = "indeterminate";
-                                        }
-                                    }
-                                    break;
-                                }
-                            }
-                        }, err => {
-                            this.isCallingApi = false;
-                            this.showAssignmentProgress = false;
-                            this.utilService.showErrorCall(err);
-                        })
-                    })
-                }
-                else {
-                    this.utilService.showErrorToast("wrong File Extension")
-                }
-            }
+        let files = []
+        let tempFiles = [];
+        let re = /(?:\.([^.]+))?$/;
+        for (let i = 0; i < event.target.files.length; i++) {
+            tempFiles.push(event.target.files[i])
         }
+        tempFiles.forEach(element => {
+            let ext = "";
+            this.signUrl = "";
+            this.assignModal.filename = "";
+            ext = re.exec(element.name)[1];
+            files.push(element);
+            if (element.type === "application/pdf") {
+                this.assignModal = {};
+                let reader: any = new FileReader();
+                reader.readAsBinaryString(element);
+                reader.onloadend = () => {
+                    var count = reader.result.match(/\/Type[\s]*\/Page[^s]/g).length;
+                    this.assignModal.totalpages = count.toString();
+                    this.assignModal.fileTypeId = "1";
+                }
+                let modal = {
+                    fileTypeId: 1,
+                    contentType: element.type,
+                    fileName: element.name
+                }
+                this.isCallingApi = true;
+                this.signUrl = "";
+                this.lessonService.getLessonAssignmentFileSigned(modal).subscribe(async (res) => {
+                    this.assignModal.filename = res.data.filename;
+                    this.signUrl = res.data.signedurl;
+                    if (this.signUrl) {
+                        await this.putFileOnBucket(element, "pdf", this.assignModal.totalpages, "", "1", res.data.filename);
+                    }
+                });
+            }
+            else if (element.type === "video/mp4" || element.type === "video/webm") {
+                this.assignModal = {};
+                this.signUrl = "";
+                let fileInput: any = document.getElementById('mynAllVideo');
+                fileInput.src = URL.createObjectURL(element);
+                fileInput.onloadeddata = (e) => {
+                    this.assignModal.duration = fileInput.duration.toString();
+                    this.assignModal.fileTypeId = "2";
+                };
+                let modal = {
+                    fileTypeId: 2,
+                    contentType: element.type,
+                    fileName: element.name
+                }
+                this.lessonService.getLessonAssignmentFileSigned(modal).subscribe(async (res) => {
+                    this.assignModal.filename = res.data.filename;
+                    this.signUrl = res.data.signedurl;
+                    if (this.signUrl) {
+                        await this.putFileOnBucket(element, "video", "", this.assignModal.duration, "2", res.data.filename);
+                    }
+                });
+            }
+            else if (element.type === "image/png" || element.type === "image/jpeg") {
+                this.assignModal = {};
+                this.signUrl = "";
+                this.assignModal.fileTypeId = "3"
+                let modal = {
+                    fileTypeId: 3,
+                    contentType: element.type,
+                    fileName: element.name
+                }
+                this.lessonService.getLessonAssignmentFileSigned(modal).subscribe(async (res) => {
+                    this.assignModal.filename = res.data.filename;
+                    this.signUrl = res.data.signedurl;
+                    if (this.signUrl) {
+                        await this.putFileOnBucket(element, "image", "", "", "3", res.data.filename);
+                    }
+                });
+            }
+            else if (ext === "xlsx" || ext === "xls" || ext === "csv" || ext == "dbf" || ext === "dif" || ext === "ods" || ext === "prn" || ext === "slk" || ext === "xla" || ext === "xlam" || ext === "xlsb" || ext === "xlsm" || ext === "xlt" || ext === "xltm" || ext === "xltx" || ext === "xlw") {
+                this.assignModal = {};
+                this.assignModal.fileTypeId = "6";
+                let modal = {
+                    fileTypeId: 6,
+                    contentType: element.type,
+                    fileName: element.name
+                }
+                this.lessonService.getLessonAssignmentFileSigned(modal).subscribe(async (res) => {
+                    this.assignModal.filename = res.data.filename;
+                    this.signUrl = res.data.signedurl;
+                    if (this.signUrl) {
+                        await this.putFileOnBucket(element, "csv", "", "", "6", res.data.filename);
+                    }
+                });
+            }
+            else if (ext === "docs" || ext === "docx" || ext === "doc" || ext === "docm" || ext === "dot" || ext === "dotm" || ext === "dotx" || ext === "odt" || ext === "rtf" || ext === "txt" || ext === "wps" || ext === "xml" || ext === "xps") {
+                this.assignModal = {};
+                this.assignModal.fileTypeId = "7";
+                let modal = {
+                    fileTypeId: 7,
+                    contentType: element.type,
+                    fileName: element.name
+                }
+                this.lessonService.getLessonAssignmentFileSigned(modal).subscribe(async (res) => {
+                    this.assignModal.filename = res.data.filename;
+                    this.signUrl = res.data.signedurl;
+                    if (this.signUrl) {
+                        await this.putFileOnBucket(element, "docs", "", "", "7", res.data.filename);
+                    }
+                });
+            }
+            else if (ext === "pptx" || ext === "ppt" || ext === "pptm" || ext === "potx" || ext === "potm" || ext === "odp") {
+                this.assignModal = {};
+                this.assignModal.fileTypeId = "8";
+                let modal = {
+                    fileTypeId: 8,
+                    contentType: element.type,
+                    fileName: element.name
+                }
+                this.lessonService.getLessonAssignmentFileSigned(modal).subscribe(async (res) => {
+                    this.assignModal.filename = res.data.filename;
+                    this.signUrl = res.data.signedurl;
+                    if (this.signUrl) {
+                        await this.putFileOnBucket(element, "ppt", "", "", "8", res.data.filename);
+                    }
+                });
+            }
+            else {
+                this.utilService.showErrorToast("wrong File Extension")
+            }
+        });
     }
+
+
     assignmentFilesDropped(files: FileHandle[]): void {
         this.assignModal = {};
         let temp: any = [];
@@ -1325,12 +885,16 @@ export class AddLessonComponent implements OnInit {
                 this.lessonModel[key] = res.data[key];
             });
             this.lessonModel.chapterId = this.lessonModel.chapter.id;
-            if (res.data.assignment && res.data.assignment.assignmentfiles.length > 0) {
+            if (res.data.assignment) {
                 // this.assignmentfiles = res.data.assignment.assignmentfiles;
                 this.assignmentid = res.data.assignment.id;
                 this.assignmentName = res.data.assignment.name;
                 this.assignmentDesc = res.data.assignment.description;
                 this.assigncode = res.data.assignment.code;
+
+            }
+            if (res.data.assignment.assignmentfiles.length > 0) {
+
                 this.tempfiles = res.data.assignment.assignmentfiles;
                 let assignIds = [];
                 for (let ind = 0; ind < res.data.assignment.assignmentfiles.length; ind++) {
