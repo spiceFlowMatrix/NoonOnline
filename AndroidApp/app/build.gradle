@@ -211,7 +211,7 @@ dependencies {
     //For MutiselectitemSpinner
     implementation 'com.github.abumoallim:Android-Multi-Select-Dialog:v1.9'
     implementation 'com.google.firebase:firebase-auth:19.3.0'
-
+    implementation 'com.google.android.gms:play-services-auth:18.0.0'
 }
 
 apply plugin: 'com.google.gms.google-services'

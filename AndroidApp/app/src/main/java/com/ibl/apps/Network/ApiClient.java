@@ -129,20 +129,20 @@ public class ApiClient {
             }
         });
 
-        try {
-            // Tell the URLConnection to use a SocketFactory from our SSLContext
-            httpClient.sslSocketFactory(getSSLSocketFactory(context));
-        } catch (CertificateException e) {
-            e.printStackTrace();
-        } catch (KeyStoreException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (KeyManagementException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            // Tell the URLConnection to use a SocketFactory from our SSLContext
+//            httpClient.sslSocketFactory(getSSLSocketFactory(context));
+//        } catch (CertificateException e) {
+//            e.printStackTrace();
+//        } catch (KeyStoreException e) {
+//            e.printStackTrace();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        } catch (NoSuchAlgorithmException e) {
+//            e.printStackTrace();
+//        } catch (KeyManagementException e) {
+//            e.printStackTrace();
+//        }
 
         okHttpClient = httpClient.build();
     }
