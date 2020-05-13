@@ -8,17 +8,17 @@
     <!--    <string name="BASE_URL" translatable="false">https://coreapistaging.noon-online.com/api/v1/</string>-->
     <!--    <string name="BASE_URL" translatable="false">https://dari-production-apps.noon-online.com/api/v1/</string>-->
     <string name="BASE_URL" translatable="false">https://dari-staging-apps.noon-online.com/api/v1/</string>
-    <!--Encrypt Decrypt API KEY for 30 days trial  [Valid until: April 30, 2020]-->
+    <!--Encrypt Decrypt API KEY for 30 days trial  [Valid until: June 12, 2020]-->
     <!-- Refere Link http://libeasy.alwaysdata.net/libmedia/license/ -->
-    <string name="YOUR_API_KEY" translatable="false">FddCGAkGxZv/7pSkymTZ6X+jB28WxDbQk0XzU0TO3+9YkNEQbkClbZRlb6HmjtBrtKWNhgqfl3J9q9i4GENx8V6ppKZe0TGmxTHEiscu2YrSLMjNyDfHw5Rqh8rJMcc=</string>
+    <string name="YOUR_API_KEY" translatable="false">ff44fHAn1qPMEBV6qrOw6CvAozHc+V05kjTfif+KNVXhWcAHnGrRYg3SnNryLtC/EjLonQM7jx3edbuNdyLRkV673Ale42kJajHW8mguy/J9LNq1ZzfVuztqlbJmMdU=</string>
     <!-- <string name="app_scheme" translatable="false">noon</string>
      <string name="com_auth0_client_id" translatable="false">2a7660n1nw4iAP5sOoYyHUlAIgRGfzeo</string>
      <string name="com_auth0_domain" translatable="false">satyamdev.auth0.com</string>
      <string name="com_auth0_audience" translatable="false"> https://satyamdev.auth0.com/api/v2/</string>
      <string name="com_auth0_database_connection" translatable="false">Username-Password-Authentication</string>
      <string name="com_auth0_scope" translatable="false">openid offline_access</string>
-     <string name="BASE_URL" translatable="false">http://192.168.22.11:8070/api/v1/</string>
-     &lt;!&ndash;Encrypt Decrypt API KEY for 30 days trial  [Valid until: April 30, 2020]&ndash;&gt;
+     <string name="BASE_URL" translatable="false">http://3.6.218.28/api/v1/</string>
+     &lt;!&ndash;Encrypt Decrypt API KEY for 30 days trial  [Valid until: June 12, 2020]&ndash;&gt;
      &lt;!&ndash; Refere Link http://libeasy.alwaysdata.net/libmedia/license/ &ndash;&gt;
-     <string name="YOUR_API_KEY" translatable="false">lXW9sFHf9d8YDIq/56MsL6dl7gTgR9Gwoj7Z0LV2Po2O1yCAClWNnhOe5OJzh8LGR9rLfX1TXeQ8xoxfAQw/916DMzZeqsA2VTHuHVcu8x1CLOJaWDftVARqrV1ZMe0=</string>-->
+     <string name="YOUR_API_KEY" translatable="false">ff44fHAn1qPMEBV6qrOw6CvAozHc+V05kjTfif+KNVXhWcAHnGrRYg3SnNryLtC/EjLonQM7jx3edbuNdyLRkV673Ale42kJajHW8mguy/J9LNq1ZzfVuztqlbJmMdU=</string>-->
 </resources>

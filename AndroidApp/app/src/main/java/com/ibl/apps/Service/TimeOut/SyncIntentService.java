@@ -56,6 +56,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -385,7 +386,7 @@ public class SyncIntentService extends JobIntentService implements DroidListener
                         try {
                             Date ExpiresAtDate = null;
                             Date CurrantAtDate = null;
-                            SimpleDateFormat inputFormat = new SimpleDateFormat("E MMM dd HH:mm:ss Z yyyy");
+                            SimpleDateFormat inputFormat = new SimpleDateFormat("E MMM dd HH:mm:ss Z yyyy", Locale.ENGLISH);
                             ExpiresAtDate = inputFormat.parse(authTokenObject.getExpiresAt());
                             CurrantAtDate = new Date();
 
