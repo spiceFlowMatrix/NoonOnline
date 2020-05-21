@@ -542,7 +542,7 @@ public class SyncIntentService extends JobIntentService implements DroidListener
     public void callApiProgessSyncAdd(List<LessonProgress> lessonProgressList, List<QuizUserResult> quizUserResults) {
 
         try {
-LessonDatabaseRepository lessonDatabaseRepository = new LessonDatabaseRepository();
+            LessonDatabaseRepository lessonDatabaseRepository = new LessonDatabaseRepository();
             JsonObject noonAppFullSyncObject = new JsonObject();
             JsonArray lessonProgressArray = PrefUtils.convertToJsonArray(lessonProgressList);
             noonAppFullSyncObject.add(Const.PROGRESSDATA, lessonProgressArray);
@@ -553,45 +553,45 @@ LessonDatabaseRepository lessonDatabaseRepository = new LessonDatabaseRepository
             //Log.e(Const.LOG_NOON_TAG, "=====quizResultArray===" + quizResultArray);
             Log.e(Const.LOG_NOON_TAG, "=====noonAppFullSyncObject===" + noonAppFullSyncObject);
             LessonRepository lessonRepository = new LessonRepository();
-//            disposable.add(lessonRepository.ProgessSyncAdd(noonAppFullSyncObject)
-//                    .subscribeOn(Schedulers.io())
-//                    .observeOn(AndroidSchedulers.mainThread())
-//                    .subscribeWith(new DisposableSingleObserver<LessonProgress>() {
-//                        @Override
-//                        public void onSuccess(LessonProgress lessonProgress) {
-//
-//                            if (lessonProgressList != null && lessonProgressList.size() != 0) {
-//                                for (int i = 0; i < lessonProgressList.size(); i++) {
-//                                    String quizID = lessonProgressList.get(i).getQuizId();
-//                                    String lessonID = lessonProgressList.get(i).getLessonId();
-//                                    if (quizID != null && !TextUtils.isEmpty(quizID)) {
-//                                        lessonDatabaseRepository.updateQuizIdisStatus(quizID, true, userId);
-//                                    } else {
-//                                        lessonDatabaseRepository.updateLessonIdisStatus(lessonID, true, userId);
-//                                    }
-//                                }
-//                            }
-//                            quizDatabaseRepository = new QuizDatabaseRepository();
-//                            if (quizUserResults != null && quizUserResults.size() != 0) {
-//                                for (int i = 0; i < quizUserResults.size(); i++) {
-//                                    String quizID = quizUserResults.get(i).getQuizId();
-//                                    quizDatabaseRepository.updatelQuizUserResultStatus(true, quizID, userId);
-//                                }
-//                            }
-//                        }
-//
-//                        @Override
-//                        public void onError(Throwable e) {
-//                            try {
-//                                HttpException error = (HttpException) e;
-//                                LessonProgress lessonProgress = new Gson().fromJson(Objects.requireNonNull(error.response().errorBody()).string(), LessonProgress.class);
-//                                //Log.e(Const.LOG_NOON_TAG, "==lessonProgress==" + lessonProgress);
-//                            } catch (Exception e1) {
-//                                e1.printStackTrace();
-//
-//                            }
-//                        }
-//                    }));
+            disposable.add(lessonRepository.ProgessSyncAdd(noonAppFullSyncObject)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeWith(new DisposableSingleObserver<LessonProgress>() {
+                        @Override
+                        public void onSuccess(LessonProgress lessonProgress) {
+
+                            if (lessonProgressList != null && lessonProgressList.size() != 0) {
+                                for (int i = 0; i < lessonProgressList.size(); i++) {
+                                    String quizID = lessonProgressList.get(i).getQuizId();
+                                    String lessonID = lessonProgressList.get(i).getLessonId();
+                                    if (quizID != null && !TextUtils.isEmpty(quizID)) {
+                                        lessonDatabaseRepository.updateQuizIdisStatus(quizID, true, userId);
+                                    } else {
+                                        lessonDatabaseRepository.updateLessonIdisStatus(lessonID, true, userId);
+                                    }
+                                }
+                            }
+                            quizDatabaseRepository = new QuizDatabaseRepository();
+                            if (quizUserResults != null && quizUserResults.size() != 0) {
+                                for (int i = 0; i < quizUserResults.size(); i++) {
+                                    String quizID = quizUserResults.get(i).getQuizId();
+                                    quizDatabaseRepository.updatelQuizUserResultStatus(true, quizID, userId);
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            try {
+                                HttpException error = (HttpException) e;
+                                LessonProgress lessonProgress = new Gson().fromJson(Objects.requireNonNull(error.response().errorBody()).string(), LessonProgress.class);
+                                //Log.e(Const.LOG_NOON_TAG, "==lessonProgress==" + lessonProgress);
+                            } catch (Exception e1) {
+                                e1.printStackTrace();
+
+                            }
+                        }
+                    }));
 
 
         } catch (Exception e) {

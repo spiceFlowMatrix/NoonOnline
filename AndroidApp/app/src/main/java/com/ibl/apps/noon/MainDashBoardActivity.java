@@ -533,6 +533,7 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
         mainDashboardLayoutBinding.appBarLayout.logOutBtn.setOnClickListener(this);
         mainDashboardLayoutBinding.appBarLayout.editprofileBtn.setOnClickListener(this);
         mainDashboardLayoutBinding.appBarLayout.btnNotification.setOnClickListener(this);
+        mainDashboardLayoutBinding.appBarLayout.cachebtn.setOnClickListener(this);
     }
 
     @Override
@@ -550,6 +551,11 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
             case R.id.btnNotification:
                 Intent i3 = new Intent(MainDashBoardActivity.this, NotificationActivity.class);
                 startActivity(i3);
+                break;
+
+            case R.id.cachebtn:
+                Intent cacheIntent = new Intent(MainDashBoardActivity.this, CacheEventsListActivity.class);
+                startActivity(cacheIntent);
                 break;
             case R.id.feedbackbtn:
                 if (isNetworkAvailable(MainDashBoardActivity.this)) {
@@ -572,7 +578,6 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
                     profileFragment.hideVisibleLay(true);
                 }
                 break;
-
         }
     }
 

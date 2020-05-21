@@ -60,16 +60,19 @@ import com.ibl.apps.Model.CoursePriviewObject;
 import com.ibl.apps.Model.DownloadQueueObject;
 import com.ibl.apps.Model.ProgressItem;
 import com.ibl.apps.Model.QuizMainObject;
+import com.ibl.apps.Model.RestResponse;
 import com.ibl.apps.QuizManament.QuizRepository;
 import com.ibl.apps.RoomDatabase.dao.courseManagementDatabase.CourseDatabaseRepository;
 import com.ibl.apps.RoomDatabase.dao.lessonManagementDatabase.LessonDatabaseRepository;
 import com.ibl.apps.RoomDatabase.dao.quizManagementDatabase.QuizDatabaseRepository;
+import com.ibl.apps.RoomDatabase.dao.syncAPIManagementDatabase.SyncAPIDatabaseRepository;
 import com.ibl.apps.RoomDatabase.entity.ChapterProgress;
 import com.ibl.apps.RoomDatabase.entity.FileProgress;
 import com.ibl.apps.RoomDatabase.entity.LessonNewProgress;
 import com.ibl.apps.RoomDatabase.entity.LessonProgress;
 import com.ibl.apps.RoomDatabase.entity.QuizProgress;
 import com.ibl.apps.RoomDatabase.entity.QuizUserResult;
+import com.ibl.apps.RoomDatabase.entity.SyncAPITable;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
 import com.ibl.apps.noon.AssignmentDetailActivity;
 import com.ibl.apps.noon.ChapterActivity;
@@ -182,6 +185,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
     private CourseDatabaseRepository courseDatabaseRepository;
     private LessonDatabaseRepository lessonDatabaseRepository;
     Observer<Integer> observer;
+    private SyncAPIDatabaseRepository syncAPIDatabaseRepository;
 
     public CourseItemFragment() {
         // Required empty public constructor
@@ -254,6 +258,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
         quizDatabaseRepository = new QuizDatabaseRepository();
         courseDatabaseRepository = new CourseDatabaseRepository();
         lessonDatabaseRepository = new LessonDatabaseRepository();
+        syncAPIDatabaseRepository = new SyncAPIDatabaseRepository();
 
         queueArray.clear();
         hashMap.clear();
@@ -529,7 +534,18 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
             new setLocalDataTask(new CourseItemAsyncResponse() {
                 @Override
                 public CoursePriviewObject getCoursePriviewObject(CoursePriviewObject coursePriviewObject) {
-
+                    if (fileProgressList.size() > 0) {
+                        callApiSyncFiles(fileProgressList);
+                    }
+                    if (lessonProgressList.size() > 0) {
+                        callApiSyncLessonProgress(lessonProgressList);
+                    }
+                    if (quizProgressList.size() > 0) {
+                        callApiSyncQuiz(quizProgressList);
+                    }
+                    if (chapterProgressList.size() > 0) {
+                        callApiSyncChapter(chapterProgressList);
+                    }
                     if (coursePriviewObject != null) {
                         courseItemListAdapter.notifyDataSetChanged();
                     } else {
@@ -653,35 +669,49 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                 }
             }
         }
-        try {
 
-        } catch (JsonSyntaxException e) {
-            e.printStackTrace();
-        }
+        disposable.add(lessonRepository.getLessonProgressSync(array)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(new DisposableSingleObserver<RestResponse>() {
+                    @Override
+                    public void onSuccess(RestResponse restResponse) {
+                        if (restResponse.getResponse_code().equals("0")) {
+                            Log.e("getLessonProgressSync", "onSuccess: " + array.get(0).getAsString());
+                            lessonProgressList.clear();
+                        }
+                    }
 
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.e("onError", "===callApiSyncLessonProgress===: " + e.getMessage());
+                        try {
+                            if (!userId.equals("")) {
+                                SyncAPITable syncAPITable = new SyncAPITable();
 
-//        disposable.add(lessonRepository.getLessonProgressSync(array).subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribeWith(new DisposableSingleObserver<RestResponse>() {
-//                    @Override
-//                    public void onSuccess(RestResponse restResponse) {
-//                        if (restResponse.getResponse_code().equals("0")) {
-//                            lessonProgressList.clear();
-//                        }
-//                    }
-//
-//                    @Override
-//                    public void onError(Throwable e) {
-//                        Log.e("onError", "===callApiSyncLessonProgress===: " + e.getMessage());
-//                    }
-//                }));
+                                syncAPITable.setApi_name("Lesson Progressed");
+                                syncAPITable.setEndpoint_url("LessonProgress/LessonProgressSync");
+                                syncAPITable.setParameters(String.valueOf(array));
+                                syncAPITable.setHeaders(PrefUtils.getAuthid(getActivity()));
+                                syncAPITable.setStatus("pending");
+                                syncAPITable.setDescription(e.getMessage());
+                                syncAPITable.setCreated_time("20 May");
+                                syncAPITable.setUserid(Integer.parseInt(userId));
+                                syncAPIDatabaseRepository.insertSyncData(syncAPITable);
+                            }
+                        } catch (JsonSyntaxException exeption) {
+                            exeption.printStackTrace();
+                        }
+
+                    }
+                }));
     }
 
     private void callApiSyncChapter(ArrayList<ChapterProgress> chapterprogress) {
         JsonArray array = new JsonArray();
         if (!chapterprogress.isEmpty()) {
             for (int i = 0; i < chapterprogress.size(); i++) {
-                JsonObject jsonObject = new JsonObject();
+                JsonObject jsonObject = new JsonObject();//done ?
                 try {
                     jsonObject.addProperty("courseid", Integer.parseInt(chapterprogress.get(i).getCourseId()));
                     jsonObject.addProperty("chapterid", Integer.parseInt(chapterprogress.get(i).getChapterId()));
@@ -695,21 +725,38 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
 
         }
 
-//        disposable.add(lessonRepository.getChapterProgressSync(array).subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribeWith(new DisposableSingleObserver<RestResponse>() {
-//                    @Override
-//                    public void onSuccess(RestResponse restResponse) {
-//                        if (restResponse.getResponse_code().equals("0")) {
-//                            chapterProgressList.clear();
-//                        }
-//                    }
-//
-//                    @Override
-//                    public void onError(Throwable e) {
-//                        Log.e("onError", "===callApiSyncChapter===: " + e.getMessage());
-//                    }
-//                }));
+        disposable.add(lessonRepository.getChapterProgressSync(array).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(new DisposableSingleObserver<RestResponse>() {
+                    @Override
+                    public void onSuccess(RestResponse restResponse) {
+                        if (restResponse.getResponse_code().equals("0")) {
+                            chapterProgressList.clear();
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.e("onError", "===callApiSyncChapter===: " + e.getMessage());
+                        try {
+                            if (!userId.equals("")) {
+                                SyncAPITable syncAPITable = new SyncAPITable();
+
+                                syncAPITable.setApi_name("Chapter Progressed");
+                                syncAPITable.setEndpoint_url("ChapterProgress/ChapterProgressSync");
+                                syncAPITable.setParameters(String.valueOf(array));
+                                syncAPITable.setHeaders(PrefUtils.getAuthid(getActivity()));
+                                syncAPITable.setStatus("pending");
+                                syncAPITable.setDescription(e.getMessage());
+                                syncAPITable.setCreated_time("20 May");
+                                syncAPITable.setUserid(Integer.parseInt(userId));
+                                syncAPIDatabaseRepository.insertSyncData(syncAPITable);
+                            }
+                        } catch (JsonSyntaxException exeption) {
+                            exeption.printStackTrace();
+                        }
+                    }
+                }));
     }
 
     private void callApiSyncFiles(ArrayList<FileProgress> fileProgressList) {
@@ -731,21 +778,39 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
             }
         }
 
-//        disposable.add(lessonRepository.getFileProgressSync(array).subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribeWith(new DisposableSingleObserver<RestResponse>() {
-//                    @Override
-//                    public void onSuccess(RestResponse restResponse) {
-//                        if (restResponse.getResponse_code().equals("0")) {
-//                            fileProgressList.clear();
-//                        }
-//                    }
-//
-//                    @Override
-//                    public void onError(Throwable e) {
-//                        Log.e("onError", "====callApiSyncFiles=====: " + e.getMessage());
-//                    }
-//                }));
+        disposable.add(lessonRepository.getFileProgressSync(array).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(new DisposableSingleObserver<RestResponse>() {
+                    @Override
+                    public void onSuccess(RestResponse restResponse) {
+                        if (restResponse.getResponse_code().equals("0")) {
+                            fileProgressList.clear();
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.e("onError", "====callApiSyncFiles=====: " + e.getMessage());
+                        try {
+                            if (!userId.equals("")) {
+                                SyncAPITable syncAPITable = new SyncAPITable();
+
+                                syncAPITable.setApi_name("File Progressed");
+                                syncAPITable.setEndpoint_url("FileProgress/FileProgressSync");
+                                syncAPITable.setParameters(String.valueOf(array));
+                                syncAPITable.setHeaders(PrefUtils.getAuthid(getActivity()));
+                                syncAPITable.setStatus("pending");
+                                syncAPITable.setDescription(e.getMessage());
+                                syncAPITable.setCreated_time("20 May");
+                                syncAPITable.setUserid(Integer.parseInt(userId));
+                                syncAPIDatabaseRepository.insertSyncData(syncAPITable);
+                            }
+                        } catch (JsonSyntaxException exeption) {
+                            exeption.printStackTrace();
+                        }
+
+                    }
+                }));
     }
 
     private void callApiSyncQuiz(ArrayList<QuizProgress> quizProgress) {
@@ -766,21 +831,38 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
             }
         }
 
-//        disposable.add(quizRepository.getQuizProgressSync(array).subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribeWith(new DisposableSingleObserver<RestResponse>() {
-//                    @Override
-//                    public void onSuccess(RestResponse restResponse) {
-//                        if (restResponse.getResponse_code().equals("0")) {
-//                            quizProgressList.clear();
-//                        }
-//                    }
-//
-//                    @Override
-//                    public void onError(Throwable e) {
-//                        Log.e("onError", "====callApiSyncQuiz====: " + e.getMessage());
-//                    }
-//                }));
+        disposable.add(quizRepository.getQuizProgressSync(array).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(new DisposableSingleObserver<RestResponse>() {
+                    @Override
+                    public void onSuccess(RestResponse restResponse) {
+                        if (restResponse.getResponse_code().equals("0")) {
+                            quizProgressList.clear();
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.e("onError", "====callApiSyncQuiz====: " + e.getMessage());
+                        try {
+                            if (!userId.equals("")) {
+                                SyncAPITable syncAPITable = new SyncAPITable();
+
+                                syncAPITable.setApi_name("Quiz Attempted");
+                                syncAPITable.setEndpoint_url("QuizProgress/QuizProgressSync");
+                                syncAPITable.setParameters(String.valueOf(array));
+                                syncAPITable.setHeaders(PrefUtils.getAuthid(getActivity()));
+                                syncAPITable.setStatus("pending");
+                                syncAPITable.setDescription(e.getMessage());
+                                syncAPITable.setCreated_time("20 May");
+                                syncAPITable.setUserid(Integer.parseInt(userId));
+                                syncAPIDatabaseRepository.insertSyncData(syncAPITable);
+                            }
+                        } catch (JsonSyntaxException exeption) {
+                            exeption.printStackTrace();
+                        }
+                    }
+                }));
     }
 
     @Override
@@ -2026,21 +2108,38 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
 
 
                                         CompositeDisposable disposable = new CompositeDisposable();
-//                                        disposable.add(quizRepository.getUserQuizResultSync(array).subscribeOn(Schedulers.io())
-//                                                .observeOn(AndroidSchedulers.mainThread())
-//                                                .subscribeWith(new DisposableSingleObserver<RestResponse>() {
-//                                                    @Override
-//                                                    public void onSuccess(RestResponse restresponse) {
-//                                                        if (restresponse.getResponse_code().equals("0")) {
-//                                                            Log.e("onSuccess", "onSuccess: " + restresponse.toString());
-//                                                        }
-//                                                    }
-//
-//                                                    @Override
-//                                                    public void onError(Throwable e) {
-//                                                        Log.e("onError", "onError: " + e.getMessage());
-//                                                    }
-//                                                }));
+                                        disposable.add(quizRepository.getUserQuizResultSync(array).subscribeOn(Schedulers.io())
+                                                .observeOn(AndroidSchedulers.mainThread())
+                                                .subscribeWith(new DisposableSingleObserver<RestResponse>() {
+                                                    @Override
+                                                    public void onSuccess(RestResponse restresponse) {
+                                                        if (restresponse.getResponse_code().equals("0")) {
+                                                            Log.e("onSuccess", "onSuccess: " + restresponse.toString());
+                                                        }
+                                                    }
+
+                                                    @Override
+                                                    public void onError(Throwable e) {
+                                                        Log.e("onError", "onError: " + e.getMessage());
+                                                        try {
+                                                            if (!userId.equals("")) {
+                                                                SyncAPITable syncAPITable = new SyncAPITable();
+
+                                                                syncAPITable.setApi_name("QuizResult Progressed");
+                                                                syncAPITable.setEndpoint_url("UserQuizResult/UserQuizResultSync");
+                                                                syncAPITable.setParameters(String.valueOf(array));
+                                                                syncAPITable.setHeaders(PrefUtils.getAuthid(getActivity()));
+                                                                syncAPITable.setStatus("pending");
+                                                                syncAPITable.setDescription(e.getMessage());
+                                                                syncAPITable.setCreated_time("20 May");
+                                                                syncAPITable.setUserid(Integer.parseInt(userId));
+                                                                syncAPIDatabaseRepository.insertSyncData(syncAPITable);
+                                                            }
+                                                        } catch (JsonSyntaxException exeption) {
+                                                            exeption.printStackTrace();
+                                                        }
+                                                    }
+                                                }));
                                     }
                                 } else {
                                     QuizUserResult quizUserResult = new QuizUserResult();
@@ -2071,23 +2170,38 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                                         e.printStackTrace();
                                     }
 
+                                    disposable.add(quizRepository.getUserQuizResultSync(array).subscribeOn(Schedulers.io())
+                                            .observeOn(AndroidSchedulers.mainThread())
+                                            .subscribeWith(new DisposableSingleObserver<RestResponse>() {
+                                                @Override
+                                                public void onSuccess(RestResponse restresponse) {
+                                                    if (restresponse.getResponse_code().equals("0")) {
+                                                        Log.e("onSuccess", "onSuccess: " + restresponse.toString());
+                                                    }
+                                                }
 
-                                    CompositeDisposable disposable = new CompositeDisposable();
-//                                    disposable.add(quizRepository.getUserQuizResultSync(array).subscribeOn(Schedulers.io())
-//                                            .observeOn(AndroidSchedulers.mainThread())
-//                                            .subscribeWith(new DisposableSingleObserver<RestResponse>() {
-//                                                @Override
-//                                                public void onSuccess(RestResponse restresponse) {
-//                                                    if (restresponse.getResponse_code().equals("0")) {
-//                                                        Log.e("onSuccess", "onSuccess: " + restresponse.toString());
-//                                                    }
-//                                                }
-//
-//                                                @Override
-//                                                public void onError(Throwable e) {
-//                                                    Log.e("onError", "onError: " + e.getMessage());
-//                                                }
-//                                            }));
+                                                @Override
+                                                public void onError(Throwable e) {
+                                                    Log.e("onError", "onError: " + e.getMessage());
+                                                    try {
+                                                        if (!userId.equals("")) {
+                                                            SyncAPITable syncAPITable = new SyncAPITable();
+
+                                                            syncAPITable.setApi_name("QuizResult Progressed");
+                                                            syncAPITable.setEndpoint_url("UserQuizResult/UserQuizResultSync");
+                                                            syncAPITable.setParameters(String.valueOf(array));
+                                                            syncAPITable.setHeaders(PrefUtils.getAuthid(getActivity()));
+                                                            syncAPITable.setStatus("pending");
+                                                            syncAPITable.setDescription(e.getMessage());
+                                                            syncAPITable.setCreated_time("20 May");
+                                                            syncAPITable.setUserid(Integer.parseInt(userId));
+                                                            syncAPIDatabaseRepository.insertSyncData(syncAPITable);
+                                                        }
+                                                    } catch (JsonSyntaxException exeption) {
+                                                        exeption.printStackTrace();
+                                                    }
+                                                }
+                                            }));
                                 }
 
 
@@ -2124,22 +2238,38 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
 
                                         }
 
-                                        CompositeDisposable disposable = new CompositeDisposable();
-//                                        disposable.add(quizRepository.getUserQuizResultSync(array).subscribeOn(Schedulers.io())
-//                                                .observeOn(AndroidSchedulers.mainThread())
-//                                                .subscribeWith(new DisposableSingleObserver<RestResponse>() {
-//                                                    @Override
-//                                                    public void onSuccess(RestResponse restresponse) {
-//                                                        if (restresponse.getResponse_code().equals("0")) {
-//                                                            Log.e("onSuccess", "onSuccess: " + restresponse.toString());
-//                                                        }
-//                                                    }
-//
-//                                                    @Override
-//                                                    public void onError(Throwable e) {
-//                                                        Log.e("onError", "onError: " + e.getMessage());
-//                                                    }
-//                                                }));
+                                        disposable.add(quizRepository.getUserQuizResultSync(array).subscribeOn(Schedulers.io())
+                                                .observeOn(AndroidSchedulers.mainThread())
+                                                .subscribeWith(new DisposableSingleObserver<RestResponse>() {
+                                                    @Override
+                                                    public void onSuccess(RestResponse restresponse) {
+                                                        if (restresponse.getResponse_code().equals("0")) {
+                                                            Log.e("onSuccess", "onSuccess: " + restresponse.toString());
+                                                        }
+                                                    }
+
+                                                    @Override
+                                                    public void onError(Throwable e) {
+                                                        Log.e("onError", "onError: " + e.getMessage());
+                                                        try {
+                                                            if (!userId.equals("")) {
+                                                                SyncAPITable syncAPITable = new SyncAPITable();
+
+                                                                syncAPITable.setApi_name("QuizResult Progressed");
+                                                                syncAPITable.setEndpoint_url("UserQuizResult/UserQuizResultSync");
+                                                                syncAPITable.setParameters(String.valueOf(array));
+                                                                syncAPITable.setHeaders(PrefUtils.getAuthid(getActivity()));
+                                                                syncAPITable.setStatus("pending");
+                                                                syncAPITable.setDescription(e.getMessage());
+                                                                syncAPITable.setCreated_time("20 May");
+                                                                syncAPITable.setUserid(Integer.parseInt(userId));
+                                                                syncAPIDatabaseRepository.insertSyncData(syncAPITable);
+                                                            }
+                                                        } catch (JsonSyntaxException exeption) {
+                                                            exeption.printStackTrace();
+                                                        }
+                                                    }
+                                                }));
                                     }
                                 } else {
                                     QuizUserResult quizUserResult = new QuizUserResult();
@@ -2170,23 +2300,38 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                                         e.printStackTrace();
                                     }
 
+                                    disposable.add(quizRepository.getUserQuizResultSync(array).subscribeOn(Schedulers.io())
+                                            .observeOn(AndroidSchedulers.mainThread())
+                                            .subscribeWith(new DisposableSingleObserver<RestResponse>() {
+                                                @Override
+                                                public void onSuccess(RestResponse restresponse) {
+                                                    if (restresponse.getResponse_code().equals("0")) {
+                                                        Log.e("onSuccess", "onSuccess: " + restresponse.toString());
+                                                    }
+                                                }
 
-                                    CompositeDisposable disposable = new CompositeDisposable();
-//                                    disposable.add(quizRepository.getUserQuizResultSync(array).subscribeOn(Schedulers.io())
-//                                            .observeOn(AndroidSchedulers.mainThread())
-//                                            .subscribeWith(new DisposableSingleObserver<RestResponse>() {
-//                                                @Override
-//                                                public void onSuccess(RestResponse restresponse) {
-//                                                    if (restresponse.getResponse_code().equals("0")) {
-//                                                        Log.e("onSuccess", "onSuccess: " + restresponse.toString());
-//                                                    }
-//                                                }
-//
-//                                                @Override
-//                                                public void onError(Throwable e) {
-//                                                    Log.e("onError", "onError: " + e.getMessage());
-//                                                }
-//                                            }));
+                                                @Override
+                                                public void onError(Throwable e) {
+                                                    Log.e("onError", "onError: " + e.getMessage());
+                                                    try {
+                                                        if (!userId.equals("")) {
+                                                            SyncAPITable syncAPITable = new SyncAPITable();
+
+                                                            syncAPITable.setApi_name("QuizResult Progressed");
+                                                            syncAPITable.setEndpoint_url("UserQuizResult/UserQuizResultSync");
+                                                            syncAPITable.setParameters(String.valueOf(array));
+                                                            syncAPITable.setHeaders(PrefUtils.getAuthid(getActivity()));
+                                                            syncAPITable.setStatus("pending");
+                                                            syncAPITable.setDescription(e.getMessage());
+                                                            syncAPITable.setCreated_time("20 May");
+                                                            syncAPITable.setUserid(Integer.parseInt(userId));
+                                                            syncAPIDatabaseRepository.insertSyncData(syncAPITable);
+                                                        }
+                                                    } catch (JsonSyntaxException exeption) {
+                                                        exeption.printStackTrace();
+                                                    }
+                                                }
+                                            }));
                                 }
 
                             }

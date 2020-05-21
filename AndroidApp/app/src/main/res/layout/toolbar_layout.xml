@@ -53,9 +53,14 @@
                     android:visibility="gone"
                     app:srcCompat="@drawable/ic_check_black" />
 
+                <ImageView
+                    android:id="@+id/syncingbtn"
+                    android:layout_width="@dimen/_20sdp"
+                    android:layout_height="@dimen/_20sdp"
+                    android:visibility="visible"
+                    app:srcCompat="@drawable/ic_cache_syncing" />
+
             </FrameLayout>
-
-
         </androidx.appcompat.widget.Toolbar>
 
     </LinearLayout>
