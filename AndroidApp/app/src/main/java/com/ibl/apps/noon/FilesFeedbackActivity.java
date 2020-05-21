@@ -3,16 +3,10 @@ package com.ibl.apps.noon;
 import android.Manifest;
 import android.content.Intent;
 import android.database.Cursor;
-import androidx.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import com.google.android.material.bottomsheet.BottomSheetDialog;
-import androidx.recyclerview.widget.GridLayoutManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,6 +15,13 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
+import androidx.recyclerview.widget.GridLayoutManager;
+
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.ibl.apps.Adapter.ImageUploadAdapter;
@@ -36,13 +37,11 @@ import com.ibl.apps.Model.feedback.FeedBackTaskDetail;
 import com.ibl.apps.Model.feedback.FileData;
 import com.ibl.apps.Model.feedback.FillesData;
 import com.ibl.apps.Model.feedback.LessonData;
-import com.ibl.apps.Network.ApiClient;
-import com.ibl.apps.Network.ApiService;
-import com.ibl.apps.util.Const;
-import com.ibl.apps.util.Validator;
 import com.ibl.apps.noon.databinding.ActivityFilesFeedbackBinding;
 import com.ibl.apps.noon.databinding.FileSelectItemBinding;
 import com.ibl.apps.noon.databinding.PickVideoFileBinding;
+import com.ibl.apps.util.Const;
+import com.ibl.apps.util.Validator;
 import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.File;
@@ -128,6 +127,7 @@ public class FilesFeedbackActivity extends BaseActivity implements View.OnClickL
 
         setToolbar(binding.toolbarLayout.toolBar);
         showBackArrow(getResources().getString(R.string.submit_feedback));
+        binding.toolbarLayout.emptybtn.setVisibility(View.VISIBLE);
         feedbackFlagPassDeails();
         setOnclickListner();
         setUpRecyclerView();
@@ -638,16 +638,16 @@ public class FilesFeedbackActivity extends BaseActivity implements View.OnClickL
     }
 
     public String getPath(Uri uri) {
-            String[] projection = {MediaStore.Video.Media.DATA};
-            Cursor cursor = getContentResolver().query(uri, projection, null, null, null);
-            if (cursor != null) {
-                // HERE YOU WILL GET A NULLPOINTER IF CURSOR IS NULL
-                // THIS CAN BE, IF YOU USED OI FILE MANAGER FOR PICKING THE MEDIA
-                int column_index = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA);
-                cursor.moveToFirst();
-                return cursor.getString(column_index);
-            } else
-                return null;
+        String[] projection = {MediaStore.Video.Media.DATA};
+        Cursor cursor = getContentResolver().query(uri, projection, null, null, null);
+        if (cursor != null) {
+            // HERE YOU WILL GET A NULLPOINTER IF CURSOR IS NULL
+            // THIS CAN BE, IF YOU USED OI FILE MANAGER FOR PICKING THE MEDIA
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA);
+            cursor.moveToFirst();
+            return cursor.getString(column_index);
+        } else
+            return null;
     }
 
     private void feedbackFlagPassDeails() {

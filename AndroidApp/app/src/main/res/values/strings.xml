@@ -406,6 +406,7 @@
     <string name="cache_limit_message">You will lose progress if you don\'t sync \n your pending cache events.</string>
     <string name="go_to_pending_cache_events">GO TO PENDING CACHE EVENTS</string>
     <string name="no_thanks">NO THANKS</string>
+    <string name="empty_cache_events">Empty Cache Events</string>
 
     <!--&lt;!&ndash;Device Management&ndash;&gt;
     <string name="activate_deactivate_device">Activate/Deactivate device</string>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_20sdp"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:layout_marginEnd="@dimen/_15sdp">
+
+            <TextView
+                android:id="@+id/txtCacheEventsName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Lesson Progressed "
+                android:textColor="@color/black"
+                android:textSize="@dimen/_13sdp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:text="Pending"
+                android:textColor="@color/black"
+                android:textSize="@dimen/_10sdp" />
+
+            <TextView
+                android:id="@+id/txtCourseName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/txtCacheEventsName"
+                android:text="Lesson 12 of Physics grade 12, ID: 29191"
+                android:textSize="@dimen/_11sdp" />
+
+            <TextView
+                android:id="@+id/txtCacheDescription"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/txtCourseName"
+                android:layout_marginTop="@dimen/_20sdp"
+                android:text="This is the reason for the issue that is mentioned above. This is the reason for the issue that is mentioned above."
+                android:textColor="@color/black"
+                android:textSize="@dimen/_13sdp" />
+
+        </RelativeLayout>
+    </LinearLayout>
+
+</layout>

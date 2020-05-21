@@ -677,7 +677,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                     @Override
                     public void onSuccess(RestResponse restResponse) {
                         if (restResponse.getResponse_code().equals("0")) {
-                            Log.e("getLessonProgressSync", "onSuccess: " + array.get(0).getAsString());
+                            //  Log.e("getLessonProgressSync", "onSuccess: " + array.get(0).getAsString());
                             lessonProgressList.clear();
                         }
                     }
@@ -693,9 +693,9 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                                 syncAPITable.setEndpoint_url("LessonProgress/LessonProgressSync");
                                 syncAPITable.setParameters(String.valueOf(array));
                                 syncAPITable.setHeaders(PrefUtils.getAuthid(getActivity()));
-                                syncAPITable.setStatus("pending");
+                                syncAPITable.setStatus("Errored");
                                 syncAPITable.setDescription(e.getMessage());
-                                syncAPITable.setCreated_time("20 May");
+                                syncAPITable.setCreated_time(getUTCTime());
                                 syncAPITable.setUserid(Integer.parseInt(userId));
                                 syncAPIDatabaseRepository.insertSyncData(syncAPITable);
                             }
@@ -746,9 +746,9 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                                 syncAPITable.setEndpoint_url("ChapterProgress/ChapterProgressSync");
                                 syncAPITable.setParameters(String.valueOf(array));
                                 syncAPITable.setHeaders(PrefUtils.getAuthid(getActivity()));
-                                syncAPITable.setStatus("pending");
+                                syncAPITable.setStatus("Errored");
                                 syncAPITable.setDescription(e.getMessage());
-                                syncAPITable.setCreated_time("20 May");
+                                syncAPITable.setCreated_time(getUTCTime());
                                 syncAPITable.setUserid(Integer.parseInt(userId));
                                 syncAPIDatabaseRepository.insertSyncData(syncAPITable);
                             }
@@ -799,9 +799,9 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                                 syncAPITable.setEndpoint_url("FileProgress/FileProgressSync");
                                 syncAPITable.setParameters(String.valueOf(array));
                                 syncAPITable.setHeaders(PrefUtils.getAuthid(getActivity()));
-                                syncAPITable.setStatus("pending");
+                                syncAPITable.setStatus("Errored");
                                 syncAPITable.setDescription(e.getMessage());
-                                syncAPITable.setCreated_time("20 May");
+                                syncAPITable.setCreated_time(getUTCTime());
                                 syncAPITable.setUserid(Integer.parseInt(userId));
                                 syncAPIDatabaseRepository.insertSyncData(syncAPITable);
                             }
@@ -852,9 +852,9 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                                 syncAPITable.setEndpoint_url("QuizProgress/QuizProgressSync");
                                 syncAPITable.setParameters(String.valueOf(array));
                                 syncAPITable.setHeaders(PrefUtils.getAuthid(getActivity()));
-                                syncAPITable.setStatus("pending");
+                                syncAPITable.setStatus("Errored");
                                 syncAPITable.setDescription(e.getMessage());
-                                syncAPITable.setCreated_time("20 May");
+                                syncAPITable.setCreated_time(getUTCTime());
                                 syncAPITable.setUserid(Integer.parseInt(userId));
                                 syncAPIDatabaseRepository.insertSyncData(syncAPITable);
                             }
@@ -2129,9 +2129,9 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                                                                 syncAPITable.setEndpoint_url("UserQuizResult/UserQuizResultSync");
                                                                 syncAPITable.setParameters(String.valueOf(array));
                                                                 syncAPITable.setHeaders(PrefUtils.getAuthid(getActivity()));
-                                                                syncAPITable.setStatus("pending");
+                                                                syncAPITable.setStatus("Errored");
                                                                 syncAPITable.setDescription(e.getMessage());
-                                                                syncAPITable.setCreated_time("20 May");
+                                                                syncAPITable.setCreated_time(getUTCTime());
                                                                 syncAPITable.setUserid(Integer.parseInt(userId));
                                                                 syncAPIDatabaseRepository.insertSyncData(syncAPITable);
                                                             }
@@ -2191,9 +2191,9 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                                                             syncAPITable.setEndpoint_url("UserQuizResult/UserQuizResultSync");
                                                             syncAPITable.setParameters(String.valueOf(array));
                                                             syncAPITable.setHeaders(PrefUtils.getAuthid(getActivity()));
-                                                            syncAPITable.setStatus("pending");
+                                                            syncAPITable.setStatus("Errored");
                                                             syncAPITable.setDescription(e.getMessage());
-                                                            syncAPITable.setCreated_time("20 May");
+                                                            syncAPITable.setCreated_time(getUTCTime());
                                                             syncAPITable.setUserid(Integer.parseInt(userId));
                                                             syncAPIDatabaseRepository.insertSyncData(syncAPITable);
                                                         }
@@ -2259,9 +2259,9 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                                                                 syncAPITable.setEndpoint_url("UserQuizResult/UserQuizResultSync");
                                                                 syncAPITable.setParameters(String.valueOf(array));
                                                                 syncAPITable.setHeaders(PrefUtils.getAuthid(getActivity()));
-                                                                syncAPITable.setStatus("pending");
+                                                                syncAPITable.setStatus("Errored");
                                                                 syncAPITable.setDescription(e.getMessage());
-                                                                syncAPITable.setCreated_time("20 May");
+                                                                syncAPITable.setCreated_time(getUTCTime());
                                                                 syncAPITable.setUserid(Integer.parseInt(userId));
                                                                 syncAPIDatabaseRepository.insertSyncData(syncAPITable);
                                                             }
@@ -2321,9 +2321,9 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                                                             syncAPITable.setEndpoint_url("UserQuizResult/UserQuizResultSync");
                                                             syncAPITable.setParameters(String.valueOf(array));
                                                             syncAPITable.setHeaders(PrefUtils.getAuthid(getActivity()));
-                                                            syncAPITable.setStatus("pending");
+                                                            syncAPITable.setStatus("Errored");
                                                             syncAPITable.setDescription(e.getMessage());
-                                                            syncAPITable.setCreated_time("20 May");
+                                                            syncAPITable.setCreated_time(getUTCTime());
                                                             syncAPITable.setUserid(Integer.parseInt(userId));
                                                             syncAPIDatabaseRepository.insertSyncData(syncAPITable);
                                                         }
@@ -2978,5 +2978,4 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
         }
 
     }
-
 }

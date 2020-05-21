@@ -2,21 +2,22 @@ package com.ibl.apps.noon;
 
 import android.content.Intent;
 import android.database.Cursor;
-import androidx.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import androidx.annotation.Nullable;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import com.google.android.material.bottomsheet.BottomSheetDialog;
-import androidx.recyclerview.widget.GridLayoutManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
+import androidx.recyclerview.widget.GridLayoutManager;
+
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.ibl.apps.Adapter.ImageUploadAdapter;
@@ -29,11 +30,11 @@ import com.ibl.apps.Model.feedback.FeedBack;
 import com.ibl.apps.Model.feedback.FeedBackTaskDetail;
 import com.ibl.apps.Model.feedback.FileData;
 import com.ibl.apps.Model.feedback.FillesData;
-import com.ibl.apps.util.Const;
-import com.ibl.apps.util.Validator;
 import com.ibl.apps.noon.databinding.FileSelectItemBinding;
 import com.ibl.apps.noon.databinding.PickVideoFileBinding;
 import com.ibl.apps.noon.databinding.ReportProblemActivityBinding;
+import com.ibl.apps.util.Const;
+import com.ibl.apps.util.Validator;
 import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.File;
@@ -107,6 +108,7 @@ public class ReportProblemActivity extends BaseActivity implements View.OnClickL
 
         setToolbar(binding.toolbarLayout.toolBar);
         showBackArrow(getResources().getString(R.string.submit_feedback));
+        binding.toolbarLayout.emptybtn.setVisibility(View.VISIBLE);
         flagPassDeails();
         setUpRecyclerView();
         setOnClickListner();

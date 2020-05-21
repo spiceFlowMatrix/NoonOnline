@@ -7,19 +7,19 @@
 
         <include
             android:id="@+id/videoViewLayout"
-            layout="@layout/videoview_layout"></include>
+            layout="@layout/videoview_layout" />
 
         <include
             android:id="@+id/pdfViewLayout"
-            layout="@layout/pdfview_new_layout"></include>
+            layout="@layout/pdfview_new_layout" />
 
         <include
             android:id="@+id/quizViewLayout"
-            layout="@layout/quizview_layout"></include>
+            layout="@layout/quizview_layout" />
 
         <include
             android:id="@+id/imageViewLayout"
-            layout="@layout/imageview_layout"></include>
+            layout="@layout/imageview_layout" />
 
 
     </LinearLayout>

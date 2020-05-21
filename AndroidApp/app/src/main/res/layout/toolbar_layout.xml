@@ -55,10 +55,17 @@
 
                 <ImageView
                     android:id="@+id/syncingbtn"
-                    android:layout_width="@dimen/_20sdp"
-                    android:layout_height="@dimen/_20sdp"
-                    android:visibility="visible"
+                    android:layout_width="@dimen/_25sdp"
+                    android:layout_height="@dimen/_25sdp"
+                    android:visibility="gone"
                     app:srcCompat="@drawable/ic_cache_syncing" />
+
+                <ImageView
+                    android:id="@+id/emptybtn"
+                    android:layout_width="@dimen/_25sdp"
+                    android:layout_height="@dimen/_25sdp"
+                    android:visibility="gone"
+                    app:srcCompat="@drawable/ic_cache_empty" />
 
             </FrameLayout>
         </androidx.appcompat.widget.Toolbar>
