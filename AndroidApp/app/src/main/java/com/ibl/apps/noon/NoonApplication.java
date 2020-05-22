@@ -293,19 +293,21 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
                 array.add(jsonObject);
                 Log.e("isback", "call5minIntervalData: " + array.toString());
 
+                SyncAPITable syncAPITable = new SyncAPITable();
                 if (!userId.equals("")) {
-                    SyncAPITable syncAPITable = new SyncAPITable();
                     syncAPITable.setApi_name("AppTimeTrack Progressed");
                     syncAPITable.setEndpoint_url("ProgessSync/AppTimeTrack");
                     syncAPITable.setParameters(String.valueOf(array));
                     syncAPITable.setHeaders(PrefUtils.getAuthid(getContext()));
                     syncAPITable.setStatus("Pending");
-                    syncAPITable.setDescription("e.getMessage()");
+                    syncAPITable.setDescription(getContext().getResources().getString(R.string.apptime_track_pending_description));
                     syncAPITable.setCreated_time(getUTCTime());
                     syncAPITable.setUserid(Integer.parseInt(userId));
+
                     SyncAPIDatabaseRepository syncAPIDatabaseRepository = new SyncAPIDatabaseRepository();
                     syncAPIDatabaseRepository.insertSyncData(syncAPITable);
                 }
+
                 syncTimeTrackingObject.setActivitytime(getUTCTime());
                 syncTimeTrackingObject.setOuttime("");
                 SharedPreferences sharedPreferences2 = getSharedPreferences("spendtime", MODE_PRIVATE);

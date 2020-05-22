@@ -21,8 +21,12 @@ public class SyncAPIDatabaseRepository {
         return database.syncDataDao().getSyncUserById(userid);
     }
 
-    public List<SyncAPITable> deleteById(int dataBaseId) {
-        return database.syncDataDao().deleteById(dataBaseId);
+    public void deleteAll() {
+        database.syncDataDao().deleteAll();
+    }
+
+    public int deleteById(int userid) {
+        return database.syncDataDao().deleteById(userid);
     }
 
 }

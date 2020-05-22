@@ -6,7 +6,6 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.ibl.apps.Adapter.CacheEventsDescriptionAdapter;
 import com.ibl.apps.Base.BaseActivity;
 import com.ibl.apps.RoomDatabase.entity.SyncAPITable;
 import com.ibl.apps.noon.databinding.ActivityCacheEventsDescrptionBinding;
@@ -15,7 +14,6 @@ import java.lang.reflect.Type;
 
 public class CacheEventsDescriptionActivity extends BaseActivity {
     ActivityCacheEventsDescrptionBinding binding;
-    CacheEventsDescriptionAdapter cacheEventsDescriptionAdapter;
     private String getSyncAPIData;
     private SyncAPITable syncAPIArray = new SyncAPITable();
 

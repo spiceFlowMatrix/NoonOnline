@@ -26,6 +26,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -75,11 +76,13 @@ import com.ibl.apps.RoomDatabase.entity.QuizUserResult;
 import com.ibl.apps.RoomDatabase.entity.SyncAPITable;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
 import com.ibl.apps.noon.AssignmentDetailActivity;
+import com.ibl.apps.noon.CacheEventsListActivity;
 import com.ibl.apps.noon.ChapterActivity;
 import com.ibl.apps.noon.NoonApplication;
 import com.ibl.apps.noon.R;
 import com.ibl.apps.noon.databinding.CourselessonLayoutBinding;
 import com.ibl.apps.noon.databinding.DialogViewerItemLayoutBinding;
+import com.ibl.apps.noon.databinding.HitLimitDialogBinding;
 import com.ibl.apps.util.Const;
 import com.ibl.apps.util.GlideApp;
 import com.ibl.apps.util.PrefUtils;
@@ -124,6 +127,7 @@ import static com.ibl.apps.Adapter.CourseItemInnerListAdapter.fileProgressList;
 import static com.ibl.apps.Adapter.CourseItemInnerListAdapter.lessonProgressList;
 import static com.ibl.apps.Adapter.CourseItemInnerListAdapter.quizProgressList;
 import static com.ibl.apps.Base.BaseActivity.freeMemory;
+import static com.ibl.apps.noon.CacheEventsListActivity.isClick;
 
 
 public class CourseItemFragment extends BaseFragment implements View.OnClickListener, View.OnTouchListener, CourseInnerItemInterface, IOnBackPressed, CourseHideResponse {
@@ -149,7 +153,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
     String fileType = "";
     String fileTypeName = "";
     String lessonID = "";
-    String quizID = "";
+    public String quizID = "";
     String videoUri = "";
     String chapterid = "";
     String fileid = "";
@@ -186,6 +190,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
     private LessonDatabaseRepository lessonDatabaseRepository;
     Observer<Integer> observer;
     private SyncAPIDatabaseRepository syncAPIDatabaseRepository;
+    private String ErrorSync;
 
     public CourseItemFragment() {
         // Required empty public constructor
@@ -292,6 +297,28 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                     userDetailsObject = userDetails;
                     userId = userDetailsObject.getId();
                     loadData();
+                    SyncAPIDatabaseRepository syncAPIDatabaseRepository = new SyncAPIDatabaseRepository();
+
+                    List<SyncAPITable> syncAPITableList = syncAPIDatabaseRepository.getSyncUserById(Integer.parseInt(userId));
+                    for (int i = 0; i < syncAPITableList.size(); i++) {
+                        ErrorSync = syncAPITableList.get(i).getStatus();
+                    }
+                    if (syncAPITableList != null && syncAPITableList.size() != 0) {
+                        fragmentCourseItemLayoutBinding.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_pending);
+                    } else if (syncAPITableList == null && syncAPITableList.size() == 0) {
+                        GlideApp.with(getActivity())
+                                .load(R.drawable.ic_cache_empty)
+                                .error(R.drawable.ic_cache_empty)
+                                .into(fragmentCourseItemLayoutBinding.cacheEventsStatusBtn);
+                    } else if (isClick) {
+                        fragmentCourseItemLayoutBinding.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_syncing);
+                    } /*else if (ErrorSync.contains("Errored")) {
+                            mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_error);
+                        }*/
+
+                    if (syncAPITableList.size() >= 50) {
+                        showHitLimitDialog(getActivity());
+                    }
                     Licensing.allow(NoonApplication.getContext());
                 }
                 return null;
@@ -980,6 +1007,37 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                                 dialog.setContentView(dialogViewerItemLayoutBinding.getRoot());
                                 dialog.show();
 
+                                List<SyncAPITable> syncAPITableList = syncAPIDatabaseRepository.getSyncUserById(Integer.parseInt(userId));
+
+                                for (int i = 0; i < syncAPITableList.size(); i++) {
+                                    ErrorSync = syncAPITableList.get(i).getStatus();
+                                }
+                                if (syncAPITableList != null && syncAPITableList.size() != 0) {
+                                    dialogViewerItemLayoutBinding.pdfViewLayout.pdfCacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_pending);
+                                } else if (syncAPITableList == null && syncAPITableList.size() == 0) {
+                                    GlideApp.with(getActivity())
+                                            .load(R.drawable.ic_cache_empty)
+                                            .error(R.drawable.ic_cache_empty)
+                                            .into(dialogViewerItemLayoutBinding.pdfViewLayout.pdfCacheEventsStatusBtn);
+                                } else if (isClick) {
+                                    dialogViewerItemLayoutBinding.pdfViewLayout.pdfCacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_syncing);
+                                } /*else if (ErrorSync.contains("Errored")) {
+                                    dialogViewerItemLayoutBinding.pdfViewLayout.pdfCacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_error);
+                                }*/
+
+
+                                dialogViewerItemLayoutBinding.pdfViewLayout.pdfCacheEventsStatusBtn.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        getActivity().finish();
+                                        startActivity(new Intent(NoonApplication.getContext(), CacheEventsListActivity.class));
+                                    }
+                                });
+
+
+                                if (syncAPIDatabaseRepository.getSyncUserById(Integer.parseInt(userId)).size() >= 50) {
+                                    showHitLimitDialog(NoonApplication.getContext());
+                                }
 
                                 try {
                                     PRDownloader.download(videoUri, yourFilePath, Const.dir_fileName + Const.PDFextension).build().start(new OnDownloadListener() {
@@ -2127,7 +2185,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
 
                                                                 syncAPITable.setApi_name("QuizResult Progressed");
                                                                 syncAPITable.setEndpoint_url("UserQuizResult/UserQuizResultSync");
-                                                                syncAPITable.setParameters(String.valueOf(array));
+                                                                syncAPITable.setParameters(new Gson().toJson(array));
                                                                 syncAPITable.setHeaders(PrefUtils.getAuthid(getActivity()));
                                                                 syncAPITable.setStatus("Errored");
                                                                 syncAPITable.setDescription(e.getMessage());
@@ -2977,5 +3035,28 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
             }
         }
 
+    }
+
+    public void showHitLimitDialog(Context context) {
+        HitLimitDialogBinding hitLimitDialogBinding = DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.hit_limit_dialog, null, false);
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setView(hitLimitDialogBinding.getRoot());
+
+        final AlertDialog alertDialog = builder.create();
+        hitLimitDialogBinding.txtNoThanksClick.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alertDialog.dismiss();
+            }
+        });
+
+        hitLimitDialogBinding.txtPendingClick.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alertDialog.dismiss();
+                startActivity(new Intent(context, CacheEventsListActivity.class));
+            }
+        });
+        alertDialog.show();
     }
 }

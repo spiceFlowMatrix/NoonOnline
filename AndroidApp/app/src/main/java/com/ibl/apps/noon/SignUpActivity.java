@@ -38,9 +38,11 @@ import com.ibl.apps.Model.TrileSignupObject;
 import com.ibl.apps.Model.UserObject;
 import com.ibl.apps.RoomDatabase.dao.lessonManagementDatabase.LessonDatabaseRepository;
 import com.ibl.apps.RoomDatabase.dao.quizManagementDatabase.QuizDatabaseRepository;
+import com.ibl.apps.RoomDatabase.dao.syncAPIManagementDatabase.SyncAPIDatabaseRepository;
 import com.ibl.apps.RoomDatabase.dao.userManagementDatabse.UserDatabaseRepository;
 import com.ibl.apps.RoomDatabase.entity.LessonProgress;
 import com.ibl.apps.RoomDatabase.entity.QuizUserResult;
+import com.ibl.apps.RoomDatabase.entity.SyncAPITable;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
 import com.ibl.apps.UserCredentialsManagement.UserRepository;
 import com.ibl.apps.noon.databinding.ActivitySignUpBinding;
@@ -960,6 +962,20 @@ public class SignUpActivity extends BaseActivity implements View.OnClickListener
                             HttpException error = (HttpException) e;
                             SyncRecords syncRecords = new Gson().fromJson(error.response().errorBody().string(), SyncRecords.class);
                             //Log.e(Const.LOG_NOON_TAG, "===SyncRecords=ERROR==" + syncRecords.getMessage());
+                            SyncAPIDatabaseRepository syncAPIDatabaseRepository = new SyncAPIDatabaseRepository();
+                            if (!userId.equals("")) {
+                                SyncAPITable syncAPITable = new SyncAPITable();
+
+                                syncAPITable.setApi_name("SyncRecords Progressed");
+                                syncAPITable.setEndpoint_url("ProgessSync/GetSyncRecords");
+                                syncAPITable.setParameters("");
+                                syncAPITable.setHeaders(PrefUtils.getAuthid(SignUpActivity.this));
+                                syncAPITable.setStatus("Errored");
+                                syncAPITable.setDescription(e.getMessage());
+                                syncAPITable.setCreated_time(getUTCTime());
+                                syncAPITable.setUserid(Integer.parseInt(userId));
+                                syncAPIDatabaseRepository.insertSyncData(syncAPITable);
+                            }
                             hideDialog();
                         } catch (Exception e1) {
                             //showError(e1);

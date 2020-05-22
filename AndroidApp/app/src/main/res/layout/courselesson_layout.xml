@@ -48,14 +48,13 @@
                 </LinearLayout>
 
                 <ImageView
-                    android:id="@+id/errorbtn"
+                    android:id="@+id/cacheEventsStatusBtn"
                     android:layout_width="@dimen/_25sdp"
                     android:layout_height="@dimen/_27sdp"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
                     android:layout_marginEnd="@dimen/_15sdp"
-                    android:visibility="visible"
-                    app:srcCompat="@drawable/ic_cache_error" />
+                    android:visibility="visible" />
             </RelativeLayout>
 
         </com.google.android.material.appbar.AppBarLayout>

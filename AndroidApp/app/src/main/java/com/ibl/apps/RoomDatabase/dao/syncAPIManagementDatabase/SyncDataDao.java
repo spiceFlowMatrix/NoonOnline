@@ -19,6 +19,6 @@ public interface SyncDataDao {
     @Query("DELETE FROM SyncAPITable")
     void deleteAll();
 
-    @Query("SELECT * FROM SyncAPITable WHERE id=:id")
-    List<SyncAPITable> deleteById(int id);
+    @Query("DELETE FROM SyncAPITable WHERE userid=:userid")
+    int deleteById(int userid);
 }

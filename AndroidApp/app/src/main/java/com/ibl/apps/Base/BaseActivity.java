@@ -15,6 +15,7 @@ import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
@@ -51,9 +52,11 @@ import com.ibl.apps.Network.ApiService;
 import com.ibl.apps.RoomDatabase.dao.userManagementDatabse.UserDatabaseRepository;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
 import com.ibl.apps.UserCredentialsManagement.UserRepository;
+import com.ibl.apps.noon.CacheEventsListActivity;
 import com.ibl.apps.noon.LoginActivity;
 import com.ibl.apps.noon.NoonApplication;
 import com.ibl.apps.noon.R;
+import com.ibl.apps.noon.databinding.HitLimitDialogBinding;
 import com.ibl.apps.util.Const;
 import com.ibl.apps.util.CustomTypefaceSpan;
 import com.ibl.apps.util.JWTUtils;
@@ -74,6 +77,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import cz.msebera.android.httpclient.util.ByteArrayBuffer;
 import io.fabric.sdk.android.Fabric;
@@ -98,6 +102,7 @@ public abstract class BaseActivity extends AppCompatActivity implements DroidLis
     private TimerTask timerTask;
     private UserRepository userRepository;
     private UserDatabaseRepository userDatabaseRepository;
+    public static int synchingAPITag = -1;
     //LogoutPopupLayoutBinding logoutPopupLayoutBinding;
 
     @SuppressLint("NewApi")
@@ -718,6 +723,38 @@ public abstract class BaseActivity extends AppCompatActivity implements DroidLis
         SharedPreferences preferences = getSharedPreferences("Settings", Activity.MODE_PRIVATE);
         String selectLan = preferences.getString("My_Language", "");
         setLocale(selectLan);
+    }
+
+    public String getUTCTime() {
+
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss a", Locale.ENGLISH);
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+        String gmtTime = sdf.format(new Date());
+//        Log.e("date", "getUTCTime: " + gmtTime);
+        return gmtTime;
+    }
+
+    public void showHitLimitDialog(Context context) {
+        HitLimitDialogBinding hitLimitDialogBinding = DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.hit_limit_dialog, null, false);
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setView(hitLimitDialogBinding.getRoot());
+
+        final AlertDialog alertDialog = builder.create();
+        hitLimitDialogBinding.txtNoThanksClick.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alertDialog.dismiss();
+            }
+        });
+
+        hitLimitDialogBinding.txtPendingClick.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alertDialog.dismiss();
+                startActivity(new Intent(context, CacheEventsListActivity.class));
+            }
+        });
+        alertDialog.show();
     }
 
     @Override

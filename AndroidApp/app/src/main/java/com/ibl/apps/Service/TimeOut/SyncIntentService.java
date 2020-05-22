@@ -33,9 +33,11 @@ import com.ibl.apps.Network.ApiService;
 import com.ibl.apps.RoomDatabase.dao.courseManagementDatabase.CourseDatabaseRepository;
 import com.ibl.apps.RoomDatabase.dao.lessonManagementDatabase.LessonDatabaseRepository;
 import com.ibl.apps.RoomDatabase.dao.quizManagementDatabase.QuizDatabaseRepository;
+import com.ibl.apps.RoomDatabase.dao.syncAPIManagementDatabase.SyncAPIDatabaseRepository;
 import com.ibl.apps.RoomDatabase.dao.userManagementDatabse.UserDatabaseRepository;
 import com.ibl.apps.RoomDatabase.entity.LessonProgress;
 import com.ibl.apps.RoomDatabase.entity.QuizUserResult;
+import com.ibl.apps.RoomDatabase.entity.SyncAPITable;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
 import com.ibl.apps.UserCredentialsManagement.UserRepository;
 import com.ibl.apps.UserProfileManagement.UserProfileRepository;
@@ -58,6 +60,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.TimeZone;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -167,7 +170,7 @@ public class SyncIntentService extends JobIntentService implements DroidListener
 
                         if (isNetworkAvailable(mycontext)) {
                             /*---------------------------FOR User Accound FillesData UPDATE-------------------*/
-                            callApiUpdateProfile();
+                            // callApiUpdateProfile();
 
                             /*---------------------------FOR Quiz Timer--------------------------------*/
                             quizDatabaseRepository = new QuizDatabaseRepository();
@@ -585,6 +588,20 @@ public class SyncIntentService extends JobIntentService implements DroidListener
                             try {
                                 HttpException error = (HttpException) e;
                                 LessonProgress lessonProgress = new Gson().fromJson(Objects.requireNonNull(error.response().errorBody()).string(), LessonProgress.class);
+                                SyncAPIDatabaseRepository syncAPIDatabaseRepository = new SyncAPIDatabaseRepository();
+                                if (!userId.equals("")) {
+                                    SyncAPITable syncAPITable = new SyncAPITable();
+
+                                    syncAPITable.setApi_name("ProgressSyncAdd Progressed");
+                                    syncAPITable.setEndpoint_url("ProgessSync/ProgessSyncAdd");
+                                    syncAPITable.setParameters(String.valueOf(noonAppFullSyncObject));
+                                    syncAPITable.setHeaders(PrefUtils.getAuthid(mycontext));
+                                    syncAPITable.setStatus("Errored");
+                                    syncAPITable.setDescription(e.getMessage());
+                                    syncAPITable.setCreated_time(getUTCTime());
+                                    syncAPITable.setUserid(Integer.parseInt(userId));
+                                    syncAPIDatabaseRepository.insertSyncData(syncAPITable);
+                                }
                                 //Log.e(Const.LOG_NOON_TAG, "==lessonProgress==" + lessonProgress);
                             } catch (Exception e1) {
                                 e1.printStackTrace();
@@ -597,6 +614,15 @@ public class SyncIntentService extends JobIntentService implements DroidListener
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private String getUTCTime() {
+
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss a", Locale.ENGLISH);
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+        String gmtTime = sdf.format(new Date());
+//        Log.e("date", "getUTCTime: " + gmtTime);
+        return gmtTime;
     }
 
     public void callApiUpdateProfile() {

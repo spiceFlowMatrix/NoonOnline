@@ -407,6 +407,8 @@
     <string name="go_to_pending_cache_events">GO TO PENDING CACHE EVENTS</string>
     <string name="no_thanks">NO THANKS</string>
     <string name="empty_cache_events">Empty Cache Events</string>
+    <string name="apptime_track_pending_description">We are using the AppTimeTrack API for tracking users online-offline activity.</string>
+
 
     <!--&lt;!&ndash;Device Management&ndash;&gt;
     <string name="activate_deactivate_device">Activate/Deactivate device</string>

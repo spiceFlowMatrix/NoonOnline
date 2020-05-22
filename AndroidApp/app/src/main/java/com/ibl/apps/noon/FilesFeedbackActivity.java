@@ -2,6 +2,7 @@ package com.ibl.apps.noon;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
@@ -37,10 +38,13 @@ import com.ibl.apps.Model.feedback.FeedBackTaskDetail;
 import com.ibl.apps.Model.feedback.FileData;
 import com.ibl.apps.Model.feedback.FillesData;
 import com.ibl.apps.Model.feedback.LessonData;
+import com.ibl.apps.RoomDatabase.dao.syncAPIManagementDatabase.SyncAPIDatabaseRepository;
+import com.ibl.apps.RoomDatabase.entity.SyncAPITable;
 import com.ibl.apps.noon.databinding.ActivityFilesFeedbackBinding;
 import com.ibl.apps.noon.databinding.FileSelectItemBinding;
 import com.ibl.apps.noon.databinding.PickVideoFileBinding;
 import com.ibl.apps.util.Const;
+import com.ibl.apps.util.GlideApp;
 import com.ibl.apps.util.Validator;
 import com.theartofdev.edmodo.cropper.CropImage;
 
@@ -62,6 +66,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static com.ibl.apps.noon.AssignmentAddActivity.getMimeType;
+import static com.ibl.apps.noon.CacheEventsListActivity.isClick;
 
 public class FilesFeedbackActivity extends BaseActivity implements View.OnClickListener {
     ActivityFilesFeedbackBinding binding;
@@ -78,6 +83,7 @@ public class FilesFeedbackActivity extends BaseActivity implements View.OnClickL
     private int chpterId = 0;
     private Long id;
     private FeedbackRepository feedbackRepository;
+    private String ErrorSync;
 
     @Override
     protected int getContentView() {
@@ -89,6 +95,8 @@ public class FilesFeedbackActivity extends BaseActivity implements View.OnClickL
         super.onViewReady(savedInstanceState, intent);
         binding = (ActivityFilesFeedbackBinding) getBindObj();
         feedbackRepository = new FeedbackRepository();
+        SharedPreferences sharedPreferencesuser = getSharedPreferences("user", MODE_PRIVATE);
+        String userId = sharedPreferencesuser.getString("uid", "");
 
         if (fileIdList != null) {
             fileIdList.clear();
@@ -127,7 +135,38 @@ public class FilesFeedbackActivity extends BaseActivity implements View.OnClickL
 
         setToolbar(binding.toolbarLayout.toolBar);
         showBackArrow(getResources().getString(R.string.submit_feedback));
-        binding.toolbarLayout.emptybtn.setVisibility(View.VISIBLE);
+        binding.toolbarLayout.cacheEventsStatusBtn.setVisibility(View.VISIBLE);
+        SyncAPIDatabaseRepository syncAPIDatabaseRepository = new SyncAPIDatabaseRepository();
+        List<SyncAPITable> syncAPITableList = syncAPIDatabaseRepository.getSyncUserById(Integer.parseInt(userId));
+
+        for (int i = 0; i < syncAPITableList.size(); i++) {
+            ErrorSync = syncAPITableList.get(i).getStatus();
+        }
+        if (syncAPITableList != null && syncAPITableList.size() != 0) {
+            binding.toolbarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_pending);
+        } else if (syncAPITableList == null && syncAPITableList.size() == 0) {
+            GlideApp.with(FilesFeedbackActivity.this)
+                    .load(R.drawable.ic_cache_empty)
+                    .error(R.drawable.ic_cache_empty)
+                    .into(binding.toolbarLayout.cacheEventsStatusBtn);
+        } else if (isClick) {
+            binding.toolbarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_syncing);
+        } /*else if (ErrorSync.contains("Errored")) {
+            binding.toolbarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_error);
+        }*/
+
+
+        binding.toolbarLayout.cacheEventsStatusBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(FilesFeedbackActivity.this, CacheEventsListActivity.class));
+            }
+        });
+
+
+        if (syncAPIDatabaseRepository.getSyncUserById(Integer.parseInt(userId)).size() >= 50) {
+            showHitLimitDialog(FilesFeedbackActivity.this);
+        }
         feedbackFlagPassDeails();
         setOnclickListner();
         setUpRecyclerView();

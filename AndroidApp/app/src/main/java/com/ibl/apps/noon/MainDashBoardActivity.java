@@ -38,21 +38,22 @@ import com.ibl.apps.Fragment.ProfileFragment;
 import com.ibl.apps.Fragment.ReportFragment;
 import com.ibl.apps.Interface.BackInterface;
 import com.ibl.apps.RoomDatabase.dao.courseManagementDatabase.CourseDatabaseRepository;
+import com.ibl.apps.RoomDatabase.dao.syncAPIManagementDatabase.SyncAPIDatabaseRepository;
+import com.ibl.apps.RoomDatabase.entity.SyncAPITable;
 import com.ibl.apps.RoomDatabase.entity.SyncTimeTrackingObject;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
 import com.ibl.apps.Service.TimeOut.SyncEventReceiver;
 import com.ibl.apps.noon.databinding.LogoutPopupLayoutBinding;
 import com.ibl.apps.noon.databinding.MainDashboardLayoutBinding;
 import com.ibl.apps.util.Const;
+import com.ibl.apps.util.GlideApp;
 import com.ibl.apps.util.PrefUtils;
 import com.ibl.apps.util.SingleShotLocationProvider;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
-import java.util.TimeZone;
+
+import static com.ibl.apps.noon.CacheEventsListActivity.isClick;
 
 /**
  * Created by iblinfotech on 10/09/18.
@@ -78,6 +79,7 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
     private String userRoleName;
     private UserDetails userDetail;
     CourseDatabaseRepository courseDatabaseRepository;
+    private String ErrorSync;
 
     @Override
     protected int getContentView() {
@@ -167,6 +169,29 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
 //                                mainDashboardLayoutBinding.appBarLayout.contentMain.bottomNavigation.getMenu().removeItem(R.id.action_item4);
 //                            }
 //                        }
+
+                        SyncAPIDatabaseRepository syncAPIDatabaseRepository = new SyncAPIDatabaseRepository();
+
+                        List<SyncAPITable> syncAPITableList = syncAPIDatabaseRepository.getSyncUserById(Integer.parseInt(userId));
+                        for (int i = 0; i < syncAPITableList.size(); i++) {
+                            ErrorSync = syncAPITableList.get(i).getStatus();
+                        }
+                        if (syncAPITableList != null && syncAPITableList.size() != 0) {
+                            mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_pending);
+                        } else if (syncAPITableList == null && syncAPITableList.size() == 0) {
+                            GlideApp.with(MainDashBoardActivity.this)
+                                    .load(R.drawable.ic_cache_empty)
+                                    .error(R.drawable.ic_cache_empty)
+                                    .into(mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn);
+                        } else if (isClick) {
+                            mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_syncing);
+                        } /*else if (ErrorSync.contains("Errored")) {
+                            mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_error);
+                        }*/
+
+                        if (syncAPITableList.size() >= 50) {
+                            showHitLimitDialog(MainDashBoardActivity.this);
+                        }
 
                         mainDashboardLayoutBinding.appBarLayout.contentMain.bottomNavigation.setOnNavigationItemSelectedListener(
                                 new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -533,7 +558,7 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
         mainDashboardLayoutBinding.appBarLayout.logOutBtn.setOnClickListener(this);
         mainDashboardLayoutBinding.appBarLayout.editprofileBtn.setOnClickListener(this);
         mainDashboardLayoutBinding.appBarLayout.btnNotification.setOnClickListener(this);
-        mainDashboardLayoutBinding.appBarLayout.cachebtn.setOnClickListener(this);
+        mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn.setOnClickListener(this);
     }
 
     @Override
@@ -553,7 +578,7 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
                 startActivity(i3);
                 break;
 
-            case R.id.cachebtn:
+            case R.id.cacheEventsStatusBtn:
                 Intent cacheIntent = new Intent(MainDashBoardActivity.this, CacheEventsListActivity.class);
                 startActivity(cacheIntent);
                 break;
@@ -688,14 +713,6 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
             }
         }
 
-    }
-
-
-    private String getUTCTime() {
-        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss a", Locale.ENGLISH);
-        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-        String gmtTime = sdf.format(new Date());
-        return gmtTime;
     }
 
     private String getCarierName() {

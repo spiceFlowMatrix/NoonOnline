@@ -54,18 +54,10 @@
                     app:srcCompat="@drawable/ic_check_black" />
 
                 <ImageView
-                    android:id="@+id/syncingbtn"
+                    android:id="@+id/cacheEventsStatusBtn"
                     android:layout_width="@dimen/_25sdp"
                     android:layout_height="@dimen/_25sdp"
-                    android:visibility="gone"
-                    app:srcCompat="@drawable/ic_cache_syncing" />
-
-                <ImageView
-                    android:id="@+id/emptybtn"
-                    android:layout_width="@dimen/_25sdp"
-                    android:layout_height="@dimen/_25sdp"
-                    android:visibility="gone"
-                    app:srcCompat="@drawable/ic_cache_empty" />
+                    android:visibility="gone" />
 
             </FrameLayout>
         </androidx.appcompat.widget.Toolbar>
