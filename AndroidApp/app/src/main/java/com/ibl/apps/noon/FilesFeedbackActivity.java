@@ -39,7 +39,6 @@ import com.ibl.apps.Model.feedback.FileData;
 import com.ibl.apps.Model.feedback.FillesData;
 import com.ibl.apps.Model.feedback.LessonData;
 import com.ibl.apps.RoomDatabase.dao.syncAPIManagementDatabase.SyncAPIDatabaseRepository;
-import com.ibl.apps.RoomDatabase.entity.SyncAPITable;
 import com.ibl.apps.noon.databinding.ActivityFilesFeedbackBinding;
 import com.ibl.apps.noon.databinding.FileSelectItemBinding;
 import com.ibl.apps.noon.databinding.PickVideoFileBinding;
@@ -66,7 +65,6 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static com.ibl.apps.noon.AssignmentAddActivity.getMimeType;
-import static com.ibl.apps.noon.CacheEventsListActivity.isClick;
 
 public class FilesFeedbackActivity extends BaseActivity implements View.OnClickListener {
     ActivityFilesFeedbackBinding binding;
@@ -137,23 +135,26 @@ public class FilesFeedbackActivity extends BaseActivity implements View.OnClickL
         showBackArrow(getResources().getString(R.string.submit_feedback));
         binding.toolbarLayout.cacheEventsStatusBtn.setVisibility(View.VISIBLE);
         SyncAPIDatabaseRepository syncAPIDatabaseRepository = new SyncAPIDatabaseRepository();
-        List<SyncAPITable> syncAPITableList = syncAPIDatabaseRepository.getSyncUserById(Integer.parseInt(userId));
 
-        for (int i = 0; i < syncAPITableList.size(); i++) {
-            ErrorSync = syncAPITableList.get(i).getStatus();
+        SharedPreferences sharedPreferenceCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
+        String flagStatus = sharedPreferenceCache.getString("FlagStatus", "");
+        switch (flagStatus) {
+            case "1":
+                binding.toolbarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_pending);
+                break;
+            case "2":
+                binding.toolbarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_error);
+                break;
+            case "3":
+                binding.toolbarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_syncing);
+                break;
+            case "4":
+                GlideApp.with(FilesFeedbackActivity.this)
+                        .load(R.drawable.ic_cache_empty)
+                        .error(R.drawable.ic_cache_empty)
+                        .into(binding.toolbarLayout.cacheEventsStatusBtn);
+                break;
         }
-        if (syncAPITableList != null && syncAPITableList.size() != 0) {
-            binding.toolbarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_pending);
-        } else if (syncAPITableList == null && syncAPITableList.size() == 0) {
-            GlideApp.with(FilesFeedbackActivity.this)
-                    .load(R.drawable.ic_cache_empty)
-                    .error(R.drawable.ic_cache_empty)
-                    .into(binding.toolbarLayout.cacheEventsStatusBtn);
-        } else if (isClick) {
-            binding.toolbarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_syncing);
-        } /*else if (ErrorSync.contains("Errored")) {
-            binding.toolbarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_error);
-        }*/
 
 
         binding.toolbarLayout.cacheEventsStatusBtn.setOnClickListener(new View.OnClickListener() {

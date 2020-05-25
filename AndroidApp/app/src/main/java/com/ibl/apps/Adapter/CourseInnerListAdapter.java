@@ -4,15 +4,11 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import androidx.databinding.DataBindingUtil;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.res.ResourcesCompat;
-import androidx.recyclerview.widget.RecyclerView;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextUtils;
@@ -20,20 +16,24 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
+import androidx.databinding.DataBindingUtil;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.droidnet.DroidListener;
 import com.droidnet.DroidNet;
 import com.google.gson.Gson;
 import com.ibl.apps.Model.CourseObject;
 import com.ibl.apps.Model.CoursePriviewObject;
 import com.ibl.apps.RoomDatabase.dao.courseManagementDatabase.CourseDatabaseRepository;
-import com.ibl.apps.RoomDatabase.database.AppDatabase;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
-import com.ibl.apps.util.Const;
-import com.ibl.apps.util.CustomTypefaceSpan;
-import com.ibl.apps.util.GlideApp;
 import com.ibl.apps.noon.ChapterActivity;
 import com.ibl.apps.noon.R;
 import com.ibl.apps.noon.databinding.CourseInnerLayoutBinding;
+import com.ibl.apps.util.Const;
+import com.ibl.apps.util.CustomTypefaceSpan;
+import com.ibl.apps.util.GlideApp;
 
 import java.util.List;
 
@@ -48,6 +48,7 @@ public class CourseInnerListAdapter extends RecyclerView.Adapter<CourseInnerList
     DroidNet mDroidNet;
     public static boolean isNetworkConnected = false;
     CourseDatabaseRepository courseDatabaseRepository;
+    private String gradeName;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         CourseInnerLayoutBinding courseInnerLayoutBinding;
@@ -58,10 +59,11 @@ public class CourseInnerListAdapter extends RecyclerView.Adapter<CourseInnerList
         }
     }
 
-    public CourseInnerListAdapter(Context ctx, List<CourseObject.Courses> list, UserDetails userDetailsObject) {
+    public CourseInnerListAdapter(Context ctx, List<CourseObject.Courses> list, UserDetails userDetailsObject, String gradeName) {
         courseDatabaseRepository = new CourseDatabaseRepository();
         this.list = list;
         this.ctx = ctx;
+        this.gradeName = gradeName;
         this.userDetailsObject = userDetailsObject;
         mDroidNet = DroidNet.getInstance();
         mDroidNet.addInternetConnectivityListener(this);
@@ -154,6 +156,7 @@ public class CourseInnerListAdapter extends RecyclerView.Adapter<CourseInnerList
                 Intent i = new Intent(ctx, ChapterActivity.class);
                 i.putExtra(Const.GradeID, model.getId());
                 i.putExtra(Const.CourseName, model.getName());
+                i.putExtra("GradeName", gradeName);
                 i.putExtra(Const.ActivityFlag, "0");
                 i.putExtra(Const.LessonID, "0");
                 i.putExtra(Const.QuizID, "0");

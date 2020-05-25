@@ -25,6 +25,12 @@ public class SyncAPITable {
 
     private String created_time;
 
+    private String chapterName;
+
+    private String courseName;
+
+    private String gradeName;
+
     public int getId() {
         return id;
     }
@@ -97,6 +103,30 @@ public class SyncAPITable {
         this.created_time = created_time;
     }
 
+    public String getChapterName() {
+        return chapterName;
+    }
+
+    public void setChapterName(String chapterName) {
+        this.chapterName = chapterName;
+    }
+
+    public String getCourseName() {
+        return courseName;
+    }
+
+    public void setCourseName(String courseName) {
+        this.courseName = courseName;
+    }
+
+    public String getGradeName() {
+        return gradeName;
+    }
+
+    public void setGradeName(String gradeName) {
+        this.gradeName = gradeName;
+    }
+
     @Override
     public String toString() {
         return "SyncAPITable{" +
@@ -109,6 +139,9 @@ public class SyncAPITable {
                 ", status='" + status + '\'' +
                 ", description='" + description + '\'' +
                 ", created_time='" + created_time + '\'' +
+                ", chapterName='" + chapterName + '\'' +
+                ", courseName='" + courseName + '\'' +
+                ", gradeName='" + gradeName + '\'' +
                 '}';
     }
 }

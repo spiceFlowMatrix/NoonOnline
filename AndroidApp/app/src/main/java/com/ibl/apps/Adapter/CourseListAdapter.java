@@ -1,12 +1,13 @@
 package com.ibl.apps.Adapter;
 
 import android.content.Context;
-import androidx.databinding.DataBindingUtil;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.databinding.DataBindingUtil;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.ibl.apps.Model.CourseObject;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
@@ -93,7 +94,7 @@ public class CourseListAdapter extends RecyclerView.Adapter<CourseListAdapter.My
 
         holder.courseLayoutBinding.rcHorizontalLayout.rcVertical.setLayoutManager(new GridLayoutManager(ctx, 2));
         holder.courseLayoutBinding.rcHorizontalLayout.rcVertical.setHasFixedSize(true);
-        CourseInnerListAdapter adp = new CourseInnerListAdapter(ctx, CourseInnerList, userDetailsObject);
+        CourseInnerListAdapter adp = new CourseInnerListAdapter(ctx, CourseInnerList, userDetailsObject, model.getName());
         holder.courseLayoutBinding.rcHorizontalLayout.rcVertical.setAdapter(adp);
     }
 

@@ -53,8 +53,6 @@ import com.ibl.apps.util.SingleShotLocationProvider;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.ibl.apps.noon.CacheEventsListActivity.isClick;
-
 /**
  * Created by iblinfotech on 10/09/18.
  */
@@ -173,21 +171,25 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
                         SyncAPIDatabaseRepository syncAPIDatabaseRepository = new SyncAPIDatabaseRepository();
 
                         List<SyncAPITable> syncAPITableList = syncAPIDatabaseRepository.getSyncUserById(Integer.parseInt(userId));
-                        for (int i = 0; i < syncAPITableList.size(); i++) {
-                            ErrorSync = syncAPITableList.get(i).getStatus();
+                        SharedPreferences sharedPreferencesuser = getSharedPreferences("cacheStatus", MODE_PRIVATE);
+                        String flagStatus = sharedPreferencesuser.getString("FlagStatus", "");
+                        switch (flagStatus) {
+                            case "1":
+                                mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_pending);
+                                break;
+                            case "2":
+                                mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_error);
+                                break;
+                            case "3":
+                                mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_syncing);
+                                break;
+                            case "4":
+                                GlideApp.with(MainDashBoardActivity.this)
+                                        .load(R.drawable.ic_cache_empty)
+                                        .error(R.drawable.ic_cache_empty)
+                                        .into(mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn);
+                                break;
                         }
-                        if (syncAPITableList != null && syncAPITableList.size() != 0) {
-                            mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_pending);
-                        } else if (syncAPITableList == null && syncAPITableList.size() == 0) {
-                            GlideApp.with(MainDashBoardActivity.this)
-                                    .load(R.drawable.ic_cache_empty)
-                                    .error(R.drawable.ic_cache_empty)
-                                    .into(mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn);
-                        } else if (isClick) {
-                            mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_syncing);
-                        } /*else if (ErrorSync.contains("Errored")) {
-                            mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_error);
-                        }*/
 
                         if (syncAPITableList.size() >= 50) {
                             showHitLimitDialog(MainDashBoardActivity.this);

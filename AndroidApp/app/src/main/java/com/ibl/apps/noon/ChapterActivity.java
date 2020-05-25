@@ -43,7 +43,7 @@ public class ChapterActivity extends BaseActivity implements View.OnClickListene
 
     MenuItem prevMenuItem;
     UserDetails userDetailsObject = new UserDetails();
-    String GradeId, CourseName, ActivityFlag, LessonID, QuizID;
+    String GradeId, CourseName, ActivityFlag, LessonID, QuizID, gradeName;
     ViewPagerAdapter adapter;
     Boolean isNotification = false;
     String AddtionalLibrary, AddtionalDiscussions, AddtionalAssignment = "";
@@ -159,6 +159,7 @@ public class ChapterActivity extends BaseActivity implements View.OnClickListene
         if (getIntent() != null) {
             GradeId = getIntent().getStringExtra(Const.GradeID);
             CourseName = getIntent().getStringExtra(Const.CourseName);
+            gradeName = getIntent().getStringExtra("GradeName");
             ActivityFlag = getIntent().getStringExtra(Const.ActivityFlag);
             LessonID = getIntent().getStringExtra(Const.LessonID);
             QuizID = getIntent().getStringExtra(Const.QuizID);
@@ -212,6 +213,7 @@ public class ChapterActivity extends BaseActivity implements View.OnClickListene
         Bundle bundle = new Bundle();
         bundle.putString(Const.GradeID, GradeId);
         bundle.putString(Const.CourseName, CourseName);
+        bundle.putString("GradeName", gradeName);
         bundle.putString(Const.ActivityFlag, ActivityFlag);
         bundle.putString(Const.LessonID, LessonID);
         bundle.putString(Const.QuizID, QuizID);

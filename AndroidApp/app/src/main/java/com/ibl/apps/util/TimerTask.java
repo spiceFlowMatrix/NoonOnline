@@ -41,7 +41,6 @@ public class TimerTask {
                         intervaleditor.clear();
                         intervaleditor.putBoolean("iscall", true);
                         intervaleditor.apply();
-
                     }
 
                     if (editor != null) {
@@ -50,6 +49,7 @@ public class TimerTask {
 //                        Log.e("TotalTime", "===run===" + gmtTime);
                         editor.apply();
                     }
+
                 });
             }
         }
@@ -69,6 +69,10 @@ public class TimerTask {
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putBoolean("iscall", false);
             editor.apply();
+
+            context.getSharedPreferences("spendtime1", MODE_PRIVATE).edit()
+                    .putBoolean("is_save", false).apply();
+
         }
     }
 }

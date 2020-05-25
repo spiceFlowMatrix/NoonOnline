@@ -102,7 +102,6 @@ public abstract class BaseActivity extends AppCompatActivity implements DroidLis
     private TimerTask timerTask;
     private UserRepository userRepository;
     private UserDatabaseRepository userDatabaseRepository;
-    public static int synchingAPITag = -1;
     //LogoutPopupLayoutBinding logoutPopupLayoutBinding;
 
     @SuppressLint("NewApi")

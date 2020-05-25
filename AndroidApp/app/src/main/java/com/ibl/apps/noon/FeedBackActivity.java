@@ -17,16 +17,12 @@ import com.ibl.apps.Fragment.CompletedFragment;
 import com.ibl.apps.Fragment.ProgressFragment;
 import com.ibl.apps.Fragment.QueueFragment;
 import com.ibl.apps.RoomDatabase.dao.syncAPIManagementDatabase.SyncAPIDatabaseRepository;
-import com.ibl.apps.RoomDatabase.entity.SyncAPITable;
 import com.ibl.apps.noon.databinding.ActivityFeedBackBinding;
 import com.ibl.apps.noon.databinding.BottomSheetBinding;
 import com.ibl.apps.util.Const;
 import com.ibl.apps.util.GlideApp;
 
 import java.util.ArrayList;
-import java.util.List;
-
-import static com.ibl.apps.noon.CacheEventsListActivity.isClick;
 
 public class FeedBackActivity extends BaseActivity implements View.OnClickListener {
 
@@ -60,24 +56,25 @@ public class FeedBackActivity extends BaseActivity implements View.OnClickListen
         });
         setUpViewPager();
         binding.toolbarLayout.cacheEventsStatusBtn.setVisibility(View.VISIBLE);
-        List<SyncAPITable> syncAPITableList = syncAPIDatabaseRepository.getSyncUserById(Integer.parseInt(userId));
-
-        for (int i = 0; i < syncAPITableList.size(); i++) {
-            ErrorSync = syncAPITableList.get(i).getStatus();
+        SharedPreferences sharedPreferenceCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
+        String flagStatus = sharedPreferenceCache.getString("FlagStatus", "");
+        switch (flagStatus) {
+            case "1":
+                binding.toolbarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_pending);
+                break;
+            case "2":
+                binding.toolbarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_error);
+                break;
+            case "3":
+                binding.toolbarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_syncing);
+                break;
+            case "4":
+                GlideApp.with(FeedBackActivity.this)
+                        .load(R.drawable.ic_cache_empty)
+                        .error(R.drawable.ic_cache_empty)
+                        .into(binding.toolbarLayout.cacheEventsStatusBtn);
+                break;
         }
-        if (syncAPITableList != null && syncAPITableList.size() != 0) {
-            binding.toolbarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_pending);
-        } else if (syncAPITableList == null && syncAPITableList.size() == 0) {
-            GlideApp.with(FeedBackActivity.this)
-                    .load(R.drawable.ic_cache_empty)
-                    .error(R.drawable.ic_cache_empty)
-                    .into(binding.toolbarLayout.cacheEventsStatusBtn);
-        } else if (isClick) {
-            binding.toolbarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_syncing);
-        }/* else if (ErrorSync.contains("Errored")) {
-            binding.toolbarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_error);
-        }*/
-
 
         binding.toolbarLayout.cacheEventsStatusBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -85,7 +82,6 @@ public class FeedBackActivity extends BaseActivity implements View.OnClickListen
                 startActivity(new Intent(FeedBackActivity.this, CacheEventsListActivity.class));
             }
         });
-
 
         if (syncAPIDatabaseRepository.getSyncUserById(Integer.parseInt(userId)).size() >= 50) {
             showHitLimitDialog(FeedBackActivity.this);
