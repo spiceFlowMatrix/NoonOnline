@@ -68,6 +68,7 @@
             android:layout_height="@dimen/_30sdp"
             android:layout_alignParentEnd="true"
             android:layout_margin="@dimen/_15sdp"
+            android:src="@drawable/ic_cache_empty"
             android:visibility="visible" />
 
         <androidx.cardview.widget.CardView

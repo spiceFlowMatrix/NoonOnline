@@ -725,7 +725,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                                 syncAPITable.setEndpoint_url("LessonProgress/LessonProgressSync");
                                 syncAPITable.setParameters(String.valueOf(array));
                                 syncAPITable.setHeaders(PrefUtils.getAuthid(getActivity()));
-                                syncAPITable.setStatus("Errored");
+                                syncAPITable.setStatus(getString(R.string.errored_status));
                                 syncAPITable.setDescription(e.getMessage());
                                 syncAPITable.setCreated_time(getUTCTime());
                                 syncAPITable.setGradeName(gradeName);
@@ -788,7 +788,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                                 syncAPITable.setEndpoint_url("ChapterProgress/ChapterProgressSync");
                                 syncAPITable.setParameters(String.valueOf(array));
                                 syncAPITable.setHeaders(PrefUtils.getAuthid(getActivity()));
-                                syncAPITable.setStatus("Errored");
+                                syncAPITable.setStatus(getString(R.string.errored_status));
                                 syncAPITable.setDescription(e.getMessage());
                                 syncAPITable.setCreated_time(getUTCTime());
                                 syncAPITable.setGradeName(gradeName);
@@ -851,7 +851,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                                 syncAPITable.setEndpoint_url("FileProgress/FileProgressSync");
                                 syncAPITable.setParameters(String.valueOf(array));
                                 syncAPITable.setHeaders(PrefUtils.getAuthid(getActivity()));
-                                syncAPITable.setStatus("Errored");
+                                syncAPITable.setStatus(getString(R.string.errored_status));
                                 syncAPITable.setDescription(e.getMessage());
                                 syncAPITable.setCreated_time(getUTCTime());
                                 syncAPITable.setGradeName(gradeName);
@@ -914,7 +914,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                                 syncAPITable.setEndpoint_url("QuizProgress/QuizProgressSync");
                                 syncAPITable.setParameters(String.valueOf(array));
                                 syncAPITable.setHeaders(PrefUtils.getAuthid(getActivity()));
-                                syncAPITable.setStatus("Errored");
+                                syncAPITable.setStatus(getString(R.string.errored_status));
                                 syncAPITable.setDescription(e.getMessage());
                                 syncAPITable.setCreated_time(getUTCTime());
                                 syncAPITable.setGradeName(gradeName);
@@ -2232,7 +2232,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                                                                 syncAPITable.setEndpoint_url("UserQuizResult/UserQuizResultSync");
                                                                 syncAPITable.setParameters(new Gson().toJson(array));
                                                                 syncAPITable.setHeaders(PrefUtils.getAuthid(getActivity()));
-                                                                syncAPITable.setStatus("Errored");
+                                                                syncAPITable.setStatus(getString(R.string.errored_status));
                                                                 syncAPITable.setDescription(e.getMessage());
                                                                 syncAPITable.setCreated_time(getUTCTime());
                                                                 syncAPITable.setGradeName(gradeName);
@@ -2304,7 +2304,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                                                             syncAPITable.setEndpoint_url("UserQuizResult/UserQuizResultSync");
                                                             syncAPITable.setParameters(String.valueOf(array));
                                                             syncAPITable.setHeaders(PrefUtils.getAuthid(getActivity()));
-                                                            syncAPITable.setStatus("Errored");
+                                                            syncAPITable.setStatus(getString(R.string.errored_status));
                                                             syncAPITable.setDescription(e.getMessage());
                                                             syncAPITable.setCreated_time(getUTCTime());
                                                             syncAPITable.setGradeName(gradeName);
@@ -2382,7 +2382,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                                                                 syncAPITable.setEndpoint_url("UserQuizResult/UserQuizResultSync");
                                                                 syncAPITable.setParameters(String.valueOf(array));
                                                                 syncAPITable.setHeaders(PrefUtils.getAuthid(getActivity()));
-                                                                syncAPITable.setStatus("Errored");
+                                                                syncAPITable.setStatus(getString(R.string.errored_status));
                                                                 syncAPITable.setDescription(e.getMessage());
                                                                 syncAPITable.setCreated_time(getUTCTime());
                                                                 syncAPITable.setGradeName(gradeName);
@@ -2454,7 +2454,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                                                             syncAPITable.setEndpoint_url("UserQuizResult/UserQuizResultSync");
                                                             syncAPITable.setParameters(String.valueOf(array));
                                                             syncAPITable.setHeaders(PrefUtils.getAuthid(getActivity()));
-                                                            syncAPITable.setStatus("Errored");
+                                                            syncAPITable.setStatus(getString(R.string.errored_status));
                                                             syncAPITable.setDescription(e.getMessage());
                                                             syncAPITable.setCreated_time(getUTCTime());
                                                             syncAPITable.setGradeName(gradeName);

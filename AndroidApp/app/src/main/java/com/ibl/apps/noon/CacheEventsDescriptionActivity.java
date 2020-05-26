@@ -2,7 +2,6 @@ package com.ibl.apps.noon;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -40,7 +39,7 @@ public class CacheEventsDescriptionActivity extends BaseActivity {
         Type listOfCourseType = new TypeToken<SyncAPITable>() {
         }.getType();
         syncAPIArray = gson.fromJson(getSyncAPIData, listOfCourseType);
-        Log.e("syncAPIArray", "onViewReady: " + syncAPIArray.toString());
+//        Log.e("syncAPIArray", "onViewReady: " + syncAPIArray.toString());
 
         binding.toolBar.setNavigationOnClickListener(view -> {
             finish();
@@ -58,9 +57,14 @@ public class CacheEventsDescriptionActivity extends BaseActivity {
             if (syncAPIArray.getStatus() != null) {
                 binding.txtStatus.setText(syncAPIArray.getStatus());
             }
+
+            if (syncAPIArray.getCourseName() != null && syncAPIArray.getGradeName() != null)
+                binding.txtCourseName.setText(syncAPIArray.getCourseName() + " " + syncAPIArray.getGradeName() + ", ID: " + syncAPIArray.getId());
+
+            if (syncAPIArray.getEndpoint_url().equals("ProgessSync/AppTimeTrack") || syncAPIArray.getEndpoint_url().equals("ProgessSync/ProgessSyncAdd")) {
+                binding.txtCourseName.setText("ID: " + syncAPIArray.getId());
+            }
         }
-
-
 //        cacheEventsDescriptionAdapter = new CacheEventsDescriptionAdapter();
 //        binding.rcVerticalLayout.rcVertical.setAdapter(cacheEventsDescriptionAdapter);
     }

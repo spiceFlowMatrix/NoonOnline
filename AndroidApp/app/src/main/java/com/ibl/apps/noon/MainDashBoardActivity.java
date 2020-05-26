@@ -355,7 +355,7 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
                         syncTimeTrackingObject.setVersion(Build.VERSION.RELEASE);
                         syncTimeTrackingObject.setUserid(Integer.parseInt(userId));
                         courseDatabaseRepository.updateSyncTimeTracking(syncTimeTrackingObject);
-                    } else {
+                    } else {//06:32:33 AM in
                         SyncTimeTrackingObject syncTimeTrackingObjectinsert = new SyncTimeTrackingObject();
                         syncTimeTrackingObjectinsert.setLatitude("");
                         syncTimeTrackingObjectinsert.setLongitude("");

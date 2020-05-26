@@ -54,6 +54,7 @@
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
                     android:layout_marginEnd="@dimen/_15sdp"
+                    android:src="@drawable/ic_cache_empty"
                     android:visibility="visible" />
             </RelativeLayout>
 

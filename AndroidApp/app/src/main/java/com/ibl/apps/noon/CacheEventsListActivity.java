@@ -192,6 +192,8 @@ public class CacheEventsListActivity extends BaseActivity {
                 editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
                 editor.apply();
             }
+
+//            JsonArray jsonArray = new Gson().fromJson(syncAPITableList.get(position).getParameters(), JsonArray.class);
             callApiSyncLessonProgress(lessonProgressList, position);
         } else if (syncAPITableList.get(position).getEndpoint_url().contains("ChapterProgress/ChapterProgressSync")) {
             NoonApplication.cacheStatus = 3;
@@ -224,7 +226,8 @@ public class CacheEventsListActivity extends BaseActivity {
             }
             List<QuizUserResult> quizUserResults = quizDatabaseRepository.getAllQuizuserResult(false, userId);
             List<LessonProgress> lessonProgressList = lessonDatabaseRepository.getAllLessonProgressData(false, userId);
-            callApiProgessSyncAdd(lessonProgressList, quizUserResults, position);
+            JsonObject jsonArray = new Gson().fromJson(syncAPITableList.get(position).getParameters(), JsonObject.class);
+            callApiProgessSyncAdd(lessonProgressList, quizUserResults, position, jsonArray);
         } else if (syncAPITableList.get(position).getEndpoint_url().contains("QuizProgress/QuizProgressSync")) {
             NoonApplication.cacheStatus = 3;
             SharedPreferences sharedPreferencesCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
@@ -677,7 +680,7 @@ public class CacheEventsListActivity extends BaseActivity {
                 }));
     }
 
-    public void callApiProgessSyncAdd(List<LessonProgress> lessonProgressList, List<QuizUserResult> quizUserResults, int position) {
+    public void callApiProgessSyncAdd(List<LessonProgress> lessonProgressList, List<QuizUserResult> quizUserResults, int position, JsonObject jsonArray) {
 
         try {
             JsonObject noonAppFullSyncObject = new JsonObject();
@@ -690,7 +693,7 @@ public class CacheEventsListActivity extends BaseActivity {
             //Log.e(Const.LOG_NOON_TAG, "=====quizResultArray===" + quizResultArray);
             Log.e(Const.LOG_NOON_TAG, "=====noonAppFullSyncObject===" + noonAppFullSyncObject);
             LessonRepository lessonRepository = new LessonRepository();
-            disposable.add(lessonRepository.ProgessSyncAdd(noonAppFullSyncObject)
+            disposable.add(lessonRepository.ProgessSyncAdd(jsonArray)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeWith(new DisposableSingleObserver<LessonProgress>() {

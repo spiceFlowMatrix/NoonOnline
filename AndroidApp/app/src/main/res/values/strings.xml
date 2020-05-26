@@ -408,6 +408,9 @@
     <string name="no_thanks">NO THANKS</string>
     <string name="empty_cache_events">Empty Cache Events</string>
     <string name="apptime_track_pending_description">We are using the AppTimeTrack API for tracking users online-offline activity.</string>
+    <string name="progress_add_pending_description">We are using the ProgressSyncAdd API for update users progress activity.</string>
+    <string name="pending_status">Pending</string>
+    <string name="errored_status">Errored</string>
 
 
     <!--&lt;!&ndash;Device Management&ndash;&gt;

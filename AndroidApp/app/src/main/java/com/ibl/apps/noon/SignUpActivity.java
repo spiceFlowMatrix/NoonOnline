@@ -970,7 +970,7 @@ public class SignUpActivity extends BaseActivity implements View.OnClickListener
                                 syncAPITable.setEndpoint_url("ProgessSync/GetSyncRecords");
                                 syncAPITable.setParameters("");
                                 syncAPITable.setHeaders(PrefUtils.getAuthid(SignUpActivity.this));
-                                syncAPITable.setStatus("Errored");
+                                syncAPITable.setStatus(getString(R.string.errored_status));
                                 syncAPITable.setDescription(e.getMessage());
                                 syncAPITable.setCreated_time(getUTCTime());
                                 syncAPITable.setUserid(Integer.parseInt(userId));

@@ -58,6 +58,7 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
     private static Context context;
     private BroadcastReceiver mNetworkReceiver;
     public static int cacheStatus = -1;
+    public static boolean AppTimeTrack = false;
 
     // This flag should be set to true to enable VectorDrawable support for API < 21
     static {
@@ -120,7 +121,7 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
                 SharedPreferences shared = context.getSharedPreferences("interval", MODE_PRIVATE);
                 boolean isbackground = shared.getBoolean("iscall", false);
                 if (isbackground) {
-                    Log.e("isbackground", "run:5 min ");
+//                    Log.e("isbackground", "run:5 min ");
                     call5minIntervalData();
                 }
                 h.postDelayed(this, 300000);
@@ -234,7 +235,7 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
                                                 syncAPITable.setEndpoint_url("ProgessSync/AppTimeTrack");
                                                 syncAPITable.setParameters(String.valueOf(array));
                                                 syncAPITable.setHeaders(PrefUtils.getAuthid(getContext()));
-                                                syncAPITable.setStatus("Errored");
+                                                syncAPITable.setStatus(getString(R.string.errored_status));
                                                 syncAPITable.setDescription(e.getMessage());
                                                 syncAPITable.setCreated_time(getUTCTime());
                                                 syncAPITable.setUserid(Integer.parseInt(userId));
@@ -292,34 +293,34 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
 
                 jsonObject.addProperty(Const.networkspeed, networkSpeed);
                 array.add(jsonObject);
-                Log.e("isback", "call5minIntervalData: " + array.toString());
 
                 SyncAPITable syncAPITable = new SyncAPITable();
                 if (!userId.equals("") && !outtimrsave.equals("")) {
+//                    Log.e("isback", "call5minIntervalData: " + array.toString());
                     syncAPITable.setApi_name("AppTimeTrack Progressed");
                     syncAPITable.setEndpoint_url("ProgessSync/AppTimeTrack");
                     syncAPITable.setParameters(String.valueOf(array));
                     syncAPITable.setHeaders(PrefUtils.getAuthid(getContext()));
-                    syncAPITable.setStatus("Pending");
+                    syncAPITable.setStatus(context.getResources().getString(R.string.pending_status));
                     syncAPITable.setDescription(getContext().getResources().getString(R.string.apptime_track_pending_description));
                     syncAPITable.setCreated_time(getUTCTime());
                     syncAPITable.setUserid(Integer.parseInt(userId));
                     SyncAPIDatabaseRepository syncAPIDatabaseRepository = new SyncAPIDatabaseRepository();
                     syncAPIDatabaseRepository.insertSyncData(syncAPITable);
-                    //SharedPreferences sharedPreferences2 = context.getSharedPreferences("spendtime1", MODE_PRIVATE);
-                    //sharedPreferences2.edit().putBoolean("is_save", true).apply();
-                }
+                    AppTimeTrack = true;
+//                    courseDatabaseRepository.updateSyncTimeTracking(syncTimeTrackingObject);
 
-                syncTimeTrackingObject.setActivitytime(getUTCTime());
-                syncTimeTrackingObject.setOuttime("");
+                    syncTimeTrackingObject.setActivitytime(getUTCTime());
+                    syncTimeTrackingObject.setOuttime("");
 
-                SharedPreferences sharedPreferences2 = getSharedPreferences("spendtime", MODE_PRIVATE);
-                if (sharedPreferences2 != null) {
-                    SharedPreferences.Editor editor = sharedPreferences2.edit();
-                    editor.clear();
-                    editor.apply();
+                    SharedPreferences sharedPreferences2 = getSharedPreferences("spendtime", MODE_PRIVATE);
+                    if (sharedPreferences2 != null) {
+                        SharedPreferences.Editor editor = sharedPreferences2.edit();
+                        editor.clear();
+                        editor.apply();
+                    }
+                    courseDatabaseRepository.updateSyncTimeTracking(syncTimeTrackingObject);
                 }
-                courseDatabaseRepository.updateSyncTimeTracking(syncTimeTrackingObject);
             }
             cacheStatus = 1;
             SharedPreferences sharedPreferencesCache = context.getSharedPreferences("cacheStatus", MODE_PRIVATE);

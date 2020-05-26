@@ -3,6 +3,9 @@ package com.ibl.apps.util;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Handler;
+import android.util.Log;
+
+import com.ibl.apps.noon.NoonApplication;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -44,10 +47,15 @@ public class TimerTask {
                     }
 
                     if (editor != null) {
-                        editor.clear();
-                        editor.putString("totaltime", gmtTime);
-//                        Log.e("TotalTime", "===run===" + gmtTime);
-                        editor.apply();
+                        if (sharedPreferences.getString("totaltime", "").isEmpty()) {
+                            NoonApplication.AppTimeTrack = true;
+                        }
+                        if (NoonApplication.AppTimeTrack) {
+                            editor.clear();
+                            editor.putString("totaltime", gmtTime);
+                            Log.e("TotalTime", "===run===" + gmtTime);
+                            editor.apply();
+                        }
                     }
 
                 });
@@ -70,8 +78,6 @@ public class TimerTask {
             editor.putBoolean("iscall", false);
             editor.apply();
 
-            context.getSharedPreferences("spendtime1", MODE_PRIVATE).edit()
-                    .putBoolean("is_save", false).apply();
 
         }
     }

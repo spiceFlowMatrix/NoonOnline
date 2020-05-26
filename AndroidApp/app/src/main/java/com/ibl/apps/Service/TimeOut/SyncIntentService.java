@@ -118,7 +118,7 @@ public class SyncIntentService extends JobIntentService implements DroidListener
             String action = intent.getAction();
             if (ACTION_START.equals(action)) {
 
-                Log.e(Const.LOG_NOON_TAG, "====SERVICE CALL====");
+                //Log.e(Const.LOG_NOON_TAG, "====SERVICE CALL====");
 
 
                 mDroidNet = DroidNet.getInstance();
@@ -180,7 +180,7 @@ public class SyncIntentService extends JobIntentService implements DroidListener
                             LessonDatabaseRepository lessonDatabaseRepository = new LessonDatabaseRepository();
                             List<LessonProgress> lessonProgressList = lessonDatabaseRepository.getAllLessonProgressData(false, userId);
 
-                            //callApiProgessSyncAdd(lessonProgressList, quizUserResults);
+                            callApiProgessSyncAdd(lessonProgressList, quizUserResults);
                         }
 
                         /*--------------------------- For courses need to be deleted from local storage after expiry date in offline Database ----------------------------------*/
@@ -555,8 +555,24 @@ public class SyncIntentService extends JobIntentService implements DroidListener
             noonAppFullSyncObject.add(Const.TIMERDATA, quizResultArray);
             //Log.e(Const.LOG_NOON_TAG, "=====quizResultArray===" + quizResultArray);
             Log.e(Const.LOG_NOON_TAG, "=====noonAppFullSyncObject===" + noonAppFullSyncObject);
+
+            SyncAPITable syncAPITable = new SyncAPITable();
+            if (!userId.equals("")) {
+                syncAPITable.setApi_name("ProgressSyncAdd Progressed");
+                syncAPITable.setEndpoint_url("ProgessSync/ProgessSyncAdd");
+                syncAPITable.setParameters(String.valueOf(noonAppFullSyncObject));
+                syncAPITable.setHeaders(PrefUtils.getAuthid(mycontext));
+                syncAPITable.setStatus(mycontext.getResources().getString(R.string.pending_status));
+                syncAPITable.setDescription(mycontext.getResources().getString(R.string.progress_add_pending_description));
+                syncAPITable.setCreated_time(getUTCTime());
+                syncAPITable.setUserid(Integer.parseInt(userId));
+                SyncAPIDatabaseRepository syncAPIDatabaseRepository = new SyncAPIDatabaseRepository();
+                syncAPIDatabaseRepository.insertSyncData(syncAPITable);
+
+            }
+
             LessonRepository lessonRepository = new LessonRepository();
-            disposable.add(lessonRepository.ProgessSyncAdd(noonAppFullSyncObject)
+            /*disposable.add(lessonRepository.ProgessSyncAdd(noonAppFullSyncObject)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeWith(new DisposableSingleObserver<LessonProgress>() {
@@ -608,7 +624,7 @@ public class SyncIntentService extends JobIntentService implements DroidListener
 
                             }
                         }
-                    }));
+                    }));*/
 
 
         } catch (Exception e) {
