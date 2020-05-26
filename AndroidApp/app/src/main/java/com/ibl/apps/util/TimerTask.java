@@ -3,7 +3,6 @@ package com.ibl.apps.util;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Handler;
-import android.util.Log;
 
 import com.ibl.apps.noon.NoonApplication;
 
@@ -53,16 +52,13 @@ public class TimerTask {
                         if (NoonApplication.AppTimeTrack) {
                             editor.clear();
                             editor.putString("totaltime", gmtTime);
-                            Log.e("TotalTime", "===run===" + gmtTime);
+//                            Log.e("TotalTime", "===run===" + gmtTime);
                             editor.apply();
                         }
                     }
-
                 });
             }
-        }
-
-        ;
+        };
 
 
         // public void schedule (TimerTask task, long delay, long period)

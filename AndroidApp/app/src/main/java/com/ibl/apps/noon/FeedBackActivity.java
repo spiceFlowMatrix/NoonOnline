@@ -84,6 +84,14 @@ public class FeedBackActivity extends BaseActivity implements View.OnClickListen
         });
 
         if (syncAPIDatabaseRepository.getSyncUserById(Integer.parseInt(userId)).size() >= 50) {
+            NoonApplication.cacheStatus = 2;
+            SharedPreferences sharedPreferencesCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferencesCache.edit();
+            if (editor != null) {
+                editor.clear();
+                editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
+                editor.apply();
+            }
             showHitLimitDialog(FeedBackActivity.this);
         }
         //setOnClick();

@@ -145,6 +145,14 @@ public class ReportProblemActivity extends BaseActivity implements View.OnClickL
 
 
         if (syncAPIDatabaseRepository.getSyncUserById(Integer.parseInt(userId)).size() >= 50) {
+            NoonApplication.cacheStatus = 2;
+            SharedPreferences sharedPreferencesCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferencesCache.edit();
+            if (editor != null) {
+                editor.clear();
+                editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
+                editor.apply();
+            }
             showHitLimitDialog(ReportProblemActivity.this);
         }
         flagPassDeails();
