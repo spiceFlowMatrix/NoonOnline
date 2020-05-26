@@ -123,9 +123,9 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
                     Log.e("isbackground", "run:5 min ");
                     call5minIntervalData();
                 }
-                h.postDelayed(this, 120000);
+                h.postDelayed(this, 300000);
             }
-        }, 120000);
+        }, 300000);
     }
 
     private void callLogfiles() {
