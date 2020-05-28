@@ -397,6 +397,12 @@
     <string name="validation_limitDecription">There is limit of only 150 charaters</string>
     <string name="many_attempt">شما رمزعبور را چندین دفعه اشتباه وارد کردید، آی‌پی مبایل شما برای این حساب مسدود شد. برای رفع انسداد به ایمیل آدرس‌تان مراجعه کنید، و یا هم با اداره تعلیمات ن تماس بگیرید. </string>
 
+    <string name="sign_up_with_trial">Sign Up with Trial</string>
+    <string name="first_name">First Name</string>
+    <string name="last_name">Last Name</string>
+    <string name="login_trial">Login Trial</string>
+    <string name="sign_up_trial">Sign Up Trial</string>
+
     <string name="pending_cache_events">Pending Cache Events</string>
     <string name="too_many_events_cache">Too many events in cache</string>
     <string name="cache_limit_message">You will lose progress if you don\'t sync \n your pending cache events.</string>
