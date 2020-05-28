@@ -33,9 +33,11 @@ import com.ibl.apps.Network.ApiService;
 import com.ibl.apps.RoomDatabase.dao.courseManagementDatabase.CourseDatabaseRepository;
 import com.ibl.apps.RoomDatabase.dao.lessonManagementDatabase.LessonDatabaseRepository;
 import com.ibl.apps.RoomDatabase.dao.quizManagementDatabase.QuizDatabaseRepository;
+import com.ibl.apps.RoomDatabase.dao.syncAPIManagementDatabase.SyncAPIDatabaseRepository;
 import com.ibl.apps.RoomDatabase.dao.userManagementDatabse.UserDatabaseRepository;
 import com.ibl.apps.RoomDatabase.entity.LessonProgress;
 import com.ibl.apps.RoomDatabase.entity.QuizUserResult;
+import com.ibl.apps.RoomDatabase.entity.SyncAPITable;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
 import com.ibl.apps.UserCredentialsManagement.UserRepository;
 import com.ibl.apps.UserProfileManagement.UserProfileRepository;
@@ -58,6 +60,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.TimeZone;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -115,7 +118,7 @@ public class SyncIntentService extends JobIntentService implements DroidListener
             String action = intent.getAction();
             if (ACTION_START.equals(action)) {
 
-                Log.e(Const.LOG_NOON_TAG, "====SERVICE CALL====");
+                //Log.e(Const.LOG_NOON_TAG, "====SERVICE CALL====");
 
 
                 mDroidNet = DroidNet.getInstance();
@@ -167,7 +170,7 @@ public class SyncIntentService extends JobIntentService implements DroidListener
 
                         if (isNetworkAvailable(mycontext)) {
                             /*---------------------------FOR User Accound FillesData UPDATE-------------------*/
-                            callApiUpdateProfile();
+                            // callApiUpdateProfile();
 
                             /*---------------------------FOR Quiz Timer--------------------------------*/
                             quizDatabaseRepository = new QuizDatabaseRepository();
@@ -542,7 +545,7 @@ public class SyncIntentService extends JobIntentService implements DroidListener
     public void callApiProgessSyncAdd(List<LessonProgress> lessonProgressList, List<QuizUserResult> quizUserResults) {
 
         try {
-LessonDatabaseRepository lessonDatabaseRepository = new LessonDatabaseRepository();
+            LessonDatabaseRepository lessonDatabaseRepository = new LessonDatabaseRepository();
             JsonObject noonAppFullSyncObject = new JsonObject();
             JsonArray lessonProgressArray = PrefUtils.convertToJsonArray(lessonProgressList);
             noonAppFullSyncObject.add(Const.PROGRESSDATA, lessonProgressArray);
@@ -552,51 +555,90 @@ LessonDatabaseRepository lessonDatabaseRepository = new LessonDatabaseRepository
             noonAppFullSyncObject.add(Const.TIMERDATA, quizResultArray);
             //Log.e(Const.LOG_NOON_TAG, "=====quizResultArray===" + quizResultArray);
             Log.e(Const.LOG_NOON_TAG, "=====noonAppFullSyncObject===" + noonAppFullSyncObject);
+
+            SyncAPITable syncAPITable = new SyncAPITable();
+            if (!userId.equals("")) {
+                syncAPITable.setApi_name("ProgressSyncAdd Progressed");
+                syncAPITable.setEndpoint_url("ProgessSync/ProgessSyncAdd");
+                syncAPITable.setParameters(String.valueOf(noonAppFullSyncObject));
+                syncAPITable.setHeaders(PrefUtils.getAuthid(mycontext));
+                syncAPITable.setStatus(mycontext.getResources().getString(R.string.pending_status));
+                syncAPITable.setDescription(mycontext.getResources().getString(R.string.progress_add_pending_description));
+                syncAPITable.setCreated_time(getUTCTime());
+                syncAPITable.setUserid(Integer.parseInt(userId));
+                SyncAPIDatabaseRepository syncAPIDatabaseRepository = new SyncAPIDatabaseRepository();
+                syncAPIDatabaseRepository.insertSyncData(syncAPITable);
+
+            }
+
             LessonRepository lessonRepository = new LessonRepository();
-//            disposable.add(lessonRepository.ProgessSyncAdd(noonAppFullSyncObject)
-//                    .subscribeOn(Schedulers.io())
-//                    .observeOn(AndroidSchedulers.mainThread())
-//                    .subscribeWith(new DisposableSingleObserver<LessonProgress>() {
-//                        @Override
-//                        public void onSuccess(LessonProgress lessonProgress) {
-//
-//                            if (lessonProgressList != null && lessonProgressList.size() != 0) {
-//                                for (int i = 0; i < lessonProgressList.size(); i++) {
-//                                    String quizID = lessonProgressList.get(i).getQuizId();
-//                                    String lessonID = lessonProgressList.get(i).getLessonId();
-//                                    if (quizID != null && !TextUtils.isEmpty(quizID)) {
-//                                        lessonDatabaseRepository.updateQuizIdisStatus(quizID, true, userId);
-//                                    } else {
-//                                        lessonDatabaseRepository.updateLessonIdisStatus(lessonID, true, userId);
-//                                    }
-//                                }
-//                            }
-//                            quizDatabaseRepository = new QuizDatabaseRepository();
-//                            if (quizUserResults != null && quizUserResults.size() != 0) {
-//                                for (int i = 0; i < quizUserResults.size(); i++) {
-//                                    String quizID = quizUserResults.get(i).getQuizId();
-//                                    quizDatabaseRepository.updatelQuizUserResultStatus(true, quizID, userId);
-//                                }
-//                            }
-//                        }
-//
-//                        @Override
-//                        public void onError(Throwable e) {
-//                            try {
-//                                HttpException error = (HttpException) e;
-//                                LessonProgress lessonProgress = new Gson().fromJson(Objects.requireNonNull(error.response().errorBody()).string(), LessonProgress.class);
-//                                //Log.e(Const.LOG_NOON_TAG, "==lessonProgress==" + lessonProgress);
-//                            } catch (Exception e1) {
-//                                e1.printStackTrace();
-//
-//                            }
-//                        }
-//                    }));
+            /*disposable.add(lessonRepository.ProgessSyncAdd(noonAppFullSyncObject)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeWith(new DisposableSingleObserver<LessonProgress>() {
+                        @Override
+                        public void onSuccess(LessonProgress lessonProgress) {
+
+                            if (lessonProgressList != null && lessonProgressList.size() != 0) {
+                                for (int i = 0; i < lessonProgressList.size(); i++) {
+                                    String quizID = lessonProgressList.get(i).getQuizId();
+                                    String lessonID = lessonProgressList.get(i).getLessonId();
+                                    if (quizID != null && !TextUtils.isEmpty(quizID)) {
+                                        lessonDatabaseRepository.updateQuizIdisStatus(quizID, true, userId);
+                                    } else {
+                                        lessonDatabaseRepository.updateLessonIdisStatus(lessonID, true, userId);
+                                    }
+                                }
+                            }
+                            quizDatabaseRepository = new QuizDatabaseRepository();
+                            if (quizUserResults != null && quizUserResults.size() != 0) {
+                                for (int i = 0; i < quizUserResults.size(); i++) {
+                                    String quizID = quizUserResults.get(i).getQuizId();
+                                    quizDatabaseRepository.updatelQuizUserResultStatus(true, quizID, userId);
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            try {
+                                HttpException error = (HttpException) e;
+                                LessonProgress lessonProgress = new Gson().fromJson(Objects.requireNonNull(error.response().errorBody()).string(), LessonProgress.class);
+                                SyncAPIDatabaseRepository syncAPIDatabaseRepository = new SyncAPIDatabaseRepository();
+                                if (!userId.equals("")) {
+                                    SyncAPITable syncAPITable = new SyncAPITable();
+
+                                    syncAPITable.setApi_name("ProgressSyncAdd Progressed");
+                                    syncAPITable.setEndpoint_url("ProgessSync/ProgessSyncAdd");
+                                    syncAPITable.setParameters(String.valueOf(noonAppFullSyncObject));
+                                    syncAPITable.setHeaders(PrefUtils.getAuthid(mycontext));
+                                    syncAPITable.setStatus("Errored");
+                                    syncAPITable.setDescription(e.getMessage());
+                                    syncAPITable.setCreated_time(getUTCTime());
+                                    syncAPITable.setUserid(Integer.parseInt(userId));
+                                    syncAPIDatabaseRepository.insertSyncData(syncAPITable);
+                                }
+                                //Log.e(Const.LOG_NOON_TAG, "==lessonProgress==" + lessonProgress);
+                            } catch (Exception e1) {
+                                e1.printStackTrace();
+
+                            }
+                        }
+                    }));*/
 
 
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private String getUTCTime() {
+
+        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss a", Locale.ENGLISH);
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+        String gmtTime = sdf.format(new Date());
+//        Log.e("date", "getUTCTime: " + gmtTime);
+        return gmtTime;
     }
 
     public void callApiUpdateProfile() {

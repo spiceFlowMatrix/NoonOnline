@@ -2,17 +2,12 @@ package com.ibl.apps.noon;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
-import androidx.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import com.google.android.material.bottomsheet.BottomSheetDialog;
-import androidx.recyclerview.widget.GridLayoutManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,6 +16,13 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
+import androidx.recyclerview.widget.GridLayoutManager;
+
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.ibl.apps.Adapter.ImageUploadAdapter;
@@ -36,13 +38,13 @@ import com.ibl.apps.Model.feedback.FeedBackTaskDetail;
 import com.ibl.apps.Model.feedback.FileData;
 import com.ibl.apps.Model.feedback.FillesData;
 import com.ibl.apps.Model.feedback.LessonData;
-import com.ibl.apps.Network.ApiClient;
-import com.ibl.apps.Network.ApiService;
-import com.ibl.apps.util.Const;
-import com.ibl.apps.util.Validator;
+import com.ibl.apps.RoomDatabase.dao.syncAPIManagementDatabase.SyncAPIDatabaseRepository;
 import com.ibl.apps.noon.databinding.ActivityFilesFeedbackBinding;
 import com.ibl.apps.noon.databinding.FileSelectItemBinding;
 import com.ibl.apps.noon.databinding.PickVideoFileBinding;
+import com.ibl.apps.util.Const;
+import com.ibl.apps.util.GlideApp;
+import com.ibl.apps.util.Validator;
 import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.File;
@@ -79,6 +81,7 @@ public class FilesFeedbackActivity extends BaseActivity implements View.OnClickL
     private int chpterId = 0;
     private Long id;
     private FeedbackRepository feedbackRepository;
+    private String ErrorSync;
 
     @Override
     protected int getContentView() {
@@ -90,6 +93,8 @@ public class FilesFeedbackActivity extends BaseActivity implements View.OnClickL
         super.onViewReady(savedInstanceState, intent);
         binding = (ActivityFilesFeedbackBinding) getBindObj();
         feedbackRepository = new FeedbackRepository();
+        SharedPreferences sharedPreferencesuser = getSharedPreferences("user", MODE_PRIVATE);
+        String userId = sharedPreferencesuser.getString("uid", "");
 
         if (fileIdList != null) {
             fileIdList.clear();
@@ -128,6 +133,49 @@ public class FilesFeedbackActivity extends BaseActivity implements View.OnClickL
 
         setToolbar(binding.toolbarLayout.toolBar);
         showBackArrow(getResources().getString(R.string.submit_feedback));
+        binding.toolbarLayout.cacheEventsStatusBtn.setVisibility(View.VISIBLE);
+        SyncAPIDatabaseRepository syncAPIDatabaseRepository = new SyncAPIDatabaseRepository();
+
+        SharedPreferences sharedPreferenceCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
+        String flagStatus = sharedPreferenceCache.getString("FlagStatus", "");
+        switch (flagStatus) {
+            case "1":
+                binding.toolbarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_pending);
+                break;
+            case "2":
+                binding.toolbarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_error);
+                break;
+            case "3":
+                binding.toolbarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_syncing);
+                break;
+            case "4":
+                GlideApp.with(FilesFeedbackActivity.this)
+                        .load(R.drawable.ic_cache_empty)
+                        .error(R.drawable.ic_cache_empty)
+                        .into(binding.toolbarLayout.cacheEventsStatusBtn);
+                break;
+        }
+
+
+        binding.toolbarLayout.cacheEventsStatusBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(FilesFeedbackActivity.this, CacheEventsListActivity.class));
+            }
+        });
+
+
+        if (syncAPIDatabaseRepository.getSyncUserById(Integer.parseInt(userId)).size() >= 50) {
+            NoonApplication.cacheStatus = 2;
+            SharedPreferences sharedPreferencesCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferencesCache.edit();
+            if (editor != null) {
+                editor.clear();
+                editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
+                editor.apply();
+            }
+            showHitLimitDialog(FilesFeedbackActivity.this);
+        }
         feedbackFlagPassDeails();
         setOnclickListner();
         setUpRecyclerView();
@@ -638,16 +686,16 @@ public class FilesFeedbackActivity extends BaseActivity implements View.OnClickL
     }
 
     public String getPath(Uri uri) {
-            String[] projection = {MediaStore.Video.Media.DATA};
-            Cursor cursor = getContentResolver().query(uri, projection, null, null, null);
-            if (cursor != null) {
-                // HERE YOU WILL GET A NULLPOINTER IF CURSOR IS NULL
-                // THIS CAN BE, IF YOU USED OI FILE MANAGER FOR PICKING THE MEDIA
-                int column_index = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA);
-                cursor.moveToFirst();
-                return cursor.getString(column_index);
-            } else
-                return null;
+        String[] projection = {MediaStore.Video.Media.DATA};
+        Cursor cursor = getContentResolver().query(uri, projection, null, null, null);
+        if (cursor != null) {
+            // HERE YOU WILL GET A NULLPOINTER IF CURSOR IS NULL
+            // THIS CAN BE, IF YOU USED OI FILE MANAGER FOR PICKING THE MEDIA
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DATA);
+            cursor.moveToFirst();
+            return cursor.getString(column_index);
+        } else
+            return null;
     }
 
     private void feedbackFlagPassDeails() {

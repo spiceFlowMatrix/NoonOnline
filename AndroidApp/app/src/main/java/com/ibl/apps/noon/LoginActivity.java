@@ -16,7 +16,6 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.res.ResourcesCompat;
 
@@ -25,9 +24,6 @@ import com.auth0.android.authentication.AuthenticationAPIClient;
 import com.auth0.android.authentication.AuthenticationException;
 import com.auth0.android.callback.BaseCallback;
 import com.auth0.android.result.Credentials;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -40,9 +36,11 @@ import com.ibl.apps.Model.TemsCondition;
 import com.ibl.apps.Model.UserObject;
 import com.ibl.apps.RoomDatabase.dao.lessonManagementDatabase.LessonDatabaseRepository;
 import com.ibl.apps.RoomDatabase.dao.quizManagementDatabase.QuizDatabaseRepository;
+import com.ibl.apps.RoomDatabase.dao.syncAPIManagementDatabase.SyncAPIDatabaseRepository;
 import com.ibl.apps.RoomDatabase.dao.userManagementDatabse.UserDatabaseRepository;
 import com.ibl.apps.RoomDatabase.entity.LessonProgress;
 import com.ibl.apps.RoomDatabase.entity.QuizUserResult;
+import com.ibl.apps.RoomDatabase.entity.SyncAPITable;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
 import com.ibl.apps.UserCredentialsManagement.UserRepository;
 import com.ibl.apps.noon.databinding.LoginLayoutBinding;
@@ -185,7 +183,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                 //openActivity(SignUpTrialActivity.class);
                 break;*/
 
-          //  case R.id.cardLoginTrial:
+            //  case R.id.cardLoginTrial:
 
                 /*if (validateFields()) {
                     String email = loginLayoutBinding.loginEmail.getText().toString().trim();
@@ -217,7 +215,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                     }*//*
                 }*/
 
-              //  break;
+            //  break;
         }
     }
 
@@ -605,7 +603,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                             }.execute();
 
                             openActivity(MainDashBoardActivity.class);
-//                            callApiGetSyncRecords(userId);
+                            callApiGetSyncRecords(userId);
                             finish();
                         }
 
@@ -657,14 +655,14 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                                             LessonProgress lessonProgress = lessonDatabaseRepository.getItemProgressData(syncData.getProgressdata().get(i).getLessonProgressId(), userId);
                                             if (lessonProgress != null) {
                                                 lessonDatabaseRepository.updateLessonUserIdWise(syncData.getProgressdata().get(i).getLessonId(),
-                                                                syncData.getProgressdata().get(i).getLessonProgress().split("\\.")[0],
-                                                                syncData.getProgressdata().get(i).getGradeId(),
-                                                                syncData.getProgressdata().get(i).getUserId(),
-                                                                syncData.getProgressdata().get(i).getTotalRecords(),
-                                                                syncData.getProgressdata().get(i).getQuizId(),
-                                                                true,
-                                                                syncData.getProgressdata().get(i).getFileId(),
-                                                                syncData.getProgressdata().get(i).getLessonProgressId());
+                                                        syncData.getProgressdata().get(i).getLessonProgress().split("\\.")[0],
+                                                        syncData.getProgressdata().get(i).getGradeId(),
+                                                        syncData.getProgressdata().get(i).getUserId(),
+                                                        syncData.getProgressdata().get(i).getTotalRecords(),
+                                                        syncData.getProgressdata().get(i).getQuizId(),
+                                                        true,
+                                                        syncData.getProgressdata().get(i).getFileId(),
+                                                        syncData.getProgressdata().get(i).getLessonProgressId());
 
                                             } else {
                                                 lessonProgress = new LessonProgress();
@@ -706,12 +704,24 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 
                     @Override
                     public void onError(Throwable e) {
-
-
                         try {
                             HttpException error = (HttpException) e;
                             SyncRecords syncRecords = new Gson().fromJson(error.response().errorBody().string(), SyncRecords.class);
                             //Log.e(Const.LOG_NOON_TAG, "===SyncRecords=ERROR==" + syncRecords.getMessage());
+                            SyncAPIDatabaseRepository syncAPIDatabaseRepository = new SyncAPIDatabaseRepository();
+                            if (!userId.equals("")) {
+                                SyncAPITable syncAPITable = new SyncAPITable();
+
+                                syncAPITable.setApi_name("SyncRecords Progressed");
+                                syncAPITable.setEndpoint_url("ProgessSync/GetSyncRecords");
+                                syncAPITable.setParameters("");
+                                syncAPITable.setHeaders(PrefUtils.getAuthid(LoginActivity.this));
+                                syncAPITable.setStatus(getString(R.string.errored_status));
+                                syncAPITable.setDescription(e.getMessage());
+                                syncAPITable.setCreated_time(getUTCTime());
+                                syncAPITable.setUserid(Integer.parseInt(userId));
+                                syncAPIDatabaseRepository.insertSyncData(syncAPITable);
+                            }
                             hideDialog();
                         } catch (Exception e1) {
                             //showError(e1);

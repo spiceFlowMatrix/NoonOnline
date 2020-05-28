@@ -38,21 +38,20 @@ import com.ibl.apps.Fragment.ProfileFragment;
 import com.ibl.apps.Fragment.ReportFragment;
 import com.ibl.apps.Interface.BackInterface;
 import com.ibl.apps.RoomDatabase.dao.courseManagementDatabase.CourseDatabaseRepository;
+import com.ibl.apps.RoomDatabase.dao.syncAPIManagementDatabase.SyncAPIDatabaseRepository;
+import com.ibl.apps.RoomDatabase.entity.SyncAPITable;
 import com.ibl.apps.RoomDatabase.entity.SyncTimeTrackingObject;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
 import com.ibl.apps.Service.TimeOut.SyncEventReceiver;
 import com.ibl.apps.noon.databinding.LogoutPopupLayoutBinding;
 import com.ibl.apps.noon.databinding.MainDashboardLayoutBinding;
 import com.ibl.apps.util.Const;
+import com.ibl.apps.util.GlideApp;
 import com.ibl.apps.util.PrefUtils;
 import com.ibl.apps.util.SingleShotLocationProvider;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
-import java.util.TimeZone;
 
 /**
  * Created by iblinfotech on 10/09/18.
@@ -78,6 +77,7 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
     private String userRoleName;
     private UserDetails userDetail;
     CourseDatabaseRepository courseDatabaseRepository;
+    private String ErrorSync;
 
     @Override
     protected int getContentView() {
@@ -167,6 +167,41 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
 //                                mainDashboardLayoutBinding.appBarLayout.contentMain.bottomNavigation.getMenu().removeItem(R.id.action_item4);
 //                            }
 //                        }
+
+                        SyncAPIDatabaseRepository syncAPIDatabaseRepository = new SyncAPIDatabaseRepository();
+
+                        List<SyncAPITable> syncAPITableList = syncAPIDatabaseRepository.getSyncUserById(Integer.parseInt(userId));
+                        SharedPreferences sharedPreferencesuser = getSharedPreferences("cacheStatus", MODE_PRIVATE);
+                        String flagStatus = sharedPreferencesuser.getString("FlagStatus", "");
+                        switch (flagStatus) {
+                            case "1":
+                                mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_pending);
+                                break;
+                            case "2":
+                                mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_error);
+                                break;
+                            case "3":
+                                mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_syncing);
+                                break;
+                            case "4":
+                                GlideApp.with(MainDashBoardActivity.this)
+                                        .load(R.drawable.ic_cache_empty)
+                                        .error(R.drawable.ic_cache_empty)
+                                        .into(mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn);
+                                break;
+                        }
+
+                        if (syncAPITableList.size() >= 50) {
+                            NoonApplication.cacheStatus = 2;
+                            SharedPreferences sharedPreferencesCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
+                            SharedPreferences.Editor editor = sharedPreferencesCache.edit();
+                            if (editor != null) {
+                                editor.clear();
+                                editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
+                                editor.apply();
+                            }
+                            showHitLimitDialog(MainDashBoardActivity.this);
+                        }
 
                         mainDashboardLayoutBinding.appBarLayout.contentMain.bottomNavigation.setOnNavigationItemSelectedListener(
                                 new BottomNavigationView.OnNavigationItemSelectedListener() {
@@ -328,7 +363,7 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
                         syncTimeTrackingObject.setVersion(Build.VERSION.RELEASE);
                         syncTimeTrackingObject.setUserid(Integer.parseInt(userId));
                         courseDatabaseRepository.updateSyncTimeTracking(syncTimeTrackingObject);
-                    } else {
+                    } else {//06:32:33 AM in
                         SyncTimeTrackingObject syncTimeTrackingObjectinsert = new SyncTimeTrackingObject();
                         syncTimeTrackingObjectinsert.setLatitude("");
                         syncTimeTrackingObjectinsert.setLongitude("");
@@ -533,6 +568,7 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
         mainDashboardLayoutBinding.appBarLayout.logOutBtn.setOnClickListener(this);
         mainDashboardLayoutBinding.appBarLayout.editprofileBtn.setOnClickListener(this);
         mainDashboardLayoutBinding.appBarLayout.btnNotification.setOnClickListener(this);
+        mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn.setOnClickListener(this);
     }
 
     @Override
@@ -550,6 +586,11 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
             case R.id.btnNotification:
                 Intent i3 = new Intent(MainDashBoardActivity.this, NotificationActivity.class);
                 startActivity(i3);
+                break;
+
+            case R.id.cacheEventsStatusBtn:
+                Intent cacheIntent = new Intent(MainDashBoardActivity.this, CacheEventsListActivity.class);
+                startActivity(cacheIntent);
                 break;
             case R.id.feedbackbtn:
                 if (isNetworkAvailable(MainDashBoardActivity.this)) {
@@ -572,7 +613,6 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
                     profileFragment.hideVisibleLay(true);
                 }
                 break;
-
         }
     }
 
@@ -683,14 +723,6 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
             }
         }
 
-    }
-
-
-    private String getUTCTime() {
-        SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss a", Locale.ENGLISH);
-        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-        String gmtTime = sdf.format(new Date());
-        return gmtTime;
     }
 
     private String getCarierName() {

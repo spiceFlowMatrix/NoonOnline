@@ -28,10 +28,13 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import com.ibl.apps.Model.SyncTimeTracking;
 import com.ibl.apps.RoomDatabase.dao.courseManagementDatabase.CourseDatabaseRepository;
+import com.ibl.apps.RoomDatabase.dao.syncAPIManagementDatabase.SyncAPIDatabaseRepository;
+import com.ibl.apps.RoomDatabase.entity.SyncAPITable;
 import com.ibl.apps.RoomDatabase.entity.SyncTimeTrackingObject;
 import com.ibl.apps.Service.NetworkChangeReceiver;
 import com.ibl.apps.UserCredentialsManagement.UserRepository;
 import com.ibl.apps.util.Const;
+import com.ibl.apps.util.PrefUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -54,6 +57,8 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
 
     private static Context context;
     private BroadcastReceiver mNetworkReceiver;
+    public static int cacheStatus = -1;
+    public static boolean AppTimeTrack = false;
 
     // This flag should be set to true to enable VectorDrawable support for API < 21
     static {
@@ -76,7 +81,7 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
     public void onCreate() {
         super.onCreate();
         Fabric.with(this, new Crashlytics());
-
+        callApiForCacheEventsInterval();
         //CallApiForSpendApp();
         //callApiForInterval();
         //callLogfiles();
@@ -108,6 +113,22 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
         }, 300000);
     }
 
+    private void callApiForCacheEventsInterval() {
+        final Handler h = new Handler();
+        h.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                SharedPreferences shared = context.getSharedPreferences("interval", MODE_PRIVATE);
+                boolean isbackground = shared.getBoolean("iscall", false);
+                if (isbackground) {
+//                    Log.e("isbackground", "run:5 min ");
+                    call5minIntervalData();
+                }
+                h.postDelayed(this, 300000);
+            }
+        }, 300000);
+    }
+
     private void callLogfiles() {
         Handler handler = new Handler();
         handler.postDelayed(() -> {
@@ -125,7 +146,7 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
     }
 
     private void saveDataOffline() {
-        CourseDatabaseRepository courseDatabaseRepository= new CourseDatabaseRepository();
+        CourseDatabaseRepository courseDatabaseRepository = new CourseDatabaseRepository();
         SharedPreferences sharedPreferences = getSharedPreferences("spendtime", MODE_PRIVATE);
         if (sharedPreferences != null) {
             SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -144,7 +165,7 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
         }
     }
 
-    private void CallApiForSpendApp() {
+    public void CallApiForSpendApp() {
         try {
             SharedPreferences sharedPreferences = getSharedPreferences("spendtime", MODE_PRIVATE);
             String outtimrsave = sharedPreferences.getString("totaltime", "");
@@ -207,7 +228,23 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
 
                                     @Override
                                     public void onError(Throwable e) {
-
+                                        try {
+                                            if (!userId.equals("")) {
+                                                SyncAPITable syncAPITable = new SyncAPITable();
+                                                syncAPITable.setApi_name("AppTimeTrack Progressed");
+                                                syncAPITable.setEndpoint_url("ProgessSync/AppTimeTrack");
+                                                syncAPITable.setParameters(String.valueOf(array));
+                                                syncAPITable.setHeaders(PrefUtils.getAuthid(getContext()));
+                                                syncAPITable.setStatus(getString(R.string.errored_status));
+                                                syncAPITable.setDescription(e.getMessage());
+                                                syncAPITable.setCreated_time(getUTCTime());
+                                                syncAPITable.setUserid(Integer.parseInt(userId));
+                                                SyncAPIDatabaseRepository syncAPIDatabaseRepository = new SyncAPIDatabaseRepository();
+                                                syncAPIDatabaseRepository.insertSyncData(syncAPITable);
+                                            }
+                                        } catch (Exception exception) {
+                                            exception.printStackTrace();
+                                        }
                                     }
                                 }));
                     }
@@ -215,6 +252,86 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
             }
         } catch (JsonSyntaxException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void call5minIntervalData() {
+        try {
+
+            SharedPreferences sharedPreferencesuser = getSharedPreferences("user", MODE_PRIVATE);
+            String userId = sharedPreferencesuser.getString("uid", "");
+
+            SharedPreferences sharedPreferences = getSharedPreferences("spendtime", MODE_PRIVATE);
+            String outtimrsave = sharedPreferences.getString("totaltime", "");
+
+            SharedPreferences sharedPreferences1 = getSharedPreferences("NetworkSpeed", MODE_PRIVATE);
+            String networkSpeed = sharedPreferences1.getString("downloadspeed", "");
+
+            CourseDatabaseRepository courseDatabaseRepository = new CourseDatabaseRepository();
+            SyncTimeTrackingObject syncTimeTrackingObject = courseDatabaseRepository.getSyncTimeTrackById(Integer.parseInt(userId));
+
+            if (syncTimeTrackingObject != null) {
+                JsonArray array = new JsonArray();
+                JsonObject jsonObject = new JsonObject();
+                jsonObject.addProperty(Const.userid, Integer.valueOf(userId));
+                jsonObject.addProperty(Const.latitude, String.valueOf(syncTimeTrackingObject.getLatitude()));
+                jsonObject.addProperty(Const.longitude, String.valueOf(syncTimeTrackingObject.getLongitude()));
+                jsonObject.addProperty(Const.serviceprovider, syncTimeTrackingObject.getServiceprovider());
+                jsonObject.addProperty("school", "");
+                jsonObject.addProperty("subjectstaken", "");
+                jsonObject.addProperty("grade", "");
+                jsonObject.addProperty(Const.hardwareplatform, syncTimeTrackingObject.getHardwareplatform());
+                jsonObject.addProperty(Const.operatingsystem, syncTimeTrackingObject.getOperatingsystem());
+                jsonObject.addProperty(Const.version, syncTimeTrackingObject.getVersion());
+                jsonObject.addProperty(Const.ISP, getWifiName(getContext()));
+                jsonObject.addProperty(Const.activitytime, syncTimeTrackingObject.getActivitytime());
+
+                if (syncTimeTrackingObject.getOuttime() != null && !syncTimeTrackingObject.getOuttime().isEmpty())
+                    jsonObject.addProperty(Const.outtime, syncTimeTrackingObject.getOuttime());
+                else
+                    jsonObject.addProperty(Const.outtime, outtimrsave);
+
+                jsonObject.addProperty(Const.networkspeed, networkSpeed);
+                array.add(jsonObject);
+
+                SyncAPITable syncAPITable = new SyncAPITable();
+                if (!userId.equals("") && !outtimrsave.equals("")) {
+//                    Log.e("isback", "call5minIntervalData: " + array.toString());
+                    syncAPITable.setApi_name("AppTimeTrack Progressed");
+                    syncAPITable.setEndpoint_url("ProgessSync/AppTimeTrack");
+                    syncAPITable.setParameters(String.valueOf(array));
+                    syncAPITable.setHeaders(PrefUtils.getAuthid(getContext()));
+                    syncAPITable.setStatus(context.getResources().getString(R.string.pending_status));
+                    syncAPITable.setDescription(getContext().getResources().getString(R.string.apptime_track_pending_description));
+                    syncAPITable.setCreated_time(getUTCTime());
+                    syncAPITable.setUserid(Integer.parseInt(userId));
+                    SyncAPIDatabaseRepository syncAPIDatabaseRepository = new SyncAPIDatabaseRepository();
+                    syncAPIDatabaseRepository.insertSyncData(syncAPITable);
+                    AppTimeTrack = true;
+//                    courseDatabaseRepository.updateSyncTimeTracking(syncTimeTrackingObject);
+
+                    syncTimeTrackingObject.setActivitytime(getUTCTime());
+                    syncTimeTrackingObject.setOuttime("");
+
+                    SharedPreferences sharedPreferences2 = getSharedPreferences("spendtime", MODE_PRIVATE);
+                    if (sharedPreferences2 != null) {
+                        SharedPreferences.Editor editor = sharedPreferences2.edit();
+                        editor.clear();
+                        editor.apply();
+                    }
+                    courseDatabaseRepository.updateSyncTimeTracking(syncTimeTrackingObject);
+                }
+            }
+            cacheStatus = 1;
+            SharedPreferences sharedPreferencesCache = context.getSharedPreferences("cacheStatus", MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferencesCache.edit();
+            if (editor != null) {
+                editor.clear();
+                editor.putString("FlagStatus", String.valueOf(cacheStatus));
+                editor.apply();
+            }
+        } catch (JsonSyntaxException exeption) {
+            exeption.printStackTrace();
         }
     }
 

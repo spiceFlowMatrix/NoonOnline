@@ -1,22 +1,26 @@
 package com.ibl.apps.noon;
 
 import android.content.Intent;
-import androidx.databinding.DataBindingUtil;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import com.google.android.material.bottomsheet.BottomSheetDialog;
-import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 
+import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.Fragment;
+
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.ibl.apps.Adapter.FeedBackPagerAdapter;
 import com.ibl.apps.Base.BaseActivity;
 import com.ibl.apps.Fragment.CompletedFragment;
 import com.ibl.apps.Fragment.ProgressFragment;
 import com.ibl.apps.Fragment.QueueFragment;
-import com.ibl.apps.util.Const;
+import com.ibl.apps.RoomDatabase.dao.syncAPIManagementDatabase.SyncAPIDatabaseRepository;
 import com.ibl.apps.noon.databinding.ActivityFeedBackBinding;
 import com.ibl.apps.noon.databinding.BottomSheetBinding;
+import com.ibl.apps.util.Const;
+import com.ibl.apps.util.GlideApp;
 
 import java.util.ArrayList;
 
@@ -25,6 +29,7 @@ public class FeedBackActivity extends BaseActivity implements View.OnClickListen
     private ActivityFeedBackBinding binding;
     ArrayList<Fragment> fragments = new ArrayList<>();
     ArrayList<String> titles = new ArrayList<>();
+    private String ErrorSync;
 
 
     @Override
@@ -36,8 +41,11 @@ public class FeedBackActivity extends BaseActivity implements View.OnClickListen
     protected void onViewReady(Bundle savedInstanceState, Intent intent) {
         super.onViewReady(savedInstanceState, intent);
         binding = (ActivityFeedBackBinding) getBindObj();
+        SharedPreferences sharedPreferencesuser = getSharedPreferences("user", MODE_PRIVATE);
+        String userId = sharedPreferencesuser.getString("uid", "");
         setToolbar(binding.toolbarLayout.toolBar);
         showBackArrow(getResources().getString(R.string.feedback));
+        SyncAPIDatabaseRepository syncAPIDatabaseRepository = new SyncAPIDatabaseRepository();
         binding.toolbarLayout.toolBar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -47,6 +55,45 @@ public class FeedBackActivity extends BaseActivity implements View.OnClickListen
             }
         });
         setUpViewPager();
+        binding.toolbarLayout.cacheEventsStatusBtn.setVisibility(View.VISIBLE);
+        SharedPreferences sharedPreferenceCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
+        String flagStatus = sharedPreferenceCache.getString("FlagStatus", "");
+        switch (flagStatus) {
+            case "1":
+                binding.toolbarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_pending);
+                break;
+            case "2":
+                binding.toolbarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_error);
+                break;
+            case "3":
+                binding.toolbarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_syncing);
+                break;
+            case "4":
+                GlideApp.with(FeedBackActivity.this)
+                        .load(R.drawable.ic_cache_empty)
+                        .error(R.drawable.ic_cache_empty)
+                        .into(binding.toolbarLayout.cacheEventsStatusBtn);
+                break;
+        }
+
+        binding.toolbarLayout.cacheEventsStatusBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(FeedBackActivity.this, CacheEventsListActivity.class));
+            }
+        });
+
+        if (syncAPIDatabaseRepository.getSyncUserById(Integer.parseInt(userId)).size() >= 50) {
+            NoonApplication.cacheStatus = 2;
+            SharedPreferences sharedPreferencesCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferencesCache.edit();
+            if (editor != null) {
+                editor.clear();
+                editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
+                editor.apply();
+            }
+            showHitLimitDialog(FeedBackActivity.this);
+        }
         //setOnClick();
     }
 

@@ -46,6 +46,16 @@
                         android:textStyle="bold" />
 
                 </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/cacheEventsStatusBtn"
+                    android:layout_width="@dimen/_25sdp"
+                    android:layout_height="@dimen/_27sdp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="@dimen/_15sdp"
+                    android:src="@drawable/ic_cache_empty"
+                    android:visibility="visible" />
             </RelativeLayout>
 
         </com.google.android.material.appbar.AppBarLayout>

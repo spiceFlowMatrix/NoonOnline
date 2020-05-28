@@ -401,6 +401,17 @@
     <string name="last_name">Last Name</string>
     <string name="login_trial">Login Trial</string>
     <string name="sign_up_trial">Sign Up Trial</string>
+    <string name="pending_cache_events">Pending Cache Events</string>
+    <string name="too_many_events_cache">Too many events in cache</string>
+    <string name="cache_limit_message">You will lose progress if you don\'t sync \n your pending cache events.</string>
+    <string name="go_to_pending_cache_events">GO TO PENDING CACHE EVENTS</string>
+    <string name="no_thanks">NO THANKS</string>
+    <string name="empty_cache_events">Empty Cache Events</string>
+    <string name="apptime_track_pending_description">We are using the AppTimeTrack API for tracking users online-offline activity.</string>
+    <string name="progress_add_pending_description">We are using the ProgressSyncAdd API for update users progress activity.</string>
+    <string name="pending_status">Pending</string>
+    <string name="errored_status">Errored</string>
+
 
     <!--&lt;!&ndash;Device Management&ndash;&gt;
     <string name="activate_deactivate_device">Activate/Deactivate device</string>

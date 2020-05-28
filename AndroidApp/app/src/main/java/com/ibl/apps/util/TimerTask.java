@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Handler;
 
+import com.ibl.apps.noon.NoonApplication;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -41,20 +43,22 @@ public class TimerTask {
                         intervaleditor.clear();
                         intervaleditor.putBoolean("iscall", true);
                         intervaleditor.apply();
-
                     }
 
                     if (editor != null) {
-                        editor.clear();
-                        editor.putString("totaltime", gmtTime);
-//                        Log.e("TotalTime", "===run===" + gmtTime);
-                        editor.apply();
+                        if (sharedPreferences.getString("totaltime", "").isEmpty()) {
+                            NoonApplication.AppTimeTrack = true;
+                        }
+                        if (NoonApplication.AppTimeTrack) {
+                            editor.clear();
+                            editor.putString("totaltime", gmtTime);
+//                            Log.e("TotalTime", "===run===" + gmtTime);
+                            editor.apply();
+                        }
                     }
                 });
             }
-        }
-
-        ;
+        };
 
 
         // public void schedule (TimerTask task, long delay, long period)
@@ -69,6 +73,8 @@ public class TimerTask {
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putBoolean("iscall", false);
             editor.apply();
+
+
         }
     }
 }
