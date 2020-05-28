@@ -13,6 +13,6 @@ namespace Trainning24.BL.ViewModels
         public string status { get; set; }
         public string approvedOn { get; set; }
         public string rejectedOn { get; set; }
-        public DeviceUser user { get; set; }
+        //public DeviceUser user { get; set; }
     }
 }

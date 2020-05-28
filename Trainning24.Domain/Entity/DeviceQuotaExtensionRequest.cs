@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Trainning24.Domain.Entity
 {
-    public class DeviceQuotas : EntityBase
+    public class DeviceQuotaExtensionRequest : EntityBase
     {
         public long UserId { get; set; }
         public string RequestedOn { get; set; }
