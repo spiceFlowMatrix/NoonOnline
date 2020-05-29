@@ -137,7 +137,7 @@ namespace Trainning24.BL.Business.Device
                 _eFDeviceQuotaExtensionRequestRepository.Update(obj);
             
                 var DeviceQuota = _eFDeviceQuotaRepository.GetById(i => i.UserId == userId);
-                DeviceQuota.DeviceLimit = Convert.ToInt32(obj.RequestedLimit);
+                DeviceQuota.DeviceLimit += Convert.ToInt32(obj.RequestedLimit);
                 _eFDeviceQuotaRepository.Update(DeviceQuota);
                 return _eFDeviceQuotaRepository.Update(DeviceQuota);
             }
