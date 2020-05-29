@@ -130,34 +130,36 @@ public class FilesFeedbackActivity extends BaseActivity implements View.OnClickL
 //            binding.bottomLay.setVisibility(View.VISIBLE);
 //            binding.descrptionWrapper.setVisibility(View.VISIBLE);
 //        }
-
-        setToolbar(binding.toolbarLayout.toolBar);
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT) {
+            binding.txtCacheTitle.setTextSize(35);
+        }
+        setToolbar(binding.toolBar);
         showBackArrow(getResources().getString(R.string.submit_feedback));
-        binding.toolbarLayout.cacheEventsStatusBtn.setVisibility(View.VISIBLE);
+        binding.cacheEventsStatusBtn.setVisibility(View.VISIBLE);
         SyncAPIDatabaseRepository syncAPIDatabaseRepository = new SyncAPIDatabaseRepository();
 
         SharedPreferences sharedPreferenceCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
         String flagStatus = sharedPreferenceCache.getString("FlagStatus", "");
         switch (flagStatus) {
             case "1":
-                binding.toolbarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_pending);
+                binding.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_pending);
                 break;
             case "2":
-                binding.toolbarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_error);
+                binding.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_error);
                 break;
             case "3":
-                binding.toolbarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_syncing);
+                binding.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_syncing);
                 break;
             case "4":
                 GlideApp.with(FilesFeedbackActivity.this)
                         .load(R.drawable.ic_cache_empty)
                         .error(R.drawable.ic_cache_empty)
-                        .into(binding.toolbarLayout.cacheEventsStatusBtn);
+                        .into(binding.cacheEventsStatusBtn);
                 break;
         }
 
 
-        binding.toolbarLayout.cacheEventsStatusBtn.setOnClickListener(new View.OnClickListener() {
+        binding.cacheEventsStatusBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(FilesFeedbackActivity.this, CacheEventsListActivity.class));
@@ -179,7 +181,7 @@ public class FilesFeedbackActivity extends BaseActivity implements View.OnClickL
         feedbackFlagPassDeails();
         setOnclickListner();
         setUpRecyclerView();
-        binding.toolbarLayout.toolBar.setNavigationOnClickListener(v -> {
+        binding.toolBar.setNavigationOnClickListener(v -> {
             if (isNetworkAvailable(FilesFeedbackActivity.this)) {
                 finish();
                 Intent intent1 = new Intent(FilesFeedbackActivity.this, FeedBackActivity.class);
