@@ -113,6 +113,7 @@ public class ReportProblemActivity extends BaseActivity implements View.OnClickL
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT) {
             binding.txtCacheTitle.setTextSize(35);
         }
+
         setToolbar(binding.toolBar);
         showBackArrow(getResources().getString(R.string.submit_feedback));
         binding.cacheEventsStatusBtn.setVisibility(View.VISIBLE);
