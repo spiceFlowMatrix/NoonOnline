@@ -74,9 +74,9 @@ namespace Trainning24.BL.Business.Device
         /// <param name="paginationModel"></param>
         /// <param name="total"></param>
         /// <returns></returns>
-        public List<ResponceDeviceQuotaExtension> QuotaExtensionList(DeviceQuotaExtensionFilterModel paginationModel, out int total)
+        public List<ResponseDeviceQuotaExtension> QuotaExtensionList(DeviceQuotaExtensionFilterModel paginationModel, out int total)
         {
-            List<ResponceDeviceQuotaExtension> deviceQuotaExtensionslist = new List<ResponceDeviceQuotaExtension>();
+            List<ResponseDeviceQuotaExtension> deviceQuotaExtensionslist = new List<ResponseDeviceQuotaExtension>();
             var usersList = _EFUsersRepository.GetAll();
             var deviceQuotaList = _eFDeviceQuotaRepository.GetAll();
             var DQExtensionRequestList = _eFDeviceQuotaExtensionRequestRepository.ListQuery(b => b.ApprovedOn == null);
@@ -84,7 +84,7 @@ namespace Trainning24.BL.Business.Device
             deviceQuotaExtensionslist = (from dqr in DQExtensionRequestList
                                          join dq in deviceQuotaList on dqr.UserId equals dq.UserId
                                          join x in usersList on dqr.UserId equals x.Id
-                                         select new ResponceDeviceQuotaExtension
+                                         select new ResponseDeviceQuotaExtension
                                          {
                                              Id = dqr.Id,
                                              RequestedLimit = dqr.RequestedLimit,
@@ -94,29 +94,28 @@ namespace Trainning24.BL.Business.Device
                                              UserId = x.Id,
                                              email = x.Email,
                                              username = x.Username,
-                                         }
-                                         ).ToList();
+                                         }).ToList();
             total = deviceQuotaExtensionslist != null ? deviceQuotaExtensionslist.Count() : 0;
             if (!string.IsNullOrEmpty(paginationModel.fromdate) && !string.IsNullOrEmpty(paginationModel.todate))
                 deviceQuotaExtensionslist = deviceQuotaExtensionslist.FindAll(
                     b => DateTime.ParseExact(b.RequestedOn, "yyyy-MM-dd'T'HH:mm:ss.fff'Z'", CultureInfo.InvariantCulture) >= DateTime.ParseExact(paginationModel.fromdate, "yyyy-MM-dd'T'HH:mm:ss.fff'Z'", CultureInfo.InvariantCulture)
                     && DateTime.ParseExact(b.RequestedOn, "yyyy-MM-dd'T'HH:mm:ss.fff'Z'", CultureInfo.InvariantCulture) <= DateTime.ParseExact(paginationModel.todate, "yyyy-MM-dd'T'HH:mm:ss.fff'Z'", CultureInfo.InvariantCulture));
-            
+
             if (!string.IsNullOrEmpty(paginationModel.search))
                 deviceQuotaExtensionslist = deviceQuotaExtensionslist.Where(b => b.Id.ToString().Any(k => b.Id.ToString().Contains(paginationModel.search)
                                                             || b.UserId.ToString().Contains(paginationModel.search)
                                                             || b.RequestedLimit.ToString().Contains(paginationModel.search)
                                                             || b.CurrentQuotaLimit.ToString().Contains(paginationModel.search)
-                                                            || b.email.ToLower().Contains(paginationModel.search.ToLower())
+                                                            || (b.email != null && b.email.ToLower().Contains(paginationModel.search.ToLower()))
                                                             || (b.username != null && b.username.ToLower().Contains(paginationModel.search.ToLower()))
-                                                            || b.email.ToLower().Contains(paginationModel.search.ToLower())
                                                             || b.Status.ToLower().Contains(paginationModel.search.ToLower())
                                                            )).ToList();
+
             if (paginationModel.pagenumber != 0 && paginationModel.perpagerecord != 0)
                 deviceQuotaExtensionslist = deviceQuotaExtensionslist.Skip(paginationModel.perpagerecord * (paginationModel.pagenumber - 1)).
                 Take(paginationModel.perpagerecord).
                 ToList();
-            
+
             return deviceQuotaExtensionslist;
         }
 
@@ -135,6 +134,12 @@ namespace Trainning24.BL.Business.Device
                 obj.LastModifierUserId = userId;
                 obj.ApprovedOn = DateTime.Now.ToString();
                 obj.LastModificationTime = DateTime.Now.ToString();
+                _eFDeviceQuotaExtensionRequestRepository.Update(obj);
+            
+                var DeviceQuota = _eFDeviceQuotaRepository.GetById(i => i.UserId == userId);
+                DeviceQuota.DeviceLimit = Convert.ToInt32(obj.RequestedLimit);
+                _eFDeviceQuotaRepository.Update(DeviceQuota);
+                return _eFDeviceQuotaRepository.Update(DeviceQuota);
             }
             else
             {
@@ -142,10 +147,10 @@ namespace Trainning24.BL.Business.Device
                 obj.LastModifierUserId = userId;
                 obj.RejectedOn = DateTime.Now.ToString();
                 obj.LastModificationTime = DateTime.Now.ToString();
+                return _eFDeviceQuotaExtensionRequestRepository.Update(obj);
             }
-
-            return _eFDeviceQuotaExtensionRequestRepository.Update(obj);
+           
         }
-        
+
     }
 }

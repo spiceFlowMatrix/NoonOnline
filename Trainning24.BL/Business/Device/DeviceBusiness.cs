@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using Trainning24.BL.ViewModels.Device;
 using Trainning24.Domain.Entity;
+using Trainning24.Domain.Helper;
 using Trainning24.Repository.EF;
 using Trainning24.Repository.EF.Device;
 
@@ -15,14 +17,16 @@ namespace Trainning24.BL.Business.Device
         private readonly EFDeviceOSRepository _eFDeviceOSRepository;
         private readonly EFDeviceTagsRepository _eFDeviceTagsRepository;
         private readonly EFDeviceQuotaRepository _eFDeviceQuotaRepository;
+        private readonly DeviceQuotasBusiness DeviceQuotasBusiness;
 
 
-        public DeviceBusiness(EFDeviceRepository eFDeviceRepository, EFDeviceOSRepository eFDeviceOSRepository, EFDeviceTagsRepository eFDeviceTagsRepository, EFDeviceQuotaRepository eFDeviceQuotaRepository)
+        public DeviceBusiness(EFDeviceRepository eFDeviceRepository, EFDeviceOSRepository eFDeviceOSRepository, EFDeviceTagsRepository eFDeviceTagsRepository, EFDeviceQuotaRepository eFDeviceQuotaRepository, DeviceQuotasBusiness deviceQuotasBusiness)
         {
             _eFDeviceRepository = eFDeviceRepository;
             _eFDeviceOSRepository = eFDeviceOSRepository;
             _eFDeviceTagsRepository = eFDeviceTagsRepository;
             _eFDeviceQuotaRepository = eFDeviceQuotaRepository;
+            this.DeviceQuotasBusiness = deviceQuotasBusiness;
         }
 
         public List<Devices> GetAll(int UserId)
@@ -179,7 +183,7 @@ namespace Trainning24.BL.Business.Device
             var devices = _eFDeviceRepository.ListQuery(b => b.UserId == userId).ToList();
             if (devices != null)
             {
-            var deiviceIds = devices.Select(s => s.Id).ToList();
+                var deiviceIds = devices.Select(s => s.Id).ToList();
                 var deviceOS = _eFDeviceOSRepository.ListQuery(b => deiviceIds.Contains(b.DeviceId)).ToList();
 
                 var devicesModel = (from x in devices
@@ -197,8 +201,10 @@ namespace Trainning24.BL.Business.Device
                                         tags = GetDeviceTag(x.Id)
                                     }).ToList();
                 responceDeviceModel.devicesModel = devicesModel;
+                var extensionRequest = DeviceQuotasBusiness.GetbyUserId(userId);
+                responceDeviceModel.IsPendingRequest = extensionRequest != null ? true : false; ;
                 var devicequotalimit = _eFDeviceQuotaRepository.GetById(b => b.UserId == userId);
-                responceDeviceModel.deviceLimit = devicequotalimit != null? devicequotalimit.DeviceLimit:0;
+                responceDeviceModel.deviceLimit = devicequotalimit != null ? devicequotalimit.DeviceLimit : 0;
                 responceDeviceModel.currentConsumption = devicesModel.Where(b => b.IsActive == true).Count();
             }
             return responceDeviceModel;
@@ -220,10 +226,55 @@ namespace Trainning24.BL.Business.Device
                 deviceTag.name = item.Name;
                 deviceTags.Add(deviceTag);
             }
-           return deviceTags;
+            return deviceTags;
         }
 
+        /// <summary>
+        /// All device with device status
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public List<ResponseUserDeviceModel> GetAllDeviceUserWise()
+        {
+            List<ResponseUserDeviceModel> responceUserDeviceModel = new List<ResponseUserDeviceModel>();
 
+            DBHelper dbHelper = new DBHelper(getconnectionstring());
+            try
+            {
+                dbHelper.Open();
+                DataTable userDevicelist = dbHelper.ExcecuteQueryDT("SELECT u.Id,u.fullname,u.email,u.username,dq.DeviceLimit ,(SELECT count(*) from devices as d where  d.UserId = u.Id AND (d.IsDeleted!=true OR d.IsDeleted Is Null) ) as currentConsumption FROM `devicequotas` as dq Left JOIN `users` as u ON dq.UserId = u.Id  WHERE (dq.IsDeleted != true OR dq.IsDeleted Is Null) && (u.IsDeleted != true OR u.IsDeleted Is Null)");
+                dbHelper.Close();
+                if (userDevicelist.Rows.Count != 0)
+                {
+                    foreach (DataRow userDevice in userDevicelist.Rows)
+                    {
+                        ResponseUserDeviceModel responseUserDeviceModel = new ResponseUserDeviceModel();
+                        responseUserDeviceModel.deviceLimit = Convert.ToInt32(userDevice["DeviceLimit"].ToString());
+                        responseUserDeviceModel.currentConsumption = Convert.ToInt32(userDevice["currentConsumption "].ToString());
+                        responseUserDeviceModel.userId = Convert.ToInt64(userDevice["Id"].ToString());
+                        responseUserDeviceModel.username = userDevice["username"].ToString();
+                        responseUserDeviceModel.email = userDevice["email"].ToString();
+                        responceUserDeviceModel.Add(responseUserDeviceModel);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                dbHelper.Close();
+                throw ex;
+            }
+            finally
+            {
+                dbHelper.Dispose();
+            }
+
+
+            return responceUserDeviceModel;
+        }
+        private string getconnectionstring()
+        {
+            return Environment.GetEnvironmentVariable("ASPNET_DB_CONNECTIONSTRING");
+        }
     }
 
 }

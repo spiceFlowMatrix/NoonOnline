@@ -53,7 +53,7 @@ namespace Training24Admin.Controllers
 
                 if (tc.RoleName.Contains(General.getRoleType("1")))
                 {
-                    List<ResponceDeviceQuotaExtension> QuotaExtensionList = DeviceQuotasBusiness.QuotaExtensionList(deviceQuotaExtensionFilterModel, out int total);
+                    List<ResponseDeviceQuotaExtension> QuotaExtensionList = DeviceQuotasBusiness.QuotaExtensionList(deviceQuotaExtensionFilterModel, out int total);
                     successResponse.totalcount = total;
                     successResponse.data = QuotaExtensionList;
                     successResponse.response_code = 0;
@@ -77,6 +77,7 @@ namespace Training24Admin.Controllers
                 return StatusCode(500, unsuccessResponse);
             }
         }
+
 
         /// <summary>
         /// Request a device quota exension
@@ -121,10 +122,11 @@ namespace Training24Admin.Controllers
                         }
                         else
                         {
-                            unsuccessResponse.response_code = 1;
-                            unsuccessResponse.message = "PENDING extension request already exists";
-                            unsuccessResponse.status = "Unsuccess";
-                            return StatusCode(405, unsuccessResponse);
+                            successResponse.data = penddingExtensionRequest;
+                            successResponse.response_code = 1;
+                            successResponse.message = "PENDING extension request already exists";
+                            successResponse.status = "Unsuccess";
+                            return StatusCode(405, successResponse);
                         }
                     }
                     else

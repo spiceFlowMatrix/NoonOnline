@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Trainning24.BL.ViewModels.Device
 {
-    public class ResponceDeviceQuotaExtension
+    public class ResponseDeviceQuotaExtension
     {
         public long Id { get; set; }
         public string RequestedOn { get; set; }
