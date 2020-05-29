@@ -108,7 +108,7 @@ namespace Trainning24.BL.Business.Device
                                                             || b.RequestedLimit.ToString().Contains(paginationModel.search)
                                                             || b.CurrentQuotaLimit.ToString().Contains(paginationModel.search)
                                                             || b.email.ToLower().Contains(paginationModel.search.ToLower())
-                                                            || b.username.ToLower().Contains(paginationModel.search.ToLower())
+                                                            || (b.username != null && b.username.ToLower().Contains(paginationModel.search.ToLower()))
                                                             || b.email.ToLower().Contains(paginationModel.search.ToLower())
                                                             || b.Status.ToLower().Contains(paginationModel.search.ToLower())
                                                            )).ToList();

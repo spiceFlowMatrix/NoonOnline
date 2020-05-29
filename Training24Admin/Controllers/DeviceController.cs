@@ -32,12 +32,11 @@ namespace Training24Admin.Controllers
             this.deviceBusiness = deviceBusiness;
 
         }
-      
+
 
         /// <summary>
-        /// Get my device profile
+        ///  Get my all device profile by user.
         /// </summary>
-        /// <param name="userId">Id of user</param>
         /// <returns></returns>
         [HttpGet()]
         public IActionResult Get()
@@ -101,10 +100,9 @@ namespace Training24Admin.Controllers
         /// <param name="userId">Id of user</param>
         /// <param name="objData">New device that I want to activate</param>
         /// <returns></returns>
-        [HttpPost("{userId}")]
+        [HttpPost]
         public IActionResult Post( [FromBody]DeviceActivate objData)
         {
-
             SuccessResponse successResponse = new SuccessResponse();
             UnsuccessResponse unsuccessResponse = new UnsuccessResponse();
             string Authorization = Request.Headers["id_token"];
@@ -168,25 +166,13 @@ namespace Training24Admin.Controllers
         }
 
         /// <summary>
-        /// Reactivate an existing device that has been deactivated
-        /// </summary>
-        /// <param name="userId">Id of user</param>
-        /// <param name="deviceId">Id of device</param>
-        /// <returns></returns>
-        //[HttpPut("{userId}")]
-        //public IActionResult Put(int userId, int deviceId)
-        //{
-        //    return StatusCode(406, ModelState);
-        //}
-
-        /// <summary>
         /// Deactivate an existing device
         /// </summary>
         /// <param name="userId">Id of user</param>
         /// <param name="deviceId">Id of device</param>
         /// <returns></returns>
-        [HttpPut("{deviceId}")]
-        public IActionResult Delete(int deviceId)
+        [HttpPut("ChaneDeviceStatus/{deviceId}")]
+        public IActionResult ChaneDeviceStatus(int deviceId)
         {
             SuccessResponse successResponse = new SuccessResponse();
             UnsuccessResponse unsuccessResponse = new UnsuccessResponse();

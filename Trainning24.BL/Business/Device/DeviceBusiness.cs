@@ -177,9 +177,9 @@ namespace Trainning24.BL.Business.Device
             ResponceDeviceModel responceDeviceModel = new ResponceDeviceModel();
 
             var devices = _eFDeviceRepository.ListQuery(b => b.UserId == userId).ToList();
-            var deiviceIds = devices.Select(s => s.Id).ToList();
             if (devices != null)
             {
+            var deiviceIds = devices.Select(s => s.Id).ToList();
                 var deviceOS = _eFDeviceOSRepository.ListQuery(b => deiviceIds.Contains(b.DeviceId)).ToList();
 
                 var devicesModel = (from x in devices
@@ -197,7 +197,8 @@ namespace Trainning24.BL.Business.Device
                                         tags = GetDeviceTag(x.Id)
                                     }).ToList();
                 responceDeviceModel.devicesModel = devicesModel;
-                responceDeviceModel.deviceLimit = _eFDeviceQuotaRepository.GetById(b => b.UserId == userId).DeviceLimit;
+                var devicequotalimit = _eFDeviceQuotaRepository.GetById(b => b.UserId == userId);
+                responceDeviceModel.deviceLimit = devicequotalimit != null? devicequotalimit.DeviceLimit:0;
                 responceDeviceModel.currentConsumption = devicesModel.Where(b => b.IsActive == true).Count();
             }
             return responceDeviceModel;

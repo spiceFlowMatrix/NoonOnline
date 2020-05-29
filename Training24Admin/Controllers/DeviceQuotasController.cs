@@ -22,28 +22,28 @@ namespace Training24Admin.Controllers
     [ApiExplorerSettings(GroupName = nameof(SwaggerGrouping.DeviceQuotas))]
     public class DeviceQuotasController : ControllerBase
     {
-        private readonly LessonBusiness LessonBusiness; 
-        private readonly DeviceQuotasBusiness DeviceQuotasBusiness; 
+        private readonly LessonBusiness LessonBusiness;
+        private readonly DeviceQuotasBusiness DeviceQuotasBusiness;
         public DeviceQuotasController(LessonBusiness lessonBusiness, DeviceQuotasBusiness deviceQuotasBusiness)
         {
             this.LessonBusiness = lessonBusiness;
             this.DeviceQuotasBusiness = deviceQuotasBusiness;
         }
-        /// <summary>
-        /// Fetch a list of quotas for all students who have activated (or registered) the student app on it
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet()]
-        public IActionResult Get()
-        {
-            return StatusCode(406, ModelState);
-        }
+  
 
         [HttpGet("getAllDeviceQuotaExtensionRequest")]
-        public IActionResult GetAllDeviceQuotaExtensionRequest([FromBody]DeviceQuotaExtensionFilterModel deviceQuotaExtensionFilterModel)
+        public IActionResult GetAllDeviceQuotaExtensionRequest(int pagenumber, int perpagerecord, string search, string fromdate, string todate)
         {
             PaginationResponse successResponse = new PaginationResponse();
             UnsuccessResponse unsuccessResponse = new UnsuccessResponse();
+            DeviceQuotaExtensionFilterModel deviceQuotaExtensionFilterModel = new DeviceQuotaExtensionFilterModel()
+            {
+                pagenumber = pagenumber,
+                perpagerecord = perpagerecord,
+                search = search,
+                fromdate = fromdate,
+                todate = todate,
+            };
             try
             {
                 //string Authorization = Request.Headers["Authorization"];
@@ -53,10 +53,7 @@ namespace Training24Admin.Controllers
 
                 if (tc.RoleName.Contains(General.getRoleType("1")))
                 {
-                    List<ResponceDeviceQuotaExtension> QuotaExtensionList = DeviceQuotasBusiness.QuotaExtensionList(
-                                                                                                            deviceQuotaExtensionFilterModel,
-                                                                                                            out int total
-                                                                                                            );
+                    List<ResponceDeviceQuotaExtension> QuotaExtensionList = DeviceQuotasBusiness.QuotaExtensionList(deviceQuotaExtensionFilterModel, out int total);
                     successResponse.totalcount = total;
                     successResponse.data = QuotaExtensionList;
                     successResponse.response_code = 0;
@@ -160,7 +157,7 @@ namespace Training24Admin.Controllers
         /// <param name="IsAccepted">true will approve and false will reject.</param>
         /// <returns></returns>
         [HttpPut]
-        public IActionResult Put(int extensionRequestId,bool IsAccepted )
+        public IActionResult Put(int extensionRequestId, bool IsAccepted)
         {
             SuccessResponse successResponse = new SuccessResponse();
             UnsuccessResponse unsuccessResponse = new UnsuccessResponse();
@@ -224,16 +221,5 @@ namespace Training24Admin.Controllers
             }
         }
 
-        /// <summary>
-        /// Reject existing quota extension requests
-        /// </summary>
-        /// <param name="userId">Id of user</param>
-        /// <param name="extensionRequestId">Requested device extention id</param>
-        /// <returns></returns>
-        [HttpDelete]
-        public IActionResult Delete(int userId, int extensionRequestId)
-        {
-            return StatusCode(406, ModelState);
-        }
     }
 }
