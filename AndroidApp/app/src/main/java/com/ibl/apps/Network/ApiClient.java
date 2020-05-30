@@ -1,6 +1,7 @@
 package com.ibl.apps.Network;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
@@ -41,6 +42,8 @@ import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
+
+import static android.content.Context.MODE_PRIVATE;
 
 /**
  * Created by ravi on 20/02/18.
@@ -96,6 +99,8 @@ public class ApiClient {
                 String authid = PrefUtils.getAuthid(context);
 
                 //Log.e(Const.LOG_NOON_TAG, "===authid=" + authid);
+                SharedPreferences sharedPreferences = context.getSharedPreferences("deviceManagement", MODE_PRIVATE);
+                String deviceToken = sharedPreferences.getString("deviceToken", "");
 
                 UserDatabaseRepository userDatabaseRepository = new UserDatabaseRepository();
                 if (!TextUtils.isEmpty(authid)) {
@@ -116,10 +121,12 @@ public class ApiClient {
                         if (!TextUtils.isEmpty(accessToken) && !TextUtils.isEmpty(idToken)) {
                             requestBuilder.addHeader("Authorization", "Bearer" + " " + accessToken);
                             requestBuilder.addHeader("id_token", "Bearer" + " " + idToken);
+                            requestBuilder.addHeader("deviceToken", deviceToken);
 
                             Log.e(Const.LOG_NOON_TAG, "==getExpiresAt==" + authTokenObject.getExpiresAt());
                             Log.e(Const.LOG_NOON_TAG, "==Authorization==" + "Bearer" + " " + accessToken);
                             Log.e(Const.LOG_NOON_TAG, "==id_token==" + "Bearer" + " " + idToken);
+                            Log.e(Const.LOG_NOON_TAG, "==deviceToken==" + deviceToken);
                         }
                     }
                 }

@@ -101,6 +101,13 @@
             android:name=".CacheEventsDescriptionActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
 
+        <activity
+            android:name=".LoginDevicesActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
+        <activity
+            android:name=".ExtendQuotaRequestActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
+
         <meta-data
             android:name="fr.maxcom.libmedia.apiKey"
             android:value="@string/YOUR_API_KEY" />

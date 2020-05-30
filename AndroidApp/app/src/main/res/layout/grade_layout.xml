@@ -17,7 +17,19 @@
                 layout="@layout/recycleview_verticle_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:visibility="visible" />
+                android:visibility="gone" />
+
+            <include
+                android:id="@+id/outOfDeviceQuota"
+                layout="@layout/device_quote_out_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <include
+                android:id="@+id/deactivatedDeviceQuota"
+                layout="@layout/device_deactivate_error_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
 
             <include
                 android:id="@+id/advanceSearchLayout"

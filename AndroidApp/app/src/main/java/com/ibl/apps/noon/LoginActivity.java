@@ -71,6 +71,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
     UserRepository userRepository;
     UserDatabaseRepository userDatabaseRepository;
     LessonDatabaseRepository lessonDatabaseRepository;
+    private String macAddress, ipAddress;
 
     @Override
     protected int getContentView() {
@@ -641,7 +642,6 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                 .subscribeWith(new DisposableSingleObserver<SyncRecords>() {
                     @Override
                     public void onSuccess(SyncRecords syncRecords) {
-
                         try {
                             if (syncRecords.getData() != null) {
                                 SyncRecords.Data syncData = syncRecords.getData();

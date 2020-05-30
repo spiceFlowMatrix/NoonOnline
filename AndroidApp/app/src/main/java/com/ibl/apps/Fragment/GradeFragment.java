@@ -4,12 +4,15 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -18,6 +21,7 @@ import android.os.HandlerThread;
 import android.os.Message;
 import android.os.Process;
 import android.telephony.TelephonyManager;
+import android.text.format.Formatter;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,18 +42,23 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.ibl.apps.Adapter.CourseListAdapter;
 import com.ibl.apps.Base.BaseFragment;
 import com.ibl.apps.CourseManagement.CourseRepository;
+import com.ibl.apps.DeviceManagement.DeviceManagementRepository;
 import com.ibl.apps.Interface.CourseAsyncResponse;
 import com.ibl.apps.Model.CourseObject;
 import com.ibl.apps.Model.IntervalObject;
 import com.ibl.apps.Model.IntervalTableObject;
+import com.ibl.apps.Model.deviceManagement.registeruser.DeviceRegisterModel;
 import com.ibl.apps.RoomDatabase.dao.courseManagementDatabase.CourseDatabaseRepository;
 import com.ibl.apps.RoomDatabase.dao.lessonManagementDatabase.LessonDatabaseRepository;
 import com.ibl.apps.RoomDatabase.entity.SyncTimeTrackingObject;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
 import com.ibl.apps.Service.CourseImageManager;
+import com.ibl.apps.noon.LoginDevicesActivity;
 import com.ibl.apps.noon.NoonApplication;
 import com.ibl.apps.noon.R;
 import com.ibl.apps.noon.databinding.GradeLayoutBinding;
@@ -70,9 +79,11 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 import pub.devrel.easypermissions.EasyPermissions;
+import retrofit2.Response;
 import tcking.github.com.giraffeplayer2.LazyLoadManager;
 import tcking.github.com.giraffeplayer2.VideoInfo;
 
+import static android.content.Context.MODE_PRIVATE;
 import static tcking.github.com.giraffeplayer2.GiraffePlayer.MSG_CTRL_PLAYING;
 
 
@@ -100,6 +111,9 @@ public class GradeFragment extends BaseFragment implements View.OnClickListener,
     private CourseRepository courseRepository; //22 use
     private CourseDatabaseRepository courseDatabaseRepository;
     private LessonDatabaseRepository lessonDatabaseRepository;
+    private String macAddress;
+    private String ipAddress;
+    private String deviceToken = "";
 
     public GradeFragment() {
         // Required empty public constructor
@@ -165,36 +179,22 @@ public class GradeFragment extends BaseFragment implements View.OnClickListener,
     protected void setUp(View view) {
 
         showDialog(NoonApplication.getContext().getResources().getString(R.string.loading));
-        PrefUtils.MyAsyncTask asyncTask = (PrefUtils.MyAsyncTask) new PrefUtils.MyAsyncTask(new PrefUtils.MyAsyncTask.AsyncResponse() {
-            @Override
-            public UserDetails getLocalUserDetails(UserDetails userDetails) {
-                if (userDetails != null) {
-                    userDetailsObject = userDetails;
-                    userId = userDetailsObject.getId();
-                    SharedPreferences sharedPreferences = (Objects.requireNonNull(getActivity())).getSharedPreferences("user", Context.MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    editor.putString("uid", userId);
-                    editor.apply();
-                    if (isNetworkAvailable(getActivity())) {
-                        loadData(SearchText, SpinnerGradeId);
-                    } else {
-                        new setLocalDataTask(new CourseAsyncResponse() {
-                            @Override
-                            public List<CourseObject.Data> getLocalUserDetails(List<CourseObject.Data> courseListl) {
-                                gradeLayoutBinding.rcVerticalLayout.rcVertical.setHasFixedSize(true);
-                                adp = new CourseListAdapter(getActivity(), courseListl, userDetailsObject);
-                                gradeLayoutBinding.rcVerticalLayout.rcVertical.setAdapter(adp);
-                                adp.notifyDataSetChanged();
-                                hideDialog();
-                                return null;
-                            }
-                        }).execute();
-                    }
+        if (isNetworkAvailable(getActivity())) {
+            callAPIDeviceManagement();
+        } else {
+            new setLocalDataTask(new CourseAsyncResponse() {
+                @Override
+                public List<CourseObject.Data> getLocalUserDetails(List<CourseObject.Data> courseListl) {
+                    gradeLayoutBinding.rcVerticalLayout.rcVertical.setHasFixedSize(true);
+                    adp = new CourseListAdapter(getActivity(), courseListl, userDetailsObject);
+                    gradeLayoutBinding.rcVerticalLayout.rcVertical.setAdapter(adp);
+                    adp.notifyDataSetChanged();
+                    hideDialog();
+                    return null;
                 }
-                return null;
-            }
+            }).execute();
+        }
 
-        }).execute();
         if (!EasyPermissions.hasPermissions(Objects.requireNonNull(getActivity()), PERMISSIONS)) {
             EasyPermissions.requestPermissions(this, NoonApplication.getContext().getResources().getString(R.string.validation_download_permission), 0x01, PERMISSIONS);
 
@@ -222,6 +222,133 @@ public class GradeFragment extends BaseFragment implements View.OnClickListener,
 //            }
             //getCurrentLocation();
         }
+
+        setOnClickListener();
+
+    }
+
+    private void callAPIDeviceManagement() {
+        WifiManager manager = (WifiManager) getActivity().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        WifiInfo info = null;
+        if (manager != null) {
+            info = manager.getConnectionInfo();
+            macAddress = info.getMacAddress();
+            ipAddress = Formatter.formatIpAddress(manager.getConnectionInfo().getIpAddress());
+        }
+
+        //OS
+        JsonObject jsonOs = new JsonObject();
+        jsonOs.addProperty("name", Const.var_deviceType);
+        jsonOs.addProperty("version", Build.VERSION.RELEASE);
+
+        //tag
+        JsonArray jsonArray = new JsonArray();
+        JsonObject j = new JsonObject();
+        j.addProperty("name", "");
+        jsonArray.add(j);
+
+        //main
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("macAddress", macAddress);
+        jsonObject.addProperty("ipAddress", ipAddress);
+        jsonObject.addProperty("modelName", Build.MODEL);
+        jsonObject.addProperty("modelNumber", Build.MANUFACTURER);
+        jsonObject.add("operatingSystem", jsonOs);
+        jsonObject.add("tags", jsonArray);
+
+
+        DeviceManagementRepository deviceManagementRepository = new DeviceManagementRepository();
+        disposable.add(deviceManagementRepository.registerDeviceDetail(jsonObject)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(new DisposableSingleObserver<Response<DeviceRegisterModel>>() {
+                    @Override
+                    public void onSuccess(Response<DeviceRegisterModel> deviceListModel) {
+                        Log.e("TAG", "onSuccess: " + deviceListModel.code());
+                        Log.e("TAG", "onSuccess: " + deviceListModel.body());
+                        Log.e("TAG", "onSuccess: " + deviceListModel.errorBody());
+                        Log.e("TAG", "onSuccess: " + deviceListModel.raw().cacheResponse());
+                        if (deviceListModel.body() != null) {
+                            if (deviceListModel.code() == 406) {
+                                gradeLayoutBinding.deactivatedDeviceQuota.deviceDeactivateLay.setVisibility(View.VISIBLE);
+                                gradeLayoutBinding.outOfDeviceQuota.deviceQuotaLay.setVisibility(View.GONE);
+                                //gradeLayoutBinding.advanceSearchLayout.mainAdvanceSearchLayout.setVisibility(View.GONE);
+                                gradeLayoutBinding.rcVerticalLayout.rcVertical.setVisibility(View.GONE);
+                            } else if (deviceListModel.body().getResponseCode() == 3) {
+                                gradeLayoutBinding.deactivatedDeviceQuota.deviceDeactivateLay.setVisibility(View.GONE);
+                                gradeLayoutBinding.outOfDeviceQuota.deviceQuotaLay.setVisibility(View.VISIBLE);
+                                //gradeLayoutBinding.advanceSearchLayout.mainAdvanceSearchLayout.setVisibility(View.GONE);
+                                gradeLayoutBinding.rcVerticalLayout.rcVertical.setVisibility(View.GONE);
+                            } else if (deviceListModel.body().getResponseCode() == 0) {
+                                if (deviceListModel.body().getData().getDeviceToken() != null) {
+                                    deviceToken = deviceListModel.body().getData().getDeviceToken();
+                                }
+
+                                SharedPreferences sharedPreferences = getActivity().getSharedPreferences("deviceManagement", MODE_PRIVATE);
+                                SharedPreferences.Editor editor = sharedPreferences.edit();
+
+                                if (editor != null) {
+                                    editor.putString("deviceToken", deviceToken);
+                                    Log.e("deviceToken", "onSuccess: " + deviceToken);
+                                    editor.apply();
+                                }
+                                gradeLayoutBinding.deactivatedDeviceQuota.deviceDeactivateLay.setVisibility(View.GONE);
+                                gradeLayoutBinding.outOfDeviceQuota.deviceQuotaLay.setVisibility(View.GONE);
+                                //gradeLayoutBinding.advanceSearchLayout.mainAdvanceSearchLayout.setVisibility(View.GONE);
+                                gradeLayoutBinding.rcVerticalLayout.rcVertical.setVisibility(View.VISIBLE);
+                                PrefUtils.MyAsyncTask asyncTask = (PrefUtils.MyAsyncTask) new PrefUtils.MyAsyncTask(new PrefUtils.MyAsyncTask.AsyncResponse() {
+                                    @Override
+                                    public UserDetails getLocalUserDetails(UserDetails userDetails) {
+                                        if (userDetails != null) {
+                                            userDetailsObject = userDetails;
+                                            userId = userDetailsObject.getId();
+                                            SharedPreferences sharedPreferences = (Objects.requireNonNull(getActivity())).getSharedPreferences("user", MODE_PRIVATE);
+                                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                                            editor.putString("uid", userId);
+                                            editor.apply();
+                                            if (isNetworkAvailable(getActivity())) {
+                                                loadData(SearchText, SpinnerGradeId);
+                                            } else {
+                                                new setLocalDataTask(new CourseAsyncResponse() {
+                                                    @Override
+                                                    public List<CourseObject.Data> getLocalUserDetails(List<CourseObject.Data> courseListl) {
+                                                        gradeLayoutBinding.rcVerticalLayout.rcVertical.setHasFixedSize(true);
+                                                        adp = new CourseListAdapter(getActivity(), courseListl, userDetailsObject);
+                                                        gradeLayoutBinding.rcVerticalLayout.rcVertical.setAdapter(adp);
+                                                        adp.notifyDataSetChanged();
+                                                        hideDialog();
+                                                        return null;
+                                                    }
+                                                }).execute();
+                                            }
+                                        }
+                                        return null;
+                                    }
+
+                                }).execute();
+                            }
+                        }
+                        hideDialog();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Log.e("onError", "onError: dddd" + e.getMessage());
+                        e.printStackTrace();
+                        hideDialog();
+                        new setLocalDataTask(new CourseAsyncResponse() {
+                            @Override
+                            public List<CourseObject.Data> getLocalUserDetails(List<CourseObject.Data> courseListl) {
+                                gradeLayoutBinding.rcVerticalLayout.rcVertical.setHasFixedSize(true);
+                                adp = new CourseListAdapter(getActivity(), courseListl, userDetailsObject);
+                                gradeLayoutBinding.rcVerticalLayout.rcVertical.setAdapter(adp);
+                                adp.notifyDataSetChanged();
+                                hideDialog();
+                                return null;
+                            }
+                        }).execute();
+                    }
+                }));
     }
 
     private void getCurrentLocation() {
@@ -304,7 +431,7 @@ public class GradeFragment extends BaseFragment implements View.OnClickListener,
     private void getLocation(SingleShotLocationProvider.GPSCoordinates location) {
         if (location != null) {
             // SyncTimeTrackingDao syncTimeTrackingDao = AppDatabase.getAppDatabase(getActivity()).syncTimeTrackingDao();
-            SharedPreferences sharedPreferences = NoonApplication.getContext().getSharedPreferences("user", Context.MODE_PRIVATE);
+            SharedPreferences sharedPreferences = NoonApplication.getContext().getSharedPreferences("user", MODE_PRIVATE);
             if (sharedPreferences != null) {
                 userId = sharedPreferences.getString("uid", "");
                 assert userId != null;
@@ -354,13 +481,17 @@ public class GradeFragment extends BaseFragment implements View.OnClickListener,
     }
 
     public void setOnClickListener() {
-
+        gradeLayoutBinding.outOfDeviceQuota.imgOutQuota.setOnClickListener(this);
+        gradeLayoutBinding.deactivatedDeviceQuota.imgDeactivate.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-
+            case R.id.imgOutQuota:
+            case R.id.imgDeactivate:
+                startActivity(new Intent(getActivity(), LoginDevicesActivity.class));
+                break;
         }
     }
 
@@ -711,7 +842,7 @@ public class GradeFragment extends BaseFragment implements View.OnClickListener,
         alert.setNegativeButton("Agree", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int i) {
-                SharedPreferences sharedPreferences = getActivity().getSharedPreferences(Const.privacyPolicy, Context.MODE_PRIVATE);
+                SharedPreferences sharedPreferences = getActivity().getSharedPreferences(Const.privacyPolicy, MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putBoolean(Const.isAgree, true);
                 editor.apply();

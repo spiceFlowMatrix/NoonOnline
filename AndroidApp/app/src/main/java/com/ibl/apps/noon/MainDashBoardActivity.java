@@ -77,7 +77,6 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
     private String userRoleName;
     private UserDetails userDetail;
     CourseDatabaseRepository courseDatabaseRepository;
-    private String ErrorSync;
 
     @Override
     protected int getContentView() {
@@ -569,6 +568,7 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
         mainDashboardLayoutBinding.appBarLayout.editprofileBtn.setOnClickListener(this);
         mainDashboardLayoutBinding.appBarLayout.btnNotification.setOnClickListener(this);
         mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn.setOnClickListener(this);
+        mainDashboardLayoutBinding.appBarLayout.txtDevice.setOnClickListener(this);
     }
 
     @Override
@@ -612,6 +612,12 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
                     profileFragment.updateUserData();
                     profileFragment.hideVisibleLay(true);
                 }
+                break;
+
+            case R.id.txtDevice:
+                if (isNetworkAvailable(MainDashBoardActivity.this))
+                    openActivity(LoginDevicesActivity.class);
+                else showNetworkAlert(MainDashBoardActivity.this);
                 break;
         }
     }

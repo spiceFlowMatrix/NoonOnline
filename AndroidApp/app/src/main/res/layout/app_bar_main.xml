@@ -43,7 +43,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:orientation="horizontal"
-                        android:visibility="visible">
+                        android:visibility="gone">
 
                         <Spinner
                             android:id="@+id/languageSelectSpinner"
@@ -57,10 +57,10 @@
 
                         <ImageView
                             android:id="@+id/cacheEventsStatusBtn"
-                            android:src="@drawable/ic_cache_empty"
                             android:layout_width="@dimen/_25sdp"
                             android:layout_height="@dimen/_25sdp"
                             android:layout_marginEnd="@dimen/_7sdp"
+                            android:src="@drawable/ic_cache_empty"
                             android:visibility="visible" />
 
 
@@ -94,6 +94,15 @@
                         android:layout_height="match_parent"
                         android:orientation="horizontal"
                         android:visibility="gone">
+
+                        <TextView
+                            android:id="@+id/txtDevice"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="@dimen/_10sdp"
+                            android:text="@string/devices"
+                            android:textColor="@color/colorBlack"
+                            android:textSize="@dimen/_11sdp" />
 
                         <ImageView
                             android:id="@+id/logOutBtn"
