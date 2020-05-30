@@ -129,7 +129,7 @@ namespace Training24Admin.Controllers
                         }
                         else
                         {
-                            unsuccessResponse.response_code = 1;
+                            unsuccessResponse.response_code = 3;
                             unsuccessResponse.message = "you are out of device quota";
                             unsuccessResponse.status = "Unsuccess";
                             return StatusCode(406, unsuccessResponse);
@@ -145,7 +145,7 @@ namespace Training24Admin.Controllers
                     }
                     else
                     {
-                        unsuccessResponse.response_code = 1;
+                        unsuccessResponse.response_code = 2;
                         unsuccessResponse.message = "This device has been deactivated.";
                         unsuccessResponse.status = "Unsuccess";
                         return StatusCode(406, unsuccessResponse);
