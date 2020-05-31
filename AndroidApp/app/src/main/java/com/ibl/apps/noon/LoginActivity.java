@@ -363,7 +363,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
 
     public void callAutoApiLoginUser(String email, String password) {
         Log.e("LOGIN", "---2---");
-        showDialog(getString(R.string.loading));
+//        showDialog(getString(R.string.loading));
+        showDialog(getString(R.string.reistering_device));
 
         //Log.e("1", "---email--------" + email);
         //Log.e("1", "---password--------" + password);

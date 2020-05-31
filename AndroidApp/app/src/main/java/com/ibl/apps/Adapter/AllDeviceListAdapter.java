@@ -3,7 +3,6 @@ package com.ibl.apps.Adapter;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,10 +37,12 @@ public class AllDeviceListAdapter extends RecyclerView.Adapter<AllDeviceListAdap
     private List<DevicesModel> devicesModel;
     private BottomSheetDialog mBottomSheetDialog;
     private ProgressDialog mProgressDialog = null;
+    private ShowBottomInterface showBottomInterface;
 
-    public AllDeviceListAdapter(Context context, List<DevicesModel> devicesModel) {
+    public AllDeviceListAdapter(Context context, List<DevicesModel> devicesModel, ShowBottomInterface showBottomInterface) {
         this.context = context;
         this.devicesModel = devicesModel;
+        this.showBottomInterface = showBottomInterface;
     }
 
     @Override
@@ -57,13 +58,17 @@ public class AllDeviceListAdapter extends RecyclerView.Adapter<AllDeviceListAdap
         SharedPreferences sharedPreferences = context.getSharedPreferences("deviceManagement", MODE_PRIVATE);
         String deviceToken = sharedPreferences.getString("deviceToken", "");
 
-        if (deviceToken.equals(model.getDeviceToken())) {
+        if (deviceToken.contains(model.getDeviceToken())) {
             holder.binding.txtDeviceName.setText(context.getResources().getString(R.string.this_device));
-        } else if (!TextUtils.isEmpty(model.getModelName())) {
-            holder.binding.txtDeviceName.setText(model.getModelName());
+            holder.binding.txtDeviceName.setTextColor(context.getResources().getColor(R.color.colorDarkBlue));
+            holder.binding.txtDeviceStatus.setTextColor(context.getResources().getColor(R.color.colorDarkBlue));
+            holder.binding.dash.setBackgroundColor(context.getResources().getColor(R.color.colorDarkBlue));
+        } else {
+            holder.binding.txtDeviceName.setText(model.getModelNumber());
+            holder.binding.txtDeviceName.setTextColor(context.getResources().getColor(R.color.colorBlack));
+            holder.binding.txtDeviceStatus.setTextColor(context.getResources().getColor(R.color.colorBlack));
+            holder.binding.dash.setBackgroundColor(context.getResources().getColor(R.color.colorBlack));
         }
-        if (!TextUtils.isEmpty(model.getModelName()))
-            holder.binding.txtDeviceName.setText(model.getModelName());
 
         if (model.getIsActive()) {
             holder.binding.txtDeviceStatus.setText(context.getResources().getString(R.string.device_active));
@@ -73,7 +78,7 @@ public class AllDeviceListAdapter extends RecyclerView.Adapter<AllDeviceListAdap
         holder.binding.imgMenu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showBottom(model.getId());
+                showBottomInterface.showBottomDialog(model.getId());
             }
         });
     }
@@ -145,6 +150,10 @@ public class AllDeviceListAdapter extends RecyclerView.Adapter<AllDeviceListAdap
         }
     }
 
+    public interface ShowBottomInterface {
+        void showBottomDialog(Long id);
+    }
+
     public class MyViewHolder extends RecyclerView.ViewHolder {
         DeviceLoginDetailListBinding binding;
 
@@ -152,5 +161,7 @@ public class AllDeviceListAdapter extends RecyclerView.Adapter<AllDeviceListAdap
             super(binding.getRoot());
             this.binding = binding;
         }
+
+
     }
 }

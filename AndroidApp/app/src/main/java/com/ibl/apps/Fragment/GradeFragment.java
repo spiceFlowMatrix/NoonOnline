@@ -42,6 +42,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.ibl.apps.Adapter.CourseListAdapter;
@@ -66,6 +67,7 @@ import com.ibl.apps.util.Const;
 import com.ibl.apps.util.PrefUtils;
 import com.ibl.apps.util.SingleShotLocationProvider;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -114,6 +116,8 @@ public class GradeFragment extends BaseFragment implements View.OnClickListener,
     private String macAddress;
     private String ipAddress;
     private String deviceToken = "";
+    public static int deviceStatus = -1;
+    private Long errorCode;
 
     public GradeFragment() {
         // Required empty public constructor
@@ -179,21 +183,7 @@ public class GradeFragment extends BaseFragment implements View.OnClickListener,
     protected void setUp(View view) {
 
         showDialog(NoonApplication.getContext().getResources().getString(R.string.loading));
-        if (isNetworkAvailable(getActivity())) {
-            callAPIDeviceManagement();
-        } else {
-            new setLocalDataTask(new CourseAsyncResponse() {
-                @Override
-                public List<CourseObject.Data> getLocalUserDetails(List<CourseObject.Data> courseListl) {
-                    gradeLayoutBinding.rcVerticalLayout.rcVertical.setHasFixedSize(true);
-                    adp = new CourseListAdapter(getActivity(), courseListl, userDetailsObject);
-                    gradeLayoutBinding.rcVerticalLayout.rcVertical.setAdapter(adp);
-                    adp.notifyDataSetChanged();
-                    hideDialog();
-                    return null;
-                }
-            }).execute();
-        }
+        callAPIDeviceManagement();
 
         if (!EasyPermissions.hasPermissions(Objects.requireNonNull(getActivity()), PERMISSIONS)) {
             EasyPermissions.requestPermissions(this, NoonApplication.getContext().getResources().getString(R.string.validation_download_permission), 0x01, PERMISSIONS);
@@ -264,33 +254,56 @@ public class GradeFragment extends BaseFragment implements View.OnClickListener,
                 .subscribeWith(new DisposableSingleObserver<Response<DeviceRegisterModel>>() {
                     @Override
                     public void onSuccess(Response<DeviceRegisterModel> deviceListModel) {
-                        Log.e("TAG", "onSuccess: " + deviceListModel.code());
-                        Log.e("TAG", "onSuccess: " + deviceListModel.body());
-                        Log.e("TAG", "onSuccess: " + deviceListModel.errorBody());
-                        Log.e("TAG", "onSuccess: " + deviceListModel.raw().cacheResponse());
-                        if (deviceListModel.body() != null) {
-                            if (deviceListModel.code() == 406) {
-                                gradeLayoutBinding.deactivatedDeviceQuota.deviceDeactivateLay.setVisibility(View.VISIBLE);
-                                gradeLayoutBinding.outOfDeviceQuota.deviceQuotaLay.setVisibility(View.GONE);
-                                //gradeLayoutBinding.advanceSearchLayout.mainAdvanceSearchLayout.setVisibility(View.GONE);
-                                gradeLayoutBinding.rcVerticalLayout.rcVertical.setVisibility(View.GONE);
-                            } else if (deviceListModel.body().getResponseCode() == 3) {
-                                gradeLayoutBinding.deactivatedDeviceQuota.deviceDeactivateLay.setVisibility(View.GONE);
-                                gradeLayoutBinding.outOfDeviceQuota.deviceQuotaLay.setVisibility(View.VISIBLE);
-                                //gradeLayoutBinding.advanceSearchLayout.mainAdvanceSearchLayout.setVisibility(View.GONE);
-                                gradeLayoutBinding.rcVerticalLayout.rcVertical.setVisibility(View.GONE);
-                            } else if (deviceListModel.body().getResponseCode() == 0) {
+
+                        try {
+                            if ((deviceListModel.errorBody() != null)) {
+
+                                errorCode = new Gson().fromJson(deviceListModel.errorBody().string(), DeviceRegisterModel.class).getResponseCode();
+                                Log.e("TAG", "onSuccess: errorBody" + errorCode);
+
+
+                                if (errorCode == 2) {
+                                    deviceStatus = 2;
+                                    SharedPreferences deviceStatusPreferences = getActivity().getSharedPreferences("deviceStatus", MODE_PRIVATE);
+                                    SharedPreferences.Editor editor = deviceStatusPreferences.edit();
+                                    editor.putString("deviceStatusCode", String.valueOf(deviceStatus));
+                                    editor.apply();
+                                    gradeLayoutBinding.deactivatedDeviceQuota.deviceDeactivateLay.setVisibility(View.VISIBLE);
+                                    gradeLayoutBinding.outOfDeviceQuota.deviceQuotaLay.setVisibility(View.GONE);
+                                    //gradeLayoutBinding.advanceSearchLayout.mainAdvanceSearchLayout.setVisibility(View.GONE);
+                                    gradeLayoutBinding.rcVerticalLayout.rcVertical.setVisibility(View.GONE);
+                                } else if (errorCode == 3) {
+                                    deviceStatus = 3;
+                                    SharedPreferences deviceStatusPreferences = getActivity().getSharedPreferences("deviceStatus", MODE_PRIVATE);
+                                    SharedPreferences.Editor editor = deviceStatusPreferences.edit();
+                                    editor.putString("deviceStatusCode", String.valueOf(deviceStatus));
+                                    editor.apply();
+                                    gradeLayoutBinding.deactivatedDeviceQuota.deviceDeactivateLay.setVisibility(View.GONE);
+                                    gradeLayoutBinding.outOfDeviceQuota.deviceQuotaLay.setVisibility(View.VISIBLE);
+                                    //gradeLayoutBinding.advanceSearchLayout.mainAdvanceSearchLayout.setVisibility(View.GONE);
+                                    gradeLayoutBinding.rcVerticalLayout.rcVertical.setVisibility(View.GONE);
+                                }
+                            }
+
+                            if (deviceListModel.body() != null && deviceListModel.body().getResponseCode() == 0) {
+                                /*SharedPreferences sharedPreferences = getActivity().getSharedPreferences("errorBody", MODE_PRIVATE);
+                                SharedPreferences.Editor editor = sharedPreferences.edit();
+
+                                if (editor != null) {
+                                    editor.putString("errorCode", String.valueOf(deviceListModel.body().getResponseCode()));
+                                    editor.apply();
+                                }*/
                                 if (deviceListModel.body().getData().getDeviceToken() != null) {
                                     deviceToken = deviceListModel.body().getData().getDeviceToken();
                                 }
 
-                                SharedPreferences sharedPreferences = getActivity().getSharedPreferences("deviceManagement", MODE_PRIVATE);
-                                SharedPreferences.Editor editor = sharedPreferences.edit();
+                                SharedPreferences deviceManagementPreferences = getActivity().getSharedPreferences("deviceManagement", MODE_PRIVATE);
+                                SharedPreferences.Editor deviceManagementEditor = deviceManagementPreferences.edit();
 
-                                if (editor != null) {
-                                    editor.putString("deviceToken", deviceToken);
+                                if (deviceManagementEditor != null) {
+                                    deviceManagementEditor.putString("deviceToken", deviceToken);
                                     Log.e("deviceToken", "onSuccess: " + deviceToken);
-                                    editor.apply();
+                                    deviceManagementEditor.apply();
                                 }
                                 gradeLayoutBinding.deactivatedDeviceQuota.deviceDeactivateLay.setVisibility(View.GONE);
                                 gradeLayoutBinding.outOfDeviceQuota.deviceQuotaLay.setVisibility(View.GONE);
@@ -326,27 +339,64 @@ public class GradeFragment extends BaseFragment implements View.OnClickListener,
                                     }
 
                                 }).execute();
+                                deviceStatus = 0;
+                                SharedPreferences deviceStatusPreferences = getActivity().getSharedPreferences("deviceStatus", MODE_PRIVATE);
+                                SharedPreferences.Editor editor = deviceStatusPreferences.edit();
+                                editor.putString("deviceStatusCode", String.valueOf(deviceStatus));
+                                editor.apply();
                             }
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
                         hideDialog();
                     }
 
                     @Override
                     public void onError(Throwable e) {
-                        Log.e("onError", "onError: dddd" + e.getMessage());
-                        e.printStackTrace();
+                        SharedPreferences deviceSharedPreferences = getActivity().getSharedPreferences("deviceStatus", MODE_PRIVATE);
+                        String deviceStatusCode = deviceSharedPreferences.getString("deviceStatusCode", "");
+                        if (deviceStatusCode.equals("0")) {
+                            PrefUtils.MyAsyncTask asyncTask = (PrefUtils.MyAsyncTask) new PrefUtils.MyAsyncTask(new PrefUtils.MyAsyncTask.AsyncResponse() {
+                                @Override
+                                public UserDetails getLocalUserDetails(UserDetails userDetails) {
+                                    if (userDetails != null) {
+                                        userDetailsObject = userDetails;
+                                        userId = userDetailsObject.getId();
+                                        SharedPreferences sharedPreferences = (Objects.requireNonNull(getActivity())).getSharedPreferences("user", MODE_PRIVATE);
+                                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                                        editor.putString("uid", userId);
+                                        editor.apply();
+                                        gradeLayoutBinding.deactivatedDeviceQuota.deviceDeactivateLay.setVisibility(View.GONE);
+                                        gradeLayoutBinding.outOfDeviceQuota.deviceQuotaLay.setVisibility(View.GONE);
+                                        //gradeLayoutBinding.advanceSearchLayout.mainAdvanceSearchLayout.setVisibility(View.GONE);
+                                        gradeLayoutBinding.rcVerticalLayout.rcVertical.setVisibility(View.VISIBLE);
+                                        new setLocalDataTask(new CourseAsyncResponse() {
+                                            @Override
+                                            public List<CourseObject.Data> getLocalUserDetails(List<CourseObject.Data> courseListl) {
+                                                gradeLayoutBinding.rcVerticalLayout.rcVertical.setHasFixedSize(true);
+                                                adp = new CourseListAdapter(getActivity(), courseListl, userDetailsObject);
+                                                gradeLayoutBinding.rcVerticalLayout.rcVertical.setAdapter(adp);
+                                                adp.notifyDataSetChanged();
+                                                hideDialog();
+                                                return null;
+                                            }
+                                        }).execute();
+
+                                    }
+                                    return null;
+                                }
+
+                            }).execute();
+                        } else if (deviceStatusCode.equals("2")) {
+                            gradeLayoutBinding.deactivatedDeviceQuota.deviceDeactivateLay.setVisibility(View.VISIBLE);
+                            gradeLayoutBinding.outOfDeviceQuota.deviceQuotaLay.setVisibility(View.GONE);
+                            gradeLayoutBinding.rcVerticalLayout.rcVertical.setVisibility(View.GONE);
+                        } else if (deviceStatusCode.equals("3")) {
+                            gradeLayoutBinding.deactivatedDeviceQuota.deviceDeactivateLay.setVisibility(View.GONE);
+                            gradeLayoutBinding.outOfDeviceQuota.deviceQuotaLay.setVisibility(View.VISIBLE);
+                            gradeLayoutBinding.rcVerticalLayout.rcVertical.setVisibility(View.GONE);
+                        }
                         hideDialog();
-                        new setLocalDataTask(new CourseAsyncResponse() {
-                            @Override
-                            public List<CourseObject.Data> getLocalUserDetails(List<CourseObject.Data> courseListl) {
-                                gradeLayoutBinding.rcVerticalLayout.rcVertical.setHasFixedSize(true);
-                                adp = new CourseListAdapter(getActivity(), courseListl, userDetailsObject);
-                                gradeLayoutBinding.rcVerticalLayout.rcVertical.setAdapter(adp);
-                                adp.notifyDataSetChanged();
-                                hideDialog();
-                                return null;
-                            }
-                        }).execute();
                     }
                 }));
     }

@@ -134,6 +134,7 @@ public class ExtendQuotaRequestActivity extends BaseActivity implements View.OnC
                         public void onSuccess(RequestQuotaModel deviceListModel) {
                             if (deviceListModel != null)
                                 if (deviceListModel.getResponseCode() == 0) {
+                                    setResult(RESULT_OK);
                                     finish();
                                 }
                             hideDialog();

@@ -53,6 +53,8 @@ import com.ibl.apps.util.SingleShotLocationProvider;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.ibl.apps.Fragment.GradeFragment.deviceStatus;
+
 /**
  * Created by iblinfotech on 10/09/18.
  */
@@ -94,6 +96,7 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
 
         sharedPreferences = getSharedPreferences("rolename", MODE_PRIVATE);
         userRoleName = sharedPreferences.getString("userrolename", "");
+
 
         if (!TextUtils.isEmpty(userRoleName)) {
             if (!userRoleName.equals("Parent")) {
@@ -171,23 +174,31 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
 
                         List<SyncAPITable> syncAPITableList = syncAPIDatabaseRepository.getSyncUserById(Integer.parseInt(userId));
                         SharedPreferences sharedPreferencesuser = getSharedPreferences("cacheStatus", MODE_PRIVATE);
+
                         String flagStatus = sharedPreferencesuser.getString("FlagStatus", "");
-                        switch (flagStatus) {
-                            case "1":
-                                mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_pending);
-                                break;
-                            case "2":
-                                mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_error);
-                                break;
-                            case "3":
-                                mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_syncing);
-                                break;
-                            case "4":
-                                GlideApp.with(MainDashBoardActivity.this)
-                                        .load(R.drawable.ic_cache_empty)
-                                        .error(R.drawable.ic_cache_empty)
-                                        .into(mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn);
-                                break;
+                        if (deviceStatus == 0) {
+                            switch (flagStatus) {
+                                case "1":
+                                    mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_pending);
+                                    break;
+                                case "2":
+                                    mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_error);
+                                    break;
+                                case "3":
+                                    mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_syncing);
+                                    break;
+                                case "4":
+                                    GlideApp.with(MainDashBoardActivity.this)
+                                            .load(R.drawable.ic_cache_empty)
+                                            .error(R.drawable.ic_cache_empty)
+                                            .into(mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn);
+                                    break;
+                            }
+                        } else {
+                            GlideApp.with(MainDashBoardActivity.this)
+                                    .load(R.drawable.ic_cache_empty)
+                                    .error(R.drawable.ic_cache_empty)
+                                    .into(mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn);
                         }
 
                         if (syncAPITableList.size() >= 50) {
@@ -199,7 +210,9 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
                                 editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
                                 editor.apply();
                             }
-                            showHitLimitDialog(MainDashBoardActivity.this);
+                            if (deviceStatus == 0) {
+                                showHitLimitDialog(MainDashBoardActivity.this);
+                            }
                         }
 
                         mainDashboardLayoutBinding.appBarLayout.contentMain.bottomNavigation.setOnNavigationItemSelectedListener(
@@ -580,27 +593,35 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
                 startActivity(i);
                 break;
             case R.id.serachCourseIMag:
-                Intent i1 = new Intent(MainDashBoardActivity.this, SearchActivity.class);
-                startActivity(i1);
+                if (deviceStatus == 0) {
+                    Intent i1 = new Intent(MainDashBoardActivity.this, SearchActivity.class);
+                    startActivity(i1);
+                }
                 break;
             case R.id.btnNotification:
-                Intent i3 = new Intent(MainDashBoardActivity.this, NotificationActivity.class);
-                startActivity(i3);
+                if (deviceStatus == 0) {
+                    Intent i3 = new Intent(MainDashBoardActivity.this, NotificationActivity.class);
+                    startActivity(i3);
+                }
                 break;
 
             case R.id.cacheEventsStatusBtn:
-                Intent cacheIntent = new Intent(MainDashBoardActivity.this, CacheEventsListActivity.class);
-                startActivity(cacheIntent);
+                if (deviceStatus == 0) {
+                    Intent cacheIntent = new Intent(MainDashBoardActivity.this, CacheEventsListActivity.class);
+                    startActivity(cacheIntent);
+                }
                 break;
             case R.id.feedbackbtn:
-                if (isNetworkAvailable(MainDashBoardActivity.this)) {
-                    Intent i2 = new Intent(MainDashBoardActivity.this, FeedBackActivity.class);
+                if (deviceStatus == 0) {
+                    if (isNetworkAvailable(MainDashBoardActivity.this)) {
+                        Intent i2 = new Intent(MainDashBoardActivity.this, FeedBackActivity.class);
 //                Intent i2 = new Intent(Intent.ACTION_VIEW);
 //                i2.setData(Uri.parse(Const.FEEDBACK_URL));
-                    startActivity(i2);
-                    finish();
-                } else {
-                    showNetworkAlert(MainDashBoardActivity.this);
+                        startActivity(i2);
+                        finish();
+                    } else {
+                        showNetworkAlert(MainDashBoardActivity.this);
+                    }
                 }
                 break;
             case R.id.logOutBtn:

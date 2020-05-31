@@ -45,6 +45,7 @@ import com.ibl.apps.util.Const;
 import com.ibl.apps.util.LoadMoreData.RecyclerViewLoadMoreScroll;
 import com.ibl.apps.util.PrefUtils;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,6 +57,7 @@ import retrofit2.HttpException;
 import retrofit2.Response;
 
 import static android.content.Context.MODE_PRIVATE;
+import static com.ibl.apps.Fragment.GradeFragment.deviceStatus;
 
 
 public class LibraryFragment extends BaseFragment implements View.OnClickListener {
@@ -91,6 +93,7 @@ public class LibraryFragment extends BaseFragment implements View.OnClickListene
     private LibraryRepository libraryRepository;
     private LibraryDatabaseRepository libraryDatabaseRepository;
     private String macAddress, ipAddress;
+    private Long errorCode;
 
     public LibraryFragment() {
         // Required empty public constructor
@@ -141,28 +144,7 @@ public class LibraryFragment extends BaseFragment implements View.OnClickListene
         //showBackArrow(getString(R.string.item_5));
         libraryLayoutBinding.libraryText.setText(getString(R.string.item_5));
 
-        if (isNetworkAvailable(getActivity())) {
-            callAPIDeviceManagement();
-        } else {
-            new setLocalDataTask(new LibraryAsyncResponse() {
-                @Override
-                public List<LibraryObject> getLocalUserDetails(List<LibraryObject> libraryObjects) {
-
-                    List<LibraryObject.Data> libraryDataObjects = new ArrayList<>();
-
-                    for (int i = 0; i < libraryObjects.size(); i++) {
-                        libraryDataObjects = libraryObjects.get(i).getData();
-                    }
-
-                    libraryLayoutBinding.rcVerticalLayout.rcVertical.setHasFixedSize(true);
-                    libraryLayoutBinding.rcVerticalLayout.rcVertical.setLayoutManager(new GridLayoutManager(getActivity(), 2));
-                    libraryListAdapter = new LibraryListAdapter(getActivity(), libraryDataObjects, userDetailsObject);
-                    libraryLayoutBinding.rcVerticalLayout.rcVertical.setAdapter(libraryListAdapter);
-                    hideDialog();
-                    return null;
-                }
-            }).execute();
-        }
+        callAPIDeviceManagement();
         backInterface = (BackInterface) getActivity();
 
         setOnClickListener();
@@ -207,19 +189,35 @@ public class LibraryFragment extends BaseFragment implements View.OnClickListene
 
                     @Override
                     public void onSuccess(Response<DeviceRegisterModel> deviceListModel) {
+                        try {
+                            if ((deviceListModel.errorBody() != null)) {
+                                errorCode = new Gson().fromJson(deviceListModel.errorBody().string(), DeviceRegisterModel.class).getResponseCode();
+                                Log.e("TAG", "onSuccess: errorBody" + errorCode);
 
-                        if (deviceListModel.body() != null) {
-                            if (deviceListModel.body().getResponseCode() == 2) {
-                                libraryLayoutBinding.deactivatedDeviceQuota.deviceDeactivateLay.setVisibility(View.VISIBLE);
-                                libraryLayoutBinding.outOfDeviceQuota.deviceQuotaLay.setVisibility(View.GONE);
-                                //libraryLayoutBinding.advanceSearchLayout.mainAdvanceSearchLayout.setVisibility(View.GONE);
-                                libraryLayoutBinding.rcVerticalLayout.rcVertical.setVisibility(View.GONE);
-                            } else if (deviceListModel.body().getResponseCode() == 3) {
-                                libraryLayoutBinding.deactivatedDeviceQuota.deviceDeactivateLay.setVisibility(View.GONE);
-                                libraryLayoutBinding.outOfDeviceQuota.deviceQuotaLay.setVisibility(View.VISIBLE);
-                                //libraryLayoutBinding.advanceSearchLayout.mainAdvanceSearchLayout.setVisibility(View.GONE);
-                                libraryLayoutBinding.rcVerticalLayout.rcVertical.setVisibility(View.GONE);
-                            } else if (deviceListModel.body().getResponseCode() == 0) {
+                                if (errorCode == 2) {
+                                    deviceStatus = 2;
+                                    SharedPreferences deviceStatusPreferences = getActivity().getSharedPreferences("deviceStatus", MODE_PRIVATE);
+                                    SharedPreferences.Editor editor = deviceStatusPreferences.edit();
+                                    editor.putString("deviceStatusCode", String.valueOf(deviceStatus));
+                                    editor.apply();
+                                    libraryLayoutBinding.deactivatedDeviceQuota.deviceDeactivateLay.setVisibility(View.VISIBLE);
+                                    libraryLayoutBinding.outOfDeviceQuota.deviceQuotaLay.setVisibility(View.GONE);
+                                    //libraryLayoutBinding.advanceSearchLayout.mainAdvanceSearchLayout.setVisibility(View.GONE);
+                                    libraryLayoutBinding.rcVerticalLayout.rcVertical.setVisibility(View.GONE);
+                                } else if (errorCode == 3) {
+                                    deviceStatus = 3;
+                                    SharedPreferences deviceStatusPreferences = getActivity().getSharedPreferences("deviceStatus", MODE_PRIVATE);
+                                    SharedPreferences.Editor editor = deviceStatusPreferences.edit();
+                                    editor.putString("deviceStatusCode", String.valueOf(deviceStatus));
+                                    editor.apply();
+                                    libraryLayoutBinding.deactivatedDeviceQuota.deviceDeactivateLay.setVisibility(View.GONE);
+                                    libraryLayoutBinding.outOfDeviceQuota.deviceQuotaLay.setVisibility(View.VISIBLE);
+                                    //libraryLayoutBinding.advanceSearchLayout.mainAdvanceSearchLayout.setVisibility(View.GONE);
+                                    libraryLayoutBinding.rcVerticalLayout.rcVertical.setVisibility(View.GONE);
+                                }
+                            }
+
+                            if (deviceListModel.body() != null && deviceListModel.body().getResponseCode() == 0) {
                                 if (deviceListModel.body().getData().getDeviceToken() != null) {
                                     deviceToken = deviceListModel.body().getData().getDeviceToken();
                                 }
@@ -234,7 +232,6 @@ public class LibraryFragment extends BaseFragment implements View.OnClickListene
                                 }
                                 libraryLayoutBinding.deactivatedDeviceQuota.deviceDeactivateLay.setVisibility(View.GONE);
                                 libraryLayoutBinding.outOfDeviceQuota.deviceQuotaLay.setVisibility(View.GONE);
-                                //libraryLayoutBinding.advanceSearchLayout.mainAdvanceSearchLayout.setVisibility(View.GONE);
                                 libraryLayoutBinding.rcVerticalLayout.rcVertical.setVisibility(View.VISIBLE);
                                 PrefUtils.MyAsyncTask asyncTask = (PrefUtils.MyAsyncTask) new PrefUtils.MyAsyncTask(new PrefUtils.MyAsyncTask.AsyncResponse() {
                                     @Override
@@ -289,7 +286,14 @@ public class LibraryFragment extends BaseFragment implements View.OnClickListene
                                         return true;
                                     }
                                 });
+                                deviceStatus = 0;
+                                SharedPreferences deviceStatusPreferences = getActivity().getSharedPreferences("deviceStatus", MODE_PRIVATE);
+                                SharedPreferences.Editor editor1 = deviceStatusPreferences.edit();
+                                editor1.putString("deviceStatusCode", String.valueOf(deviceStatus));
+                                editor1.apply();
                             }
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
                         hideDialog();
                     }
@@ -297,24 +301,39 @@ public class LibraryFragment extends BaseFragment implements View.OnClickListene
                     @Override
                     public void onError(Throwable e) {
                         hideDialog();
-                        new setLocalDataTask(new LibraryAsyncResponse() {
-                            @Override
-                            public List<LibraryObject> getLocalUserDetails(List<LibraryObject> libraryObjects) {
+                        SharedPreferences deviceSharedPreferences = getActivity().getSharedPreferences("deviceStatus", MODE_PRIVATE);
+                        String deviceStatusCode = deviceSharedPreferences.getString("deviceStatusCode", "");
+                        if (deviceStatusCode.equals("0")) {
+                            libraryLayoutBinding.deactivatedDeviceQuota.deviceDeactivateLay.setVisibility(View.GONE);
+                            libraryLayoutBinding.outOfDeviceQuota.deviceQuotaLay.setVisibility(View.GONE);
+                            libraryLayoutBinding.rcVerticalLayout.rcVertical.setVisibility(View.VISIBLE);
+                            new setLocalDataTask(new LibraryAsyncResponse() {
+                                @Override
+                                public List<LibraryObject> getLocalUserDetails(List<LibraryObject> libraryObjects) {
 
-                                List<LibraryObject.Data> libraryDataObjects = new ArrayList<>();
+                                    List<LibraryObject.Data> libraryDataObjects = new ArrayList<>();
 
-                                for (int i = 0; i < libraryObjects.size(); i++) {
-                                    libraryDataObjects = libraryObjects.get(i).getData();
+                                    for (int i = 0; i < libraryObjects.size(); i++) {
+                                        libraryDataObjects = libraryObjects.get(i).getData();
+                                    }
+
+                                    libraryLayoutBinding.rcVerticalLayout.rcVertical.setHasFixedSize(true);
+                                    libraryLayoutBinding.rcVerticalLayout.rcVertical.setLayoutManager(new GridLayoutManager(getActivity(), 2));
+                                    libraryListAdapter = new LibraryListAdapter(getActivity(), libraryDataObjects, userDetailsObject);
+                                    libraryLayoutBinding.rcVerticalLayout.rcVertical.setAdapter(libraryListAdapter);
+                                    hideDialog();
+                                    return null;
                                 }
-
-                                libraryLayoutBinding.rcVerticalLayout.rcVertical.setHasFixedSize(true);
-                                libraryLayoutBinding.rcVerticalLayout.rcVertical.setLayoutManager(new GridLayoutManager(getActivity(), 2));
-                                libraryListAdapter = new LibraryListAdapter(getActivity(), libraryDataObjects, userDetailsObject);
-                                libraryLayoutBinding.rcVerticalLayout.rcVertical.setAdapter(libraryListAdapter);
-                                hideDialog();
-                                return null;
-                            }
-                        }).execute();
+                            }).execute();
+                        } else if (deviceStatusCode.equals("2")) {
+                            libraryLayoutBinding.deactivatedDeviceQuota.deviceDeactivateLay.setVisibility(View.VISIBLE);
+                            libraryLayoutBinding.outOfDeviceQuota.deviceQuotaLay.setVisibility(View.GONE);
+                            libraryLayoutBinding.rcVerticalLayout.rcVertical.setVisibility(View.GONE);
+                        } else if (deviceStatusCode.equals("3")) {
+                            libraryLayoutBinding.deactivatedDeviceQuota.deviceDeactivateLay.setVisibility(View.GONE);
+                            libraryLayoutBinding.outOfDeviceQuota.deviceQuotaLay.setVisibility(View.VISIBLE);
+                            libraryLayoutBinding.rcVerticalLayout.rcVertical.setVisibility(View.GONE);
+                        }
                     }
                 }));
     }
@@ -840,10 +859,12 @@ public class LibraryFragment extends BaseFragment implements View.OnClickListene
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.serachMenu:
-                libraryLayoutBinding.serachMenu.setVisibility(View.GONE);
-                libraryLayoutBinding.libraryText.setVisibility(View.GONE);
-                libraryLayoutBinding.booksearchview.setVisibility(View.VISIBLE);
-                libraryLayoutBinding.booksearchview.onActionViewExpanded();
+                if (deviceStatus == 0) {
+                    libraryLayoutBinding.serachMenu.setVisibility(View.GONE);
+                    libraryLayoutBinding.libraryText.setVisibility(View.GONE);
+                    libraryLayoutBinding.booksearchview.setVisibility(View.VISIBLE);
+                    libraryLayoutBinding.booksearchview.onActionViewExpanded();
+                }
                 break;
             case R.id.btnbackLibrary:
                 if (libraryLayoutBinding.booksearchview.getVisibility() == View.VISIBLE) {
@@ -855,13 +876,14 @@ public class LibraryFragment extends BaseFragment implements View.OnClickListene
                 }
                 break;
             case R.id.gradeMenu:
-
-                if (bookLayout) {
-                    bookLayout = false;
-                } else {
-                    bookLayout = true;
+                if (deviceStatus == 0) {
+                    if (bookLayout) {
+                        bookLayout = false;
+                    } else {
+                        bookLayout = true;
+                    }
+                    setBookLayout(bookLayout);
                 }
-                setBookLayout(bookLayout);
                 break;
         }
     }
