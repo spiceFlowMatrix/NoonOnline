@@ -115,7 +115,7 @@ namespace Training24Admin.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    var deviceExist = deviceBusiness.GetDevicesByMacAdd(objData.macAddress);
+                    var deviceExist = deviceBusiness.GetDevicesByMacAdd(objData.macAddress, int.Parse(tc.Id));
                     if (deviceExist == null)
                     {
                         if (deviceBusiness.CheckDeviceQuota(int.Parse(tc.Id)) > 0)

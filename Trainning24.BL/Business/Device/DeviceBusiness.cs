@@ -166,9 +166,10 @@ namespace Trainning24.BL.Business.Device
         /// </summary>
         /// <param name="macAdd">device mac Address</param>
         /// <returns>Devices details</returns>  
-        public Devices GetDevicesByMacAdd(string macAdd)
+        public Devices GetDevicesByMacAdd(string macAdd,int userId)
         {
-            return _eFDeviceRepository.GetById(b => b.MacAddress == macAdd);
+
+            return _eFDeviceRepository.GetById(b => b.MacAddress == macAdd && b.UserId == userId);
         }
 
         /// <summary>
