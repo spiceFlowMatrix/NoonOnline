@@ -268,6 +268,8 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
             String networkSpeed = sharedPreferences1.getString("downloadspeed", "");
 
             CourseDatabaseRepository courseDatabaseRepository = new CourseDatabaseRepository();
+            if (userId == null && userId.isEmpty())
+                return;
             SyncTimeTrackingObject syncTimeTrackingObject = courseDatabaseRepository.getSyncTimeTrackById(Integer.parseInt(userId));
 
             if (syncTimeTrackingObject != null) {

@@ -401,6 +401,8 @@
     <string name="last_name">Last Name</string>
     <string name="login_trial">Login Trial</string>
     <string name="sign_up_trial">Sign Up Trial</string>
+
+    <!--Sync Cache Events-->
     <string name="pending_cache_events">Pending Cache Events</string>
     <string name="too_many_events_cache">Too many events in cache</string>
     <string name="cache_limit_message">You will lose progress if you don\'t sync \n your pending cache events.</string>
@@ -413,7 +415,7 @@
     <string name="errored_status">Errored</string>
 
 
-    <!--&lt;!&ndash;Device Management&ndash;&gt;
+    <!--Device Management-->
     <string name="activate_deactivate_device">Activate/Deactivate device</string>
     <string name="clicking_below_button">You can deactivate or activate your device by clicking on the below button.</string>
     <string name="activate_deactivate">Activate/Deactivate</string>
@@ -425,7 +427,16 @@
     <string name="extend_quote_request">Extend quote request</string>
     <string name="out_of_device_quota">You are out of device quota</string>
     <string name="device_activate_instruction">Please deactivate another device or request \na quota extension from the Device Management \ncontrol panel in order to activate this device</string>
-    <string name="go_to_device_management">GO TO DEVICE MANAGEMENT</string>-->
+    <string name="go_to_device_management">GO TO DEVICE MANAGEMENT</string>
+    <string name="device_has_deactivated">This device has been deactivated</string>
+    <string name="reactivate_instruction">Please reactivate this device from the Device \nManagement control panel in order to continue \nusing this</string>
+    <string name="device_active">Active</string>
+    <string name="device_deactivated">Deactivated</string>
+    <string name="device_total_quota">Total Quota</string>
+    <string name="device_current_quota">Current Quota</string>
+    <string name="already_pending_quota_request">You have already a pending quota request</string>
+    <string name="this_device">This device</string>
+    <string name="reistering_device">Registering Device</string>
 
     <!--<string name="pashto_school">مدرسة الباشتو</string>-->
     <!--For Pashto Notification Translation-->

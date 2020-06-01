@@ -389,6 +389,23 @@ public abstract class BaseActivity extends AppCompatActivity implements DroidLis
         sharedPreferences.clear();
         sharedPreferences.apply();
 
+        SharedPreferences sharedPreferencesCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferencesCache.edit();
+        if (editor != null) {
+            editor.clear();
+            editor.putString("FlagStatus", "");
+            editor.apply();
+        }
+
+        SharedPreferences deviceManagementPreferences = getSharedPreferences("deviceManagement", MODE_PRIVATE);
+        SharedPreferences.Editor deviceManagementEditor = deviceManagementPreferences.edit();
+
+        if (deviceManagementEditor != null) {
+            sharedPreferences.clear();
+            deviceManagementEditor.putString("deviceToken", "");
+            deviceManagementEditor.apply();
+        }
+
         PrefUtils.clearSharedPreferences(getApplicationContext());
         PrefUtils.storeReminderTokenKey(getApplicationContext(), reminderObject);
         PrefUtils.storerefreshedToken(getApplicationContext(), refreshedToken);

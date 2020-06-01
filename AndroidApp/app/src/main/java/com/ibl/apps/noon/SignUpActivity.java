@@ -564,7 +564,8 @@ public class SignUpActivity extends BaseActivity implements View.OnClickListener
 
     public void callApiSignLogin(String email, String password, String repeatpassword, String personalName, String fatherName, String gender, String birthday, String birthplace, String province, String city, String villageArea, String school, String gradeID, String tazkiranumber, String phonenumber, String fbSkype, String signupFbSkypy, String aboutUs) {
 
-        showDialog(getString(R.string.loading));
+        /*showDialog(getString(R.string.loading));*/
+        showDialog(getString(R.string.reistering_device));
 
         JsonObject gsonObject = new JsonObject();
         JSONObject jsonObject = new JSONObject();
