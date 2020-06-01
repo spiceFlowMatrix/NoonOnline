@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using Trainning24.BL.ViewModels.Device;
@@ -60,7 +61,7 @@ namespace Trainning24.BL.Business.Device
             deviceData.IpAddress = objData.ipAddress;
             deviceData.UserId = id;
             deviceData.DeviceToken = Guid.NewGuid().ToString();
-            deviceData.CreationTime = DateTime.Now.ToString();
+            deviceData.CreationTime = DateTime.UtcNow.ToString("MM/dd/yyyy hh:mm:ss tt", CultureInfo.InvariantCulture);
             deviceData.CreatorUserId = id;
             deviceData.IsDeleted = false;
             _eFDeviceRepository.Insert(deviceData);
@@ -70,7 +71,7 @@ namespace Trainning24.BL.Business.Device
                 DeviceId = deviceData.Id,
                 Name = objData.operatingSystem.name,
                 Version = objData.operatingSystem.version,
-                CreationTime = DateTime.Now.ToString(),
+                CreationTime = DateTime.UtcNow.ToString("MM/dd/yyyy hh:mm:ss tt", CultureInfo.InvariantCulture),
                 CreatorUserId = id,
                 IsDeleted = false
             };
@@ -83,7 +84,7 @@ namespace Trainning24.BL.Business.Device
                     {
                         DeviceId = deviceData.Id,
                         Name = tag.name,
-                        CreationTime = DateTime.Now.ToString(),
+                        CreationTime = DateTime.UtcNow.ToString("MM/dd/yyyy hh:mm:ss tt", CultureInfo.InvariantCulture),
                         CreatorUserId = id,
                         IsDeleted = false
                     };
@@ -100,7 +101,7 @@ namespace Trainning24.BL.Business.Device
                 device.MacAddress = obj.MacAddress;
                 device.IpAddress = obj.IpAddress;
                 device.UserId = obj.UserId;
-                device.LastModificationTime = DateTime.Now.ToString();
+                device.LastModificationTime = DateTime.UtcNow.ToString("MM/dd/yyyy hh:mm:ss tt", CultureInfo.InvariantCulture);
                 device.LastModifierUserId = id;
                 _eFDeviceRepository.Update(device);
                 return device;
@@ -121,7 +122,7 @@ namespace Trainning24.BL.Business.Device
             {
                 devices.IsDeleted = devices.IsDeleted != true;
                 devices.DeleterUserId = UserId;
-                devices.DeletionTime = devices.IsDeleted != true ? DateTime.Now.ToString() : null;
+                devices.DeletionTime = devices.IsDeleted != true ? DateTime.UtcNow.ToString("MM/dd/yyyy hh:mm:ss tt", CultureInfo.InvariantCulture) : null;
                 _eFDeviceRepository.Update(devices);
                 if (devices.IsDeleted != true)
                     return 1;
@@ -151,7 +152,7 @@ namespace Trainning24.BL.Business.Device
                 DeviceQuotas deviceQuotas = new DeviceQuotas()
                 {
                     DeviceLimit = 1,
-                    CreationTime = DateTime.Now.ToString(),
+                    CreationTime = DateTime.UtcNow.ToString("MM/dd/yyyy hh:mm:ss tt", CultureInfo.InvariantCulture),
                     CreatorUserId = UserId,
                     UserId = UserId,
                     IsDeleted = false
@@ -166,7 +167,7 @@ namespace Trainning24.BL.Business.Device
         /// </summary>
         /// <param name="macAdd">device mac Address</param>
         /// <returns>Devices details</returns>  
-        public Devices GetDevicesByMacAdd(string macAdd,int userId)
+        public Devices GetDevicesByMacAdd(string macAdd, int userId)
         {
 
             return _eFDeviceRepository.GetById(b => b.MacAddress == macAdd && b.UserId == userId);
@@ -212,6 +213,36 @@ namespace Trainning24.BL.Business.Device
         }
 
         /// <summary>
+        /// All device with device status
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public List<ResponseDeviceModel> GetUserDeviceByUserId(int userId)
+        {
+            List<ResponseDeviceModel> responceDeviceModel = new List<ResponseDeviceModel>();
+
+            var devices = _eFDeviceRepository.ListQuery(b => b.UserId == userId).ToList();
+            if (devices != null)
+            {
+                var deiviceIds = devices.Select(s => s.Id).ToList();
+                var deviceOS = _eFDeviceOSRepository.ListQuery(b => deiviceIds.Contains(b.DeviceId)).ToList();
+
+               responceDeviceModel = (from x in devices
+                                    join n in deviceOS on x.Id equals n.DeviceId
+                                    select new ResponseDeviceModel
+                                    {
+                                        id = x.Id,
+                                        approvedOn = x.CreationTime,
+                                        modelName = x.ModelName,
+                                        modelNumber = x.ModelNumber,
+                                        IsActive = !x.IsDeleted,
+                                        operatingSystem = n.Name
+                                    }).ToList();
+
+            }
+            return responceDeviceModel;
+        }
+        /// <summary>
         /// Get Device tags by Device Id.
         /// </summary>
         /// <param name="deviceId"></param>
@@ -235,29 +266,67 @@ namespace Trainning24.BL.Business.Device
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public List<ResponseUserDeviceModel> GetAllDeviceUserWise()
+        public ResponseUserDeviceModel GetAllDeviceUserWise(DeviceQuotaExtensionFilterModel paginationModel, out int total)
         {
-            List<ResponseUserDeviceModel> responceUserDeviceModel = new List<ResponseUserDeviceModel>();
-
+            ResponseUserDeviceModel responceUserDeviceModel = new ResponseUserDeviceModel();
+            List<UserDeviceModel> userDeviceModels = new List<UserDeviceModel>();
             DBHelper dbHelper = new DBHelper(getconnectionstring());
             try
             {
                 dbHelper.Open();
-                DataTable userDevicelist = dbHelper.ExcecuteQueryDT("SELECT u.Id,u.fullname,u.email,u.username,dq.DeviceLimit ,(SELECT count(*) from devices as d where  d.UserId = u.Id AND (d.IsDeleted!=true OR d.IsDeleted Is Null) ) as currentConsumption FROM `devicequotas` as dq Left JOIN `users` as u ON dq.UserId = u.Id  WHERE (dq.IsDeleted != true OR dq.IsDeleted Is Null) && (u.IsDeleted != true OR u.IsDeleted Is Null)");
+                string query = null; string usreidfilter = null; string pagenation = null; string search = null;
+
+
+                //if (paginationModel.userId != 0)
+                //    usreidfilter = " && u.Id = " + paginationModel.userId;
+                //if (pagenation != null) query += pagenation;
+
+                if (paginationModel.search != null)
+                    search = " AND ( LOWER(u.username) Like LOWER('%" + paginationModel.search + "%') OR LOWER(u.email) Like 'LOWER(%" + paginationModel.search + "%') OR LOWER(u.email) Like LOWER('%" + paginationModel.search + "%'))";
+                if (paginationModel.pagenumber != 0 && paginationModel.perpagerecord != 0)
+                    pagenation = " LIMIT " + paginationModel.perpagerecord * (paginationModel.pagenumber - 1) + ", " + paginationModel.perpagerecord;
+
+                query = "SELECT u.Id,u.fullname,u.email,u.username,dq.DeviceLimit ,(SELECT count(*) from devices as d where  d.UserId = u.Id AND (d.IsDeleted!=true OR d.IsDeleted Is Null) ) as currentConsumption FROM `devicequotas` as dq Left JOIN `users` as u ON dq.UserId = u.Id  WHERE (dq.IsDeleted != true OR dq.IsDeleted Is Null) AND (u.IsDeleted != true OR u.IsDeleted Is Null)";
+                if (usreidfilter != null) query += usreidfilter; if (search != null) query += search; 
+                DataTable userDevicelist = dbHelper.ExcecuteQueryDT(query);
+                query = "SELECT u.Id,u.fullname,u.email,u.username,dq.DeviceLimit ,(SELECT count(*) from devices as d where  d.UserId = u.Id AND (d.IsDeleted!=true OR d.IsDeleted Is Null) ) as currentConsumption FROM `devicequotas` as dq Left JOIN `users` as u ON dq.UserId = u.Id  WHERE (dq.IsDeleted != true OR dq.IsDeleted Is Null) AND (u.IsDeleted != true OR u.IsDeleted Is Null)";
+                DataTable userEmaillist = dbHelper.ExcecuteQueryDT(query);
                 dbHelper.Close();
                 if (userDevicelist.Rows.Count != 0)
                 {
                     foreach (DataRow userDevice in userDevicelist.Rows)
                     {
-                        ResponseUserDeviceModel responseUserDeviceModel = new ResponseUserDeviceModel();
-                        responseUserDeviceModel.deviceLimit = Convert.ToInt32(userDevice["DeviceLimit"].ToString());
-                        responseUserDeviceModel.currentConsumption = Convert.ToInt32(userDevice["currentConsumption "].ToString());
-                        responseUserDeviceModel.userId = Convert.ToInt64(userDevice["Id"].ToString());
-                        responseUserDeviceModel.username = userDevice["username"].ToString();
-                        responseUserDeviceModel.email = userDevice["email"].ToString();
-                        responceUserDeviceModel.Add(responseUserDeviceModel);
+                        UserDeviceModel UserDeviceModel = new UserDeviceModel();
+                        UserDeviceModel.deviceLimit = Convert.ToInt32(userDevice["DeviceLimit"].ToString());
+                        UserDeviceModel.currentConsumption = Convert.ToInt32(userDevice["currentConsumption"].ToString());
+                        UserDeviceModel.userId = Convert.ToInt64(userDevice["Id"].ToString());
+                        UserDeviceModel.username = userDevice["username"].ToString();
+                        UserDeviceModel.email = userDevice["email"].ToString();
+                        userDeviceModels.Add(UserDeviceModel);
                     }
+                    List<UserEmail> userEmaillst = new List<UserEmail>();
+                    foreach (DataRow userDevice in userEmaillist.Rows)
+                    {
+                        UserEmail userEmail = new UserEmail { Id = Convert.ToInt64(userDevice["Id"].ToString()), email = userDevice["email"].ToString() };
+                       userEmaillst.Add(userEmail);
+
+                    }
+                    responceUserDeviceModel.userEmails = userEmaillst;
+                    total = userDeviceModels.Count();
+                    if (paginationModel.pagenumber != 0 && paginationModel.perpagerecord != 0)
+                        userDeviceModels = userDeviceModels.Skip(paginationModel.perpagerecord * (paginationModel.pagenumber - 1)).
+                        Take(paginationModel.perpagerecord).
+                        ToList();
+                    responceUserDeviceModel.userDeviceModels = userDeviceModels;
+                    return responceUserDeviceModel;
                 }
+                else
+                {
+                    total = 0;
+                    return null;
+
+                }
+                
             }
             catch (Exception ex)
             {
@@ -270,12 +339,13 @@ namespace Trainning24.BL.Business.Device
             }
 
 
-            return responceUserDeviceModel;
         }
         private string getconnectionstring()
         {
             return Environment.GetEnvironmentVariable("ASPNET_DB_CONNECTIONSTRING");
         }
+
+
     }
 
 }

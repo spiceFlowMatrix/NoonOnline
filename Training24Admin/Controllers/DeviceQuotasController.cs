@@ -32,7 +32,7 @@ namespace Training24Admin.Controllers
   
 
         [HttpGet("getAllDeviceQuotaExtensionRequest")]
-        public IActionResult GetAllDeviceQuotaExtensionRequest(int pagenumber, int perpagerecord, string search, string fromdate, string todate)
+        public IActionResult GetAllDeviceQuotaExtensionRequest(int pagenumber, int perpagerecord, string search,long userId, string fromdate, string todate)
         {
             PaginationResponse successResponse = new PaginationResponse();
             UnsuccessResponse unsuccessResponse = new UnsuccessResponse();
@@ -43,6 +43,7 @@ namespace Training24Admin.Controllers
                 search = search,
                 fromdate = fromdate,
                 todate = todate,
+                userId = userId
             };
             try
             {
@@ -53,7 +54,7 @@ namespace Training24Admin.Controllers
 
                 if (tc.RoleName.Contains(General.getRoleType("1")))
                 {
-                    List<ResponseDeviceQuotaExtension> QuotaExtensionList = DeviceQuotasBusiness.QuotaExtensionList(deviceQuotaExtensionFilterModel, out int total);
+                    ResponseDeviceQuotaExtension QuotaExtensionList = DeviceQuotasBusiness.QuotaExtensionList(deviceQuotaExtensionFilterModel, out int total);
                     successResponse.totalcount = total;
                     successResponse.data = QuotaExtensionList;
                     successResponse.response_code = 0;

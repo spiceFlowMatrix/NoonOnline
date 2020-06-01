@@ -6,6 +6,11 @@ namespace Trainning24.BL.ViewModels.Device
 {
     public class ResponseUserDeviceModel
     {
+        public List<UserDeviceModel> userDeviceModels { get; set; }
+        public List<UserEmail> userEmails { get; set; }
+    }
+    public class UserDeviceModel
+    {
         public int deviceLimit { get; set; }
         public int currentConsumption { get; set; }
         public long userId { get; set; }
