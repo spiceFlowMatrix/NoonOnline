@@ -434,6 +434,11 @@
     <string name="this_device">This device</string>
     <string name="reistering_device">Registering Device</string>
 
+    <string name="new_quote_limit">New Quote Limit</string>
+    <string name="logins">Logins</string>
+    <string name="extend_quota">EXTEND QUOTA</string>
+    <string name="request_quota_extension">REQUEST QUOTA EXTENSION</string>
+    <string name="devices">DEVICES</string>
 
     <!--<string name="pashto_school">مدرسة الباشتو</string>-->
     <!--For Pashto Notification Translation-->
