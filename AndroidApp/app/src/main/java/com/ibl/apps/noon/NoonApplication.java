@@ -9,6 +9,7 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Handler;
+import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.appcompat.app.AppCompatDelegate;
@@ -19,6 +20,7 @@ import androidx.lifecycle.ProcessLifecycleOwner;
 import androidx.multidex.MultiDex;
 import androidx.multidex.MultiDexApplication;
 
+import com.bumptech.glide.load.HttpException;
 import com.crashlytics.android.Crashlytics;
 import com.downloader.PRDownloader;
 import com.downloader.PRDownloaderConfig;
@@ -26,9 +28,14 @@ import com.droidnet.DroidNet;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
+import com.ibl.apps.LessonManagement.LessonRepository;
 import com.ibl.apps.Model.SyncTimeTracking;
 import com.ibl.apps.RoomDatabase.dao.courseManagementDatabase.CourseDatabaseRepository;
+import com.ibl.apps.RoomDatabase.dao.lessonManagementDatabase.LessonDatabaseRepository;
+import com.ibl.apps.RoomDatabase.dao.quizManagementDatabase.QuizDatabaseRepository;
 import com.ibl.apps.RoomDatabase.dao.syncAPIManagementDatabase.SyncAPIDatabaseRepository;
+import com.ibl.apps.RoomDatabase.entity.LessonProgress;
+import com.ibl.apps.RoomDatabase.entity.QuizUserResult;
 import com.ibl.apps.RoomDatabase.entity.SyncAPITable;
 import com.ibl.apps.RoomDatabase.entity.SyncTimeTrackingObject;
 import com.ibl.apps.Service.NetworkChangeReceiver;
@@ -40,6 +47,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.TimeZone;
@@ -57,8 +65,10 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
 
     private static Context context;
     private BroadcastReceiver mNetworkReceiver;
-    public static int cacheStatus = -1;
+    public static int cacheStatus = 4;
     public static boolean AppTimeTrack = false;
+    private LessonDatabaseRepository lessonDatabaseRepository;
+    private QuizDatabaseRepository quizDatabaseRepository;
 
     // This flag should be set to true to enable VectorDrawable support for API < 21
     static {
@@ -81,10 +91,22 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
     public void onCreate() {
         super.onCreate();
         Fabric.with(this, new Crashlytics());
-        callApiForCacheEventsInterval();
+
         //CallApiForSpendApp();
         //callApiForInterval();
         //callLogfiles();
+        callApiForCacheEventsInterval();
+        lessonDatabaseRepository = new LessonDatabaseRepository();
+        quizDatabaseRepository = new QuizDatabaseRepository();
+
+        SharedPreferences sharedPreferencesuser = getSharedPreferences("user", MODE_PRIVATE);
+        String userId = sharedPreferencesuser.getString("uid", "");
+        if (!userId.equals("")) {
+            List<LessonProgress> lessonProgressList = lessonDatabaseRepository.getAllLessonProgressData(false, userId);
+            List<QuizUserResult> quizUserResults = quizDatabaseRepository.getAllQuizuserResult(false, userId);
+            callApiProgessSyncAdd(lessonProgressList, quizUserResults, userId);
+        }
+
         // Enabling database for resume support even after the application is killed:
         PRDownloaderConfig config = PRDownloaderConfig.newBuilder()
                 .setDatabaseEnabled(true)
@@ -111,6 +133,85 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
                 h.postDelayed(this, 300000);
             }
         }, 300000);
+    }
+
+    public void callApiProgessSyncAdd(List<LessonProgress> lessonProgressList, List<QuizUserResult> quizUserResults, String userId) {
+        LessonRepository lessonRepository = new LessonRepository();
+        CompositeDisposable disposable = new CompositeDisposable();
+        try {
+            JsonObject noonAppFullSyncObject = new JsonObject();
+            JsonArray lessonProgressArray = PrefUtils.convertToJsonArray(lessonProgressList);
+            noonAppFullSyncObject.add(Const.PROGRESSDATA, lessonProgressArray);
+            //Log.e(Const.LOG_NOON_TAG, "=====lessonProgressArray===" + lessonProgressArray);
+
+            JsonArray quizResultArray = PrefUtils.convertToJsonArray(quizUserResults);
+            noonAppFullSyncObject.add(Const.TIMERDATA, quizResultArray);
+            //Log.e(Const.LOG_NOON_TAG, "=====quizResultArray===" + quizResultArray);
+//            Log.e(Const.LOG_NOON_TAG, "=====noonAppFullSyncObject===" + noonAppFullSyncObject);
+
+
+            disposable.add(lessonRepository.ProgessSyncAdd(noonAppFullSyncObject)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeWith(new DisposableSingleObserver<LessonProgress>() {
+                        @Override
+                        public void onSuccess(LessonProgress lessonProgress) {
+
+                            if (lessonProgressList != null && lessonProgressList.size() != 0) {
+                                for (int i = 0; i < lessonProgressList.size(); i++) {
+                                    String quizID = lessonProgressList.get(i).getQuizId();
+                                    String lessonID = lessonProgressList.get(i).getLessonId();
+                                    if (quizID != null && !TextUtils.isEmpty(quizID)) {
+                                        lessonDatabaseRepository.updateQuizIdisStatus(quizID, true, userId);
+                                    } else {
+                                        lessonDatabaseRepository.updateLessonIdisStatus(lessonID, true, userId);
+                                    }
+                                }
+                            }
+                            if (quizUserResults != null && quizUserResults.size() != 0) {
+                                for (int i = 0; i < quizUserResults.size(); i++) {
+                                    String quizID = quizUserResults.get(i).getQuizId();
+                                    quizDatabaseRepository.updatelQuizUserResultStatus(true, quizID, userId);
+                                }
+                            }
+                            Log.e(Const.LOG_NOON_TAG, "=====noonAppFullSyncObject==onSuccess=");
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            HttpException error = (HttpException) e;
+                            //LessonProgress lessonProgress = new Gson().fromJson(Objects.requireNonNull(error.response().errorBody()).string(), LessonProgress.class);
+                            if (!userId.equals("")) {
+                                SyncAPITable syncAPITable = new SyncAPITable();
+                                syncAPITable.setApi_name("ProgressSyncAdd Progressed");
+                                syncAPITable.setEndpoint_url("ProgessSync/ProgessSyncAdd");
+                                syncAPITable.setParameters(String.valueOf(noonAppFullSyncObject));
+                                syncAPITable.setHeaders(PrefUtils.getAuthid(context));
+                                syncAPITable.setStatus(getString(R.string.errored_status));
+                                syncAPITable.setDescription(e.getMessage());
+                                syncAPITable.setCreated_time(getUTCTime());
+                                syncAPITable.setUserid(Integer.parseInt(userId));
+
+                                SyncAPIDatabaseRepository syncAPIDatabaseRepository = new SyncAPIDatabaseRepository();
+                                syncAPIDatabaseRepository.insertSyncData(syncAPITable);
+
+                                NoonApplication.cacheStatus = 2;
+                                SharedPreferences sharedPreferencesCache = context.getSharedPreferences("cacheStatus", MODE_PRIVATE);
+                                SharedPreferences.Editor editor = sharedPreferencesCache.edit();
+                                if (editor != null) {
+                                    editor.clear();
+                                    editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
+                                    editor.apply();
+                                }
+                            }
+                            //Log.e(Const.LOG_NOON_TAG, "==lessonProgress==" + lessonProgress);
+                        }
+                    }));
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void callApiForCacheEventsInterval() {
@@ -322,16 +423,18 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
                         editor.apply();
                     }
                     courseDatabaseRepository.updateSyncTimeTracking(syncTimeTrackingObject);
+
+                    cacheStatus = 1;
+                    SharedPreferences sharedPreferencesCache = context.getSharedPreferences("cacheStatus", MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferencesCache.edit();
+                    if (editor != null) {
+                        editor.clear();
+                        editor.putString("FlagStatus", String.valueOf(cacheStatus));
+                        editor.apply();
+                    }
                 }
             }
-            cacheStatus = 1;
-            SharedPreferences sharedPreferencesCache = context.getSharedPreferences("cacheStatus", MODE_PRIVATE);
-            SharedPreferences.Editor editor = sharedPreferencesCache.edit();
-            if (editor != null) {
-                editor.clear();
-                editor.putString("FlagStatus", String.valueOf(cacheStatus));
-                editor.apply();
-            }
+
         } catch (JsonSyntaxException exeption) {
             exeption.printStackTrace();
         }

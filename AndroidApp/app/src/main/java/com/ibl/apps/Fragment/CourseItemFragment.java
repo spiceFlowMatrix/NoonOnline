@@ -320,6 +320,14 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                                     .into(fragmentCourseItemLayoutBinding.cacheEventsStatusBtn);
                             break;
                     }
+
+                    fragmentCourseItemLayoutBinding.cacheEventsStatusBtn.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            startActivity(new Intent(NoonApplication.getContext(), CacheEventsListActivity.class));
+                        }
+                    });
+
                     if (syncAPIDatabaseRepository.getSyncUserById(Integer.parseInt(userId)).size() >= 50) {
                         NoonApplication.cacheStatus = 2;
                         SharedPreferences sharedPreferencesCache = getActivity().getSharedPreferences("cacheStatus", MODE_PRIVATE);
@@ -574,18 +582,6 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
             new setLocalDataTask(new CourseItemAsyncResponse() {
                 @Override
                 public CoursePriviewObject getCoursePriviewObject(CoursePriviewObject coursePriviewObject) {
-                    if (fileProgressList.size() > 0) {
-                        callApiSyncFiles(fileProgressList);
-                    }
-                    if (lessonProgressList.size() > 0) {
-                        callApiSyncLessonProgress(lessonProgressList);
-                    }
-                    if (quizProgressList.size() > 0) {
-                        callApiSyncQuiz(quizProgressList);
-                    }
-                    if (chapterProgressList.size() > 0) {
-                        callApiSyncChapter(chapterProgressList);
-                    }
                     if (coursePriviewObject != null) {
                         courseItemListAdapter.notifyDataSetChanged();
                     } else {
@@ -740,14 +736,15 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                                 syncAPITable.setCourseName(CourseName);
                                 syncAPITable.setUserid(Integer.parseInt(userId));
                                 syncAPIDatabaseRepository.insertSyncData(syncAPITable);
-                            }
-                            NoonApplication.cacheStatus = 2;
-                            SharedPreferences sharedPreferencesCache = getActivity().getSharedPreferences("cacheStatus", MODE_PRIVATE);
-                            SharedPreferences.Editor editor = sharedPreferencesCache.edit();
-                            if (editor != null) {
-                                editor.clear();
-                                editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
-                                editor.apply();
+
+                                NoonApplication.cacheStatus = 2;
+                                SharedPreferences sharedPreferencesCache = getActivity().getSharedPreferences("cacheStatus", MODE_PRIVATE);
+                                SharedPreferences.Editor editor = sharedPreferencesCache.edit();
+                                if (editor != null) {
+                                    editor.clear();
+                                    editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
+                                    editor.apply();
+                                }
                             }
                         } catch (JsonSyntaxException exeption) {
                             exeption.printStackTrace();
@@ -803,14 +800,15 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                                 syncAPITable.setCourseName(CourseName);
                                 syncAPITable.setUserid(Integer.parseInt(userId));
                                 syncAPIDatabaseRepository.insertSyncData(syncAPITable);
-                            }
-                            NoonApplication.cacheStatus = 2;
-                            SharedPreferences sharedPreferencesCache = getActivity().getSharedPreferences("cacheStatus", MODE_PRIVATE);
-                            SharedPreferences.Editor editor = sharedPreferencesCache.edit();
-                            if (editor != null) {
-                                editor.clear();
-                                editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
-                                editor.apply();
+
+                                NoonApplication.cacheStatus = 2;
+                                SharedPreferences sharedPreferencesCache = getActivity().getSharedPreferences("cacheStatus", MODE_PRIVATE);
+                                SharedPreferences.Editor editor = sharedPreferencesCache.edit();
+                                if (editor != null) {
+                                    editor.clear();
+                                    editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
+                                    editor.apply();
+                                }
                             }
                         } catch (JsonSyntaxException exeption) {
                             exeption.printStackTrace();
@@ -866,14 +864,15 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                                 syncAPITable.setCourseName(CourseName);
                                 syncAPITable.setUserid(Integer.parseInt(userId));
                                 syncAPIDatabaseRepository.insertSyncData(syncAPITable);
-                            }
-                            NoonApplication.cacheStatus = 2;
-                            SharedPreferences sharedPreferencesCache = getActivity().getSharedPreferences("cacheStatus", MODE_PRIVATE);
-                            SharedPreferences.Editor editor = sharedPreferencesCache.edit();
-                            if (editor != null) {
-                                editor.clear();
-                                editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
-                                editor.apply();
+
+                                NoonApplication.cacheStatus = 2;
+                                SharedPreferences sharedPreferencesCache = getActivity().getSharedPreferences("cacheStatus", MODE_PRIVATE);
+                                SharedPreferences.Editor editor = sharedPreferencesCache.edit();
+                                if (editor != null) {
+                                    editor.clear();
+                                    editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
+                                    editor.apply();
+                                }
                             }
                         } catch (JsonSyntaxException exeption) {
                             exeption.printStackTrace();
@@ -929,14 +928,15 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                                 syncAPITable.setCourseName(CourseName);
                                 syncAPITable.setUserid(Integer.parseInt(userId));
                                 syncAPIDatabaseRepository.insertSyncData(syncAPITable);
-                            }
-                            NoonApplication.cacheStatus = 2;
-                            SharedPreferences sharedPreferencesCache = getActivity().getSharedPreferences("cacheStatus", MODE_PRIVATE);
-                            SharedPreferences.Editor editor = sharedPreferencesCache.edit();
-                            if (editor != null) {
-                                editor.clear();
-                                editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
-                                editor.apply();
+
+                                NoonApplication.cacheStatus = 2;
+                                SharedPreferences sharedPreferencesCache = getActivity().getSharedPreferences("cacheStatus", MODE_PRIVATE);
+                                SharedPreferences.Editor editor = sharedPreferencesCache.edit();
+                                if (editor != null) {
+                                    editor.clear();
+                                    editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
+                                    editor.apply();
+                                }
                             }
                         } catch (JsonSyntaxException exeption) {
                             exeption.printStackTrace();
@@ -2254,14 +2254,15 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                                                                 syncAPITable.setCourseName(CourseName);
                                                                 syncAPITable.setUserid(Integer.parseInt(userId));
                                                                 syncAPIDatabaseRepository.insertSyncData(syncAPITable);
-                                                            }
-                                                            NoonApplication.cacheStatus = 2;
-                                                            SharedPreferences sharedPreferencesCache = getActivity().getSharedPreferences("cacheStatus", MODE_PRIVATE);
-                                                            SharedPreferences.Editor editor = sharedPreferencesCache.edit();
-                                                            if (editor != null) {
-                                                                editor.clear();
-                                                                editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
-                                                                editor.apply();
+
+                                                                NoonApplication.cacheStatus = 2;
+                                                                SharedPreferences sharedPreferencesCache = getActivity().getSharedPreferences("cacheStatus", MODE_PRIVATE);
+                                                                SharedPreferences.Editor editor = sharedPreferencesCache.edit();
+                                                                if (editor != null) {
+                                                                    editor.clear();
+                                                                    editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
+                                                                    editor.apply();
+                                                                }
                                                             }
                                                         } catch (JsonSyntaxException exeption) {
                                                             exeption.printStackTrace();
@@ -2326,14 +2327,15 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                                                             syncAPITable.setCourseName(CourseName);
                                                             syncAPITable.setUserid(Integer.parseInt(userId));
                                                             syncAPIDatabaseRepository.insertSyncData(syncAPITable);
-                                                        }
-                                                        NoonApplication.cacheStatus = 2;
-                                                        SharedPreferences sharedPreferencesCache = getActivity().getSharedPreferences("cacheStatus", MODE_PRIVATE);
-                                                        SharedPreferences.Editor editor = sharedPreferencesCache.edit();
-                                                        if (editor != null) {
-                                                            editor.clear();
-                                                            editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
-                                                            editor.apply();
+
+                                                            NoonApplication.cacheStatus = 2;
+                                                            SharedPreferences sharedPreferencesCache = getActivity().getSharedPreferences("cacheStatus", MODE_PRIVATE);
+                                                            SharedPreferences.Editor editor = sharedPreferencesCache.edit();
+                                                            if (editor != null) {
+                                                                editor.clear();
+                                                                editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
+                                                                editor.apply();
+                                                            }
                                                         }
                                                     } catch (JsonSyntaxException exeption) {
                                                         exeption.printStackTrace();
@@ -2404,14 +2406,15 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                                                                 syncAPITable.setCourseName(CourseName);
                                                                 syncAPITable.setUserid(Integer.parseInt(userId));
                                                                 syncAPIDatabaseRepository.insertSyncData(syncAPITable);
-                                                            }
-                                                            NoonApplication.cacheStatus = 2;
-                                                            SharedPreferences sharedPreferencesCache = getActivity().getSharedPreferences("cacheStatus", MODE_PRIVATE);
-                                                            SharedPreferences.Editor editor = sharedPreferencesCache.edit();
-                                                            if (editor != null) {
-                                                                editor.clear();
-                                                                editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
-                                                                editor.apply();
+
+                                                                NoonApplication.cacheStatus = 2;
+                                                                SharedPreferences sharedPreferencesCache = getActivity().getSharedPreferences("cacheStatus", MODE_PRIVATE);
+                                                                SharedPreferences.Editor editor = sharedPreferencesCache.edit();
+                                                                if (editor != null) {
+                                                                    editor.clear();
+                                                                    editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
+                                                                    editor.apply();
+                                                                }
                                                             }
                                                         } catch (JsonSyntaxException exeption) {
                                                             exeption.printStackTrace();
@@ -2476,14 +2479,15 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                                                             syncAPITable.setCourseName(CourseName);
                                                             syncAPITable.setUserid(Integer.parseInt(userId));
                                                             syncAPIDatabaseRepository.insertSyncData(syncAPITable);
-                                                        }
-                                                        NoonApplication.cacheStatus = 2;
-                                                        SharedPreferences sharedPreferencesCache = getActivity().getSharedPreferences("cacheStatus", MODE_PRIVATE);
-                                                        SharedPreferences.Editor editor = sharedPreferencesCache.edit();
-                                                        if (editor != null) {
-                                                            editor.clear();
-                                                            editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
-                                                            editor.apply();
+
+                                                            NoonApplication.cacheStatus = 2;
+                                                            SharedPreferences sharedPreferencesCache = getActivity().getSharedPreferences("cacheStatus", MODE_PRIVATE);
+                                                            SharedPreferences.Editor editor = sharedPreferencesCache.edit();
+                                                            if (editor != null) {
+                                                                editor.clear();
+                                                                editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
+                                                                editor.apply();
+                                                            }
                                                         }
                                                     } catch (JsonSyntaxException exeption) {
                                                         exeption.printStackTrace();

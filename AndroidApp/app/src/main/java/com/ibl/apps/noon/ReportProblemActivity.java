@@ -110,33 +110,36 @@ public class ReportProblemActivity extends BaseActivity implements View.OnClickL
 //            binding.descrptionWrapperApp.setVisibility(View.VISIBLE);
 //            binding.generaldescrptionWrapper.setVisibility(View.VISIBLE);
 //        }
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT) {
+            binding.txtCacheTitle.setTextSize(35);
+        }
 
-        setToolbar(binding.toolbarLayout.toolBar);
+        setToolbar(binding.toolBar);
         showBackArrow(getResources().getString(R.string.submit_feedback));
-        binding.toolbarLayout.cacheEventsStatusBtn.setVisibility(View.VISIBLE);
+        binding.cacheEventsStatusBtn.setVisibility(View.VISIBLE);
 
         SyncAPIDatabaseRepository syncAPIDatabaseRepository = new SyncAPIDatabaseRepository();
         SharedPreferences sharedPreferenceCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
         String flagStatus = sharedPreferenceCache.getString("FlagStatus", "");
         switch (flagStatus) {
             case "1":
-                binding.toolbarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_pending);
+                binding.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_pending);
                 break;
             case "2":
-                binding.toolbarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_error);
+                binding.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_error);
                 break;
             case "3":
-                binding.toolbarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_syncing);
+                binding.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_syncing);
                 break;
             case "4":
                 GlideApp.with(ReportProblemActivity.this)
                         .load(R.drawable.ic_cache_empty)
                         .error(R.drawable.ic_cache_empty)
-                        .into(binding.toolbarLayout.cacheEventsStatusBtn);
+                        .into(binding.cacheEventsStatusBtn);
                 break;
         }
 
-        binding.toolbarLayout.cacheEventsStatusBtn.setOnClickListener(new View.OnClickListener() {
+        binding.cacheEventsStatusBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(ReportProblemActivity.this, CacheEventsListActivity.class));
@@ -159,7 +162,7 @@ public class ReportProblemActivity extends BaseActivity implements View.OnClickL
         setUpRecyclerView();
         setOnClickListner();
 
-        binding.toolbarLayout.toolBar.setNavigationOnClickListener(view -> {
+        binding.toolBar.setNavigationOnClickListener(view -> {
             if (isNetworkAvailable(ReportProblemActivity.this)) {
                 finish();
                 Intent intent1 = new Intent(ReportProblemActivity.this, FeedBackActivity.class);

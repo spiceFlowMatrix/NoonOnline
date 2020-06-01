@@ -2,6 +2,7 @@ package com.ibl.apps.noon;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -43,10 +44,13 @@ public class FeedBackActivity extends BaseActivity implements View.OnClickListen
         binding = (ActivityFeedBackBinding) getBindObj();
         SharedPreferences sharedPreferencesuser = getSharedPreferences("user", MODE_PRIVATE);
         String userId = sharedPreferencesuser.getString("uid", "");
-        setToolbar(binding.toolbarLayout.toolBar);
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT) {
+            binding.txtCacheTitle.setTextSize(35);
+        }
+        setToolbar(binding.toolBar);
         showBackArrow(getResources().getString(R.string.feedback));
         SyncAPIDatabaseRepository syncAPIDatabaseRepository = new SyncAPIDatabaseRepository();
-        binding.toolbarLayout.toolBar.setNavigationOnClickListener(new View.OnClickListener() {
+        binding.toolBar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 finish();
@@ -55,28 +59,28 @@ public class FeedBackActivity extends BaseActivity implements View.OnClickListen
             }
         });
         setUpViewPager();
-        binding.toolbarLayout.cacheEventsStatusBtn.setVisibility(View.VISIBLE);
+        binding.cacheEventsStatusBtn.setVisibility(View.VISIBLE);
         SharedPreferences sharedPreferenceCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
         String flagStatus = sharedPreferenceCache.getString("FlagStatus", "");
         switch (flagStatus) {
             case "1":
-                binding.toolbarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_pending);
+                binding.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_pending);
                 break;
             case "2":
-                binding.toolbarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_error);
+                binding.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_error);
                 break;
             case "3":
-                binding.toolbarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_syncing);
+                binding.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_syncing);
                 break;
             case "4":
                 GlideApp.with(FeedBackActivity.this)
                         .load(R.drawable.ic_cache_empty)
                         .error(R.drawable.ic_cache_empty)
-                        .into(binding.toolbarLayout.cacheEventsStatusBtn);
+                        .into(binding.cacheEventsStatusBtn);
                 break;
         }
 
-        binding.toolbarLayout.cacheEventsStatusBtn.setOnClickListener(new View.OnClickListener() {
+        binding.cacheEventsStatusBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(FeedBackActivity.this, CacheEventsListActivity.class));
