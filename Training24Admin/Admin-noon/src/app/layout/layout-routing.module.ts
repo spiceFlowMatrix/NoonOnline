@@ -44,6 +44,11 @@ const routes: Routes = [
                     "./assignments/assignment.module#AssignmentsModule"
             },
             {
+                path: "device-admin",
+                loadChildren:
+                    "./device-admin/device-admin.module#DeviceAdminModule"
+            },
+            {
                 path: "school",
                 loadChildren: "./school/school.module#SchoolModule"
             },

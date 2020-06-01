@@ -35,6 +35,11 @@ export let AdminMenuList = [
         icon: 'fa-file',
         title: 'Files'
     },
+    {
+        link: '/device-admin/device-administration',
+        icon: 'fa-wrench',
+        title: 'Device Administration'
+    },
     // {
     //     link: '/chapters/chapters-list',
     //     icon: 'fa-book',
