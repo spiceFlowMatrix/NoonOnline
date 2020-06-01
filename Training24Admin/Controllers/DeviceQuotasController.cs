@@ -4,63 +4,224 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Training24Admin.Model;
+using Trainning24.BL.Business;
+using Trainning24.BL.Business.Device;
 using Trainning24.BL.ViewModels;
+using Trainning24.BL.ViewModels.Device;
+using Trainning24.BL.ViewModels.Users;
 
 namespace Training24Admin.Controllers
 {
     /// <summary>
     /// Everything about your device quotas
     /// </summary>
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     [ApiController]
     [Produces("application/json")]
     [ApiExplorerSettings(GroupName = nameof(SwaggerGrouping.DeviceQuotas))]
     public class DeviceQuotasController : ControllerBase
     {
-        /// <summary>
-        /// Fetch a list of quotas for all students who have activated (or registered) the student app on it
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet()]
-        public IActionResult Get()
+        private readonly LessonBusiness LessonBusiness;
+        private readonly DeviceQuotasBusiness DeviceQuotasBusiness;
+        public DeviceQuotasController(LessonBusiness lessonBusiness, DeviceQuotasBusiness deviceQuotasBusiness)
         {
-            return StatusCode(406, ModelState);
+            this.LessonBusiness = lessonBusiness;
+            this.DeviceQuotasBusiness = deviceQuotasBusiness;
         }
+  
+
+        [HttpGet("getAllDeviceQuotaExtensionRequest")]
+        public IActionResult GetAllDeviceQuotaExtensionRequest(int pagenumber, int perpagerecord, string search, string fromdate, string todate)
+        {
+            PaginationResponse successResponse = new PaginationResponse();
+            UnsuccessResponse unsuccessResponse = new UnsuccessResponse();
+            DeviceQuotaExtensionFilterModel deviceQuotaExtensionFilterModel = new DeviceQuotaExtensionFilterModel()
+            {
+                pagenumber = pagenumber,
+                perpagerecord = perpagerecord,
+                search = search,
+                fromdate = fromdate,
+                todate = todate,
+            };
+            try
+            {
+                //string Authorization = Request.Headers["Authorization"];
+                string Authorization = Request.Headers["id_token"];
+                TokenClaims tc = General.GetClaims(Authorization);
+                tc.Id = LessonBusiness.getUserId(tc.sub);
+
+                if (tc.RoleName.Contains(General.getRoleType("1")))
+                {
+                    List<ResponseDeviceQuotaExtension> QuotaExtensionList = DeviceQuotasBusiness.QuotaExtensionList(deviceQuotaExtensionFilterModel, out int total);
+                    successResponse.totalcount = total;
+                    successResponse.data = QuotaExtensionList;
+                    successResponse.response_code = 0;
+                    successResponse.message = "QuotaExtensionList";
+                    successResponse.status = "Success";
+                    return StatusCode(200, successResponse);
+                }
+                else
+                {
+                    unsuccessResponse.response_code = 1;
+                    unsuccessResponse.message = "You are not authorized.";
+                    unsuccessResponse.status = "Unsuccess";
+                    return StatusCode(401, unsuccessResponse);
+                }
+            }
+            catch (Exception ex)
+            {
+                unsuccessResponse.response_code = 2;
+                unsuccessResponse.message = ex.Message;
+                unsuccessResponse.status = "Failure";
+                return StatusCode(500, unsuccessResponse);
+            }
+        }
+
 
         /// <summary>
         /// Request a device quota exension
         /// </summary>
         /// <param name="userId">Id of user</param>
-        /// <param name="objData">Quota extension request details</param>
+        /// <param name="requestedLimit">Quota extension request Limit </param>
         /// <returns></returns>
-        [HttpPost("{userId}")]
-        public IActionResult Post(int userId, DeviceQuotas objData)
+        [HttpPost("{requestedLimit}")]
+        public IActionResult Post(int requestedLimit)
         {
-            return StatusCode(406, ModelState);
+            SuccessResponse successResponse = new SuccessResponse();
+            UnsuccessResponse unsuccessResponse = new UnsuccessResponse();
+            string Authorization = Request.Headers["id_token"];
+
+            TokenClaims tc = General.GetClaims(Authorization);
+            tc.Id = LessonBusiness.getUserId(tc.sub);
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    if (tc.RoleName.Contains(General.getRoleType("4")))
+                    {
+                        var penddingExtensionRequest = DeviceQuotasBusiness.GetbyUserId(int.Parse(tc.Id));
+                        if (penddingExtensionRequest == null)
+                        {
+                            var deviceDetail = DeviceQuotasBusiness.ExtensionRequest(int.Parse(tc.Id), requestedLimit);
+                            if (deviceDetail != 0)
+                            {
+                                successResponse.data = deviceDetail;
+                                successResponse.response_code = 0;
+                                successResponse.message = "successful operation";
+                                successResponse.status = "Success";
+                                return StatusCode(200, successResponse);
+                            }
+                            else
+                            {
+                                unsuccessResponse.response_code = 1;
+                                unsuccessResponse.message = "Not valid input";
+                                unsuccessResponse.status = "Unsuccess";
+                                return StatusCode(405, unsuccessResponse);
+                            }
+                        }
+                        else
+                        {
+                            successResponse.data = penddingExtensionRequest;
+                            successResponse.response_code = 1;
+                            successResponse.message = "PENDING extension request already exists";
+                            successResponse.status = "Unsuccess";
+                            return StatusCode(405, successResponse);
+                        }
+                    }
+                    else
+                    {
+                        unsuccessResponse.response_code = 1;
+                        unsuccessResponse.message = "You are not authorized.";
+                        unsuccessResponse.status = "Unsuccess";
+                        return StatusCode(401, unsuccessResponse);
+                    }
+                }
+                else
+                {
+                    return StatusCode(406, ModelState);
+                }
+            }
+            catch (Exception ex)
+            {
+                unsuccessResponse.response_code = 2;
+                unsuccessResponse.message = ex.Message;
+                unsuccessResponse.status = "Failure";
+                return StatusCode(500, unsuccessResponse);
+            }
         }
 
         /// <summary>
-        /// Approve existing quota extension requests
+        /// Approve/Reject existing quota extension requests
         /// </summary>
         /// <param name="userId">Id of user</param>
         /// <param name="extensionRequestId">Requested device extention id</param>
+        /// <param name="IsAccepted">true will approve and false will reject.</param>
         /// <returns></returns>
-        [HttpPut("{userId}")]
-        public IActionResult Put(int userId, int extensionRequestId)
+        [HttpPut]
+        public IActionResult Put(int extensionRequestId, bool IsAccepted)
         {
-            return StatusCode(406, ModelState);
+            SuccessResponse successResponse = new SuccessResponse();
+            UnsuccessResponse unsuccessResponse = new UnsuccessResponse();
+            string Authorization = Request.Headers["id_token"];
+
+            TokenClaims tc = General.GetClaims(Authorization);
+            tc.Id = LessonBusiness.getUserId(tc.sub);
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    if (tc.RoleName.Contains(General.getRoleType("1")))
+                    {
+                        var penddingExtensionRequest = DeviceQuotasBusiness.GetbyId(extensionRequestId);
+                        if (penddingExtensionRequest != null)
+                        {
+                            var deviceDetail = DeviceQuotasBusiness.ExtensionRequestChangeStatus(penddingExtensionRequest, IsAccepted, int.Parse(tc.Id));
+                            if (deviceDetail != 0)
+                            {
+                                successResponse.data = deviceDetail;
+                                successResponse.response_code = 0;
+                                successResponse.message = "successful operation";
+                                successResponse.status = "Success";
+                                return StatusCode(200, successResponse);
+                            }
+                            else
+                            {
+                                unsuccessResponse.response_code = 1;
+                                unsuccessResponse.message = "Not valid input";
+                                unsuccessResponse.status = "Unsuccess";
+                                return StatusCode(405, unsuccessResponse);
+                            }
+                        }
+                        else
+                        {
+                            unsuccessResponse.response_code = 1;
+                            unsuccessResponse.message = "Extension request not exists";
+                            unsuccessResponse.status = "Unsuccess";
+                            return StatusCode(405, unsuccessResponse);
+                        }
+                    }
+                    else
+                    {
+                        unsuccessResponse.response_code = 1;
+                        unsuccessResponse.message = "You are not authorized.";
+                        unsuccessResponse.status = "Unsuccess";
+                        return StatusCode(401, unsuccessResponse);
+                    }
+                }
+                else
+                {
+                    return StatusCode(406, ModelState);
+                }
+            }
+            catch (Exception ex)
+            {
+                unsuccessResponse.response_code = 2;
+                unsuccessResponse.message = ex.Message;
+                unsuccessResponse.status = "Failure";
+                return StatusCode(500, unsuccessResponse);
+            }
         }
 
-        /// <summary>
-        /// Reject existing quota extension requests
-        /// </summary>
-        /// <param name="userId">Id of user</param>
-        /// <param name="extensionRequestId">Requested device extention id</param>
-        /// <returns></returns>
-        [HttpDelete("{userId}")]
-        public IActionResult Delete(int userId, int extensionRequestId)
-        {
-            return StatusCode(406, ModelState);
-        }
     }
 }
