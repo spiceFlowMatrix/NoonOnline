@@ -10,6 +10,7 @@ export class CommonAPIService {
     erpurl: any;
     erpusername: any;
     erpPassword: any;
+    // apiEndpoint = "http://13.233.31.69/api/"
     apiEndpoint = "/api/"
     private _adminHeaders = new HttpHeaders({
         Accept: "application/json",
@@ -53,22 +54,22 @@ export class CommonAPIService {
                 })
             );
     }
-    
+
     putWithFormDataUrl(url, file) {
         let tempHeaders = new HttpHeaders({
             "Content-Type": file.type
         });
         return this.http.put(url, file, {
-                headers: tempHeaders,
-                observe: "events",
-                reportProgress: true
-            })
-            // .pipe(
-            //     map(response => response),
-            //     catchError(error => {
-            //         return throwError(error);
-            //     })
-            // );
+            headers: tempHeaders,
+            observe: "events",
+            reportProgress: true
+        })
+        // .pipe(
+        //     map(response => response),
+        //     catchError(error => {
+        //         return throwError(error);
+        //     })
+        // );
     }
 
     public getAdminHeaders(): HttpHeaders {
@@ -214,7 +215,21 @@ export class CommonAPIService {
                 })
             );
     }
-
+    putStatus(url) {
+        return this.http
+            .put<any>(this.apiEndpoint + url, null, {
+                headers: new HttpHeaders({
+                    Authorization: "Bearer " + localStorage.getItem("access_token"),
+                    id_token: "Bearer " + localStorage.getItem("id_token")
+                })
+            })
+            .pipe(
+                map(response => response),
+                catchError(error => {
+                    return throwError(error);
+                })
+            );
+    }
     put(url: string, data?: any, id?: any): Observable<any> {
         if (typeof data === "object" && data.id) {
             if (data.key == "Edit") {

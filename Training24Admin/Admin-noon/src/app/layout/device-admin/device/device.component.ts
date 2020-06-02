@@ -86,22 +86,48 @@ const ELEMENT_DATA2: any[] = [
 export class DeviceComponent implements OnInit {
   dataSource = ELEMENT_DATA;
   columnsToDisplay = ['username', 'email', 'currentConsumption', 'deviceLimit'];
+  // columnsToDisplay = [
+  //   { display: 'username', use: 'Username' },
+  //   { display: 'email', use: 'Email Address' },
+  //   { display: 'currentConsumption', use: 'Current Quota Limitation' },
+  //   { display: 'deviceLimit', use: 'Active Device Number' }];
   expandedElement: any;
   displayedColumns: string[] = ['Date', 'Username', 'Email Address', 'Device Id', 'Current Quota Limitation', 'Requested Quota Limistation', 'Status'];
   dataSourceMini = ELEMENT_DATA2;
 
   userEmails: any;
-  deviceModels:any;
+  deviceModels: any;
+  devices: any;
+  filterModal:any = {
+    page: 1,
+    pageRecord:10,
+    userId:0
+  }
   constructor(public deviceService: DeviceService) { }
 
   ngOnInit(): void {
     this.getDevice();
   }
   getDevice() {
-    this.deviceService.getDevice().subscribe((res) => {
+    this.deviceService.getDevice(this.filterModal).subscribe((res) => {
       console.log(res);
       this.userEmails = res.data.userEmails;
       this.dataSource = res.data.userDeviceModels;
     })
+  }
+  getUserDevice(id) {
+    this.devices = null;
+    this.deviceService.getUserDevice(id).subscribe((res) => {
+      console.log(res);
+      this.devices = res.data;
+    })
+  }
+  toggleStatus(id,i) {
+    console.log(id);
+    this.deviceService.toggleDeviceStatus(id).subscribe((res)=> {
+      this.devices[i].isActive =! this.devices[i].isActive;
+      console.log(res);
+    })
+    
   }
 }

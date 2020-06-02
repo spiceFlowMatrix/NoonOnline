@@ -26,43 +26,43 @@
 <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
   <ng-container matColumnDef="Date">
     <th mat-header-cell *matHeaderCellDef> Date </th>
-    <td mat-cell *matCellDef="let element"> {{element.Date}} </td>
+    <td mat-cell *matCellDef="let element"> {{element.requestedOn | date}} </td>
   </ng-container>
 
   <ng-container matColumnDef="Username">
     <th mat-header-cell *matHeaderCellDef> Username </th>
-    <td mat-cell *matCellDef="let element"> {{element.Username}} </td>
+    <td mat-cell *matCellDef="let element"> {{element.username}} </td>
   </ng-container>
 
   <ng-container matColumnDef="Device Id">
     <th mat-header-cell *matHeaderCellDef> Device Id </th>
-    <td mat-cell *matCellDef="let element"> {{element.Device_Id}} </td>
+    <td mat-cell *matCellDef="let element"> {{element.id}} </td>
   </ng-container>
 
   <ng-container matColumnDef="Email Address">
     <th mat-header-cell *matHeaderCellDef> Email Address </th>
-    <td mat-cell *matCellDef="let element"> {{element.Email_Address}} </td>
+    <td mat-cell *matCellDef="let element"> {{element.email}} </td>
   </ng-container>
 
   <ng-container matColumnDef="Current Quota Limitation">
     <th mat-header-cell *matHeaderCellDef> Current Quota Limitation </th>
-    <td mat-cell *matCellDef="let element"> {{element.Current_Quota_Limitation}} </td>
+    <td mat-cell *matCellDef="let element"> {{element.currentQuotaLimit}} </td>
   </ng-container>
 
   <ng-container matColumnDef="Requested Quota Limistation">
     <th mat-header-cell *matHeaderCellDef> Requested Quota Limistation </th>
-    <td mat-cell *matCellDef="let element"> {{element.Requested_Quota_Limistation}} </td>
+    <td mat-cell *matCellDef="let element;"> {{element.requestedLimit}} </td>
   </ng-container>
 
   <ng-container matColumnDef="Status">
     <th mat-header-cell *matHeaderCellDef> Status </th>
-    <td mat-cell *matCellDef="let element"> {{element.Status}} </td>
+    <td mat-cell *matCellDef="let element"> {{element.status}} </td>
   </ng-container>
 
   <ng-container matColumnDef="reject">
     <th mat-header-cell *matHeaderCellDef> Reject </th>
-    <td mat-cell *matCellDef="let element">
-      <div class="reject">
+    <td mat-cell *matCellDef="let element;let i = index">
+      <div class="reject" (click)="acceptReject(element.id,i,false)">
         <mat-icon>close</mat-icon><span> Reject</span>
       </div>
     </td>
@@ -70,8 +70,8 @@
 
   <ng-container matColumnDef="approve">
     <th mat-header-cell *matHeaderCellDef> Approve </th>
-    <td mat-cell *matCellDef="let element">
-      <div class="approve">
+    <td mat-cell *matCellDef="let element;let i = index">
+      <div class="approve" (click)="acceptReject(element.id,i,true)">
         <mat-icon>done</mat-icon>
         <span>Approve </span>
       </div>
