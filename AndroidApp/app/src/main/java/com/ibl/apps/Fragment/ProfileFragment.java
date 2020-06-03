@@ -1,11 +1,18 @@
 package com.ibl.apps.Fragment;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.text.format.Formatter;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,12 +22,15 @@ import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.ibl.apps.Base.BaseFragment;
+import com.ibl.apps.DeviceManagement.DeviceManagementRepository;
 import com.ibl.apps.Model.StatisticsObject;
 import com.ibl.apps.Model.UploadImageObject;
 import com.ibl.apps.Model.UserObject;
+import com.ibl.apps.Model.deviceManagement.registeruser.DeviceRegisterModel;
 import com.ibl.apps.RoomDatabase.dao.userManagementDatabse.UserDatabaseRepository;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
 import com.ibl.apps.UserProfileManagement.UserProfileRepository;
@@ -39,6 +49,8 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.NetworkInterface;
+import java.util.Collections;
 import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -53,8 +65,11 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.HttpException;
+import retrofit2.Response;
 
 import static android.app.Activity.RESULT_OK;
+import static android.content.Context.MODE_PRIVATE;
+import static com.ibl.apps.util.Const.deviceStatus;
 
 
 public class ProfileFragment extends BaseFragment implements View.OnClickListener {
@@ -74,6 +89,7 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
     String userId = "0";
     private UserProfileRepository userProfileRepository;
     private UserDatabaseRepository userDatabaseRepository;
+    private String ipAddress;
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -644,5 +660,114 @@ public class ProfileFragment extends BaseFragment implements View.OnClickListene
                 profileLayoutBinding.edtphonenumber.setText(phonenumber);
             }
         }
+    }
+
+    public String getWifiMacAddress() {
+        try {
+            String interfaceName = "wlan0";
+            List<NetworkInterface> interfaces = Collections.list(NetworkInterface.getNetworkInterfaces());
+            for (NetworkInterface intf : interfaces) {
+                if (!intf.getName().equalsIgnoreCase(interfaceName)) {
+                    continue;
+                }
+
+                byte[] mac = intf.getHardwareAddress();
+                if (mac == null) {
+                    return "";
+                }
+
+                StringBuilder buf = new StringBuilder();
+                for (byte aMac : mac) {
+                    buf.append(String.format("%02X:", aMac));
+                }
+                if (buf.length() > 0) {
+                    buf.deleteCharAt(buf.length() - 1);
+                }
+                return buf.toString();
+            }
+        } catch (Exception ex) {
+            ex.getMessage();
+        } // for now eat exceptions
+        return "";
+    }
+
+    private void callAPIDeviceManagement() {
+        WifiManager manager = (WifiManager) getActivity().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        WifiInfo info = null;
+        if (manager != null) {
+            info = manager.getConnectionInfo();
+            //macAddress = info.getMacAddress();
+            ipAddress = Formatter.formatIpAddress(manager.getConnectionInfo().getIpAddress());
+        }
+
+        //OS
+        JsonObject jsonOs = new JsonObject();
+        jsonOs.addProperty("name", Const.var_deviceType);
+        jsonOs.addProperty("version", Build.VERSION.RELEASE);
+
+        //tag
+        JsonArray jsonArray = new JsonArray();
+        JsonObject j = new JsonObject();
+        j.addProperty("name", "");
+        jsonArray.add(j);
+
+        //main
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("macAddress", getWifiMacAddress());
+        jsonObject.addProperty("ipAddress", ipAddress);
+        jsonObject.addProperty("modelName", Build.MODEL);
+        jsonObject.addProperty("modelNumber", Build.MANUFACTURER);
+        jsonObject.add("operatingSystem", jsonOs);
+        jsonObject.add("tags", jsonArray);
+
+        CompositeDisposable disposable = new CompositeDisposable();
+        DeviceManagementRepository deviceManagementRepository = new DeviceManagementRepository();
+        disposable.add(deviceManagementRepository.registerDeviceDetail(jsonObject)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(new DisposableSingleObserver<Response<DeviceRegisterModel>>() {
+                    @Override
+                    public void onSuccess(Response<DeviceRegisterModel> deviceListModel) {
+
+                        try {
+                            if ((deviceListModel.errorBody() != null)) {
+
+                                Long errorCode = new Gson().fromJson(deviceListModel.errorBody().string(), DeviceRegisterModel.class).getResponseCode();
+                                Log.e("TAG", "onSuccess: errorBody" + errorCode);
+
+                                if (errorCode == 2) {
+                                    deviceStatus = 2;
+                                    SharedPreferences deviceStatusPreferences = getActivity().getSharedPreferences("deviceStatus", MODE_PRIVATE);
+                                    SharedPreferences.Editor editor = deviceStatusPreferences.edit();
+                                    editor.putString("deviceStatusCode", String.valueOf(deviceStatus));
+                                    editor.apply();
+                                } else if (errorCode == 3) {
+                                    deviceStatus = 3;
+                                    SharedPreferences deviceStatusPreferences = getActivity().getSharedPreferences("deviceStatus", MODE_PRIVATE);
+                                    SharedPreferences.Editor editor = deviceStatusPreferences.edit();
+                                    editor.putString("deviceStatusCode", String.valueOf(deviceStatus));
+                                    editor.apply();
+                                }
+                            }
+
+                            if (deviceListModel.body() != null && deviceListModel.body().getResponseCode() == 0) {
+                                deviceStatus = 0;
+                                SharedPreferences deviceStatusPreferences = getActivity().getSharedPreferences("deviceStatus", MODE_PRIVATE);
+                                SharedPreferences.Editor editor = deviceStatusPreferences.edit();
+                                editor.putString("deviceStatusCode", String.valueOf(deviceStatus));
+                                editor.apply();
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        hideDialog();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                        hideDialog();
+                    }
+                }));
     }
 }

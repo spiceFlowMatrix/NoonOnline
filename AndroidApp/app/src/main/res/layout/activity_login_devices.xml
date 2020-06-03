@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -43,37 +44,108 @@
             android:layout_height="1dp"
             android:background="@color/colorGray" />
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/_20sdp"
             android:layout_marginTop="@dimen/_15sdp"
-            android:layout_marginEnd="@dimen/_20sdp"
-            android:orientation="vertical">
+            android:layout_marginEnd="@dimen/_20sdp">
 
             <LinearLayout
-                android:id="@+id/targetProgressTextLay"
+                android:id="@+id/lnr_progress"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="-5dp"
-                android:orientation="vertical" />
+                android:layout_below="@id/tv_total_quota"
+                android:orientation="vertical">
 
-            <com.ibl.apps.util.CustomProgressBar
-                android:id="@+id/customProgressbar"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/_15sdp"
-                android:progressDrawable="@android:color/transparent" />
 
-            <LinearLayout
-                android:id="@+id/trueProgressTextLay"
-                android:layout_width="match_parent"
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:baselineAligned="false"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:id="@+id/targetProgressTextLay"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="end"
+                        android:orientation="vertical">
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/_15sdp"
+                            android:background="@color/colorProgress" />
+
+                        <View
+                            android:id="@+id/viewSky"
+                            android:layout_width="@dimen/_1sdp"
+                            android:layout_height="@dimen/_10sdp"
+                            android:background="@color/colorProgress" />
+
+                        <TextView
+                            android:id="@+id/tv_current_quota_count"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            tools:text="Current Quota\n 10" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/trueProgressTextLay"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="end"
+                        android:orientation="vertical">
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/_15sdp"
+                            android:background="@color/colorMoreDarkGray" />
+
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tv_total_quota"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="-5dp"
-                android:orientation="vertical" />
+                android:layout_alignParentEnd="true"
+                android:layout_gravity="end"
+                android:gravity="center"
+                tools:text="Total Quota\n 10" />
 
-        </LinearLayout>
+            <View
+                android:layout_width="@dimen/_1sdp"
+                android:layout_height="@dimen/_10sdp"
+                android:layout_above="@id/lnr_progress"
+                android:layout_alignParentEnd="true"
+                android:background="@color/colorRed" />
 
+            <View
+                android:id="@+id/viewSky0"
+                android:layout_width="@dimen/_1sdp"
+                android:layout_height="@dimen/_10sdp"
+                android:layout_below="@id/lnr_progress"
+                android:background="@color/colorProgress"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/tv_current_quota0"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/lnr_progress"
+                android:gravity="center"
+                android:visibility="gone"
+                tools:text="Current Quota\n 10" />
+        </RelativeLayout>
+
+        <!--req-->
         <RelativeLayout
+            android:visibility="visible"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/_20sdp"
@@ -94,7 +166,6 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_marginTop="@dimen/_20sdp"
-
                 android:text="@string/request_quota_extension"
                 android:textAlignment="viewEnd"
                 android:textColor="@color/colorDarkBlue" />

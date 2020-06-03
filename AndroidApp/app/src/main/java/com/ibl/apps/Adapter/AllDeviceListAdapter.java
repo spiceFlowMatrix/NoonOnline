@@ -6,27 +6,17 @@ import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
-import com.ibl.apps.DeviceManagement.DeviceManagementRepository;
-import com.ibl.apps.Model.deviceManagement.DeviceListModel;
 import com.ibl.apps.Model.deviceManagement.DevicesModel;
 import com.ibl.apps.noon.R;
-import com.ibl.apps.noon.databinding.ActivateDeavtivateBottomSheetBinding;
 import com.ibl.apps.noon.databinding.DeviceLoginDetailListBinding;
 
 import java.util.List;
-
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.observers.DisposableSingleObserver;
-import io.reactivex.schedulers.Schedulers;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -64,7 +54,7 @@ public class AllDeviceListAdapter extends RecyclerView.Adapter<AllDeviceListAdap
             holder.binding.txtDeviceStatus.setTextColor(context.getResources().getColor(R.color.colorDarkBlue));
             holder.binding.dash.setBackgroundColor(context.getResources().getColor(R.color.colorDarkBlue));
         } else {
-            holder.binding.txtDeviceName.setText(model.getModelNumber());
+            holder.binding.txtDeviceName.setText(model.getModelName());
             holder.binding.txtDeviceName.setTextColor(context.getResources().getColor(R.color.colorBlack));
             holder.binding.txtDeviceStatus.setTextColor(context.getResources().getColor(R.color.colorBlack));
             holder.binding.dash.setBackgroundColor(context.getResources().getColor(R.color.colorBlack));
@@ -81,45 +71,6 @@ public class AllDeviceListAdapter extends RecyclerView.Adapter<AllDeviceListAdap
                 showBottomInterface.showBottomDialog(model.getId());
             }
         });
-    }
-
-    private void showBottom(Long DeviceId) {
-        mBottomSheetDialog = new BottomSheetDialog(context);
-        ActivateDeavtivateBottomSheetBinding bottomSheetBinding = DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.activate_deavtivate_bottom_sheet, null, false);
-
-        mBottomSheetDialog.setContentView(bottomSheetBinding.getRoot());
-        BottomSheetBehavior mBehavior = BottomSheetBehavior.from((View) bottomSheetBinding.getRoot().getParent());
-        CompositeDisposable disposable = new CompositeDisposable();
-        DeviceManagementRepository deviceManagementRepository = new DeviceManagementRepository();
-
-        bottomSheetBinding.cardViewActivateDeactivate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showDialog(context.getResources().getString(R.string.loading));
-                disposable.add(deviceManagementRepository.chaneDeviceStatus(String.valueOf(DeviceId))
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeWith(new DisposableSingleObserver<DeviceListModel>() {
-                            @Override
-                            public void onSuccess(DeviceListModel deviceListModel) {
-                                if (deviceListModel != null && deviceListModel.getMessage() != null)
-                                    Toast.makeText(context, deviceListModel.getMessage(), Toast.LENGTH_LONG).show();
-                                mBottomSheetDialog.dismiss();
-                                hideDialog();
-                            }
-
-                            @Override
-                            public void onError(Throwable e) {
-                                hideDialog();
-                            }
-                        }));
-            }
-        });
-
-        mBottomSheetDialog.setOnShowListener(dialogInterface -> {
-            mBehavior.setPeekHeight(bottomSheetBinding.getRoot().getHeight()); //get the height dynamically
-        });
-        mBottomSheetDialog.show();
     }
 
     @Override

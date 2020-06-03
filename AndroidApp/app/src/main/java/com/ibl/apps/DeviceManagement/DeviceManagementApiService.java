@@ -18,7 +18,7 @@ public interface DeviceManagementApiService {
     Single<DeviceListModel> fetchDeviceList();
 
     @PUT("Device/ChaneDeviceStatus/{id}")
-    Single<DeviceListModel> chaneDeviceStatus(@Path("id") String userId);
+    Single<Response<DeviceListModel>> chaneDeviceStatus(@Path("id") String userId);
 
     @POST("DeviceQuotas/{id}")
     Single<RequestQuotaModel> requestDeviceQuotas(@Path("id") String userId);

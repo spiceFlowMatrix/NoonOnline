@@ -1,35 +1,44 @@
 package com.ibl.apps.noon;
 
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Build;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.Gravity;
+import android.text.SpannableStringBuilder;
+import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewTreeObserver;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.databinding.DataBindingUtil;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.gson.Gson;
 import com.ibl.apps.Adapter.AllDeviceListAdapter;
 import com.ibl.apps.Base.BaseActivity;
 import com.ibl.apps.DeviceManagement.DeviceManagementRepository;
 import com.ibl.apps.Model.ProgressItem;
 import com.ibl.apps.Model.deviceManagement.DeviceListModel;
+import com.ibl.apps.Model.deviceManagement.registeruser.DeviceRegisterModel;
 import com.ibl.apps.noon.databinding.ActivateDeavtivateBottomSheetBinding;
 import com.ibl.apps.noon.databinding.ActivityLoginDevicesBinding;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
+import retrofit2.Response;
+
+import static com.ibl.apps.util.Const.deviceStatus;
 
 public class LoginDevicesActivity extends BaseActivity implements View.OnClickListener, AllDeviceListAdapter.ShowBottomInterface {
     ActivityLoginDevicesBinding binding;
@@ -69,7 +78,7 @@ public class LoginDevicesActivity extends BaseActivity implements View.OnClickLi
 
         setOnClickListners();
         binding.toolBar.setNavigationOnClickListener(view -> {
-            finish();
+            onBackPressed();
         });
     }
 
@@ -97,82 +106,8 @@ public class LoginDevicesActivity extends BaseActivity implements View.OnClickLi
                                 }
                                 if (deviceListModel.getData().getDeviceLimit() == 0)
                                     return;
-                                progressItemList.clear();
-                                mProgressItem = new ProgressItem();
-                                mProgressItem.progressItemPercentage = deviceListModel.getData().getCurrentConsumption() / deviceListModel.getData().getDeviceLimit() * 100;
-                                mProgressItem.color = R.color.colorProgress;
-                                progressItemList.add(mProgressItem);
 
-                                /*mProgressItem = new ProgressItem();
-                                mProgressItem.progressItemPercentage = TargetProgress;
-                                mProgressItem.color = R.color.colorRed;
-                                progressItemList.add(mProgressItem);*/
-
-                                mProgressItem = new ProgressItem();
-                                mProgressItem.progressItemPercentage = 100 - (deviceListModel.getData().getCurrentConsumption() / deviceListModel.getData().getDeviceLimit() * 100);
-                                mProgressItem.color = R.color.colorMoreDarkGray;
-                                progressItemList.add(mProgressItem);
-
-                                binding.customProgressbar.getThumb().mutate().setAlpha(0);
-                                binding.customProgressbar.initData(progressItemList);
-                                binding.customProgressbar.invalidate();
-
-                                binding.targetProgressTextLay.removeAllViews();
-                                float a1 = progressItemList.get(0).progressItemPercentage;
-                                int width = binding.targetProgressTextLay.getMeasuredWidth();
-                                int height = binding.targetProgressTextLay.getMeasuredHeight();
-
-                                int targetMarginFromInt = (int) ((width * a1) / 100);
-                                //CurrentConsumption
-                                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-                                if (a1 == 100) {
-                                    params.setMargins(targetMarginFromInt - 120, 0, 0, 0);
-                                } else {
-                                    params.setMargins(targetMarginFromInt, 0, 0, 0);
-                                }
-                                TextView aTrueText = new TextView(LoginDevicesActivity.this);
-                                String currentConsumption = getString(R.string.device_current_quota) + "\n" + deviceListModel.getData().getCurrentConsumption();
-                                aTrueText.setText(currentConsumption);
-                                aTrueText.setTextColor(getResources().getColor(R.color.colorDarkGray));
-                                aTrueText.setTextSize(12);
-                                aTrueText.setGravity(Gravity.CENTER);
-                                binding.targetProgressTextLay.addView(aTrueText, params);
-                                LinearLayout.LayoutParams paramsview = new LinearLayout.LayoutParams(5, 30);
-                                if (a1 == 100) {
-                                    paramsview.setMargins(targetMarginFromInt - 5, 0, 0, 0);
-                                } else {
-                                    paramsview.setMargins(targetMarginFromInt, 0, 0, 0);
-                                }
-                                View view = new View(LoginDevicesActivity.this);
-                                view.setBackgroundColor(getResources().getColor(R.color.colorProgress));
-                                binding.targetProgressTextLay.addView(view, paramsview);
-
-                                //Total Quota
-                                binding.trueProgressTextLay.removeAllViews();
-                                LinearLayout.LayoutParams paramsviewTotal = new LinearLayout.LayoutParams(5, 30);
-                                paramsviewTotal.setMargins(940, 0, 0, 0);
-                                View Total = new View(LoginDevicesActivity.this);
-                                Total.setBackgroundColor(getResources().getColor(R.color.colorRed));
-                                binding.trueProgressTextLay.addView(Total, paramsviewTotal);
-
-                                LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-                                params1.setMargins(800, 0, 0, 0);
-                                TextView aTrueText1 = new TextView(LoginDevicesActivity.this);
-                                String totalQuota = deviceListModel.getData().getDeviceLimit() + "\n" + getString(R.string.device_total_quota);
-                                aTrueText1.setText(totalQuota);
-                                aTrueText1.setTextColor(getResources().getColor(R.color.colorDarkGray));
-                                aTrueText1.setTextSize(12);
-                                aTrueText1.setGravity(Gravity.CENTER);
-                                binding.trueProgressTextLay.addView(aTrueText1, params1);
-
-
-
-                                /*if (deviceListModel.getData().getDeviceLimit() != null)
-                                    totalQuotaCount(deviceListModel.getData().getDeviceLimit());
-
-                                if (deviceListModel.getData().getCurrentConsumption() != null)
-                                    currentDeviceConsumption(deviceListModel.getData().getCurrentConsumption());*/
-
+                                progressQuota(deviceListModel.getData().getCurrentConsumption(), deviceListModel.getData().getDeviceLimit());
 
                                 allDeviceListAdapter = new AllDeviceListAdapter(LoginDevicesActivity.this, deviceListModel.getData().getDevicesModel(), showBottomInterface);
                                 binding.rcVerticalLayout.rcVertical.setAdapter(allDeviceListAdapter);
@@ -194,98 +129,45 @@ public class LoginDevicesActivity extends BaseActivity implements View.OnClickLi
 
     }
 
-/*    private void currentDeviceConsumption(Long currentConsumption) {
-        //Current Quota
-        ViewTreeObserver vto1 = binding.targetProgressTextLay.getViewTreeObserver();
-        vto1.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
-                    binding.targetProgressTextLay.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-                } else {
-                    binding.targetProgressTextLay.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                }
-                int width = binding.targetProgressTextLay.getMeasuredWidth();
-                int height = binding.targetProgressTextLay.getMeasuredHeight();
+    private void progressQuota(Long currentConsumption, Long deviceLimit) {
+        int weight = (int) ((float) currentConsumption / deviceLimit * 100);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, weight);
+        binding.targetProgressTextLay.setLayoutParams(params);
+        LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 100 - weight);
+        binding.trueProgressTextLay.setLayoutParams(params1);
 
-                int targetMarginFromInt = ((width * intpassingMarks) / 100);
-                if (targetMarginFromInt != 0) {
+        binding.tvTotalQuota.setText(getString(R.string.device_total_quota) + "\n" + deviceLimit);
 
-                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-                    params.setMargins(targetMarginFromInt - 95, 0, 0, 0);
-                    TextView aTrueText = new TextView(LoginDevicesActivity.this);
-//                    aTrueText.setText("Total Quota" + "\n" + intpassingMarks + "%");
-                    aTrueText.setText(getString(R.string.device_current_quota) + "\n" + currentConsumption);
-                    aTrueText.setTextColor(getResources().getColor(R.color.colorDarkGray));
-                    aTrueText.setTextSize(12);
-                    aTrueText.setGravity(Gravity.CENTER);
-                    binding.targetProgressTextLay.addView(aTrueText, params);
+        if (currentConsumption != 0) {
+            binding.tvCurrentQuotaCount.setText(currentConsumption + "\n" + getString(R.string.device_current_quota));
+            binding.tvCurrentQuotaCount.setVisibility(View.VISIBLE);
+            binding.tvCurrentQuota0.setVisibility(View.GONE);
+            binding.viewSky0.setVisibility(View.GONE);
+            binding.viewSky.setVisibility(View.VISIBLE);
+        } else {
+            binding.tvCurrentQuota0.setText("0\n" + getString(R.string.device_current_quota));
+            binding.viewSky0.setVisibility(View.VISIBLE);
+            binding.viewSky.setVisibility(View.GONE);
+            binding.tvCurrentQuotaCount.setVisibility(View.GONE);
+            binding.tvCurrentQuota0.setVisibility(View.VISIBLE);
+        }
+    }
 
-                    LinearLayout.LayoutParams paramsview = new LinearLayout.LayoutParams(5, 30);
-                    paramsview.setMargins(targetMarginFromInt - 4, 0, 0, 0);
-                    View view = new View(LoginDevicesActivity.this);
+    private int convertDipToPixels(float dip) {
+        float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dip, getResources().getDisplayMetrics());
+        return (int) px;
+    }
 
-                    if (aTrueProgress > intpassingMarks) {
-                        view.setBackgroundColor(getResources().getColor(R.color.colorProgress));
-                    } else {
-                        view.setBackgroundColor(getResources().getColor(R.color.colorRed));
-                    }
-                    view.setBackgroundColor(getResources().getColor(R.color.colorProgress));
-                    binding.targetProgressTextLay.addView(view, paramsview);
-                }
-            }
-        });
-    }*/
-
-   /* private void totalQuotaCount(Long deviceLimit) {
-        //Total Quota
-        ViewTreeObserver vto = binding.trueProgressTextLay.getViewTreeObserver();
-        vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
-                    binding.trueProgressTextLay.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-                } else {
-                    binding.trueProgressTextLay.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                }
-                int width = binding.trueProgressTextLay.getMeasuredWidth();
-                int height = binding.trueProgressTextLay.getMeasuredHeight();
-
-                int leftMarginFromInt = ((width * aTrueProgress) / 100);
-                if (leftMarginFromInt != 0) {
-
-                    LinearLayout.LayoutParams paramsview = new LinearLayout.LayoutParams(5, 30);
-                    paramsview.setMargins(leftMarginFromInt - 3, 0, 0, 0);
-                    View view = new View(LoginDevicesActivity.this);
-                    view.setBackgroundColor(getResources().getColor(R.color.colorRed));
-                    binding.trueProgressTextLay.addView(view, paramsview);
-
-                    int margSpace = 100;
-
-                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-                    params.setMargins(leftMarginFromInt - margSpace, 0, 0, 0);
-                    TextView aTrueText = new TextView(LoginDevicesActivity.this);
-
-                    aTrueText.setText(deviceLimit + "\n" + getString(R.string.device_total_quota));
-                    aTrueText.setTextColor(getResources().getColor(R.color.colorDarkGray));
-                    aTrueText.setTextSize(12);
-                    aTrueText.setGravity(Gravity.CENTER);
-                    binding.trueProgressTextLay.addView(aTrueText, params);
-                }
-            }
-        });
-    }*/
-
-    private void getSeekbarProgress() {
+    /*private void getSeekbarProgress() {
         int aTrueProgress = (int) ((60) * 100 / 60);
         int intpassingMarks = Integer.parseInt("60");
         int TargetProgress = intpassingMarks - aTrueProgress;
         int LeftProgress = 100 - intpassingMarks;
 
-       /* if (aTrueProgress > intpassingMarks) {
+       *//* if (aTrueProgress > intpassingMarks) {
             LeftProgress = LeftProgress + (TargetProgress);
             TargetProgress = 0;
-        }*/
+        }*//*
 
         //Log.e(Const.LOG_NOON_TAG, "===passingMarks===" + passingMarks);
         //Log.e(Const.LOG_NOON_TAG, "===aTrueProgress===" + aTrueProgress);
@@ -358,11 +240,11 @@ public class LoginDevicesActivity extends BaseActivity implements View.OnClickLi
                     paramsview.setMargins(targetMarginFromInt - 4, 0, 0, 0);
                     View view = new View(LoginDevicesActivity.this);
 
-                  /*  if (aTrueProgress > intpassingMarks) {
+                  *//*  if (aTrueProgress > intpassingMarks) {
                         view.setBackgroundColor(getResources().getColor(R.color.colorProgress));
                     } else {
                         view.setBackgroundColor(getResources().getColor(R.color.colorRed));
-                    }*/
+                    }*//*
                     view.setBackgroundColor(getResources().getColor(R.color.colorProgress));
                     binding.targetProgressTextLay.addView(view, paramsview);
                 }
@@ -374,10 +256,10 @@ public class LoginDevicesActivity extends BaseActivity implements View.OnClickLi
         mProgressItem.color = R.color.colorProgress;
         progressItemList.add(mProgressItem);
 
-       /* mProgressItem = new ProgressItem();
+       *//* mProgressItem = new ProgressItem();
         mProgressItem.progressItemPercentage = TargetProgress;
         mProgressItem.color = R.color.colorRed;
-        progressItemList.add(mProgressItem);*/
+        progressItemList.add(mProgressItem);*//*
 
         mProgressItem = new ProgressItem();
         mProgressItem.progressItemPercentage = 40;
@@ -387,7 +269,7 @@ public class LoginDevicesActivity extends BaseActivity implements View.OnClickLi
         binding.customProgressbar.getThumb().mutate().setAlpha(0);
         binding.customProgressbar.initData(progressItemList);
         binding.customProgressbar.invalidate();
-    }
+    }*/
 
     private void setOnClickListners() {
         binding.txtExtendQuota.setOnClickListener(this);
@@ -425,14 +307,53 @@ public class LoginDevicesActivity extends BaseActivity implements View.OnClickLi
                 disposable.add(deviceManagementRepository.chaneDeviceStatus(String.valueOf(DeviceId))
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeWith(new DisposableSingleObserver<DeviceListModel>() {
+                        .subscribeWith(new DisposableSingleObserver<Response<DeviceListModel>>() {
                             @Override
-                            public void onSuccess(DeviceListModel deviceListModel) {
-                                if (deviceListModel != null && deviceListModel.getMessage() != null)
-                                    Toast.makeText(LoginDevicesActivity.this, deviceListModel.getMessage(), Toast.LENGTH_LONG).show();
+                            public void onSuccess(Response<DeviceListModel> deviceListModel) {
+                                if (deviceListModel.body() != null && deviceListModel.body().getMessage() != null)
+                                    Toast.makeText(LoginDevicesActivity.this, deviceListModel.body().getMessage(), Toast.LENGTH_LONG).show();
                                 mBottomSheetDialog.dismiss();
                                 callApiDeviceList();
                                 hideDialog();
+                                if (deviceListModel != null) {
+                                    if (deviceListModel.body() != null) {
+                                        if (deviceListModel.body().getMessage().contains("Device activated.")) {
+                                            deviceStatus = 0;
+                                            SharedPreferences deviceStatusPreferences = getSharedPreferences("deviceStatus", MODE_PRIVATE);
+                                            SharedPreferences.Editor editor = deviceStatusPreferences.edit();
+                                            editor.putString("deviceStatusCode", String.valueOf(deviceStatus));
+                                            editor.apply();
+                                            Log.e("activated", "Device activated: " + String.valueOf(deviceStatus));
+                                        } else if (deviceListModel.body().getMessage().contains("Device deactivated.")) {
+                                            deviceStatus = 2;
+                                            SharedPreferences deviceStatusPreferences = getSharedPreferences("deviceStatus", MODE_PRIVATE);
+                                            SharedPreferences.Editor editor = deviceStatusPreferences.edit();
+                                            editor.putString("deviceStatusCode", String.valueOf(deviceStatus));
+                                            editor.apply();
+                                            Log.e("activated", "Device deactivated: " + String.valueOf(deviceStatus));
+                                        }
+                                    }
+
+                                    if ((deviceListModel.errorBody() != null)) {
+
+                                        Long errorCode = null;
+                                        try {
+                                            errorCode = new Gson().fromJson(deviceListModel.errorBody().string(), DeviceRegisterModel.class).getResponseCode();
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        }
+                                        if (errorCode == 3) {
+                                            deviceStatus = 3;
+                                            SharedPreferences deviceStatusPreferences = getSharedPreferences("deviceStatus", MODE_PRIVATE);
+                                            SharedPreferences.Editor editor = deviceStatusPreferences.edit();
+                                            editor.putString("deviceStatusCode", String.valueOf(deviceStatus));
+                                            editor.apply();
+                                            Log.e("activated", "Device out of quota: " + String.valueOf(deviceStatus));
+                                            showOutOfDeviceQuota();
+                                        }
+                                    }
+                                }
+
                             }
 
                             @Override
@@ -449,6 +370,25 @@ public class LoginDevicesActivity extends BaseActivity implements View.OnClickLi
         mBottomSheetDialog.show();
     }
 
+    private void showOutOfDeviceQuota() {
+        try {
+            SpannableStringBuilder message = setTypeface(LoginDevicesActivity.this, getString(R.string.out_of_quota_message));
+            AlertDialog.Builder builder = new AlertDialog.Builder(LoginDevicesActivity.this);
+            builder.setTitle(R.string.validation_warning);
+            builder.setMessage(message)
+                    .setPositiveButton(R.string.button_ok, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            // Yes button clicked, do something
+                            dialog.dismiss();
+                        }
+                    });
+
+            builder.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -456,5 +396,12 @@ public class LoginDevicesActivity extends BaseActivity implements View.OnClickLi
             binding.txtAlreadyPendingQuota.setVisibility(View.VISIBLE);
             binding.txtExtendQuota.setVisibility(View.GONE);
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finishAffinity();
+        startActivity(new Intent(LoginDevicesActivity.this, MainDashBoardActivity.class));
     }
 }

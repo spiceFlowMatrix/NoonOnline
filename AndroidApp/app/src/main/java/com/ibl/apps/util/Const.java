@@ -217,4 +217,14 @@ public class Const {
     public final static String appversion = "appversion";
     public final static String filesids = "filesids";
     public final static String chapterid = "chapterid";
+
+    //For Device Management
+    public final static String macAddress = "macAddress";
+    public final static String ipAddress = "ipAddress";
+    public final static String modelName = "modelName";
+    public final static String modelNumber = "modelNumber";
+    public final static String operatingSystem = "operatingSystem";
+    public final static String tags = "tags";
+    public final static String name = "name";
+    public static int deviceStatus;
 }
