@@ -108,6 +108,12 @@ namespace Trainning24.Domain.Entity
         public DbSet<TaskActivityFeedBack> TaskActivityFeedBacks { get; set; }
         public DbSet<TaskActivityCategoryFeedBack> TaskActivityCategoryFeedBacks { get; set; }
 
+        public DbSet<Devices> Devices { get; set; }
+        public DbSet<DeviceOS> DeviceOS { get; set; }
+        public DbSet<DeviceTags> DeviceTags { get; set; }
+        public DbSet<DeviceQuotas> DeviceQuotas { get; set; }
+        public DbSet<DeviceQuotaExtensionRequest> DeviceQuotaExtensionRequests { get; set; }
+
         public Training24Context(DbContextOptions<Training24Context> options)
             : base(options)
         {

@@ -27,12 +27,14 @@ using Swashbuckle.AspNetCore.Swagger;
 using Training24Admin.Model;
 using Training24Admin.Security.Bearer.Helpers;
 using Trainning24.BL.Business;
+using Trainning24.BL.Business.Device;
 using Trainning24.BL.ViewModels.Erp;
 using Trainning24.BL.ViewModels.Files;
 using Trainning24.BL.ViewModels.Language;
 using Trainning24.BL.ViewModels.Users;
 using Trainning24.Domain.Entity;
 using Trainning24.Repository.EF;
+using Trainning24.Repository.EF.Device;
 using Trainning24.Repository.EF.Generics;
 using WebAPIApplication;
 
@@ -514,6 +516,29 @@ namespace Training24Admin
             services.AddScoped<EFTaskFeedBackCategory>();
             services.AddScoped<TaskCategoryFeedBack>();
             services.AddScoped<EFGenericRepository<TaskCategoryFeedBack>>();
+
+            services.AddScoped<DeviceBusiness>();
+            services.AddScoped<EFDeviceRepository>();
+            services.AddScoped<Devices>();
+            services.AddScoped<EFGenericRepository<Devices>>();
+
+            services.AddScoped<EFDeviceOSRepository>();
+            services.AddScoped<DeviceOS>();
+            services.AddScoped<EFGenericRepository<DeviceOS>>();
+
+            services.AddScoped<EFDeviceTagsRepository>();
+            services.AddScoped<DeviceTags>();
+            services.AddScoped<EFGenericRepository<DeviceTags>>();
+
+            services.AddScoped<EFDeviceQuotaRepository>();
+            services.AddScoped<DeviceQuotas>();
+            services.AddScoped<EFGenericRepository<DeviceQuotas>>();
+
+
+            services.AddScoped<DeviceQuotasBusiness>();
+            services.AddScoped<EFDeviceQuotaExtensionRequestRepository>();
+            services.AddScoped<DeviceQuotaExtensionRequest>();
+            services.AddScoped<EFGenericRepository<DeviceQuotaExtensionRequest>>();
 
             services.AddAutoMapper();
 

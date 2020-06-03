@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -97,8 +98,10 @@ public class CacheEventsListActivity extends BaseActivity {
         quizRepository = new QuizRepository();
 
         setToolbar(binding.toolBar);
-        showBackArrow("Pending Cache Events");
-
+        showBackArrow(getString(R.string.pending_cache_events));
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT) {
+            binding.txtCacheTitle.setTextSize(35);
+        }
         SharedPreferences sharedPreferences = getSharedPreferences("user", MODE_PRIVATE);
         userId = sharedPreferences.getString("uid", "");
         syncAPIDatabaseRepository = new SyncAPIDatabaseRepository();
@@ -172,6 +175,9 @@ public class CacheEventsListActivity extends BaseActivity {
         }
         mProgressDialog.show();
         if (syncAPITableList.get(position).getEndpoint_url().contains("ProgessSync/AppTimeTrack")) {
+            JsonArray jsonArray = new Gson().fromJson(syncAPITableList.get(position).getParameters(), JsonArray.class);
+            CallApiForSpendApp(jsonArray, position);
+
             NoonApplication.cacheStatus = 3;
             SharedPreferences sharedPreferencesCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferencesCache.edit();
@@ -181,9 +187,22 @@ public class CacheEventsListActivity extends BaseActivity {
                 editor.apply();
             }
 //            Log.e("syncAPITableList", "callSyncAPI:--if " + position + " size - " + syncAPITableList.size());
-            JsonArray jsonArray = new Gson().fromJson(syncAPITableList.get(position).getParameters(), JsonArray.class);
-            CallApiForSpendApp(jsonArray, position);
+
         } else if (syncAPITableList.get(position).getEndpoint_url().contains("LessonProgress/LessonProgressSync")) {
+            //            JsonArray jsonArray = new Gson().fromJson(syncAPITableList.get(position).getParameters(), JsonArray.class);
+            callApiSyncLessonProgress(lessonProgressList, position);
+
+            NoonApplication.cacheStatus = 3;
+            SharedPreferences sharedPreferencesCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferencesCache.edit();
+            if (editor != null) {
+                editor.clear();
+                editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
+                editor.apply();
+            }
+        } else if (syncAPITableList.get(position).getEndpoint_url().contains("ChapterProgress/ChapterProgressSync")) {
+            callApiSyncChapter(chapterProgressList, position);
+
             NoonApplication.cacheStatus = 3;
             SharedPreferences sharedPreferencesCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferencesCache.edit();
@@ -193,29 +212,9 @@ public class CacheEventsListActivity extends BaseActivity {
                 editor.apply();
             }
 
-//            JsonArray jsonArray = new Gson().fromJson(syncAPITableList.get(position).getParameters(), JsonArray.class);
-            callApiSyncLessonProgress(lessonProgressList, position);
-        } else if (syncAPITableList.get(position).getEndpoint_url().contains("ChapterProgress/ChapterProgressSync")) {
-            NoonApplication.cacheStatus = 3;
-            SharedPreferences sharedPreferencesCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
-            SharedPreferences.Editor editor = sharedPreferencesCache.edit();
-            if (editor != null) {
-                editor.clear();
-                editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
-                editor.apply();
-            }
-            callApiSyncChapter(chapterProgressList, position);
         } else if (syncAPITableList.get(position).getEndpoint_url().contains("FileProgress/FileProgressSync")) {
-            NoonApplication.cacheStatus = 3;
-            SharedPreferences sharedPreferencesCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
-            SharedPreferences.Editor editor = sharedPreferencesCache.edit();
-            if (editor != null) {
-                editor.clear();
-                editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
-                editor.apply();
-            }
             callApiSyncFiles(fileProgressList, position);
-        } else if (syncAPITableList.get(position).getEndpoint_url().contains("ProgessSync/ProgessSyncAdd")) {
+
             NoonApplication.cacheStatus = 3;
             SharedPreferences sharedPreferencesCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferencesCache.edit();
@@ -224,31 +223,37 @@ public class CacheEventsListActivity extends BaseActivity {
                 editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
                 editor.apply();
             }
+
+        } else if (syncAPITableList.get(position).getEndpoint_url().contains("ProgessSync/ProgessSyncAdd")) {
             List<QuizUserResult> quizUserResults = quizDatabaseRepository.getAllQuizuserResult(false, userId);
             List<LessonProgress> lessonProgressList = lessonDatabaseRepository.getAllLessonProgressData(false, userId);
             JsonObject jsonArray = new Gson().fromJson(syncAPITableList.get(position).getParameters(), JsonObject.class);
             callApiProgessSyncAdd(lessonProgressList, quizUserResults, position, jsonArray);
+
+            NoonApplication.cacheStatus = 3;
+            SharedPreferences sharedPreferencesCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferencesCache.edit();
+            if (editor != null) {
+                editor.clear();
+                editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
+                editor.apply();
+            }
+
         } else if (syncAPITableList.get(position).getEndpoint_url().contains("QuizProgress/QuizProgressSync")) {
-            NoonApplication.cacheStatus = 3;
-            SharedPreferences sharedPreferencesCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
-            SharedPreferences.Editor editor = sharedPreferencesCache.edit();
-            if (editor != null) {
-                editor.clear();
-                editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
-                editor.apply();
-            }
             callApiSyncQuiz(quizProgressList, position);
+
+            NoonApplication.cacheStatus = 3;
+            SharedPreferences sharedPreferencesCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferencesCache.edit();
+            if (editor != null) {
+                editor.clear();
+                editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
+                editor.apply();
+            }
+
         } else if (syncAPITableList.get(position).getEndpoint_url().contains("ProgessSync/GetSyncRecords")) {
-            NoonApplication.cacheStatus = 3;
-            SharedPreferences sharedPreferencesCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
-            SharedPreferences.Editor editor = sharedPreferencesCache.edit();
-            if (editor != null) {
-                editor.clear();
-                editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
-                editor.apply();
-            }
             callApiGetSyncRecords(position);
-        } else if (syncAPITableList.get(position).getEndpoint_url().contains("UserQuizResult/UserQuizResultSync")) {
+
             NoonApplication.cacheStatus = 3;
             SharedPreferences sharedPreferencesCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferencesCache.edit();
@@ -257,8 +262,20 @@ public class CacheEventsListActivity extends BaseActivity {
                 editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
                 editor.apply();
             }
+
+        } else if (syncAPITableList.get(position).getEndpoint_url().contains("UserQuizResult/UserQuizResultSync")) {
             JsonArray jsonArray = new Gson().fromJson(syncAPITableList.get(position).getParameters(), JsonArray.class);
             getUserQuizResultSync(jsonArray, position);
+
+            NoonApplication.cacheStatus = 3;
+            SharedPreferences sharedPreferencesCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferencesCache.edit();
+            if (editor != null) {
+                editor.clear();
+                editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
+                editor.apply();
+            }
+
         }
 
         if (syncAPITableList.size() == 1) {
@@ -334,7 +351,15 @@ public class CacheEventsListActivity extends BaseActivity {
 
                                     @Override
                                     public void onError(Throwable e) {
-                                        callSyncAPI(position);
+                                        NoonApplication.cacheStatus = 2;
+                                        SharedPreferences sharedPreferencesCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
+                                        SharedPreferences.Editor editor = sharedPreferencesCache.edit();
+                                        if (editor != null) {
+                                            editor.clear();
+                                            editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
+                                            editor.apply();
+                                        }
+                                        callSyncAPI(position + 1);
                                     }
                                 }));
                     }
@@ -423,9 +448,17 @@ public class CacheEventsListActivity extends BaseActivity {
 
                     @Override
                     public void onError(Throwable e) {
+                        NoonApplication.cacheStatus = 2;
+                        SharedPreferences sharedPreferencesCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPreferencesCache.edit();
+                        if (editor != null) {
+                            editor.clear();
+                            editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
+                            editor.apply();
+                        }
                         Log.e("onError", "===callApiSyncLessonProgress===: " + e.getMessage());
                         try {
-                            callSyncAPI(position);
+                            callSyncAPI(position + 1);
                         } catch (JsonSyntaxException exeption) {
                             exeption.printStackTrace();
                         }
@@ -470,7 +503,15 @@ public class CacheEventsListActivity extends BaseActivity {
                     public void onError(Throwable e) {
                         Log.e("onError", "===callApiSyncChapter===: " + e.getMessage());
                         try {
-                            callSyncAPI(position);
+                            NoonApplication.cacheStatus = 2;
+                            SharedPreferences sharedPreferencesCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
+                            SharedPreferences.Editor editor = sharedPreferencesCache.edit();
+                            if (editor != null) {
+                                editor.clear();
+                                editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
+                                editor.apply();
+                            }
+                            callSyncAPI(position + 1);
                         } catch (JsonSyntaxException exeption) {
                             exeption.printStackTrace();
                         }
@@ -513,9 +554,17 @@ public class CacheEventsListActivity extends BaseActivity {
 
                     @Override
                     public void onError(Throwable e) {
+                        NoonApplication.cacheStatus = 2;
+                        SharedPreferences sharedPreferencesCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPreferencesCache.edit();
+                        if (editor != null) {
+                            editor.clear();
+                            editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
+                            editor.apply();
+                        }
                         Log.e("onError", "====callApiSyncFiles=====: " + e.getMessage());
                         try {
-                            callSyncAPI(position);
+                            callSyncAPI(position + 1);
                         } catch (JsonSyntaxException exeption) {
                             exeption.printStackTrace();
                         }
@@ -558,9 +607,17 @@ public class CacheEventsListActivity extends BaseActivity {
 
                     @Override
                     public void onError(Throwable e) {
+                        NoonApplication.cacheStatus = 2;
+                        SharedPreferences sharedPreferencesCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPreferencesCache.edit();
+                        if (editor != null) {
+                            editor.clear();
+                            editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
+                            editor.apply();
+                        }
                         Log.e("onError", "====callApiSyncQuiz====: " + e.getMessage());
                         try {
-                            callSyncAPI(position);
+                            callSyncAPI(position + 1);
                         } catch (JsonSyntaxException exeption) {
                             exeption.printStackTrace();
                         }
@@ -586,7 +643,15 @@ public class CacheEventsListActivity extends BaseActivity {
 
                     @Override
                     public void onError(Throwable e) {
-                        callSyncAPI(position);
+                        NoonApplication.cacheStatus = 2;
+                        SharedPreferences sharedPreferencesCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPreferencesCache.edit();
+                        if (editor != null) {
+                            editor.clear();
+                            editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
+                            editor.apply();
+                        }
+                        callSyncAPI(position + 1);
                         Log.e("onError", "onError: " + e.getMessage());
                     }
                 }));
@@ -667,7 +732,16 @@ public class CacheEventsListActivity extends BaseActivity {
                     @Override
                     public void onError(Throwable e) {
                         try {
-                            callSyncAPI(position);
+                            NoonApplication.cacheStatus = 2;
+                            SharedPreferences sharedPreferencesCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
+                            SharedPreferences.Editor editor = sharedPreferencesCache.edit();
+                            if (editor != null) {
+                                editor.clear();
+                                editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
+                                editor.apply();
+                            }
+
+                            callSyncAPI(position + 1);
                             HttpException error = (HttpException) e;
                             SyncRecords syncRecords = new Gson().fromJson(error.response().errorBody().string(), SyncRecords.class);
                             //Log.e(Const.LOG_NOON_TAG, "===SyncRecords=ERROR==" + syncRecords.getMessage());
@@ -727,7 +801,16 @@ public class CacheEventsListActivity extends BaseActivity {
                         @Override
                         public void onError(Throwable e) {
                             try {
-                                callSyncAPI(position);
+                                NoonApplication.cacheStatus = 2;
+                                SharedPreferences sharedPreferencesCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
+                                SharedPreferences.Editor editor = sharedPreferencesCache.edit();
+                                if (editor != null) {
+                                    editor.clear();
+                                    editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
+                                    editor.apply();
+                                }
+
+                                callSyncAPI(position + 1);
                                 HttpException error = (HttpException) e;
                                 LessonProgress lessonProgress = new Gson().fromJson(Objects.requireNonNull(error.response().errorBody()).string(), LessonProgress.class);
                                 //Log.e(Const.LOG_NOON_TAG, "==lessonProgress==" + lessonProgress);

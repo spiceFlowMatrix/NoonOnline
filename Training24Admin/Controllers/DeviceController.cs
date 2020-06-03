@@ -4,6 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Training24Admin.Model;
+using Trainning24.BL.Business;
+using Trainning24.BL.Business.Device;
 using Trainning24.BL.ViewModels;
 using Trainning24.BL.ViewModels.Device;
 
@@ -12,32 +15,86 @@ namespace Training24Admin.Controllers
     /// <summary>
     /// Everything about your devices
     /// </summary>
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     [ApiController]
     [Produces("application/json")]
     [ApiExplorerSettings(GroupName = nameof(SwaggerGrouping.Device))]
     public class DeviceController : ControllerBase
     {
+
+        private readonly LessonBusiness LessonBusiness;
+        private readonly DeviceBusiness deviceBusiness;
+      
+
+        public DeviceController(LessonBusiness LessonBusiness, DeviceBusiness deviceBusiness
+           )
+        {
+            this.LessonBusiness = LessonBusiness;
+            this.deviceBusiness = deviceBusiness;
+          
+        }
+
+
         /// <summary>
-        /// Fetch a list of all devices that have activated (or registered) the student app on it
+        ///  Get my all device profile by user.
         /// </summary>
         /// <returns></returns>
         [HttpGet()]
         public IActionResult Get()
         {
-            return StatusCode(406, ModelState);
+            SuccessResponse successResponse = new SuccessResponse();
+            UnsuccessResponse unsuccessResponse = new UnsuccessResponse();
+
+            //get claims after decoding id_token 
+            string Authorization = Request.Headers["id_token"];
+
+            TokenClaims tc = General.GetClaims(Authorization);
+            tc.Id = LessonBusiness.getUserId(tc.sub);
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    if (tc.RoleName.Contains(General.getRoleType("4")))
+                    {
+                        var deviceDetail = deviceBusiness.GetAllDeviceByUserId(int.Parse(tc.Id));
+                        if (deviceDetail != null)
+                        {
+                            successResponse.data = deviceDetail;
+                            successResponse.response_code = 0;
+                            successResponse.message = "Device Detail";
+                            successResponse.status = "Success";
+                            return StatusCode(200, successResponse);
+                        }
+                        else
+                        {
+                            unsuccessResponse.response_code = 1;
+                            unsuccessResponse.message = "Device not found";
+                            unsuccessResponse.status = "Unsuccess";
+                            return StatusCode(405, unsuccessResponse);
+                        }
+                    }
+                    else
+                    {
+                        unsuccessResponse.response_code = 1;
+                        unsuccessResponse.message = "You are not authorized.";
+                        unsuccessResponse.status = "Unsuccess";
+                        return StatusCode(401, unsuccessResponse);
+                    }
+                }
+                else
+                {
+                    return StatusCode(406, ModelState);
+                }
+            }
+            catch (Exception ex)
+            {
+                unsuccessResponse.response_code = 2;
+                unsuccessResponse.message = ex.Message;
+                unsuccessResponse.status = "Failure";
+                return StatusCode(500, unsuccessResponse);
+            }
         }
 
-        /// <summary>
-        /// Get my device profile
-        /// </summary>
-        /// <param name="userId">Id of user</param>
-        /// <returns></returns>
-        [HttpGet("{userId}")]
-        public IActionResult Get(int userId)
-        {
-            return StatusCode(406, ModelState);
-        }
 
         /// <summary>
         /// Register device quota for user and activate new device
@@ -45,33 +102,173 @@ namespace Training24Admin.Controllers
         /// <param name="userId">Id of user</param>
         /// <param name="objData">New device that I want to activate</param>
         /// <returns></returns>
-        [HttpPost("{userId}")]
-        public IActionResult Post(int userId, DeviceActivate objData)
+        [HttpPost]
+        public IActionResult Post([FromBody]DeviceActivate objData)
         {
-            return StatusCode(406, ModelState);
-        }
+            SuccessResponse successResponse = new SuccessResponse();
+            UnsuccessResponse unsuccessResponse = new UnsuccessResponse();
+            string Authorization = Request.Headers["id_token"];
 
-        /// <summary>
-        /// Reactivate an existing device that has been deactivated
-        /// </summary>
-        /// <param name="userId">Id of user</param>
-        /// <param name="deviceId">Device id</param>
-        /// <returns></returns>
-        [HttpPut("{userId}")]
-        public IActionResult Put(int userId, int deviceId)
-        {
-            return StatusCode(406, ModelState);
+            TokenClaims tc = General.GetClaims(Authorization);
+            tc.Id = LessonBusiness.getUserId(tc.sub);
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    var deviceExist = deviceBusiness.GetDevicesByMacAdd(objData.macAddress, int.Parse(tc.Id));
+                    if (deviceExist == null)
+                    {
+                        if (deviceBusiness.CheckDeviceQuota(int.Parse(tc.Id)) > 0)
+                        {
+                            var deviceDetails = deviceBusiness.Create(objData, int.Parse(tc.Id));
+                            successResponse.data = deviceDetails;
+                            successResponse.response_code = 0;
+                            successResponse.message = "Device registered and activated";
+                            successResponse.status = "Success";
+                            return StatusCode(200, successResponse);
+                        }
+                        else
+                        {
+                            unsuccessResponse.response_code = 3;
+                            unsuccessResponse.message = "you are out of device quota";
+                            unsuccessResponse.status = "Unsuccess";
+                            return StatusCode(406, unsuccessResponse);
+                        }
+                    }
+                    else if (deviceExist != null && deviceExist.IsDeleted != true)
+                    {
+                        successResponse.data = deviceExist;
+                        successResponse.response_code = 0;
+                        successResponse.message = "Device registered and activated";
+                        successResponse.status = "Success";
+                        return StatusCode(200, successResponse);
+                    }
+                    else
+                    {
+                        unsuccessResponse.response_code = 2;
+                        unsuccessResponse.message = "This device has been deactivated.";
+                        unsuccessResponse.status = "Unsuccess";
+                        return StatusCode(406, unsuccessResponse);
+                    }
+
+                }
+                else
+                {
+                    return StatusCode(406, ModelState);
+                }
+            }
+            catch (Exception ex)
+            {
+                unsuccessResponse.response_code = 2;
+                unsuccessResponse.message = ex.Message;
+                unsuccessResponse.status = "Failure";
+                return StatusCode(500, unsuccessResponse);
+            }
+
         }
 
         /// <summary>
         /// Deactivate an existing device
         /// </summary>
-        /// <param name="userId">Id of user</param>
+        /// <param name="deviceId">Id of device</param>
         /// <returns></returns>
-        [HttpDelete("{userId}")]
-        public IActionResult Delete(int userId)
+        [HttpPut("ChaneDeviceStatus/{deviceId}")]
+        public IActionResult ChaneDeviceStatus(int deviceId)
         {
-            return StatusCode(406, ModelState);
+            SuccessResponse successResponse = new SuccessResponse();
+            UnsuccessResponse unsuccessResponse = new UnsuccessResponse();
+            try
+            {
+                string Authorization = Request.Headers["id_token"];
+
+                TokenClaims tc = General.GetClaims(Authorization);
+                tc.Id = LessonBusiness.getUserId(tc.sub);
+
+                var device = deviceBusiness.activeDeactiveDevice(int.Parse(tc.Id), deviceId);
+                if (device == 0)
+                {
+                    unsuccessResponse.response_code = 1;
+                    unsuccessResponse.message = "Device not found";
+                    unsuccessResponse.status = "Unsuccess";
+                    return StatusCode(404, unsuccessResponse);
+                }
+                else
+                {
+                    successResponse.response_code = 0;
+                    successResponse.message = device == 1 ? "Device activated." : "Device deactivated.";
+                    successResponse.status = "Success";
+                    return StatusCode(200, successResponse);
+                }
+            }
+            catch (Exception ex)
+            {
+                unsuccessResponse.response_code = 2;
+                unsuccessResponse.message = ex.Message;
+                unsuccessResponse.status = "Failure";
+                return StatusCode(500, unsuccessResponse);
+            }
+
+
         }
+        /// <summary>
+        ///  Get my all device profile by user.
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("GetAllUserDeviceList")]
+        public IActionResult GetAllUserDeviceList()
+        {
+            SuccessResponse successResponse = new SuccessResponse();
+            UnsuccessResponse unsuccessResponse = new UnsuccessResponse();
+
+            //get claims after decoding id_token 
+            string Authorization = Request.Headers["id_token"];
+
+            TokenClaims tc = General.GetClaims(Authorization);
+            tc.Id = LessonBusiness.getUserId(tc.sub);
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    if (tc.RoleName.Contains(General.getRoleType("1")))
+                    {
+                        var deviceDetail = deviceBusiness.GetAllDeviceUserWise();
+                        if (deviceDetail != null)
+                        {
+                            successResponse.data = deviceDetail;
+                            successResponse.response_code = 0;
+                            successResponse.message = "User Device list";
+                            successResponse.status = "Success";
+                            return StatusCode(200, successResponse);
+                        }
+                        else
+                        {
+                            unsuccessResponse.response_code = 1;
+                            unsuccessResponse.message = "Device not found";
+                            unsuccessResponse.status = "Unsuccess";
+                            return StatusCode(405, unsuccessResponse);
+                        }
+                    }
+                    else
+                    {
+                        unsuccessResponse.response_code = 1;
+                        unsuccessResponse.message = "You are not authorized.";
+                        unsuccessResponse.status = "Unsuccess";
+                        return StatusCode(401, unsuccessResponse);
+                    }
+                }
+                else
+                {
+                    return StatusCode(406, ModelState);
+                }
+            }
+            catch (Exception ex)
+            {
+                unsuccessResponse.response_code = 2;
+                unsuccessResponse.message = ex.Message;
+                unsuccessResponse.status = "Failure";
+                return StatusCode(500, unsuccessResponse);
+            }
+        }
+
     }
 }

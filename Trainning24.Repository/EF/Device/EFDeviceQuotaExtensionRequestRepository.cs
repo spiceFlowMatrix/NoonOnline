@@ -9,43 +9,43 @@ using Trainning24.Repository.EF.Generics;
 
 namespace Trainning24.Repository.EF.Device
 {
-    public class DeviceOSRepository : IGenericRepository<DeviceOS>
+    public class EFDeviceQuotaExtensionRequestRepository : IGenericRepository<DeviceQuotaExtensionRequest>
     {
-        private readonly EFGenericRepository<DeviceOS> _context;
-        public DeviceOSRepository
-        (
-            EFGenericRepository<DeviceOS> context
-        )
+        private readonly EFGenericRepository<DeviceQuotaExtensionRequest> _context;
+
+        public EFDeviceQuotaExtensionRequestRepository(
+            EFGenericRepository<DeviceQuotaExtensionRequest> context
+            )
         {
             _context = context;
         }
 
-        public int Delete(DeviceOS obj)
+        public int Delete(DeviceQuotaExtensionRequest obj)
         {
             return _context.Delete(obj);
         }
 
-        public List<DeviceOS> GetAll()
+        public List<DeviceQuotaExtensionRequest> GetAll()
         {
             return _context.GetAll();
         }
 
-        public List<DeviceOS> GetAllActive()
+        public List<DeviceQuotaExtensionRequest> GetAllActive()
         {
             throw new NotImplementedException();
         }
 
-        public DeviceOS GetById(Expression<Func<DeviceOS, bool>> ex)
+        public DeviceQuotaExtensionRequest GetById(Expression<Func<DeviceQuotaExtensionRequest, bool>> ex)
         {
             return _context.GetById(ex);
         }
 
-        public int Insert(DeviceOS obj)
+        public int Insert(DeviceQuotaExtensionRequest obj)
         {
             return _context.Insert(obj);
         }
 
-        public IQueryable<DeviceOS> ListQuery(Expression<Func<DeviceOS, bool>> where)
+        public IQueryable<DeviceQuotaExtensionRequest> ListQuery(Expression<Func<DeviceQuotaExtensionRequest, bool>> where)
         {
             return _context.ListQuery(where);
         }
@@ -55,7 +55,7 @@ namespace Trainning24.Repository.EF.Device
             return _context.Save();
         }
 
-        public int Update(DeviceOS obj)
+        public int Update(DeviceQuotaExtensionRequest obj)
         {
             return _context.Update(obj);
         }

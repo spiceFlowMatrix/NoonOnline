@@ -179,7 +179,7 @@ public class SyncIntentService extends JobIntentService implements DroidListener
                             LessonDatabaseRepository lessonDatabaseRepository = new LessonDatabaseRepository();
                             List<LessonProgress> lessonProgressList = lessonDatabaseRepository.getAllLessonProgressData(false, userId);
 
-                            callApiProgessSyncAdd(lessonProgressList, quizUserResults);
+                            //callApiProgessSyncAdd(lessonProgressList, quizUserResults);
                         }
 
                         /*--------------------------- For courses need to be deleted from local storage after expiry date in offline Database ----------------------------------*/
