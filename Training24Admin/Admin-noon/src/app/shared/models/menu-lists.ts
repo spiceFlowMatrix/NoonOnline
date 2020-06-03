@@ -76,6 +76,11 @@ export let AdminMenuList = [
         title: 'Additional Service'
     },
     {
+        link: '/app-update/app-update-form',
+        icon: 'fa-mobile',
+        title: 'App Update'
+    },
+    {
         link:'/package/package-list',
         icon: 'fa-folder',
         title: 'Package'

@@ -82,6 +82,10 @@ const routes: Routes = [
                 loadChildren: "./csvinput/csvinput.module#CsvInputModule"
             },
             {
+                path:"app-update",
+                loadChildren: "./app-update/app-update.module#AppUpdateModule"
+            },
+            {
                 path:"privacy",
                 loadChildren: "./privacy/privacy.module#PrivacyModule"
             }
