@@ -24,16 +24,15 @@ namespace Training24Admin.Controllers
 
         private readonly LessonBusiness LessonBusiness;
         private readonly DeviceBusiness deviceBusiness;
-      
+
 
         public DeviceController(LessonBusiness LessonBusiness, DeviceBusiness deviceBusiness
            )
         {
             this.LessonBusiness = LessonBusiness;
             this.deviceBusiness = deviceBusiness;
-          
-        }
 
+        }
 
         /// <summary>
         ///  Get my all device profile by user.
@@ -94,7 +93,6 @@ namespace Training24Admin.Controllers
                 return StatusCode(500, unsuccessResponse);
             }
         }
-
 
         /// <summary>
         /// Register device quota for user and activate new device
@@ -183,21 +181,30 @@ namespace Training24Admin.Controllers
 
                 TokenClaims tc = General.GetClaims(Authorization);
                 tc.Id = LessonBusiness.getUserId(tc.sub);
-
-                var device = deviceBusiness.activeDeactiveDevice(int.Parse(tc.Id), deviceId);
-                if (device == 0)
+                if (deviceBusiness.CheckDeviceQuota(int.Parse(tc.Id)) > 0)
                 {
-                    unsuccessResponse.response_code = 1;
-                    unsuccessResponse.message = "Device not found";
-                    unsuccessResponse.status = "Unsuccess";
-                    return StatusCode(404, unsuccessResponse);
+                    var device = deviceBusiness.activeDeactiveDevice(int.Parse(tc.Id), deviceId);
+                    if (device == 0)
+                    {
+                        unsuccessResponse.response_code = 1;
+                        unsuccessResponse.message = "Device not found";
+                        unsuccessResponse.status = "Unsuccess";
+                        return StatusCode(404, unsuccessResponse);
+                    }
+                    else
+                    {
+                        successResponse.response_code = 0;
+                        successResponse.message = device == 1 ? "Device activated." : "Device deactivated.";
+                        successResponse.status = "Success";
+                        return StatusCode(200, successResponse);
+                    }
                 }
                 else
                 {
-                    successResponse.response_code = 0;
-                    successResponse.message = device == 1 ? "Device activated." : "Device deactivated.";
-                    successResponse.status = "Success";
-                    return StatusCode(200, successResponse);
+                    unsuccessResponse.response_code = 3;
+                    unsuccessResponse.message = "you are out of device quota";
+                    unsuccessResponse.status = "Unsuccess";
+                    return StatusCode(406, unsuccessResponse);
                 }
             }
             catch (Exception ex)
@@ -210,16 +217,24 @@ namespace Training24Admin.Controllers
 
 
         }
+
         /// <summary>
-        ///  Get my all device profile by user.
+        ///  Get my  all user's device profile .
         /// </summary>
         /// <returns></returns>
         [HttpGet("GetAllUserDeviceList")]
-        public IActionResult GetAllUserDeviceList()
+        public IActionResult GetAllUserDeviceList(int pagenumber, int perpagerecord, string search, long userId)
         {
-            SuccessResponse successResponse = new SuccessResponse();
+            PaginationResponse successResponse = new PaginationResponse();
             UnsuccessResponse unsuccessResponse = new UnsuccessResponse();
 
+            DeviceQuotaExtensionFilterModel deviceQuotaExtensionFilterModel = new DeviceQuotaExtensionFilterModel()
+            {
+                pagenumber = pagenumber,
+                perpagerecord = perpagerecord,
+                search = search,
+                userId = userId
+            };
             //get claims after decoding id_token 
             string Authorization = Request.Headers["id_token"];
 
@@ -231,10 +246,11 @@ namespace Training24Admin.Controllers
                 {
                     if (tc.RoleName.Contains(General.getRoleType("1")))
                     {
-                        var deviceDetail = deviceBusiness.GetAllDeviceUserWise();
+                        var deviceDetail = deviceBusiness.GetAllDeviceUserWise(deviceQuotaExtensionFilterModel, out int total);
                         if (deviceDetail != null)
                         {
                             successResponse.data = deviceDetail;
+                            successResponse.totalcount = total;
                             successResponse.response_code = 0;
                             successResponse.message = "User Device list";
                             successResponse.status = "Success";
@@ -270,5 +286,116 @@ namespace Training24Admin.Controllers
             }
         }
 
+        /// <summary>
+        ///  Get my all device profile by userId.
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("GetUserDeviceListByUserId")]
+        public IActionResult GetUserDeviceListByUserId(int userId)
+        {
+            SuccessResponse successResponse = new SuccessResponse();
+            UnsuccessResponse unsuccessResponse = new UnsuccessResponse();
+
+            //get claims after decoding id_token 
+            string Authorization = Request.Headers["id_token"];
+
+            TokenClaims tc = General.GetClaims(Authorization);
+            tc.Id = LessonBusiness.getUserId(tc.sub);
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    if (tc.RoleName.Contains(General.getRoleType("1")))
+                    {
+                        var deviceDetail = deviceBusiness.GetUserDeviceByUserId(userId);
+                        if (deviceDetail != null)
+                        {
+                            successResponse.data = deviceDetail;
+                            successResponse.response_code = 0;
+                            successResponse.message = "Device Detail";
+                            successResponse.status = "Success";
+                            return StatusCode(200, successResponse);
+                        }
+                        else
+                        {
+                            unsuccessResponse.response_code = 1;
+                            unsuccessResponse.message = "Device not found";
+                            unsuccessResponse.status = "Unsuccess";
+                            return StatusCode(405, unsuccessResponse);
+                        }
+                    }
+                    else
+                    {
+                        unsuccessResponse.response_code = 1;
+                        unsuccessResponse.message = "You are not authorized.";
+                        unsuccessResponse.status = "Unsuccess";
+                        return StatusCode(401, unsuccessResponse);
+                    }
+                }
+                else
+                {
+                    return StatusCode(406, ModelState);
+                }
+            }
+            catch (Exception ex)
+            {
+                unsuccessResponse.response_code = 2;
+                unsuccessResponse.message = ex.Message;
+                unsuccessResponse.status = "Failure";
+                return StatusCode(500, unsuccessResponse);
+            }
+        }
+       
+        /// <summary>
+        /// Deactivate an existing device for admin
+        /// </summary>
+        /// <param name="userId">Id of user</param>
+        /// <param name="deviceId">Id of device</param>
+        /// <returns></returns>
+        [HttpPut("ChangeuserDeviceStatus/{userId}/{deviceId}")]
+        public IActionResult ChangeuserDeviceStatus(int userId, int deviceId)
+        {
+            SuccessResponse successResponse = new SuccessResponse();
+            UnsuccessResponse unsuccessResponse = new UnsuccessResponse();
+            try
+            {
+                string Authorization = Request.Headers["id_token"];
+
+                TokenClaims tc = General.GetClaims(Authorization);
+                tc.Id = LessonBusiness.getUserId(tc.sub);
+                if (deviceBusiness.CheckDeviceQuota(userId) > 0)
+                {
+                    var device = deviceBusiness.activeDeactiveDevice(userId, deviceId);
+                    if (device == 0)
+                    {
+                        unsuccessResponse.response_code = 1;
+                        unsuccessResponse.message = "Device not found";
+                        unsuccessResponse.status = "Unsuccess";
+                        return StatusCode(404, unsuccessResponse);
+                    }
+                    else
+                    {
+                        successResponse.response_code = 0;
+                        successResponse.message = device == 1 ? "Device activated." : "Device deactivated.";
+                        successResponse.status = "Success";
+                        return StatusCode(200, successResponse);
+                    }
+                }
+                else
+                {
+                    unsuccessResponse.response_code = 3;
+                    unsuccessResponse.message = "This user out of device quota";
+                    unsuccessResponse.status = "Unsuccess";
+                    return StatusCode(406, unsuccessResponse);
+                }
+            }
+            catch (Exception ex)
+            {
+                unsuccessResponse.response_code = 2;
+                unsuccessResponse.message = ex.Message;
+                unsuccessResponse.status = "Failure";
+                return StatusCode(500, unsuccessResponse);
+            }
+        }
     }
 }
