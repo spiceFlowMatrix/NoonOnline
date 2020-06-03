@@ -24,7 +24,7 @@ class DeviceManagementRepository implements DeviceManagementApiService {
     }
 
     @Override
-    public Single<DeviceListModel> chaneDeviceStatus(String DeviceId) {
+    public Single<Response<DeviceListModel>> chaneDeviceStatus(String DeviceId) {
         return deviceManagementApiService.chaneDeviceStatus(DeviceId);
     }
 

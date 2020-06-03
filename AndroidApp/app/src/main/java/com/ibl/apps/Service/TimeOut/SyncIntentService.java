@@ -4,7 +4,6 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.JobIntentService;
@@ -554,7 +553,7 @@ public class SyncIntentService extends JobIntentService implements DroidListener
             JsonArray quizResultArray = PrefUtils.convertToJsonArray(quizUserResults);
             noonAppFullSyncObject.add(Const.TIMERDATA, quizResultArray);
             //Log.e(Const.LOG_NOON_TAG, "=====quizResultArray===" + quizResultArray);
-            Log.e(Const.LOG_NOON_TAG, "=====noonAppFullSyncObject===" + noonAppFullSyncObject);
+            //Log.e(Const.LOG_NOON_TAG, "=====noonAppFullSyncObject===" + noonAppFullSyncObject);
 
             SyncAPITable syncAPITable = new SyncAPITable();
             if (!userId.equals("")) {

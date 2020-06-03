@@ -66,10 +66,23 @@
 
         </LinearLayout>
 
+        <include
+            android:id="@+id/outOfDeviceQuota"
+            layout="@layout/device_quote_out_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <include
+            android:id="@+id/deactivatedDeviceQuota"
+            layout="@layout/device_deactivate_error_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
         <ScrollView
             android:id="@+id/nestedScrollView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:visibility="gone">
 
             <LinearLayout
                 android:layout_width="match_parent"

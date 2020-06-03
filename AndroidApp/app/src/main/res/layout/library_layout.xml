@@ -53,12 +53,12 @@
                         </SearchView>
 
                         <TextView
-                            android:text=""
                             android:id="@+id/libraryText"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
                             android:layout_marginStart="@dimen/_25sdp"
                             android:gravity="center_vertical"
+                            android:text=""
                             android:textColor="@color/colorBlack"
                             android:textSize="@dimen/_18sdp"
                             android:textStyle="bold" />
@@ -101,7 +101,8 @@
                 android:id="@+id/rcVerticalLayout"
                 layout="@layout/recycleview_verticle_layout"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                android:visibility="gone" />
 
             <include
                 android:id="@+id/outOfDeviceQuota"

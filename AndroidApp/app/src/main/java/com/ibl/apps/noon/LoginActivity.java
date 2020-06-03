@@ -613,16 +613,13 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
                         public void onError(Throwable e) {
 
                             //  Log.e(Const.LOG_NOON_TAG, "====6===" + e);
-
                             hideDialog();
                             try {
                                 HttpException error = (HttpException) e;
                                 UserObject userObject = new Gson().fromJson(error.response().errorBody().string(), UserObject.class);
                                 showSnackBar(loginLayoutBinding.mainLoginLayout, userObject.getMessage());
                             } catch (Exception e1) {
-
                                 LocalLogin(email, password, e);
-
                                 //showError(e);
                                 //Log.e(Const.LOG_NOON_TAG, "===ERROR===2222" + e.getMessage());
                             }
