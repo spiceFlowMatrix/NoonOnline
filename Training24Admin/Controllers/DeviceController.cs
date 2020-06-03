@@ -345,5 +345,57 @@ namespace Training24Admin.Controllers
                 return StatusCode(500, unsuccessResponse);
             }
         }
+       
+        /// <summary>
+        /// Deactivate an existing device for admin
+        /// </summary>
+        /// <param name="userId">Id of user</param>
+        /// <param name="deviceId">Id of device</param>
+        /// <returns></returns>
+        [HttpPut("ChangeuserDeviceStatus/{userId}/{deviceId}")]
+        public IActionResult ChangeuserDeviceStatus(int userId, int deviceId)
+        {
+            SuccessResponse successResponse = new SuccessResponse();
+            UnsuccessResponse unsuccessResponse = new UnsuccessResponse();
+            try
+            {
+                string Authorization = Request.Headers["id_token"];
+
+                TokenClaims tc = General.GetClaims(Authorization);
+                tc.Id = LessonBusiness.getUserId(tc.sub);
+                if (deviceBusiness.CheckDeviceQuota(userId) > 0)
+                {
+                    var device = deviceBusiness.activeDeactiveDevice(userId, deviceId);
+                    if (device == 0)
+                    {
+                        unsuccessResponse.response_code = 1;
+                        unsuccessResponse.message = "Device not found";
+                        unsuccessResponse.status = "Unsuccess";
+                        return StatusCode(404, unsuccessResponse);
+                    }
+                    else
+                    {
+                        successResponse.response_code = 0;
+                        successResponse.message = device == 1 ? "Device activated." : "Device deactivated.";
+                        successResponse.status = "Success";
+                        return StatusCode(200, successResponse);
+                    }
+                }
+                else
+                {
+                    unsuccessResponse.response_code = 3;
+                    unsuccessResponse.message = "This user out of device quota";
+                    unsuccessResponse.status = "Unsuccess";
+                    return StatusCode(406, unsuccessResponse);
+                }
+            }
+            catch (Exception ex)
+            {
+                unsuccessResponse.response_code = 2;
+                unsuccessResponse.message = ex.Message;
+                unsuccessResponse.status = "Failure";
+                return StatusCode(500, unsuccessResponse);
+            }
+        }
     }
 }

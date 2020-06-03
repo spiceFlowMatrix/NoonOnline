@@ -232,6 +232,7 @@ namespace Trainning24.BL.Business.Device
                                     select new ResponseDeviceModel
                                     {
                                         id = x.Id,
+                                        userId=x.UserId,
                                         approvedOn = x.CreationTime,
                                         modelName = x.ModelName,
                                         modelNumber = x.ModelNumber,

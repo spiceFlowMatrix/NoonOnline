@@ -232,5 +232,6 @@ namespace Training24Admin.Controllers
             }
         }
 
+
     }
 }

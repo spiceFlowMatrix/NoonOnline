@@ -21,6 +21,7 @@ namespace Trainning24.BL.ViewModels.Device
     public class ResponseDeviceModel
     {
         public long id { get; set; }
+        public long userId { get; set; }
         public string approvedOn { get; set; }
         public string modelName { get; set; }
         public string modelNumber { get; set; }
