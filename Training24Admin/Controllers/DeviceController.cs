@@ -181,30 +181,41 @@ namespace Training24Admin.Controllers
 
                 TokenClaims tc = General.GetClaims(Authorization);
                 tc.Id = LessonBusiness.getUserId(tc.sub);
-                if (deviceBusiness.CheckDeviceQuota(int.Parse(tc.Id)) > 0)
+                var device = deviceBusiness.GetDevice(int.Parse(tc.Id), deviceId);
+                if (device != null)
                 {
-                    var device = deviceBusiness.activeDeactiveDevice(int.Parse(tc.Id), deviceId);
-                    if (device == 0)
+                    if (deviceBusiness.CheckDeviceQuota(int.Parse(tc.Id)) > 0 || device.IsDeleted == true)
                     {
-                        unsuccessResponse.response_code = 1;
-                        unsuccessResponse.message = "Device not found";
-                        unsuccessResponse.status = "Unsuccess";
-                        return StatusCode(404, unsuccessResponse);
+                        var result = deviceBusiness.activeDeactiveDevice(device, int.Parse(tc.Id));
+                        if (result != 0)
+                        {
+                            successResponse.response_code = 0;
+                            successResponse.message = result == 1 ? "Device activated." : "Device deactivated.";
+                            successResponse.status = "Success";
+                            return StatusCode(200, successResponse);
+                        }
+                        else
+                        {
+                            unsuccessResponse.response_code = 1;
+                            unsuccessResponse.message = "Device not found";
+                            unsuccessResponse.status = "Unsuccess";
+                            return StatusCode(404, unsuccessResponse);
+                        }
                     }
                     else
                     {
-                        successResponse.response_code = 0;
-                        successResponse.message = device == 1 ? "Device activated." : "Device deactivated.";
-                        successResponse.status = "Success";
-                        return StatusCode(200, successResponse);
+                        unsuccessResponse.response_code = 3;
+                        unsuccessResponse.message = "This user out of device quota";
+                        unsuccessResponse.status = "Unsuccess";
+                        return StatusCode(406, unsuccessResponse);
                     }
                 }
                 else
                 {
-                    unsuccessResponse.response_code = 3;
-                    unsuccessResponse.message = "you are out of device quota";
+                    unsuccessResponse.response_code = 1;
+                    unsuccessResponse.message = "Device not found";
                     unsuccessResponse.status = "Unsuccess";
-                    return StatusCode(406, unsuccessResponse);
+                    return StatusCode(404, unsuccessResponse);
                 }
             }
             catch (Exception ex)
@@ -345,7 +356,7 @@ namespace Training24Admin.Controllers
                 return StatusCode(500, unsuccessResponse);
             }
         }
-       
+
         /// <summary>
         /// Deactivate an existing device for admin
         /// </summary>
@@ -363,31 +374,43 @@ namespace Training24Admin.Controllers
 
                 TokenClaims tc = General.GetClaims(Authorization);
                 tc.Id = LessonBusiness.getUserId(tc.sub);
-                if (deviceBusiness.CheckDeviceQuota(userId) > 0)
+                var device = deviceBusiness.GetDevice(userId, deviceId);
+                if (device != null)
                 {
-                    var device = deviceBusiness.activeDeactiveDevice(userId, deviceId);
-                    if (device == 0)
+                    if (deviceBusiness.CheckDeviceQuota(userId) > 0 || device.IsDeleted == true)
                     {
-                        unsuccessResponse.response_code = 1;
-                        unsuccessResponse.message = "Device not found";
-                        unsuccessResponse.status = "Unsuccess";
-                        return StatusCode(404, unsuccessResponse);
+                        var result = deviceBusiness.activeDeactiveDevice(device, userId);
+                        if (result != 0)
+                        {
+                            successResponse.response_code = 0;
+                            successResponse.message = result == 1 ? "Device activated." : "Device deactivated.";
+                            successResponse.status = "Success";
+                            return StatusCode(200, successResponse);
+                        }
+                        else
+                        {
+                            unsuccessResponse.response_code = 1;
+                            unsuccessResponse.message = "Device not found";
+                            unsuccessResponse.status = "Unsuccess";
+                            return StatusCode(404, unsuccessResponse);
+                        }
                     }
                     else
                     {
-                        successResponse.response_code = 0;
-                        successResponse.message = device == 1 ? "Device activated." : "Device deactivated.";
-                        successResponse.status = "Success";
-                        return StatusCode(200, successResponse);
+                        unsuccessResponse.response_code = 3;
+                        unsuccessResponse.message = "This user out of device quota";
+                        unsuccessResponse.status = "Unsuccess";
+                        return StatusCode(406, unsuccessResponse);
                     }
                 }
                 else
                 {
-                    unsuccessResponse.response_code = 3;
-                    unsuccessResponse.message = "This user out of device quota";
+                    unsuccessResponse.response_code = 1;
+                    unsuccessResponse.message = "Device not found";
                     unsuccessResponse.status = "Unsuccess";
-                    return StatusCode(406, unsuccessResponse);
+                    return StatusCode(404, unsuccessResponse);
                 }
+
             }
             catch (Exception ex)
             {

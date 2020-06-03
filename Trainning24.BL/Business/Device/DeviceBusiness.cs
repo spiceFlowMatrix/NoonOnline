@@ -115,9 +115,9 @@ namespace Trainning24.BL.Business.Device
         /// <param name="userId">Id of user</param>
         /// <param name="deviceId">Id of device</param>
         /// <returns></returns> 
-        public int activeDeactiveDevice(int UserId, int deviceId)
+        public int activeDeactiveDevice(Devices devices, int UserId)
         {
-            Devices devices = _eFDeviceRepository.GetById(b => b.Id == deviceId && b.UserId == UserId);
+           // Devices devices = _eFDeviceRepository.GetById(b => b.Id == deviceId && b.UserId == UserId);
             if (devices != null)
             {
                 devices.IsDeleted = devices.IsDeleted != true;
@@ -130,7 +130,10 @@ namespace Trainning24.BL.Business.Device
             }
             return 0;
         }
-
+        public Devices GetDevice(int UserId, int deviceId)
+        {
+            return _eFDeviceRepository.GetById(b => b.Id == deviceId && b.UserId == UserId);
+        }
         /// <summary>
         ///  return device quota limit for user and if user quota is not exist then default quota limit will set 1.
         /// </summary>
