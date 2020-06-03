@@ -14,7 +14,7 @@ namespace Trainning24.Domain.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.1.14-servicing-32113")
+                .HasAnnotation("ProductVersion", "2.1.2-rtm-30932")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("Trainning24.Domain.Entity.AddtionalServices", b =>
@@ -45,10 +45,10 @@ namespace Trainning24.Domain.Migrations
                     b.ToTable("AddtionalServices");
 
                     b.HasData(
-                        new { Id = 1L, CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, IsDeleted = false, Name = "Homework", Price = "0" },
-                        new { Id = 2L, CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, IsDeleted = false, Name = "Discussion", Price = "0" },
-                        new { Id = 3L, CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, IsDeleted = false, Name = "Library", Price = "0" },
-                        new { Id = 4L, CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, IsDeleted = false, Name = "Parental Control", Price = "0" }
+                        new { Id = 1L, CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, IsDeleted = false, Name = "Homework", Price = "0" },
+                        new { Id = 2L, CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, IsDeleted = false, Name = "Discussion", Price = "0" },
+                        new { Id = 3L, CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, IsDeleted = false, Name = "Library", Price = "0" },
+                        new { Id = 4L, CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, IsDeleted = false, Name = "Parental Control", Price = "0" }
                     );
                 });
 
@@ -158,6 +158,38 @@ namespace Trainning24.Domain.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("AppTimeTracks");
+                });
+
+            modelBuilder.Entity("Trainning24.Domain.Entity.AppVersion", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("CreationTime");
+
+                    b.Property<int?>("CreatorUserId");
+
+                    b.Property<int?>("DeleterUserId");
+
+                    b.Property<string>("DeletionTime");
+
+                    b.Property<bool?>("IsDeleted");
+
+                    b.Property<bool>("IsForceUpdate");
+
+                    b.Property<string>("LastModificationTime");
+
+                    b.Property<int?>("LastModifierUserId");
+
+                    b.Property<string>("Version");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AppVersion");
+
+                    b.HasData(
+                        new { Id = 1L, CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, IsDeleted = false, IsForceUpdate = false, Version = "1.0" }
+                    );
                 });
 
             modelBuilder.Entity("Trainning24.Domain.Entity.Assignment", b =>
@@ -392,17 +424,17 @@ namespace Trainning24.Domain.Migrations
                     b.ToTable("Buckets");
 
                     b.HasData(
-                        new { Id = 1L, BucketName = "core-api-sql-migrations", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, IsDeleted = false },
-                        new { Id = 2L, BucketName = "edg-primary-course-image-storage", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, IsDeleted = false },
-                        new { Id = 3L, BucketName = "edg-primary-profile-image-storage", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, IsDeleted = false },
-                        new { Id = 4L, BucketName = "edg-sales-primary-storage", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, IsDeleted = false },
-                        new { Id = 5L, BucketName = "eu.artifacts.training24-197210.appspot.com", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, IsDeleted = false },
-                        new { Id = 6L, BucketName = "t24-app-builds", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, IsDeleted = false },
-                        new { Id = 7L, BucketName = "t24-primary-audio-storage", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, IsDeleted = false },
-                        new { Id = 8L, BucketName = "t24-primary-image-storage", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, IsDeleted = false },
-                        new { Id = 9L, BucketName = "t24-primary-pdf-storage", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, IsDeleted = false },
-                        new { Id = 10L, BucketName = "t24-primary-video-storage", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, IsDeleted = false },
-                        new { Id = 11L, BucketName = "t24-secure-files", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, IsDeleted = false }
+                        new { Id = 1L, BucketName = "core-api-sql-migrations", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, IsDeleted = false },
+                        new { Id = 2L, BucketName = "edg-primary-course-image-storage", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, IsDeleted = false },
+                        new { Id = 3L, BucketName = "edg-primary-profile-image-storage", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, IsDeleted = false },
+                        new { Id = 4L, BucketName = "edg-sales-primary-storage", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, IsDeleted = false },
+                        new { Id = 5L, BucketName = "eu.artifacts.training24-197210.appspot.com", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, IsDeleted = false },
+                        new { Id = 6L, BucketName = "t24-app-builds", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, IsDeleted = false },
+                        new { Id = 7L, BucketName = "t24-primary-audio-storage", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, IsDeleted = false },
+                        new { Id = 8L, BucketName = "t24-primary-image-storage", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, IsDeleted = false },
+                        new { Id = 9L, BucketName = "t24-primary-pdf-storage", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, IsDeleted = false },
+                        new { Id = 10L, BucketName = "t24-primary-video-storage", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, IsDeleted = false },
+                        new { Id = 11L, BucketName = "t24-secure-files", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, IsDeleted = false }
                     );
                 });
 
@@ -780,7 +812,7 @@ namespace Trainning24.Domain.Migrations
                     b.ToTable("DefaultValues");
 
                     b.HasData(
-                        new { Id = 1L, CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, IsDeleted = false, intervals = 3, istimeouton = true, reminder = 5, timeout = 15 }
+                        new { Id = 1L, CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, IsDeleted = false, intervals = 3, istimeouton = true, reminder = 5, timeout = 15 }
                     );
                 });
 
@@ -818,6 +850,164 @@ namespace Trainning24.Domain.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Deposit");
+                });
+
+            modelBuilder.Entity("Trainning24.Domain.Entity.DeviceOS", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("CreationTime");
+
+                    b.Property<int?>("CreatorUserId");
+
+                    b.Property<int?>("DeleterUserId");
+
+                    b.Property<string>("DeletionTime");
+
+                    b.Property<long>("DeviceId");
+
+                    b.Property<bool?>("IsDeleted");
+
+                    b.Property<string>("LastModificationTime");
+
+                    b.Property<int?>("LastModifierUserId");
+
+                    b.Property<string>("Name");
+
+                    b.Property<string>("Version");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("DeviceOS");
+                });
+
+            modelBuilder.Entity("Trainning24.Domain.Entity.DeviceQuotaExtensionRequest", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("ApprovedOn");
+
+                    b.Property<string>("CreationTime");
+
+                    b.Property<int?>("CreatorUserId");
+
+                    b.Property<int?>("DeleterUserId");
+
+                    b.Property<string>("DeletionTime");
+
+                    b.Property<bool?>("IsDeleted");
+
+                    b.Property<string>("LastModificationTime");
+
+                    b.Property<int?>("LastModifierUserId");
+
+                    b.Property<string>("RejectedOn");
+
+                    b.Property<long>("RequestedLimit");
+
+                    b.Property<string>("RequestedOn");
+
+                    b.Property<string>("Status");
+
+                    b.Property<long>("UserId");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("DeviceQuotaExtensionRequests");
+                });
+
+            modelBuilder.Entity("Trainning24.Domain.Entity.DeviceQuotas", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("CreationTime");
+
+                    b.Property<int?>("CreatorUserId");
+
+                    b.Property<int?>("DeleterUserId");
+
+                    b.Property<string>("DeletionTime");
+
+                    b.Property<int>("DeviceLimit");
+
+                    b.Property<bool?>("IsDeleted");
+
+                    b.Property<string>("LastModificationTime");
+
+                    b.Property<int?>("LastModifierUserId");
+
+                    b.Property<long>("UserId");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("DeviceQuotas");
+                });
+
+            modelBuilder.Entity("Trainning24.Domain.Entity.Devices", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("CreationTime");
+
+                    b.Property<int?>("CreatorUserId");
+
+                    b.Property<int?>("DeleterUserId");
+
+                    b.Property<string>("DeletionTime");
+
+                    b.Property<string>("DeviceToken");
+
+                    b.Property<string>("IpAddress");
+
+                    b.Property<bool?>("IsDeleted");
+
+                    b.Property<string>("LastModificationTime");
+
+                    b.Property<int?>("LastModifierUserId");
+
+                    b.Property<string>("MacAddress");
+
+                    b.Property<string>("ModelName");
+
+                    b.Property<string>("ModelNumber");
+
+                    b.Property<long>("UserId");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Devices");
+                });
+
+            modelBuilder.Entity("Trainning24.Domain.Entity.DeviceTags", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("CreationTime");
+
+                    b.Property<int?>("CreatorUserId");
+
+                    b.Property<int?>("DeleterUserId");
+
+                    b.Property<string>("DeletionTime");
+
+                    b.Property<long>("DeviceId");
+
+                    b.Property<bool?>("IsDeleted");
+
+                    b.Property<string>("LastModificationTime");
+
+                    b.Property<int?>("LastModifierUserId");
+
+                    b.Property<string>("Name");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("DeviceTags");
                 });
 
             modelBuilder.Entity("Trainning24.Domain.Entity.Discount", b =>
@@ -1116,11 +1306,11 @@ namespace Trainning24.Domain.Migrations
                     b.ToTable("ERPAccounts");
 
                     b.HasData(
-                        new { Id = 1L, AccountCode = "", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, IsDeleted = false, Type = 1 },
-                        new { Id = 2L, AccountCode = "", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, IsDeleted = false, Type = 2 },
-                        new { Id = 3L, AccountCode = "", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, IsDeleted = false, Type = 3 },
-                        new { Id = 4L, AccountCode = "", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, IsDeleted = false, Type = 4 },
-                        new { Id = 5L, AccountCode = "", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, IsDeleted = false, Type = 5 }
+                        new { Id = 1L, AccountCode = "", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, IsDeleted = false, Type = 1 },
+                        new { Id = 2L, AccountCode = "", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, IsDeleted = false, Type = 2 },
+                        new { Id = 3L, AccountCode = "", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, IsDeleted = false, Type = 3 },
+                        new { Id = 4L, AccountCode = "", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, IsDeleted = false, Type = 4 },
+                        new { Id = 5L, AccountCode = "", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, IsDeleted = false, Type = 5 }
                     );
                 });
 
@@ -1402,9 +1592,9 @@ namespace Trainning24.Domain.Migrations
                     b.ToTable("FeedBackTaskStatusOption");
 
                     b.HasData(
-                        new { Id = 1L, CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, IsDeleted = false, Name = "UnApproved" },
-                        new { Id = 2L, CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, IsDeleted = false, Name = "Approved" },
-                        new { Id = 3L, CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, IsDeleted = false, Name = "Completed" }
+                        new { Id = 1L, CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, IsDeleted = false, Name = "UnApproved" },
+                        new { Id = 2L, CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, IsDeleted = false, Name = "Approved" },
+                        new { Id = 3L, CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, IsDeleted = false, Name = "Completed" }
                     );
                 });
 
@@ -1506,14 +1696,14 @@ namespace Trainning24.Domain.Migrations
                     b.ToTable("FileTypes");
 
                     b.HasData(
-                        new { Id = 1L, CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, Filetype = "PDF", IsDeleted = false },
-                        new { Id = 2L, CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, Filetype = "Video", IsDeleted = false },
-                        new { Id = 3L, CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, Filetype = "Image", IsDeleted = false },
-                        new { Id = 4L, CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, Filetype = "Zip", IsDeleted = false },
-                        new { Id = 5L, CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, Filetype = "Audio", IsDeleted = false },
-                        new { Id = 6L, CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, Filetype = "Xlsx", IsDeleted = false },
-                        new { Id = 7L, CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, Filetype = "Docs", IsDeleted = false },
-                        new { Id = 8L, CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, Filetype = "PPT", IsDeleted = false }
+                        new { Id = 1L, CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, Filetype = "PDF", IsDeleted = false },
+                        new { Id = 2L, CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, Filetype = "Video", IsDeleted = false },
+                        new { Id = 3L, CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, Filetype = "Image", IsDeleted = false },
+                        new { Id = 4L, CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, Filetype = "Zip", IsDeleted = false },
+                        new { Id = 5L, CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, Filetype = "Audio", IsDeleted = false },
+                        new { Id = 6L, CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, Filetype = "Xlsx", IsDeleted = false },
+                        new { Id = 7L, CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, Filetype = "Docs", IsDeleted = false },
+                        new { Id = 8L, CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, Filetype = "PPT", IsDeleted = false }
                     );
                 });
 
@@ -1909,55 +2099,55 @@ namespace Trainning24.Domain.Migrations
                     b.ToTable("LogObjectTypes");
 
                     b.HasData(
-                        new { Id = 1L, Action = "Create", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, EntityType = "Course", IsDeleted = false },
-                        new { Id = 2L, Action = "Update", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, EntityType = "Course", IsDeleted = false },
-                        new { Id = 3L, Action = "Delete", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, EntityType = "Course", IsDeleted = false },
-                        new { Id = 4L, Action = "Create", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, EntityType = "User", IsDeleted = false },
-                        new { Id = 5L, Action = "Update", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, EntityType = "User", IsDeleted = false },
-                        new { Id = 6L, Action = "Delete", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, EntityType = "User", IsDeleted = false },
-                        new { Id = 7L, Action = "Create", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, EntityType = "Chapter", IsDeleted = false },
-                        new { Id = 8L, Action = "Update", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, EntityType = "Chapter", IsDeleted = false },
-                        new { Id = 9L, Action = "Delete", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, EntityType = "Chapter", IsDeleted = false },
-                        new { Id = 10L, Action = "Create", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, EntityType = "Lesson", IsDeleted = false },
-                        new { Id = 11L, Action = "Update", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, EntityType = "Lesson", IsDeleted = false },
-                        new { Id = 12L, Action = "Delete", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, EntityType = "Lesson", IsDeleted = false },
-                        new { Id = 13L, Action = "Create", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, EntityType = "Quiz", IsDeleted = false },
-                        new { Id = 14L, Action = "Update", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, EntityType = "Quiz", IsDeleted = false },
-                        new { Id = 15L, Action = "Delete", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, EntityType = "Quiz", IsDeleted = false },
-                        new { Id = 16L, Action = "Create", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, EntityType = "Question", IsDeleted = false },
-                        new { Id = 17L, Action = "Update", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, EntityType = "Question", IsDeleted = false },
-                        new { Id = 18L, Action = "Delete", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, EntityType = "Question", IsDeleted = false },
-                        new { Id = 19L, Action = "Create", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, EntityType = "File", IsDeleted = false },
-                        new { Id = 20L, Action = "Update", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, EntityType = "File", IsDeleted = false },
-                        new { Id = 21L, Action = "Delete", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, EntityType = "File", IsDeleted = false },
-                        new { Id = 22L, Action = "Create", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, EntityType = "Notification", IsDeleted = false },
-                        new { Id = 23L, Action = "Update", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, EntityType = "Notification", IsDeleted = false },
-                        new { Id = 24L, Action = "Delete", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, EntityType = "Notification", IsDeleted = false },
-                        new { Id = 25L, Action = "Create", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, EntityType = "Discussion", IsDeleted = false },
-                        new { Id = 26L, Action = "Update", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, EntityType = "Discussion", IsDeleted = false },
-                        new { Id = 27L, Action = "Delete", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, EntityType = "Discussion", IsDeleted = false },
-                        new { Id = 28L, Action = "Create", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, EntityType = "Comment", IsDeleted = false },
-                        new { Id = 29L, Action = "Update", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, EntityType = "Comment", IsDeleted = false },
-                        new { Id = 30L, Action = "Delete", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, EntityType = "Comment", IsDeleted = false },
-                        new { Id = 31L, Action = "Create", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, EntityType = "DiscussionFile", IsDeleted = false },
-                        new { Id = 32L, Action = "Update", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, EntityType = "DiscussionFile", IsDeleted = false },
-                        new { Id = 33L, Action = "Delete", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, EntityType = "DiscussionFile", IsDeleted = false },
-                        new { Id = 34L, Action = "Create", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, EntityType = "CommentFile", IsDeleted = false },
-                        new { Id = 35L, Action = "Update", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, EntityType = "CommentFile", IsDeleted = false },
-                        new { Id = 36L, Action = "Delete", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, EntityType = "CommentFile", IsDeleted = false },
-                        new { Id = 37L, Action = "Create", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, EntityType = "AddtionalServices", IsDeleted = false },
-                        new { Id = 38L, Action = "Update", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, EntityType = "AddtionalServices", IsDeleted = false },
-                        new { Id = 39L, Action = "Delete", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, EntityType = "AddtionalServices", IsDeleted = false },
-                        new { Id = 40L, Action = "Create", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, EntityType = "Package", IsDeleted = false },
-                        new { Id = 41L, Action = "Update", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, EntityType = "Package", IsDeleted = false },
-                        new { Id = 42L, Action = "Delete", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, EntityType = "Package", IsDeleted = false },
-                        new { Id = 43L, Action = "Create", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, EntityType = "PackageCourse", IsDeleted = false },
-                        new { Id = 44L, Action = "Update", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, EntityType = "PackageCourse", IsDeleted = false },
-                        new { Id = 45L, Action = "Delete", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, EntityType = "PackageCourse", IsDeleted = false },
-                        new { Id = 46L, Action = "Create", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, EntityType = "BookAdd", IsDeleted = false },
-                        new { Id = 47L, Action = "Update", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, EntityType = "BookUpdate", IsDeleted = false },
-                        new { Id = 48L, Action = "Delete", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, EntityType = "BookDelete", IsDeleted = false },
-                        new { Id = 49L, Action = "Update", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, EntityType = "BookPublish", IsDeleted = false }
+                        new { Id = 1L, Action = "Create", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, EntityType = "Course", IsDeleted = false },
+                        new { Id = 2L, Action = "Update", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, EntityType = "Course", IsDeleted = false },
+                        new { Id = 3L, Action = "Delete", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, EntityType = "Course", IsDeleted = false },
+                        new { Id = 4L, Action = "Create", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, EntityType = "User", IsDeleted = false },
+                        new { Id = 5L, Action = "Update", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, EntityType = "User", IsDeleted = false },
+                        new { Id = 6L, Action = "Delete", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, EntityType = "User", IsDeleted = false },
+                        new { Id = 7L, Action = "Create", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, EntityType = "Chapter", IsDeleted = false },
+                        new { Id = 8L, Action = "Update", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, EntityType = "Chapter", IsDeleted = false },
+                        new { Id = 9L, Action = "Delete", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, EntityType = "Chapter", IsDeleted = false },
+                        new { Id = 10L, Action = "Create", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, EntityType = "Lesson", IsDeleted = false },
+                        new { Id = 11L, Action = "Update", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, EntityType = "Lesson", IsDeleted = false },
+                        new { Id = 12L, Action = "Delete", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, EntityType = "Lesson", IsDeleted = false },
+                        new { Id = 13L, Action = "Create", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, EntityType = "Quiz", IsDeleted = false },
+                        new { Id = 14L, Action = "Update", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, EntityType = "Quiz", IsDeleted = false },
+                        new { Id = 15L, Action = "Delete", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, EntityType = "Quiz", IsDeleted = false },
+                        new { Id = 16L, Action = "Create", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, EntityType = "Question", IsDeleted = false },
+                        new { Id = 17L, Action = "Update", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, EntityType = "Question", IsDeleted = false },
+                        new { Id = 18L, Action = "Delete", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, EntityType = "Question", IsDeleted = false },
+                        new { Id = 19L, Action = "Create", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, EntityType = "File", IsDeleted = false },
+                        new { Id = 20L, Action = "Update", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, EntityType = "File", IsDeleted = false },
+                        new { Id = 21L, Action = "Delete", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, EntityType = "File", IsDeleted = false },
+                        new { Id = 22L, Action = "Create", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, EntityType = "Notification", IsDeleted = false },
+                        new { Id = 23L, Action = "Update", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, EntityType = "Notification", IsDeleted = false },
+                        new { Id = 24L, Action = "Delete", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, EntityType = "Notification", IsDeleted = false },
+                        new { Id = 25L, Action = "Create", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, EntityType = "Discussion", IsDeleted = false },
+                        new { Id = 26L, Action = "Update", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, EntityType = "Discussion", IsDeleted = false },
+                        new { Id = 27L, Action = "Delete", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, EntityType = "Discussion", IsDeleted = false },
+                        new { Id = 28L, Action = "Create", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, EntityType = "Comment", IsDeleted = false },
+                        new { Id = 29L, Action = "Update", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, EntityType = "Comment", IsDeleted = false },
+                        new { Id = 30L, Action = "Delete", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, EntityType = "Comment", IsDeleted = false },
+                        new { Id = 31L, Action = "Create", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, EntityType = "DiscussionFile", IsDeleted = false },
+                        new { Id = 32L, Action = "Update", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, EntityType = "DiscussionFile", IsDeleted = false },
+                        new { Id = 33L, Action = "Delete", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, EntityType = "DiscussionFile", IsDeleted = false },
+                        new { Id = 34L, Action = "Create", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, EntityType = "CommentFile", IsDeleted = false },
+                        new { Id = 35L, Action = "Update", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, EntityType = "CommentFile", IsDeleted = false },
+                        new { Id = 36L, Action = "Delete", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, EntityType = "CommentFile", IsDeleted = false },
+                        new { Id = 37L, Action = "Create", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, EntityType = "AddtionalServices", IsDeleted = false },
+                        new { Id = 38L, Action = "Update", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, EntityType = "AddtionalServices", IsDeleted = false },
+                        new { Id = 39L, Action = "Delete", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, EntityType = "AddtionalServices", IsDeleted = false },
+                        new { Id = 40L, Action = "Create", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, EntityType = "Package", IsDeleted = false },
+                        new { Id = 41L, Action = "Update", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, EntityType = "Package", IsDeleted = false },
+                        new { Id = 42L, Action = "Delete", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, EntityType = "Package", IsDeleted = false },
+                        new { Id = 43L, Action = "Create", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, EntityType = "PackageCourse", IsDeleted = false },
+                        new { Id = 44L, Action = "Update", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, EntityType = "PackageCourse", IsDeleted = false },
+                        new { Id = 45L, Action = "Delete", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, EntityType = "PackageCourse", IsDeleted = false },
+                        new { Id = 46L, Action = "Create", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, EntityType = "BookAdd", IsDeleted = false },
+                        new { Id = 47L, Action = "Update", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, EntityType = "BookUpdate", IsDeleted = false },
+                        new { Id = 48L, Action = "Delete", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, EntityType = "BookDelete", IsDeleted = false },
+                        new { Id = 49L, Action = "Update", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, EntityType = "BookPublish", IsDeleted = false }
                     );
                 });
 
@@ -2393,10 +2583,10 @@ namespace Trainning24.Domain.Migrations
                     b.ToTable("QuestionType");
 
                     b.HasData(
-                        new { Id = 1L, Code = "MCQ", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, IsDeleted = false },
-                        new { Id = 2L, Code = "SA", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, IsDeleted = false },
-                        new { Id = 3L, Code = "nonmcq", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, IsDeleted = false },
-                        new { Id = 4L, Code = "abc", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, IsDeleted = false }
+                        new { Id = 1L, Code = "MCQ", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, IsDeleted = false },
+                        new { Id = 2L, Code = "SA", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, IsDeleted = false },
+                        new { Id = 3L, Code = "nonmcq", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, IsDeleted = false },
+                        new { Id = 4L, Code = "abc", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, IsDeleted = false }
                     );
                 });
 
@@ -2599,24 +2789,24 @@ namespace Trainning24.Domain.Migrations
                     b.ToTable("Role");
 
                     b.HasData(
-                        new { Id = 1L, CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, IsDeleted = false, Name = "Administrator", RoleKey = "admin" },
-                        new { Id = 2L, CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, IsDeleted = false, Name = "Analyst", RoleKey = "analyst" },
-                        new { Id = 3L, CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, IsDeleted = false, Name = "Teacher", RoleKey = "teacher" },
-                        new { Id = 4L, CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, IsDeleted = false, Name = "Student", RoleKey = "student" },
-                        new { Id = 5L, CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, IsDeleted = false, Name = "Customer", RoleKey = "customer" },
-                        new { Id = 6L, CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, IsDeleted = false, Name = "AAF manager", RoleKey = "aaf_manager" },
-                        new { Id = 7L, CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, IsDeleted = false, Name = "Coordinator", RoleKey = "coordinator" },
-                        new { Id = 8L, CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, IsDeleted = false, Name = "Edit team leader", RoleKey = "edit_team_leader" },
-                        new { Id = 9L, CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, IsDeleted = false, Name = "Shooting team leader", RoleKey = "shooting_team_leader" },
-                        new { Id = 10L, CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, IsDeleted = false, Name = "Graphics team leader", RoleKey = "graphics_team_leader" },
-                        new { Id = 11L, CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, IsDeleted = false, Name = "Quality assurance", RoleKey = "quality_assurance" },
-                        new { Id = 12L, CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, IsDeleted = false, Name = "Feedback edge team", RoleKey = "feedback_edge_team" },
-                        new { Id = 13L, CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, IsDeleted = false, Name = "Sales admin", RoleKey = "sales_admin" },
-                        new { Id = 14L, CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, IsDeleted = false, Name = "Filming staff", RoleKey = "filming_staff" },
-                        new { Id = 15L, CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, IsDeleted = false, Name = "Editing staff", RoleKey = "editing_staff" },
-                        new { Id = 16L, CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, IsDeleted = false, Name = "Graphics staff", RoleKey = "graphics_staff" },
-                        new { Id = 17L, CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, IsDeleted = false, Name = "Sales Agent", RoleKey = "sales_agent" },
-                        new { Id = 18L, CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, IsDeleted = false, Name = "Parent", RoleKey = "parent" }
+                        new { Id = 1L, CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, IsDeleted = false, Name = "Administrator", RoleKey = "admin" },
+                        new { Id = 2L, CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, IsDeleted = false, Name = "Analyst", RoleKey = "analyst" },
+                        new { Id = 3L, CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, IsDeleted = false, Name = "Teacher", RoleKey = "teacher" },
+                        new { Id = 4L, CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, IsDeleted = false, Name = "Student", RoleKey = "student" },
+                        new { Id = 5L, CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, IsDeleted = false, Name = "Customer", RoleKey = "customer" },
+                        new { Id = 6L, CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, IsDeleted = false, Name = "AAF manager", RoleKey = "aaf_manager" },
+                        new { Id = 7L, CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, IsDeleted = false, Name = "Coordinator", RoleKey = "coordinator" },
+                        new { Id = 8L, CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, IsDeleted = false, Name = "Edit team leader", RoleKey = "edit_team_leader" },
+                        new { Id = 9L, CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, IsDeleted = false, Name = "Shooting team leader", RoleKey = "shooting_team_leader" },
+                        new { Id = 10L, CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, IsDeleted = false, Name = "Graphics team leader", RoleKey = "graphics_team_leader" },
+                        new { Id = 11L, CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, IsDeleted = false, Name = "Quality assurance", RoleKey = "quality_assurance" },
+                        new { Id = 12L, CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, IsDeleted = false, Name = "Feedback edge team", RoleKey = "feedback_edge_team" },
+                        new { Id = 13L, CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, IsDeleted = false, Name = "Sales admin", RoleKey = "sales_admin" },
+                        new { Id = 14L, CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, IsDeleted = false, Name = "Filming staff", RoleKey = "filming_staff" },
+                        new { Id = 15L, CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, IsDeleted = false, Name = "Editing staff", RoleKey = "editing_staff" },
+                        new { Id = 16L, CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, IsDeleted = false, Name = "Graphics staff", RoleKey = "graphics_staff" },
+                        new { Id = 17L, CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, IsDeleted = false, Name = "Sales Agent", RoleKey = "sales_agent" },
+                        new { Id = 18L, CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, IsDeleted = false, Name = "Parent", RoleKey = "parent" }
                     );
                 });
 
@@ -2694,7 +2884,7 @@ namespace Trainning24.Domain.Migrations
                     b.ToTable("SalesTax");
 
                     b.HasData(
-                        new { Id = 1L, CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, IsDeleted = false, Tax = 4 }
+                        new { Id = 1L, CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, IsDeleted = false, Tax = 4 }
                     );
                 });
 
@@ -3056,10 +3246,10 @@ namespace Trainning24.Domain.Migrations
                     b.ToTable("TaskActivityCategoryFeedBacks");
 
                     b.HasData(
-                        new { Id = 1L, CreationTime = "22-04-2020 02:58:46 PM", CreatorUserId = 1, IsDeleted = false, Name = "In Queue" },
-                        new { Id = 2L, CreationTime = "22-04-2020 02:58:46 PM", CreatorUserId = 1, IsDeleted = false, Name = "In Progress" },
-                        new { Id = 3L, CreationTime = "22-04-2020 02:58:46 PM", CreatorUserId = 1, IsDeleted = false, Name = "Completed" },
-                        new { Id = 4L, CreationTime = "22-04-2020 02:58:46 PM", CreatorUserId = 1, IsDeleted = false, Name = "Archived" }
+                        new { Id = 1L, CreationTime = "06/03/20 11:50:15 AM", CreatorUserId = 1, IsDeleted = false, Name = "In Queue" },
+                        new { Id = 2L, CreationTime = "06/03/20 11:50:15 AM", CreatorUserId = 1, IsDeleted = false, Name = "In Progress" },
+                        new { Id = 3L, CreationTime = "06/03/20 11:50:15 AM", CreatorUserId = 1, IsDeleted = false, Name = "Completed" },
+                        new { Id = 4L, CreationTime = "06/03/20 11:50:15 AM", CreatorUserId = 1, IsDeleted = false, Name = "Archived" }
                     );
                 });
 
@@ -3119,13 +3309,13 @@ namespace Trainning24.Domain.Migrations
                     b.ToTable("TaskCategoryFeedBacks");
 
                     b.HasData(
-                        new { Id = 1L, CreationTime = "22-04-2020 02:58:46 PM", CreatorUserId = 1, IsDeleted = false, Name = "Something Isn't Working in the App" },
-                        new { Id = 2L, CreationTime = "22-04-2020 02:58:46 PM", CreatorUserId = 1, IsDeleted = false, Name = "Video Issue" },
-                        new { Id = 3L, CreationTime = "22-04-2020 02:58:46 PM", CreatorUserId = 1, IsDeleted = false, Name = "Text Issue" },
-                        new { Id = 4L, CreationTime = "22-04-2020 02:58:46 PM", CreatorUserId = 1, IsDeleted = false, Name = "Lesson Assignment Issue" },
-                        new { Id = 5L, CreationTime = "22-04-2020 02:58:46 PM", CreatorUserId = 1, IsDeleted = false, Name = "Chapter Assignment Issue" },
-                        new { Id = 6L, CreationTime = "22-04-2020 02:58:46 PM", CreatorUserId = 1, IsDeleted = false, Name = "Quiz Issue" },
-                        new { Id = 7L, CreationTime = "22-04-2020 02:58:46 PM", CreatorUserId = 1, IsDeleted = false, Name = "General Feedback" }
+                        new { Id = 1L, CreationTime = "06/03/20 11:50:15 AM", CreatorUserId = 1, IsDeleted = false, Name = "Something Isn't Working in the App" },
+                        new { Id = 2L, CreationTime = "06/03/20 11:50:15 AM", CreatorUserId = 1, IsDeleted = false, Name = "Video Issue" },
+                        new { Id = 3L, CreationTime = "06/03/20 11:50:15 AM", CreatorUserId = 1, IsDeleted = false, Name = "Text Issue" },
+                        new { Id = 4L, CreationTime = "06/03/20 11:50:15 AM", CreatorUserId = 1, IsDeleted = false, Name = "Lesson Assignment Issue" },
+                        new { Id = 5L, CreationTime = "06/03/20 11:50:15 AM", CreatorUserId = 1, IsDeleted = false, Name = "Chapter Assignment Issue" },
+                        new { Id = 6L, CreationTime = "06/03/20 11:50:15 AM", CreatorUserId = 1, IsDeleted = false, Name = "Quiz Issue" },
+                        new { Id = 7L, CreationTime = "06/03/20 11:50:15 AM", CreatorUserId = 1, IsDeleted = false, Name = "General Feedback" }
                     );
                 });
 
@@ -3267,7 +3457,7 @@ namespace Trainning24.Domain.Migrations
                     b.ToTable("TimeIntervals");
 
                     b.HasData(
-                        new { Id = 1L, CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, Interval = 5, IsDeleted = false }
+                        new { Id = 1L, CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, Interval = 5, IsDeleted = false }
                     );
                 });
 
@@ -3339,7 +3529,7 @@ namespace Trainning24.Domain.Migrations
                     b.ToTable("Users");
 
                     b.HasData(
-                        new { Id = 1L, AuthId = "auth0|5ea05a1a8c1d6e0c0c607177", Bio = "Admin", CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, Email = "adminuser@email.com", FullName = "Admin", IsBlocked = false, IsDeleted = false, Password = "", ProfilePicUrl = "", Username = "Admin", intervals = 0, is_assignment_authorized = false, is_discussion_authorized = false, is_library_authorized = false, is_skippable = true, isallowmap = false, isfirstlogin = false, isforgot = false, istimeouton = false, istrial = false, reminder = 0, timeout = 0 }
+                        new { Id = 1L, AuthId = "auth0|5ea05a1a8c1d6e0c0c607177", Bio = "Admin", CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, Email = "adminuser@email.com", FullName = "Admin", IsBlocked = false, IsDeleted = false, Password = "", ProfilePicUrl = "", Username = "Admin", intervals = 0, is_assignment_authorized = false, is_discussion_authorized = false, is_library_authorized = false, is_skippable = true, isallowmap = false, isfirstlogin = false, isforgot = false, istimeouton = false, istrial = false, reminder = 0, timeout = 0 }
                     );
                 });
 
@@ -3491,7 +3681,7 @@ namespace Trainning24.Domain.Migrations
                     b.ToTable("UserRole");
 
                     b.HasData(
-                        new { Id = 1L, CreationTime = "22-04-2020 08:28:46 PM", CreatorUserId = 1, IsDeleted = false, RoleId = 1L, UserId = 1L }
+                        new { Id = 1L, CreationTime = "06/03/20 5:20:15 PM", CreatorUserId = 1, IsDeleted = false, RoleId = 1L, UserId = 1L }
                     );
                 });
 
