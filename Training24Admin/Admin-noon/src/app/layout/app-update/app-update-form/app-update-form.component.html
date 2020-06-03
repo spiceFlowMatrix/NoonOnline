@@ -25,7 +25,7 @@
                     <label class="control-label col-sm-4" for="versionCode">App Version Code</label>
                     <div class="col col-sm-8">
                         <input type="text" id="versionCode" class="form-control" placeholder="Enter Version Code"
-                            name="versionCode" [(ngModel)]="updateModel.versionCode" #Version="ngModel" required>
+                            name="versionCode" [(ngModel)]="updateModel.versionCode" #versionCode="ngModel" required>
                         <div *ngIf="versionCode.invalid && (versionCode.touched || manageAppForm.submitted)">
                             <p class="input-info error-message" *ngIf="versionCode.errors.required">Version Code is
                                 required</p>
