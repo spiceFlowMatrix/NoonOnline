@@ -113,6 +113,7 @@ namespace Trainning24.Domain.Entity
         public DbSet<DeviceTags> DeviceTags { get; set; }
         public DbSet<DeviceQuotas> DeviceQuotas { get; set; }
         public DbSet<DeviceQuotaExtensionRequest> DeviceQuotaExtensionRequests { get; set; }
+        public DbSet<AppVersion> AppVersion { get; set; }
 
         public Training24Context(DbContextOptions<Training24Context> options)
             : base(options)
@@ -319,6 +320,10 @@ namespace Trainning24.Domain.Entity
                 new TaskActivityCategoryFeedBack { Id = 3, CreationTime = DateTime.UtcNow.ToString(), CreatorUserId = 1, LastModificationTime = null, LastModifierUserId = null, DeleterUserId = null, DeletionTime = null, IsDeleted = false, Name = "Completed" },
                 new TaskActivityCategoryFeedBack { Id = 4, CreationTime = DateTime.UtcNow.ToString(), CreatorUserId = 1, LastModificationTime = null, LastModifierUserId = null, DeleterUserId = null, DeletionTime = null, IsDeleted = false, Name = "Archived" }
                 );
+
+            modelBuilder.Entity<AppVersion>().HasData(
+            new AppVersion { Id = 1, CreationTime = DateTime.Now.ToString(), CreatorUserId = 1, LastModificationTime = null, DeleterUserId = null, DeletionTime = null, IsDeleted = false, LastModifierUserId = null, Version = "1.0", IsForceUpdate = false }
+        );
         }
     }
 }

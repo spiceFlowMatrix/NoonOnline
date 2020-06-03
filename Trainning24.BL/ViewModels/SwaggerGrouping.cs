@@ -23,7 +23,8 @@ namespace Trainning24.BL.ViewModels
         Subscription = 15,
         SalesAgent = 16,
         Device = 17,
-        DeviceQuotas = 18
+        DeviceQuotas = 18,
+        AppVersion = 19
 
     }
 }
