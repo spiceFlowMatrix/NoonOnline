@@ -27,6 +27,7 @@ namespace Trainning24.BL.Business
             {
                 appVersionModel.IsForceUpdate = appVersion.IsForceUpdate;
                 appVersionModel.Version = appVersion.Version;
+                appVersionModel.VersionCode = appVersion.VersionCode;
             }
             return appVersionModel;
         }
@@ -36,6 +37,7 @@ namespace Trainning24.BL.Business
             if (appVersion != null)
             {
                 appVersion.IsForceUpdate = obj.IsForceUpdate;
+                appVersion.VersionCode = obj.VersionCode;
                 appVersion.Version = obj.Version;
                 _eFDeviceRepository.Update(appVersion);
             }

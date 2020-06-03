@@ -322,7 +322,7 @@ namespace Trainning24.Domain.Entity
                 );
 
             modelBuilder.Entity<AppVersion>().HasData(
-            new AppVersion { Id = 1, CreationTime = DateTime.Now.ToString(), CreatorUserId = 1, LastModificationTime = null, DeleterUserId = null, DeletionTime = null, IsDeleted = false, LastModifierUserId = null, Version = "1.0", IsForceUpdate = false }
+            new AppVersion { Id = 1, CreationTime = DateTime.Now.ToString(), CreatorUserId = 1, LastModificationTime = null, DeleterUserId = null, DeletionTime = null, IsDeleted = false, LastModifierUserId = null, Version = "1.0", VersionCode="1", IsForceUpdate = false }
         );
         }
     }
