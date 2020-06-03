@@ -438,6 +438,11 @@
     <string name="extend_quota">EXTEND QUOTA</string>
     <string name="request_quota_extension">REQUEST QUOTA EXTENSION</string>
     <string name="devices">DEVICES</string>
+    <string name="out_of_quota_message">The device quota is full. You can't activate this device.</string>
+
+     <!--Version Update-->
+    <string name="version_update">Update</string>
+    <string name="update_version_message">A new version of Noon app is available please update to version</string>
 
     
     <!--<string name="pashto_school">مدرسة الباشتو</string>-->
