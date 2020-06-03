@@ -15,14 +15,20 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatListModule } from '@angular/material/list';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatInputModule } from '@angular/material/input';
+import {MatDatepickerModule} from '@angular/material/datepicker';
 import { MatIconModule } from '@angular/material/icon';
 import { DeviceComponent } from '../device/device.component';
 import { DeviceQuotaExtensionComponent } from '../device-quota-extension/device-quota-extension.component';
 import { DeviceService } from '../../../shared/services/device.service';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MAT_MOMENT_DATE_FORMATS, MomentDateAdapter } from '@angular/material-moment-adapter'
+import { SatDatepickerModule, SatNativeDateModule, DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from 'saturn-datepicker';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
     imports: [
         CommonModule,
+        FormsModule,
         CommonDialogModule,
         MatToolbarModule,
         MatButtonModule,
@@ -31,6 +37,10 @@ import { DeviceService } from '../../../shared/services/device.service';
         MatInputModule,
         MatMenuModule,
         MatListModule,
+        MatNativeDateModule,
+        SatDatepickerModule,
+        MatDatepickerModule,
+        SatNativeDateModule,
         MatFormFieldModule,
         MatTabsModule,
         MatTableModule,
@@ -39,6 +49,7 @@ import { DeviceService } from '../../../shared/services/device.service';
         DeviceAdministartionRoutingModule
     ],
     declarations: [DeviceAdministartionComponent,DeviceComponent,DeviceQuotaExtensionComponent],
-    providers: [DeviceService]
+    providers: [DeviceService, {provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE]},
+    {provide: MAT_DATE_FORMATS, useValue: MAT_MOMENT_DATE_FORMATS},]
 })
 export class DeviceAdministartionModule { }

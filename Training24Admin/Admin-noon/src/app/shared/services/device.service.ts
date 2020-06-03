@@ -16,11 +16,11 @@ export class DeviceService {
     getUserDevice(id) {
         return this.commonApiService.get('v1/device/GetUserDeviceListByUserId?userId=' + id)
     }
-    toggleDeviceStatus(id) {
-        return this.commonApiService.putStatus('v1/Device/ChaneDeviceStatus/' + id);
+    toggleDeviceStatus(id, userId) {
+        return this.commonApiService.putStatus('v1/Device/ChangeuserDeviceStatus/' + userId + '/' + id);
     }
-    extensionRequest() {
-        return this.commonApiService.get('v1/DeviceQuotas/getAllDeviceQuotaExtensionRequest?pagenumber=' + 1 + '&perpagerecord=' + 10 + '&search=' + '' + '&userId=' + 0 + '&todate=' + '' + '&fromdate=' + '')
+    extensionRequest(filerModal) {
+        return this.commonApiService.get('v1/DeviceQuotas/getAllDeviceQuotaExtensionRequest?pagenumber=' + filerModal.pagenumber + '&perpagerecord=' + filerModal.perpagerecord + '&search=' + filerModal.search + '&userId=' + filerModal.userId + '&todate=' + filerModal.todate + '&fromdate=' + filerModal.fromdate)
     }
     AcceptRejectRequest(id, status) {
         return this.commonApiService.putStatus('v1/DeviceQuotas/?extensionRequestId=' + id + '&IsAccepted=' + status)

@@ -2,7 +2,7 @@
   <div>
     <mat-label style="font-weight:500;">Filters</mat-label>
   </div>
-  <div class="apply-filter">
+  <div class="apply-filter" (click)="getRequest()">
     <mat-icon>filter_list</mat-icon>
     <mat-label>APPLY FILTER</mat-label>
   </div>
@@ -10,15 +10,20 @@
 <div>
   <mat-form-field class="example-full-width">
     <mat-label>Search</mat-label>
-    <input matInput>
+    <input matInput  [(ngModel)]="filterModal.search">
+  </mat-form-field>
+  <mat-form-field style="margin-left: 30px">
+    <input matInput placeholder="Submitted Date" (dateInput)="change($event.value)" [satDatepicker]="picker7"
+      [(ngModel)]="sub_date" readonly>
+    <sat-datepicker #picker7 [rangeMode]="true">
+    </sat-datepicker>
+    <sat-datepicker-toggle matSuffix [for]="picker7"></sat-datepicker-toggle>
   </mat-form-field>
   <mat-form-field>
     <mat-label>Submitted By</mat-label>
-    <mat-select name="food">
-      <mat-option>None</mat-option>
-      <mat-option value="option1">Option 1</mat-option>
-      <mat-option value="option2">Option 2</mat-option>
-      <mat-option value="option3">Option 3</mat-option>
+    <mat-select  [(value)]="filterModel.userId">
+      <mat-option value="0">None</mat-option>
+      <mat-option *ngFor="let user of userEmails" value="{{user.id}}">{{user.email}}</mat-option>
     </mat-select>
   </mat-form-field>
 </div>

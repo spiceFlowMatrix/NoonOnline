@@ -101,7 +101,8 @@ export class DeviceComponent implements OnInit {
   filterModal:any = {
     page: 1,
     pageRecord:10,
-    userId:0
+    userId:0,
+    search:''
   }
   constructor(public deviceService: DeviceService) { }
 
@@ -122,9 +123,9 @@ export class DeviceComponent implements OnInit {
       this.devices = res.data;
     })
   }
-  toggleStatus(id,i) {
+  toggleStatus(id,i,userId) {
     console.log(id);
-    this.deviceService.toggleDeviceStatus(id).subscribe((res)=> {
+    this.deviceService.toggleDeviceStatus(id,userId).subscribe((res)=> {
       this.devices[i].isActive =! this.devices[i].isActive;
       console.log(res);
     })

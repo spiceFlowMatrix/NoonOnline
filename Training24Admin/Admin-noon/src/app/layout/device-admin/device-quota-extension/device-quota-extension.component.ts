@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { DeviceService } from '../../../shared/services/device.service';
+import * as moment from 'moment';
 
 const ELEMENT_DATA: any[] = [
   { Date: 1, Username: 'Hydrogen', 'Device_Id': 1.0079, 'Email_Address': 'H', 'Current_Quota_Limitation': 2, 'Requested_Quota_Limistation': 5, Status: 'Pending' },
@@ -21,22 +22,38 @@ const ELEMENT_DATA: any[] = [
 export class DeviceQuotaExtensionComponent implements OnInit {
   displayedColumns: string[] = ['Date', 'Username', 'Email Address', 'Device Id', 'Current Quota Limitation', 'Requested Quota Limistation', 'Status', 'reject', 'approve'];
   dataSource = ELEMENT_DATA;
+  filterModel: any = {};
+  userEmails: any;
+  sub_date: any;
+
   constructor(public deviceService: DeviceService) { }
 
   ngOnInit(): void {
+    this.filterModel = {
+      "pagenumber": 1,
+      "perpagerecord": 10,
+      "userId": 0,
+      "fromdate": "",
+      search: "",
+      "todate": "",
+    }
     this.getRequest()
   }
-
+  change(event) {
+    this.filterModel.fromdate = moment(event.begin).format('YYYY-MM-DD');
+    this.filterModel.todate = moment(event.end).format('YYYY-MM-DD');
+  }
   getRequest() {
-    this.deviceService.extensionRequest().subscribe((res)=> {
+    this.deviceService.extensionRequest(this.filterModel).subscribe((res) => {
       console.log(res);
+      this.userEmails = res.data.userEmails;
       this.dataSource = res.data.deviceQuotaExtensionList;
     })
   }
-  acceptReject(id,i,status) {
-    this.deviceService.AcceptRejectRequest(id,status).subscribe((res)=> {
+  acceptReject(id, i, status) {
+    this.deviceService.AcceptRejectRequest(id, status).subscribe((res) => {
       console.log(res);
-      if(status){
+      if (status) {
         this.dataSource[i].status = "Accepted"
       } else {
         this.dataSource[i].status = "Rejected"

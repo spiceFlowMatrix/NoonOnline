@@ -10,7 +10,7 @@
 <div>
   <mat-form-field class="example-full-width">
     <mat-label>Search</mat-label>
-    <input matInput>
+    <input matInput [(ngModel)]="filterModal.search">
   </mat-form-field>
   <mat-form-field>
     <mat-label>Username</mat-label>
@@ -68,11 +68,11 @@
               <td mat-cell>{{device.operatingSystem}}</td>
               <!-- <td mat-cell>Pending</td> -->
               <td mat-cell>
-                <div *ngIf="device.isActive" class="deactive" (click)="toggleStatus(device.id,i)">
+                <div *ngIf="device.isActive" class="deactive" (click)="toggleStatus(device.id,i,device.userId)">
                   <mat-icon>close</mat-icon>
                   <span>Deactivate </span>
                 </div>
-                <div  *ngIf="!device.isActive" class="approve"  (click)="toggleStatus(device.id,i)">
+                <div  *ngIf="!device.isActive" class="approve"  (click)="toggleStatus(device.id,i,device.userId)">
                   <mat-icon>done</mat-icon>
                   <span>Activate </span>
                 </div>
