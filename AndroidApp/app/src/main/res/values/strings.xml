@@ -438,6 +438,10 @@
     <string name="this_device">This device</string>
     <string name="reistering_device">Registering Device</string>
 
+    <!--Version Update-->
+    <string name="version_update">Update</string>
+    <string name="update_version_message">A new version of Noon app is available please update to version</string>
+
     <!--<string name="pashto_school">مدرسة الباشتو</string>-->
     <!--For Pashto Notification Translation-->
     <!-- <string name="just_now_pashto">همدا اوس</string>

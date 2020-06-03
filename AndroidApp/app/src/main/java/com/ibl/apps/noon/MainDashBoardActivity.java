@@ -7,11 +7,14 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationListener;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.telephony.TelephonyManager;
+import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -37,6 +40,7 @@ import com.ibl.apps.Fragment.LibraryFragment;
 import com.ibl.apps.Fragment.ProfileFragment;
 import com.ibl.apps.Fragment.ReportFragment;
 import com.ibl.apps.Interface.BackInterface;
+import com.ibl.apps.Model.versionUpdate.VersionUpdateModel;
 import com.ibl.apps.RoomDatabase.dao.courseManagementDatabase.CourseDatabaseRepository;
 import com.ibl.apps.RoomDatabase.dao.syncAPIManagementDatabase.SyncAPIDatabaseRepository;
 import com.ibl.apps.RoomDatabase.entity.SyncAPITable;
@@ -49,9 +53,15 @@ import com.ibl.apps.util.Const;
 import com.ibl.apps.util.GlideApp;
 import com.ibl.apps.util.PrefUtils;
 import com.ibl.apps.util.SingleShotLocationProvider;
+import com.ibl.apps.versionUpdateManagement.VersionUpdateRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.observers.DisposableSingleObserver;
+import io.reactivex.schedulers.Schedulers;
 
 import static com.ibl.apps.Fragment.GradeFragment.deviceStatus;
 
@@ -92,6 +102,7 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
         mainDashboardLayoutBinding = (MainDashboardLayoutBinding) getBindObj();
         setSupportActionBar(mainDashboardLayoutBinding.appBarLayout.toolBar);
         //callApiForInterval();
+        callApiForVersionUpdate();
         courseDatabaseRepository = new CourseDatabaseRepository();
 
         sharedPreferences = getSharedPreferences("rolename", MODE_PRIVATE);
@@ -406,6 +417,89 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
             }
         }*/
 
+    }
+
+    private void callApiForVersionUpdate() {
+        CompositeDisposable disposable = new CompositeDisposable();
+        VersionUpdateRepository versionUpdateRepository = new VersionUpdateRepository();
+
+        disposable.add(versionUpdateRepository.getVersionUpdate()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(new DisposableSingleObserver<VersionUpdateModel>() {
+                    @Override
+                    public void onSuccess(VersionUpdateModel versionUpdateModel) {
+                        try {
+                            if (versionUpdateModel.getData() != null && BuildConfig.VERSION_CODE < Integer.parseInt(versionUpdateModel.getData().getVersionCode())) {
+                                if (versionUpdateModel.getData().getIsForceUpdate()) {
+                                    SpannableStringBuilder message = setTypeface(MainDashBoardActivity.this, getString(R.string.update_version_message));
+                                    AlertDialog.Builder builder = new AlertDialog.Builder(MainDashBoardActivity.this);
+                                    builder.setTitle(R.string.validation_warning);
+                                    builder.setMessage(message)
+                                            .setPositiveButton(R.string.version_update, new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    // Yes button clicked, do something
+                                                    dialog.dismiss();
+                                                    String packageName = getPackageName();
+                                                    Log.e("packageName", "onClick: " + packageName);
+                                                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + packageName));
+                                                    if (intent.resolveActivity(getPackageManager()) != null) {
+                                                        startActivity(intent);
+                                                    } else {
+                                                        intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + packageName));
+                                                        if (intent.resolveActivity(getPackageManager()) != null)
+                                                            startActivity(intent);
+                                                    }
+                                                }
+                                            });
+
+                                    builder.setCancelable(false);
+                                    builder.show();
+
+                                } else {
+                                    try {
+                                        SpannableStringBuilder message = setTypeface(MainDashBoardActivity.this, getString(R.string.update_version_message));
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(MainDashBoardActivity.this);
+                                        builder.setTitle(R.string.validation_warning);
+                                        builder.setMessage(message)
+                                                .setPositiveButton(R.string.version_update, new DialogInterface.OnClickListener() {
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        // Yes button clicked, do something
+                                                        dialog.dismiss();
+                                                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.app.training24.noon"));
+                                                        if (intent.resolveActivity(getPackageManager()) != null) {
+                                                            startActivity(intent);
+                                                        } else {
+                                                            intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.app.training24.noon"));
+                                                            if (intent.resolveActivity(getPackageManager()) != null)
+                                                                startActivity(intent);
+                                                        }
+                                                    }
+                                                });
+
+                                        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int arg1) {
+                                                dialog.dismiss();
+                                            }
+                                        });
+
+                                        builder.show();
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        hideDialog();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        hideDialog();
+                    }
+                }));
     }
 
 
