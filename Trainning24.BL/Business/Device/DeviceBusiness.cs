@@ -345,7 +345,19 @@ namespace Trainning24.BL.Business.Device
             return Environment.GetEnvironmentVariable("ASPNET_DB_CONNECTIONSTRING");
         }
 
+        /// <summary>
+        /// check uder device is active/Deactivated.
+        /// </summary>
+        /// <param name="deviceToken"></param>
+        /// <returns></returns>
+        public int CheckDeviceIsActive(string deviceToken)
+        {
+            var device = _eFDeviceRepository.GetById(f => f.DeviceToken == deviceToken && f.IsDeleted != true);
+            if (device != null)
+                return 1;
+            return 0;
 
+        }
     }
 
 }

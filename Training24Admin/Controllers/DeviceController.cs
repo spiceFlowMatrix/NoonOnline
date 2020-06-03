@@ -24,14 +24,14 @@ namespace Training24Admin.Controllers
 
         private readonly LessonBusiness LessonBusiness;
         private readonly DeviceBusiness deviceBusiness;
-      
+
 
         public DeviceController(LessonBusiness LessonBusiness, DeviceBusiness deviceBusiness
            )
         {
             this.LessonBusiness = LessonBusiness;
             this.deviceBusiness = deviceBusiness;
-          
+
         }
 
         /// <summary>
@@ -181,21 +181,30 @@ namespace Training24Admin.Controllers
 
                 TokenClaims tc = General.GetClaims(Authorization);
                 tc.Id = LessonBusiness.getUserId(tc.sub);
-
-                var device = deviceBusiness.activeDeactiveDevice(int.Parse(tc.Id), deviceId);
-                if (device == 0)
+                if (deviceBusiness.CheckDeviceQuota(int.Parse(tc.Id)) > 0)
                 {
-                    unsuccessResponse.response_code = 1;
-                    unsuccessResponse.message = "Device not found";
-                    unsuccessResponse.status = "Unsuccess";
-                    return StatusCode(404, unsuccessResponse);
+                    var device = deviceBusiness.activeDeactiveDevice(int.Parse(tc.Id), deviceId);
+                    if (device == 0)
+                    {
+                        unsuccessResponse.response_code = 1;
+                        unsuccessResponse.message = "Device not found";
+                        unsuccessResponse.status = "Unsuccess";
+                        return StatusCode(404, unsuccessResponse);
+                    }
+                    else
+                    {
+                        successResponse.response_code = 0;
+                        successResponse.message = device == 1 ? "Device activated." : "Device deactivated.";
+                        successResponse.status = "Success";
+                        return StatusCode(200, successResponse);
+                    }
                 }
                 else
                 {
-                    successResponse.response_code = 0;
-                    successResponse.message = device == 1 ? "Device activated." : "Device deactivated.";
-                    successResponse.status = "Success";
-                    return StatusCode(200, successResponse);
+                    unsuccessResponse.response_code = 3;
+                    unsuccessResponse.message = "you are out of device quota";
+                    unsuccessResponse.status = "Unsuccess";
+                    return StatusCode(406, unsuccessResponse);
                 }
             }
             catch (Exception ex)
@@ -210,11 +219,11 @@ namespace Training24Admin.Controllers
         }
 
         /// <summary>
-        ///  Get my all device profile by user.
+        ///  Get my  all user's device profile .
         /// </summary>
         /// <returns></returns>
         [HttpGet("GetAllUserDeviceList")]
-        public IActionResult GetAllUserDeviceList(int pagenumber, int perpagerecord, string search ,long userId)
+        public IActionResult GetAllUserDeviceList(int pagenumber, int perpagerecord, string search, long userId)
         {
             PaginationResponse successResponse = new PaginationResponse();
             UnsuccessResponse unsuccessResponse = new UnsuccessResponse();
