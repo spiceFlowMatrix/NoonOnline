@@ -1,4 +1,4 @@
-package com.ibl.apps.CourseManagement;
+package com.ibl.apps.noon;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -55,16 +55,6 @@ import com.ibl.apps.RoomDatabase.entity.SyncAPITable;
 import com.ibl.apps.RoomDatabase.entity.SyncTimeTrackingObject;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
 import com.ibl.apps.Service.TimeOut.SyncEventReceiver;
-import com.ibl.apps.noon.BuildConfig;
-import com.ibl.apps.noon.CacheEventsListActivity;
-import com.ibl.apps.noon.FeedBackActivity;
-import com.ibl.apps.noon.GeneralDiscussionsDetailActivity;
-import com.ibl.apps.noon.LoginDevicesActivity;
-import com.ibl.apps.noon.NoonApplication;
-import com.ibl.apps.noon.NotificationActivity;
-import com.ibl.apps.noon.R;
-import com.ibl.apps.noon.ResetPasswordActivity;
-import com.ibl.apps.noon.SearchActivity;
 import com.ibl.apps.noon.databinding.LogoutPopupLayoutBinding;
 import com.ibl.apps.noon.databinding.MainDashboardLayoutBinding;
 import com.ibl.apps.util.Const;
