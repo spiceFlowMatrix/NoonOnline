@@ -725,7 +725,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                             if (!userId.equals("")) {
                                 SyncAPITable syncAPITable = new SyncAPITable();
 
-                                syncAPITable.setApi_name("Lesson Progressed");
+                                syncAPITable.setApi_name(getString(R.string.lesson_progressed));
                                 syncAPITable.setEndpoint_url("LessonProgress/LessonProgressSync");
                                 syncAPITable.setParameters(String.valueOf(array));
                                 syncAPITable.setHeaders(PrefUtils.getAuthid(getActivity()));
@@ -789,7 +789,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                             if (!userId.equals("")) {
                                 SyncAPITable syncAPITable = new SyncAPITable();
 
-                                syncAPITable.setApi_name("Chapter Progressed");
+                                syncAPITable.setApi_name(getString(R.string.chapter_progressed));
                                 syncAPITable.setEndpoint_url("ChapterProgress/ChapterProgressSync");
                                 syncAPITable.setParameters(String.valueOf(array));
                                 syncAPITable.setHeaders(PrefUtils.getAuthid(getActivity()));
@@ -853,7 +853,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                             if (!userId.equals("")) {
                                 SyncAPITable syncAPITable = new SyncAPITable();
 
-                                syncAPITable.setApi_name("File Progressed");
+                                syncAPITable.setApi_name(getString(R.string.file_progressed));
                                 syncAPITable.setEndpoint_url("FileProgress/FileProgressSync");
                                 syncAPITable.setParameters(String.valueOf(array));
                                 syncAPITable.setHeaders(PrefUtils.getAuthid(getActivity()));
@@ -917,7 +917,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                             if (!userId.equals("")) {
                                 SyncAPITable syncAPITable = new SyncAPITable();
 
-                                syncAPITable.setApi_name("Quiz Attempted");
+                                syncAPITable.setApi_name(getString(R.string.quiz_attempted));
                                 syncAPITable.setEndpoint_url("QuizProgress/QuizProgressSync");
                                 syncAPITable.setParameters(String.valueOf(array));
                                 syncAPITable.setHeaders(PrefUtils.getAuthid(getActivity()));
@@ -2243,7 +2243,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                                                             if (!userId.equals("")) {
                                                                 SyncAPITable syncAPITable = new SyncAPITable();
 
-                                                                syncAPITable.setApi_name("QuizResult Progressed");
+                                                                syncAPITable.setApi_name(getString(R.string.quiz_result_progressed));
                                                                 syncAPITable.setEndpoint_url("UserQuizResult/UserQuizResultSync");
                                                                 syncAPITable.setParameters(new Gson().toJson(array));
                                                                 syncAPITable.setHeaders(PrefUtils.getAuthid(getActivity()));
@@ -2316,7 +2316,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                                                         if (!userId.equals("")) {
                                                             SyncAPITable syncAPITable = new SyncAPITable();
 
-                                                            syncAPITable.setApi_name("QuizResult Progressed");
+                                                            syncAPITable.setApi_name(getString(R.string.quiz_result_progressed));
                                                             syncAPITable.setEndpoint_url("UserQuizResult/UserQuizResultSync");
                                                             syncAPITable.setParameters(String.valueOf(array));
                                                             syncAPITable.setHeaders(PrefUtils.getAuthid(getActivity()));
@@ -2395,7 +2395,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                                                             if (!userId.equals("")) {
                                                                 SyncAPITable syncAPITable = new SyncAPITable();
 
-                                                                syncAPITable.setApi_name("QuizResult Progressed");
+                                                                syncAPITable.setApi_name(getString(R.string.quiz_result_progressed));
                                                                 syncAPITable.setEndpoint_url("UserQuizResult/UserQuizResultSync");
                                                                 syncAPITable.setParameters(String.valueOf(array));
                                                                 syncAPITable.setHeaders(PrefUtils.getAuthid(getActivity()));
@@ -2468,7 +2468,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                                                         if (!userId.equals("")) {
                                                             SyncAPITable syncAPITable = new SyncAPITable();
 
-                                                            syncAPITable.setApi_name("QuizResult Progressed");
+                                                            syncAPITable.setApi_name(getString(R.string.quiz_result_progressed));
                                                             syncAPITable.setEndpoint_url("UserQuizResult/UserQuizResultSync");
                                                             syncAPITable.setParameters(String.valueOf(array));
                                                             syncAPITable.setHeaders(PrefUtils.getAuthid(getActivity()));

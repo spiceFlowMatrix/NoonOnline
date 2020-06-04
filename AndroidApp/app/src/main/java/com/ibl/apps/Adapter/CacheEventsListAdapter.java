@@ -47,11 +47,11 @@ public class CacheEventsListAdapter extends RecyclerView.Adapter<CacheEventsList
             holder.binding.txtCacheEventsName.setText(model.getApi_name());
 
         if (model.getCourseName() != null && model.getGradeName() != null)
-            holder.binding.txtCourseName.setText(model.getCourseName() + " " + model.getGradeName() + ", ID: " + model.getId());
+            holder.binding.txtCourseName.setText(model.getCourseName() + " " + model.getGradeName() + ", " + context.getResources().getString(R.string.sync_id) + " " + model.getId());
 
         if (model.getEndpoint_url().equals("ProgessSync/AppTimeTrack") || model.getEndpoint_url().equals("ProgessSync/ProgessSyncAdd")) {
 //            holder.binding.txtCourseName.setVisibility(View.INVISIBLE);
-            holder.binding.txtCourseName.setText("ID: " + model.getId());
+            holder.binding.txtCourseName.setText(context.getResources().getString(R.string.sync_id) + " " + model.getId());
         }
 
         if (model.getStatus() != null)
