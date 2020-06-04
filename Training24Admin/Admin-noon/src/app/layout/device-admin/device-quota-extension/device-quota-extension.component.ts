@@ -22,14 +22,14 @@ const ELEMENT_DATA: any[] = [
 export class DeviceQuotaExtensionComponent implements OnInit {
   displayedColumns: string[] = ['Date', 'Username', 'Email Address', 'Device Id', 'Current Quota Limitation', 'Requested Quota Limistation', 'Status', 'reject', 'approve'];
   dataSource = ELEMENT_DATA;
-  filterModel: any = {};
+  filterModal: any = {};
   userEmails: any;
   sub_date: any;
 
   constructor(public deviceService: DeviceService) { }
 
   ngOnInit(): void {
-    this.filterModel = {
+    this.filterModal = {
       "pagenumber": 1,
       "perpagerecord": 10,
       "userId": 0,
@@ -40,11 +40,11 @@ export class DeviceQuotaExtensionComponent implements OnInit {
     this.getRequest()
   }
   change(event) {
-    this.filterModel.fromdate = moment(event.begin).format('YYYY-MM-DD');
-    this.filterModel.todate = moment(event.end).format('YYYY-MM-DD');
+    this.filterModal.fromdate = moment(event.begin).format('YYYY-MM-DD');
+    this.filterModal.todate = moment(event.end).format('YYYY-MM-DD');
   }
   getRequest() {
-    this.deviceService.extensionRequest(this.filterModel).subscribe((res) => {
+    this.deviceService.extensionRequest(this.filterModal).subscribe((res) => {
       console.log(res);
       this.userEmails = res.data.userEmails;
       this.dataSource = res.data.deviceQuotaExtensionList;

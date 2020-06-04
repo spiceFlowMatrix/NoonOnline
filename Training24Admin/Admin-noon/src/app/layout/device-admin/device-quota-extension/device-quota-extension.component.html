@@ -21,7 +21,7 @@
   </mat-form-field>
   <mat-form-field>
     <mat-label>Submitted By</mat-label>
-    <mat-select  [(value)]="filterModel.userId">
+    <mat-select  [(value)]="filterModal.userId">
       <mat-option value="0">None</mat-option>
       <mat-option *ngFor="let user of userEmails" value="{{user.id}}">{{user.email}}</mat-option>
     </mat-select>
