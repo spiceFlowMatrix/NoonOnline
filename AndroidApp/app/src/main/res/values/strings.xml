@@ -437,6 +437,7 @@
     <string name="already_pending_quota_request">You have already a pending quota request</string>
     <string name="this_device">This device</string>
     <string name="reistering_device">Registering Device</string>
+    <string name="out_of_quota_message">The device quota is full. You can’t activate this device.</string>
 
     <!--Version Update-->
     <string name="version_update">Update</string>

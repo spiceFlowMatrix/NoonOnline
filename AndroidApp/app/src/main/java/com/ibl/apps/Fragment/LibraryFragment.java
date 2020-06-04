@@ -46,7 +46,9 @@ import com.ibl.apps.util.LoadMoreData.RecyclerViewLoadMoreScroll;
 import com.ibl.apps.util.PrefUtils;
 
 import java.io.IOException;
+import java.net.NetworkInterface;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -57,7 +59,7 @@ import retrofit2.HttpException;
 import retrofit2.Response;
 
 import static android.content.Context.MODE_PRIVATE;
-import static com.ibl.apps.Fragment.GradeFragment.deviceStatus;
+import static com.ibl.apps.util.Const.deviceStatus;
 
 
 public class LibraryFragment extends BaseFragment implements View.OnClickListener {
@@ -94,6 +96,7 @@ public class LibraryFragment extends BaseFragment implements View.OnClickListene
     private LibraryDatabaseRepository libraryDatabaseRepository;
     private String macAddress, ipAddress;
     private Long errorCode;
+    private String deviceStatusCode;
 
     public LibraryFragment() {
         // Required empty public constructor
@@ -146,8 +149,37 @@ public class LibraryFragment extends BaseFragment implements View.OnClickListene
 
         callAPIDeviceManagement();
         backInterface = (BackInterface) getActivity();
-
         setOnClickListener();
+    }
+
+
+    public String getWifiMacAddress() {
+        try {
+            String interfaceName = "wlan0";
+            List<NetworkInterface> interfaces = Collections.list(NetworkInterface.getNetworkInterfaces());
+            for (NetworkInterface intf : interfaces) {
+                if (!intf.getName().equalsIgnoreCase(interfaceName)) {
+                    continue;
+                }
+
+                byte[] mac = intf.getHardwareAddress();
+                if (mac == null) {
+                    return "";
+                }
+
+                StringBuilder buf = new StringBuilder();
+                for (byte aMac : mac) {
+                    buf.append(String.format("%02X:", aMac));
+                }
+                if (buf.length() > 0) {
+                    buf.deleteCharAt(buf.length() - 1);
+                }
+                return buf.toString();
+            }
+        } catch (Exception ex) {
+            ex.getMessage();
+        } // for now eat exceptions
+        return "";
     }
 
     private void callAPIDeviceManagement() {
@@ -155,29 +187,29 @@ public class LibraryFragment extends BaseFragment implements View.OnClickListene
         WifiInfo info = null;
         if (manager != null) {
             info = manager.getConnectionInfo();
-            macAddress = info.getMacAddress();
+//            macAddress = info.getMacAddress();
             ipAddress = Formatter.formatIpAddress(manager.getConnectionInfo().getIpAddress());
         }
 
         //OS
         JsonObject jsonOs = new JsonObject();
-        jsonOs.addProperty("name", Const.var_deviceType);
-        jsonOs.addProperty("version", Build.VERSION.RELEASE);
+        jsonOs.addProperty(Const.name, Const.var_deviceType);
+        jsonOs.addProperty(Const.version, Build.VERSION.RELEASE);
 
         //tag
         JsonArray jsonArray = new JsonArray();
         JsonObject j = new JsonObject();
-        j.addProperty("name", "");
+        j.addProperty(Const.name, "");
         jsonArray.add(j);
 
         //main
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("macAddress", macAddress);
-        jsonObject.addProperty("ipAddress", ipAddress);
-        jsonObject.addProperty("modelName", Build.MODEL);
-        jsonObject.addProperty("modelNumber", Build.MANUFACTURER);
-        jsonObject.add("operatingSystem", jsonOs);
-        jsonObject.add("tags", jsonArray);
+        jsonObject.addProperty(Const.macAddress, getWifiMacAddress());
+        jsonObject.addProperty(Const.ipAddress, ipAddress);
+        jsonObject.addProperty(Const.modelName, Build.MODEL);
+        jsonObject.addProperty(Const.modelNumber, Build.SERIAL);
+        jsonObject.add(Const.operatingSystem, jsonOs);
+        jsonObject.add(Const.tags, jsonArray);
 
 
         DeviceManagementRepository deviceManagementRepository = new DeviceManagementRepository();
@@ -192,7 +224,6 @@ public class LibraryFragment extends BaseFragment implements View.OnClickListene
                         try {
                             if ((deviceListModel.errorBody() != null)) {
                                 errorCode = new Gson().fromJson(deviceListModel.errorBody().string(), DeviceRegisterModel.class).getResponseCode();
-                                Log.e("TAG", "onSuccess: errorBody" + errorCode);
 
                                 if (errorCode == 2) {
                                     deviceStatus = 2;
@@ -859,7 +890,7 @@ public class LibraryFragment extends BaseFragment implements View.OnClickListene
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.serachMenu:
-                if (deviceStatus == 0) {
+                if (deviceStatusCode.equals("0")) {
                     libraryLayoutBinding.serachMenu.setVisibility(View.GONE);
                     libraryLayoutBinding.libraryText.setVisibility(View.GONE);
                     libraryLayoutBinding.booksearchview.setVisibility(View.VISIBLE);
@@ -876,7 +907,7 @@ public class LibraryFragment extends BaseFragment implements View.OnClickListene
                 }
                 break;
             case R.id.gradeMenu:
-                if (deviceStatus == 0) {
+                if (deviceStatusCode.equals("0")) {
                     if (bookLayout) {
                         bookLayout = false;
                     } else {

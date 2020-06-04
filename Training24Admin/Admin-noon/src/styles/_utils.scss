@@ -260,3 +260,24 @@ img.course-avatar {
         height: 400px;
     }
 }
+
+.mat-datepicker-toggle {
+    button {
+        outline: 0;
+    }
+}
+.mat-option-text {
+    color: black !important
+}
+.mat-ink-bar {
+    background-color: black !important;
+}
+.mat-form-field-ripple {
+    background-color: black !important;
+}
+.mat-form-field-label {
+    color: black !important;
+}
+.mat-select-arrow {
+    color: black !important;
+}

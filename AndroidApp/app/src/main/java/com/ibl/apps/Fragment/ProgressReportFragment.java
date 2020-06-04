@@ -3,18 +3,12 @@ package com.ibl.apps.Fragment;
 import android.app.AlertDialog;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import androidx.databinding.DataBindingUtil;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.res.ResourcesCompat;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -25,6 +19,13 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
+import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
@@ -61,22 +62,20 @@ import com.ibl.apps.Model.parent.GraphXAxisValueFormatter;
 import com.ibl.apps.Model.parent.LastOnline;
 import com.ibl.apps.Model.parent.ParentGraphPoints;
 import com.ibl.apps.Model.parent.ParentSpinnerModel;
-import com.ibl.apps.Network.ApiClient;
 import com.ibl.apps.Network.ApiService;
 import com.ibl.apps.ParentControlManagement.ParentControlRepository;
 import com.ibl.apps.RoomDatabase.dao.userManagementDatabse.UserDatabaseRepository;
-import com.ibl.apps.RoomDatabase.database.AppDatabase;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
+import com.ibl.apps.noon.NoonApplication;
+import com.ibl.apps.noon.R;
+import com.ibl.apps.noon.databinding.FragmentProgressReportBinding;
+import com.ibl.apps.noon.databinding.MarkerViewBinding;
 import com.ibl.apps.util.CustomView.MultiSelectSpinner;
 import com.ibl.apps.util.LoadMoreData.OnLoadMoreListener;
 import com.ibl.apps.util.LoadMoreData.RecyclerViewLoadMoreScroll;
 import com.ibl.apps.util.PrefUtils;
 import com.ibl.apps.util.TimeAgoLastOnlineClass;
 import com.ibl.apps.util.WorkaroundMapFragment;
-import com.ibl.apps.noon.NoonApplication;
-import com.ibl.apps.noon.R;
-import com.ibl.apps.noon.databinding.FragmentProgressReportBinding;
-import com.ibl.apps.noon.databinding.MarkerViewBinding;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -99,6 +98,7 @@ import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 
 import static android.content.Context.MODE_PRIVATE;
+import static com.ibl.apps.util.Const.deviceStatus;
 
 
 public class ProgressReportFragment extends BaseFragment implements View.OnClickListener {
@@ -126,6 +126,7 @@ public class ProgressReportFragment extends BaseFragment implements View.OnClick
     List<ParentGraphPoints.Data> paretnData = new ArrayList<>();
     private ParentControlRepository parentControlRepository;
     private UserDatabaseRepository userDatabaseRepository;
+    private String deviceStatusCode;
 
 
     public static ProgressReportFragment newInstance(String param1, String param2) {
@@ -144,8 +145,29 @@ public class ProgressReportFragment extends BaseFragment implements View.OnClick
         parentControlRepository = new ParentControlRepository();
         userDatabaseRepository = new UserDatabaseRepository();
 //        callApiLocationData();
-        setUpAllSpinners();
-        setonclicklistner();
+
+        SharedPreferences deviceSharedPreferences = getActivity().getSharedPreferences("deviceStatus", MODE_PRIVATE);
+        deviceStatusCode = deviceSharedPreferences.getString("deviceStatusCode", "");
+        Log.e("deviceStatusCode", "setUp:progress " + deviceStatus);
+        if (deviceStatusCode.equals("0")) {
+            fragmentProgressReportBinding.deactivatedDeviceQuota.deviceDeactivateLay.setVisibility(View.GONE);
+            fragmentProgressReportBinding.outOfDeviceQuota.deviceQuotaLay.setVisibility(View.GONE);
+            fragmentProgressReportBinding.nestedScrollView.setVisibility(View.VISIBLE);
+            setUpAllSpinners();
+            setonclicklistner();
+
+        } else if (deviceStatus == 2) {
+            fragmentProgressReportBinding.deactivatedDeviceQuota.deviceDeactivateLay.setVisibility(View.VISIBLE);
+            fragmentProgressReportBinding.outOfDeviceQuota.deviceQuotaLay.setVisibility(View.GONE);
+            //fragmentProgressReportBinding.advanceSearchLayout.mainAdvanceSearchLayout.setVisibility(View.GONE);
+            fragmentProgressReportBinding.nestedScrollView.setVisibility(View.GONE);
+        } else if (deviceStatus == 3) {
+            fragmentProgressReportBinding.deactivatedDeviceQuota.deviceDeactivateLay.setVisibility(View.GONE);
+            fragmentProgressReportBinding.outOfDeviceQuota.deviceQuotaLay.setVisibility(View.VISIBLE);
+            //fragmentProgressReportBinding.advanceSearchLayout.mainAdvanceSearchLayout.setVisibility(View.GONE);
+            fragmentProgressReportBinding.nestedScrollView.setVisibility(View.GONE);
+        }
+
 
         backInterface = (BackInterface) getActivity();
         if (!selectedIdsForCallback.isEmpty()) {

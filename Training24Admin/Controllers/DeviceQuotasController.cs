@@ -29,10 +29,19 @@ namespace Training24Admin.Controllers
             this.LessonBusiness = lessonBusiness;
             this.DeviceQuotasBusiness = deviceQuotasBusiness;
         }
-  
 
+        /// <summary>
+        ///  Return All device quota extension request list.
+        /// </summary>
+        /// <param name="pagenumber"></param>
+        /// <param name="perpagerecord"></param>
+        /// <param name="search"></param>
+        /// <param name="userId"></param>
+        /// <param name="fromdate"></param>
+        /// <param name="todate"></param>
+        /// <returns></returns>
         [HttpGet("getAllDeviceQuotaExtensionRequest")]
-        public IActionResult GetAllDeviceQuotaExtensionRequest(int pagenumber, int perpagerecord, string search, string fromdate, string todate)
+        public IActionResult GetAllDeviceQuotaExtensionRequest(int pagenumber, int perpagerecord, string search, long userId, string fromdate, string todate)
         {
             PaginationResponse successResponse = new PaginationResponse();
             UnsuccessResponse unsuccessResponse = new UnsuccessResponse();
@@ -43,6 +52,7 @@ namespace Training24Admin.Controllers
                 search = search,
                 fromdate = fromdate,
                 todate = todate,
+                userId = userId
             };
             try
             {
@@ -53,7 +63,7 @@ namespace Training24Admin.Controllers
 
                 if (tc.RoleName.Contains(General.getRoleType("1")))
                 {
-                    List<ResponseDeviceQuotaExtension> QuotaExtensionList = DeviceQuotasBusiness.QuotaExtensionList(deviceQuotaExtensionFilterModel, out int total);
+                    ResponseDeviceQuotaExtension QuotaExtensionList = DeviceQuotasBusiness.QuotaExtensionList(deviceQuotaExtensionFilterModel, out int total);
                     successResponse.totalcount = total;
                     successResponse.data = QuotaExtensionList;
                     successResponse.response_code = 0;
@@ -77,7 +87,6 @@ namespace Training24Admin.Controllers
                 return StatusCode(500, unsuccessResponse);
             }
         }
-
 
         /// <summary>
         /// Request a device quota exension
@@ -222,6 +231,7 @@ namespace Training24Admin.Controllers
                 return StatusCode(500, unsuccessResponse);
             }
         }
+
 
     }
 }

@@ -540,6 +540,11 @@ namespace Training24Admin
             services.AddScoped<DeviceQuotaExtensionRequest>();
             services.AddScoped<EFGenericRepository<DeviceQuotaExtensionRequest>>();
 
+            services.AddScoped<AppVersionBusiness>();
+            services.AddScoped<EFAppVersionRepository>();
+            services.AddScoped<AppVersion>();
+            services.AddScoped<EFGenericRepository<AppVersion>>();
+
             services.AddAutoMapper();
 
             services.AddCors(options =>

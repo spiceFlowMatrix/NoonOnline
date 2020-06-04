@@ -35,6 +35,11 @@ export let AdminMenuList = [
         icon: 'fa-file',
         title: 'Files'
     },
+    {
+        link: '/device-admin/device-administration',
+        icon: 'fa-wrench',
+        title: 'Device Administration'
+    },
     // {
     //     link: '/chapters/chapters-list',
     //     icon: 'fa-book',
@@ -69,6 +74,11 @@ export let AdminMenuList = [
         link: '/additional_service/additional-list',
         icon: 'fa-indent',
         title: 'Additional Service'
+    },
+    {
+        link: '/app-update/app-update-form',
+        icon: 'fa-mobile',
+        title: 'App Update'
     },
     {
         link:'/package/package-list',

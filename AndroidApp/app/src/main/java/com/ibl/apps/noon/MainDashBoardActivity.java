@@ -1,4 +1,4 @@
-package com.ibl.apps.noon;
+package com.ibl.apps.CourseManagement;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -8,12 +8,15 @@ import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationListener;
 import android.net.Uri;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.telephony.TelephonyManager;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
+import android.text.format.Formatter;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -31,8 +34,12 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView.OnNavigationItemSelectedListener;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.ibl.apps.Adapter.ViewPagerAdapter;
 import com.ibl.apps.Base.BaseActivity;
+import com.ibl.apps.DeviceManagement.DeviceManagementRepository;
 import com.ibl.apps.Fragment.ComplaintFragment;
 import com.ibl.apps.Fragment.CourseFragment;
 import com.ibl.apps.Fragment.GradeFragment;
@@ -40,6 +47,7 @@ import com.ibl.apps.Fragment.LibraryFragment;
 import com.ibl.apps.Fragment.ProfileFragment;
 import com.ibl.apps.Fragment.ReportFragment;
 import com.ibl.apps.Interface.BackInterface;
+import com.ibl.apps.Model.deviceManagement.registeruser.DeviceRegisterModel;
 import com.ibl.apps.Model.versionUpdate.VersionUpdateModel;
 import com.ibl.apps.RoomDatabase.dao.courseManagementDatabase.CourseDatabaseRepository;
 import com.ibl.apps.RoomDatabase.dao.syncAPIManagementDatabase.SyncAPIDatabaseRepository;
@@ -47,6 +55,16 @@ import com.ibl.apps.RoomDatabase.entity.SyncAPITable;
 import com.ibl.apps.RoomDatabase.entity.SyncTimeTrackingObject;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
 import com.ibl.apps.Service.TimeOut.SyncEventReceiver;
+import com.ibl.apps.noon.BuildConfig;
+import com.ibl.apps.noon.CacheEventsListActivity;
+import com.ibl.apps.noon.FeedBackActivity;
+import com.ibl.apps.noon.GeneralDiscussionsDetailActivity;
+import com.ibl.apps.noon.LoginDevicesActivity;
+import com.ibl.apps.noon.NoonApplication;
+import com.ibl.apps.noon.NotificationActivity;
+import com.ibl.apps.noon.R;
+import com.ibl.apps.noon.ResetPasswordActivity;
+import com.ibl.apps.noon.SearchActivity;
 import com.ibl.apps.noon.databinding.LogoutPopupLayoutBinding;
 import com.ibl.apps.noon.databinding.MainDashboardLayoutBinding;
 import com.ibl.apps.util.Const;
@@ -55,15 +73,20 @@ import com.ibl.apps.util.PrefUtils;
 import com.ibl.apps.util.SingleShotLocationProvider;
 import com.ibl.apps.versionUpdateManagement.VersionUpdateRepository;
 
+import java.io.IOException;
+import java.net.NetworkInterface;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
+import retrofit2.Response;
 
-import static com.ibl.apps.Fragment.GradeFragment.deviceStatus;
+import static com.ibl.apps.util.Const.deviceStatus;
+
 
 /**
  * Created by iblinfotech on 10/09/18.
@@ -89,6 +112,8 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
     private String userRoleName;
     private UserDetails userDetail;
     CourseDatabaseRepository courseDatabaseRepository;
+    private String deviceStatusCode;
+    private String ipAddress;
 
     @Override
     protected int getContentView() {
@@ -108,6 +133,8 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
         sharedPreferences = getSharedPreferences("rolename", MODE_PRIVATE);
         userRoleName = sharedPreferences.getString("userrolename", "");
 
+        SharedPreferences deviceSharedPreferences = getSharedPreferences("deviceStatus", MODE_PRIVATE);
+        deviceStatusCode = deviceSharedPreferences.getString("deviceStatusCode", "");
 
         if (!TextUtils.isEmpty(userRoleName)) {
             if (!userRoleName.equals("Parent")) {
@@ -173,7 +200,6 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
 
 //                        SharedPreferences sharedPreferences = getSharedPreferences("rolename", MODE_PRIVATE);
 //                        userRoleName = sharedPreferences.getString("userrolename", "");
-
                         userRoleName = userDetails.getRoleName().get(0);
 //                        if (!TextUtils.isEmpty(userRoleName)) {
 //                            if (!userRoleName.equals("Parent")) {
@@ -181,13 +207,16 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
 //                            }
 //                        }
 
+                        callAPIDeviceManagement();
                         SyncAPIDatabaseRepository syncAPIDatabaseRepository = new SyncAPIDatabaseRepository();
 
                         List<SyncAPITable> syncAPITableList = syncAPIDatabaseRepository.getSyncUserById(Integer.parseInt(userId));
                         SharedPreferences sharedPreferencesuser = getSharedPreferences("cacheStatus", MODE_PRIVATE);
 
                         String flagStatus = sharedPreferencesuser.getString("FlagStatus", "");
-                        if (deviceStatus == 0) {
+                        Log.e("deviceStatusCode", "setUp: flagStatus" + deviceStatusCode);
+
+                        if (deviceStatusCode.equals("0")) {
                             switch (flagStatus) {
                                 case "1":
                                     mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_pending);
@@ -221,7 +250,7 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
                                 editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
                                 editor.apply();
                             }
-                            if (deviceStatus == 0) {
+                            if (deviceStatusCode.equals("0")) {
                                 showHitLimitDialog(MainDashBoardActivity.this);
                             }
                         }
@@ -386,7 +415,7 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
                         syncTimeTrackingObject.setVersion(Build.VERSION.RELEASE);
                         syncTimeTrackingObject.setUserid(Integer.parseInt(userId));
                         courseDatabaseRepository.updateSyncTimeTracking(syncTimeTrackingObject);
-                    } else {//06:32:33 AM in
+                    } else {
                         SyncTimeTrackingObject syncTimeTrackingObjectinsert = new SyncTimeTrackingObject();
                         syncTimeTrackingObjectinsert.setLatitude("");
                         syncTimeTrackingObjectinsert.setLongitude("");
@@ -419,77 +448,72 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
 
     }
 
-    private void callApiForVersionUpdate() {
-        CompositeDisposable disposable = new CompositeDisposable();
-        VersionUpdateRepository versionUpdateRepository = new VersionUpdateRepository();
+    private void callAPIDeviceManagement() {
+        WifiManager manager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        WifiInfo info = null;
+        if (manager != null) {
+            info = manager.getConnectionInfo();
+            //macAddress = info.getMacAddress();
+            ipAddress = Formatter.formatIpAddress(manager.getConnectionInfo().getIpAddress());
+        }
 
-        disposable.add(versionUpdateRepository.getVersionUpdate()
+        //OS
+        JsonObject jsonOs = new JsonObject();
+        jsonOs.addProperty(Const.name, Const.var_deviceType);
+        jsonOs.addProperty(Const.version, Build.VERSION.RELEASE);
+
+        //tag
+        JsonArray jsonArray = new JsonArray();
+        JsonObject j = new JsonObject();
+        j.addProperty(Const.name, "");
+        jsonArray.add(j);
+
+        //main
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty(Const.macAddress, getWifiMacAddress());
+        jsonObject.addProperty(Const.ipAddress, ipAddress);
+        jsonObject.addProperty(Const.modelName, Build.MODEL);
+        jsonObject.addProperty(Const.modelNumber, Build.SERIAL);
+        jsonObject.add(Const.operatingSystem, jsonOs);
+        jsonObject.add(Const.tags, jsonArray);
+
+        CompositeDisposable disposable = new CompositeDisposable();
+        DeviceManagementRepository deviceManagementRepository = new DeviceManagementRepository();
+        disposable.add(deviceManagementRepository.registerDeviceDetail(jsonObject)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(new DisposableSingleObserver<VersionUpdateModel>() {
+                .subscribeWith(new DisposableSingleObserver<Response<DeviceRegisterModel>>() {
                     @Override
-                    public void onSuccess(VersionUpdateModel versionUpdateModel) {
+                    public void onSuccess(Response<DeviceRegisterModel> deviceListModel) {
+
                         try {
-                            if (versionUpdateModel.getData() != null && BuildConfig.VERSION_CODE < Integer.parseInt(versionUpdateModel.getData().getVersionCode())) {
-                                if (versionUpdateModel.getData().getIsForceUpdate()) {
-                                    SpannableStringBuilder message = setTypeface(MainDashBoardActivity.this, getString(R.string.update_version_message));
-                                    AlertDialog.Builder builder = new AlertDialog.Builder(MainDashBoardActivity.this);
-                                    builder.setTitle(R.string.validation_warning);
-                                    builder.setMessage(message)
-                                            .setPositiveButton(R.string.version_update, new DialogInterface.OnClickListener() {
-                                                public void onClick(DialogInterface dialog, int which) {
-                                                    // Yes button clicked, do something
-                                                    dialog.dismiss();
-                                                    String packageName = getPackageName();
-                                                    Log.e("packageName", "onClick: " + packageName);
-                                                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + packageName));
-                                                    if (intent.resolveActivity(getPackageManager()) != null) {
-                                                        startActivity(intent);
-                                                    } else {
-                                                        intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + packageName));
-                                                        if (intent.resolveActivity(getPackageManager()) != null)
-                                                            startActivity(intent);
-                                                    }
-                                                }
-                                            });
+                            if ((deviceListModel.errorBody() != null)) {
 
-                                    builder.setCancelable(false);
-                                    builder.show();
+                                Long errorCode = new Gson().fromJson(deviceListModel.errorBody().string(), DeviceRegisterModel.class).getResponseCode();
 
-                                } else {
-                                    try {
-                                        SpannableStringBuilder message = setTypeface(MainDashBoardActivity.this, getString(R.string.update_version_message));
-                                        AlertDialog.Builder builder = new AlertDialog.Builder(MainDashBoardActivity.this);
-                                        builder.setTitle(R.string.validation_warning);
-                                        builder.setMessage(message)
-                                                .setPositiveButton(R.string.version_update, new DialogInterface.OnClickListener() {
-                                                    public void onClick(DialogInterface dialog, int which) {
-                                                        // Yes button clicked, do something
-                                                        dialog.dismiss();
-                                                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.app.training24.noon"));
-                                                        if (intent.resolveActivity(getPackageManager()) != null) {
-                                                            startActivity(intent);
-                                                        } else {
-                                                            intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.app.training24.noon"));
-                                                            if (intent.resolveActivity(getPackageManager()) != null)
-                                                                startActivity(intent);
-                                                        }
-                                                    }
-                                                });
-
-                                        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                                            public void onClick(DialogInterface dialog, int arg1) {
-                                                dialog.dismiss();
-                                            }
-                                        });
-
-                                        builder.show();
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
-                                    }
+                                if (errorCode == 2) {
+                                    deviceStatus = 2;
+                                    SharedPreferences deviceStatusPreferences = getSharedPreferences("deviceStatus", MODE_PRIVATE);
+                                    SharedPreferences.Editor editor = deviceStatusPreferences.edit();
+                                    editor.putString("deviceStatusCode", deviceStatusCode);
+                                    editor.apply();
+                                } else if (errorCode == 3) {
+                                    deviceStatus = 3;
+                                    SharedPreferences deviceStatusPreferences = getSharedPreferences("deviceStatus", MODE_PRIVATE);
+                                    SharedPreferences.Editor editor = deviceStatusPreferences.edit();
+                                    editor.putString("deviceStatusCode", deviceStatusCode);
+                                    editor.apply();
                                 }
                             }
-                        } catch (Exception e) {
+
+                            if (deviceListModel.body() != null && deviceListModel.body().getResponseCode() == 0) {
+                                deviceStatus = 0;
+                                SharedPreferences deviceStatusPreferences = getSharedPreferences("deviceStatus", MODE_PRIVATE);
+                                SharedPreferences.Editor editor = deviceStatusPreferences.edit();
+                                editor.putString("deviceStatusCode", deviceStatusCode);
+                                editor.apply();
+                            }
+                        } catch (IOException e) {
                             e.printStackTrace();
                         }
                         hideDialog();
@@ -497,9 +521,39 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
 
                     @Override
                     public void onError(Throwable e) {
+
                         hideDialog();
                     }
                 }));
+    }
+
+    public String getWifiMacAddress() {
+        try {
+            String interfaceName = "wlan0";
+            List<NetworkInterface> interfaces = Collections.list(NetworkInterface.getNetworkInterfaces());
+            for (NetworkInterface intf : interfaces) {
+                if (!intf.getName().equalsIgnoreCase(interfaceName)) {
+                    continue;
+                }
+
+                byte[] mac = intf.getHardwareAddress();
+                if (mac == null) {
+                    return "";
+                }
+
+                StringBuilder buf = new StringBuilder();
+                for (byte aMac : mac) {
+                    buf.append(String.format("%02X:", aMac));
+                }
+                if (buf.length() > 0) {
+                    buf.deleteCharAt(buf.length() - 1);
+                }
+                return buf.toString();
+            }
+        } catch (Exception ex) {
+            ex.getMessage();
+        } // for now eat exceptions
+        return "";
     }
 
 
@@ -687,26 +741,30 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
                 startActivity(i);
                 break;
             case R.id.serachCourseIMag:
-                if (deviceStatus == 0) {
+                Log.e("deviceStatusCode", "setUp: serachCourseIMag" + deviceStatusCode);
+                if (deviceStatusCode.equals("0")) {
                     Intent i1 = new Intent(MainDashBoardActivity.this, SearchActivity.class);
                     startActivity(i1);
                 }
                 break;
             case R.id.btnNotification:
-                if (deviceStatus == 0) {
+                Log.e("deviceStatusCode", "setUp: btnNotification" + deviceStatusCode);
+                if (deviceStatusCode.equals("0")) {
                     Intent i3 = new Intent(MainDashBoardActivity.this, NotificationActivity.class);
                     startActivity(i3);
                 }
                 break;
 
             case R.id.cacheEventsStatusBtn:
-                if (deviceStatus == 0) {
+                Log.e("deviceStatusCode", "setUp: cacheEventsStatusBtn" + deviceStatusCode);
+                if (deviceStatusCode.equals("0")) {
                     Intent cacheIntent = new Intent(MainDashBoardActivity.this, CacheEventsListActivity.class);
                     startActivity(cacheIntent);
                 }
                 break;
             case R.id.feedbackbtn:
-                if (deviceStatus == 0) {
+                Log.e("deviceStatusCode", "setUp: feedbackbtn" + deviceStatusCode);
+                if (deviceStatusCode.equals("0")) {
                     if (isNetworkAvailable(MainDashBoardActivity.this)) {
                         Intent i2 = new Intent(MainDashBoardActivity.this, FeedBackActivity.class);
 //                Intent i2 = new Intent(Intent.ACTION_VIEW);
@@ -876,6 +934,91 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
     public void onProviderDisabled(String s) {
 
     }
+
+    private void callApiForVersionUpdate() {
+        CompositeDisposable disposable = new CompositeDisposable();
+        VersionUpdateRepository versionUpdateRepository = new VersionUpdateRepository();
+
+        disposable.add(versionUpdateRepository.getVersionUpdate()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(new DisposableSingleObserver<VersionUpdateModel>() {
+                    @Override
+                    public void onSuccess(VersionUpdateModel versionUpdateModel) {
+                        try {
+                            if (versionUpdateModel.getData() != null && BuildConfig.VERSION_CODE < Integer.parseInt(versionUpdateModel.getData().getVersionCode())) {
+                                if (versionUpdateModel.getData().getIsForceUpdate()) {
+                                    SpannableStringBuilder message = setTypeface(MainDashBoardActivity.this, getString(R.string.update_version_message));
+                                    AlertDialog.Builder builder = new AlertDialog.Builder(MainDashBoardActivity.this);
+                                    builder.setTitle(R.string.validation_warning);
+                                    builder.setMessage(message)
+                                            .setPositiveButton(R.string.version_update, new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    // Yes button clicked, do something
+                                                    dialog.dismiss();
+                                                    String packageName = getPackageName();
+                                                    Log.e("packageName", "onClick: " + packageName);
+                                                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + packageName));
+                                                    if (intent.resolveActivity(getPackageManager()) != null) {
+                                                        startActivity(intent);
+                                                    } else {
+                                                        intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + packageName));
+                                                        if (intent.resolveActivity(getPackageManager()) != null)
+                                                            startActivity(intent);
+                                                    }
+                                                }
+                                            });
+
+                                    builder.setCancelable(false);
+                                    builder.show();
+
+                                } else {
+                                    try {
+                                        SpannableStringBuilder message = setTypeface(MainDashBoardActivity.this, getString(R.string.update_version_message));
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(MainDashBoardActivity.this);
+                                        builder.setTitle(R.string.validation_warning);
+                                        builder.setMessage(message)
+                                                .setPositiveButton(R.string.version_update, new DialogInterface.OnClickListener() {
+                                                    public void onClick(DialogInterface dialog, int which) {
+                                                        // Yes button clicked, do something
+                                                        dialog.dismiss();
+                                                        String packageName = getPackageName();
+                                                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + packageName));
+                                                        if (intent.resolveActivity(getPackageManager()) != null) {
+                                                            startActivity(intent);
+                                                        } else {
+                                                            intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + packageName));
+                                                            if (intent.resolveActivity(getPackageManager()) != null)
+                                                                startActivity(intent);
+                                                        }
+                                                    }
+                                                });
+
+                                        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int arg1) {
+                                                dialog.dismiss();
+                                            }
+                                        });
+
+                                        builder.show();
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        hideDialog();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        hideDialog();
+                    }
+                }));
+    }
+
 
    /* long userInteractionTime = 0;
 

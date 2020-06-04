@@ -68,8 +68,10 @@ import com.ibl.apps.util.PrefUtils;
 import com.ibl.apps.util.SingleShotLocationProvider;
 
 import java.io.IOException;
+import java.net.NetworkInterface;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -86,6 +88,7 @@ import tcking.github.com.giraffeplayer2.LazyLoadManager;
 import tcking.github.com.giraffeplayer2.VideoInfo;
 
 import static android.content.Context.MODE_PRIVATE;
+import static com.ibl.apps.util.Const.deviceStatus;
 import static tcking.github.com.giraffeplayer2.GiraffePlayer.MSG_CTRL_PLAYING;
 
 
@@ -116,7 +119,6 @@ public class GradeFragment extends BaseFragment implements View.OnClickListener,
     private String macAddress;
     private String ipAddress;
     private String deviceToken = "";
-    public static int deviceStatus = -1;
     private Long errorCode;
 
     public GradeFragment() {
@@ -217,34 +219,64 @@ public class GradeFragment extends BaseFragment implements View.OnClickListener,
 
     }
 
+    public String getWifiMacAddress() {
+        try {
+            String interfaceName = "wlan0";
+            List<NetworkInterface> interfaces = Collections.list(NetworkInterface.getNetworkInterfaces());
+            for (NetworkInterface intf : interfaces) {
+                if (!intf.getName().equalsIgnoreCase(interfaceName)) {
+                    continue;
+                }
+
+                byte[] mac = intf.getHardwareAddress();
+                if (mac == null) {
+                    return "";
+                }
+
+                StringBuilder buf = new StringBuilder();
+                for (byte aMac : mac) {
+                    buf.append(String.format("%02X:", aMac));
+                }
+                if (buf.length() > 0) {
+                    buf.deleteCharAt(buf.length() - 1);
+                }
+                return buf.toString();
+            }
+        } catch (Exception ex) {
+            ex.getMessage();
+        } // for now eat exceptions
+        return "";
+    }
+
     private void callAPIDeviceManagement() {
-        WifiManager manager = (WifiManager) getActivity().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        WifiManager manager = (WifiManager) Objects.requireNonNull(getActivity()).getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+
         WifiInfo info = null;
         if (manager != null) {
             info = manager.getConnectionInfo();
-            macAddress = info.getMacAddress();
+            //macAddress = info.getMacAddress();
             ipAddress = Formatter.formatIpAddress(manager.getConnectionInfo().getIpAddress());
         }
 
         //OS
         JsonObject jsonOs = new JsonObject();
-        jsonOs.addProperty("name", Const.var_deviceType);
-        jsonOs.addProperty("version", Build.VERSION.RELEASE);
+        jsonOs.addProperty(Const.name, Const.var_deviceType);
+        jsonOs.addProperty(Const.version, Build.VERSION.RELEASE);
 
         //tag
         JsonArray jsonArray = new JsonArray();
         JsonObject j = new JsonObject();
-        j.addProperty("name", "");
+        j.addProperty(Const.name, "");
         jsonArray.add(j);
 
         //main
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("macAddress", macAddress);
-        jsonObject.addProperty("ipAddress", ipAddress);
-        jsonObject.addProperty("modelName", Build.MODEL);
-        jsonObject.addProperty("modelNumber", Build.MANUFACTURER);
-        jsonObject.add("operatingSystem", jsonOs);
-        jsonObject.add("tags", jsonArray);
+        jsonObject.addProperty(Const.macAddress, getWifiMacAddress());
+        jsonObject.addProperty(Const.ipAddress, ipAddress);
+        jsonObject.addProperty(Const.modelName, Build.MODEL);
+        jsonObject.addProperty(Const.modelNumber, Build.SERIAL);
+        jsonObject.add(Const.operatingSystem, jsonOs);
+        jsonObject.add(Const.tags, jsonArray);
 
 
         DeviceManagementRepository deviceManagementRepository = new DeviceManagementRepository();
@@ -259,8 +291,6 @@ public class GradeFragment extends BaseFragment implements View.OnClickListener,
                             if ((deviceListModel.errorBody() != null)) {
 
                                 errorCode = new Gson().fromJson(deviceListModel.errorBody().string(), DeviceRegisterModel.class).getResponseCode();
-                                Log.e("TAG", "onSuccess: errorBody" + errorCode);
-
 
                                 if (errorCode == 2) {
                                     deviceStatus = 2;
@@ -286,13 +316,6 @@ public class GradeFragment extends BaseFragment implements View.OnClickListener,
                             }
 
                             if (deviceListModel.body() != null && deviceListModel.body().getResponseCode() == 0) {
-                                /*SharedPreferences sharedPreferences = getActivity().getSharedPreferences("errorBody", MODE_PRIVATE);
-                                SharedPreferences.Editor editor = sharedPreferences.edit();
-
-                                if (editor != null) {
-                                    editor.putString("errorCode", String.valueOf(deviceListModel.body().getResponseCode()));
-                                    editor.apply();
-                                }*/
                                 if (deviceListModel.body().getData().getDeviceToken() != null) {
                                     deviceToken = deviceListModel.body().getData().getDeviceToken();
                                 }
@@ -302,7 +325,6 @@ public class GradeFragment extends BaseFragment implements View.OnClickListener,
 
                                 if (deviceManagementEditor != null) {
                                     deviceManagementEditor.putString("deviceToken", deviceToken);
-                                    Log.e("deviceToken", "onSuccess: " + deviceToken);
                                     deviceManagementEditor.apply();
                                 }
                                 gradeLayoutBinding.deactivatedDeviceQuota.deviceDeactivateLay.setVisibility(View.GONE);
@@ -540,7 +562,10 @@ public class GradeFragment extends BaseFragment implements View.OnClickListener,
         switch (view.getId()) {
             case R.id.imgOutQuota:
             case R.id.imgDeactivate:
-                startActivity(new Intent(getActivity(), LoginDevicesActivity.class));
+                if (getActivity() != null)
+                    if (isNetworkAvailable(getActivity()))
+                        startActivity(new Intent(getActivity(), LoginDevicesActivity.class));
+                    else showNetworkAlert(getActivity());
                 break;
         }
     }
