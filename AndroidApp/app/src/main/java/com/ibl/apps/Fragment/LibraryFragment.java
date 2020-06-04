@@ -370,6 +370,9 @@ public class LibraryFragment extends BaseFragment implements View.OnClickListene
     }
 
     public void setOnClickListener() {
+        SharedPreferences deviceSharedPreferences = getActivity().getSharedPreferences("deviceStatus", MODE_PRIVATE);
+        deviceStatusCode = deviceSharedPreferences.getString("deviceStatusCode", "");
+
         libraryLayoutBinding.serachMenu.setOnClickListener(this);
         libraryLayoutBinding.btnbackLibrary.setOnClickListener(this);
         libraryLayoutBinding.gradeMenu.setOnClickListener(this);

@@ -437,11 +437,22 @@
     <string name="already_pending_quota_request">You have already a pending quota request</string>
     <string name="this_device">This device</string>
     <string name="reistering_device">Registering Device</string>
-    <string name="out_of_quota_message">The device quota is full. You can’t activate this device.</string>
+    <string name="out_of_quota_message">The device quota is full. You can\’t activate this device.</string>
 
     <!--Version Update-->
     <string name="version_update">Update</string>
     <string name="update_version_message">A new version of Noon app is available please update to version</string>
+
+
+    <string name="sync_id">ID:</string>
+    <string name="lesson_progressed">Lesson Progressed</string>
+    <string name="app_time_track_progressed">AppTimeTrack Progressed</string>
+    <string name="chapter_progressed">Chapter Progressed</string>
+    <string name="file_progressed">File Progressed</string>
+    <string name="quiz_result_progressed">QuizResult Progressed</string>
+    <string name="quiz_attempted">Quiz Attempted</string>
+    <string name="sync_progress_add">ProgressSyncAdd Progressed</string>
+    <string name="sync_record_progressed">SyncRecords Progressed</string>
 
     <!--<string name="pashto_school">مدرسة الباشتو</string>-->
     <!--For Pashto Notification Translation-->

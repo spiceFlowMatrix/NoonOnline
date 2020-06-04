@@ -174,7 +174,7 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
                                     quizDatabaseRepository.updatelQuizUserResultStatus(true, quizID, userId);
                                 }
                             }
-                            Log.e(Const.LOG_NOON_TAG, "=====noonAppFullSyncObject==onSuccess=");
+                            //Log.e(Const.LOG_NOON_TAG, "=====noonAppFullSyncObject==onSuccess=");
                         }
 
                         @Override
@@ -183,7 +183,7 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
                             //LessonProgress lessonProgress = new Gson().fromJson(Objects.requireNonNull(error.response().errorBody()).string(), LessonProgress.class);
                             if (!userId.equals("")) {
                                 SyncAPITable syncAPITable = new SyncAPITable();
-                                syncAPITable.setApi_name("ProgressSyncAdd Progressed");
+                                syncAPITable.setApi_name(getString(R.string.sync_progress_add));
                                 syncAPITable.setEndpoint_url("ProgessSync/ProgessSyncAdd");
                                 syncAPITable.setParameters(String.valueOf(noonAppFullSyncObject));
                                 syncAPITable.setHeaders(PrefUtils.getAuthid(context));
@@ -332,7 +332,7 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
                                         try {
                                             if (!userId.equals("")) {
                                                 SyncAPITable syncAPITable = new SyncAPITable();
-                                                syncAPITable.setApi_name("AppTimeTrack Progressed");
+                                                syncAPITable.setApi_name(getString(R.string.app_time_track_progressed));
                                                 syncAPITable.setEndpoint_url("ProgessSync/AppTimeTrack");
                                                 syncAPITable.setParameters(String.valueOf(array));
                                                 syncAPITable.setHeaders(PrefUtils.getAuthid(getContext()));
@@ -400,7 +400,7 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
                 SyncAPITable syncAPITable = new SyncAPITable();
                 if (!userId.equals("") && !outtimrsave.equals("")) {
 //                    Log.e("isback", "call5minIntervalData: " + array.toString());
-                    syncAPITable.setApi_name("AppTimeTrack Progressed");
+                    syncAPITable.setApi_name(getString(R.string.app_time_track_progressed));
                     syncAPITable.setEndpoint_url("ProgessSync/AppTimeTrack");
                     syncAPITable.setParameters(String.valueOf(array));
                     syncAPITable.setHeaders(PrefUtils.getAuthid(getContext()));

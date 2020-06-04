@@ -967,7 +967,7 @@ public class SignUpActivity extends BaseActivity implements View.OnClickListener
                             if (!userId.equals("")) {
                                 SyncAPITable syncAPITable = new SyncAPITable();
 
-                                syncAPITable.setApi_name("SyncRecords Progressed");
+                                syncAPITable.setApi_name(getString(R.string.sync_record_progressed));
                                 syncAPITable.setEndpoint_url("ProgessSync/GetSyncRecords");
                                 syncAPITable.setParameters("");
                                 syncAPITable.setHeaders(PrefUtils.getAuthid(SignUpActivity.this));

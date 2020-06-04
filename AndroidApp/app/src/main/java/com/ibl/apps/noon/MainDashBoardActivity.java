@@ -173,7 +173,7 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
         //add this line to display menu1 when the activity is loaded
         //displaySelectedScreen(R.id.nav_menu1);
         mainDashboardLayoutBinding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-        setOnClickListener();
+
         PrefUtils.MyAsyncTask asyncTask = (PrefUtils.MyAsyncTask) new PrefUtils.MyAsyncTask(new PrefUtils.MyAsyncTask.AsyncResponse() {
             @SuppressLint("RestrictedApi")
             @Override
@@ -421,7 +421,7 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
                 return null;
             }
         }).execute();
-
+        setOnClickListener();
         /*if (userDetails!=null&&!userDetails.getRoleName().get(0).equals("Parent")) {
             mainDashboardLayoutBinding.appBarLayout.contentMain.bottomNavigation.getMenu().removeItem(R.id.action_item4);
 //            mainDashboardLayoutBinding.appBarLayout.contentMain.bottomNavigation.getMenu().add(R.id.action_item4);
@@ -485,13 +485,13 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
                                     deviceStatus = 2;
                                     SharedPreferences deviceStatusPreferences = getSharedPreferences("deviceStatus", MODE_PRIVATE);
                                     SharedPreferences.Editor editor = deviceStatusPreferences.edit();
-                                    editor.putString("deviceStatusCode", deviceStatusCode);
+                                    editor.putString("deviceStatusCode", String.valueOf(deviceStatus));
                                     editor.apply();
                                 } else if (errorCode == 3) {
                                     deviceStatus = 3;
                                     SharedPreferences deviceStatusPreferences = getSharedPreferences("deviceStatus", MODE_PRIVATE);
                                     SharedPreferences.Editor editor = deviceStatusPreferences.edit();
-                                    editor.putString("deviceStatusCode", deviceStatusCode);
+                                    editor.putString("deviceStatusCode", String.valueOf(deviceStatus));
                                     editor.apply();
                                 }
                             }
@@ -500,9 +500,11 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
                                 deviceStatus = 0;
                                 SharedPreferences deviceStatusPreferences = getSharedPreferences("deviceStatus", MODE_PRIVATE);
                                 SharedPreferences.Editor editor = deviceStatusPreferences.edit();
-                                editor.putString("deviceStatusCode", deviceStatusCode);
+                                editor.putString("deviceStatusCode", String.valueOf(deviceStatus));
                                 editor.apply();
                             }
+
+                            Log.e("deviceStatusCode", "onSuccess: DASH" + String.valueOf(deviceStatus));
                         } catch (IOException e) {
                             e.printStackTrace();
                         }

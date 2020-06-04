@@ -557,7 +557,7 @@ public class SyncIntentService extends JobIntentService implements DroidListener
 
             SyncAPITable syncAPITable = new SyncAPITable();
             if (!userId.equals("")) {
-                syncAPITable.setApi_name("ProgressSyncAdd Progressed");
+                syncAPITable.setApi_name(getString(R.string.sync_progress_add));
                 syncAPITable.setEndpoint_url("ProgessSync/ProgessSyncAdd");
                 syncAPITable.setParameters(String.valueOf(noonAppFullSyncObject));
                 syncAPITable.setHeaders(PrefUtils.getAuthid(mycontext));
