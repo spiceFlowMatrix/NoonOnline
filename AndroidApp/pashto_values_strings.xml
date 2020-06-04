@@ -416,6 +416,16 @@
     <string name="pending_status">Pending</string>
     <string name="errored_status">Errored</string>
 
+    <string name="sync_id">ID:</string>
+    <string name="lesson_progressed">Lesson Progressed</string>
+    <string name="app_time_track_progressed">AppTimeTrack Progressed</string>
+    <string name="chapter_progressed">Chapter Progressed</string>
+    <string name="file_progressed">File Progressed</string>
+    <string name="quiz_result_progressed">QuizResult Progressed</string>
+    <string name="quiz_attempted">Quiz Attempted</string>
+    <string name="sync_progress_add">ProgressSyncAdd Progressed</string>
+    <string name="sync_record_progressed">SyncRecords Progressed</string>
+
     <!--Device Management-->
     <string name="activate_deactivate_device">Activate/Deactivate device</string>
     <string name="clicking_below_button">You can deactivate or activate your device by clicking on the below button.</string>
