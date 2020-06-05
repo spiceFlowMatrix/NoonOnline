@@ -281,8 +281,8 @@ namespace Trainning24.BL.Business.Device
                 string query = null; string usreidfilter = null; string pagenation = null; string search = null;
 
 
-                //if (paginationModel.userId != 0)
-                //    usreidfilter = " && u.Id = " + paginationModel.userId;
+                if (paginationModel.userId != 0)
+                    usreidfilter = " && u.Id = " + paginationModel.userId;
                 //if (pagenation != null) query += pagenation;
 
                 if (paginationModel.search != null)
@@ -290,10 +290,10 @@ namespace Trainning24.BL.Business.Device
                 if (paginationModel.pagenumber != 0 && paginationModel.perpagerecord != 0)
                     pagenation = " LIMIT " + paginationModel.perpagerecord * (paginationModel.pagenumber - 1) + ", " + paginationModel.perpagerecord;
 
-                query = "SELECT u.Id,u.fullname,u.email,u.username,dq.DeviceLimit ,(SELECT count(*) from devices as d where  d.UserId = u.Id AND (d.IsDeleted!=true OR d.IsDeleted Is Null) ) as currentConsumption FROM `devicequotas` as dq Left JOIN `users` as u ON dq.UserId = u.Id  WHERE (dq.IsDeleted != true OR dq.IsDeleted Is Null) AND (u.IsDeleted != true OR u.IsDeleted Is Null)";
+                query = "SELECT u.Id,u.fullname,u.email,u.username,dq.DeviceLimit ,(SELECT count(*) from Devices as d where  d.UserId = u.Id AND (d.IsDeleted!=true OR d.IsDeleted Is Null) ) as currentConsumption FROM `DeviceQuotas` as dq Left JOIN `Users` as u ON dq.UserId = u.Id  WHERE (dq.IsDeleted != true OR dq.IsDeleted Is Null) AND (u.IsDeleted != true OR u.IsDeleted Is Null)";
                 if (usreidfilter != null) query += usreidfilter; if (search != null) query += search; 
                 DataTable userDevicelist = dbHelper.ExcecuteQueryDT(query);
-                query = "SELECT u.Id,u.fullname,u.email,u.username,dq.DeviceLimit ,(SELECT count(*) from devices as d where  d.UserId = u.Id AND (d.IsDeleted!=true OR d.IsDeleted Is Null) ) as currentConsumption FROM `devicequotas` as dq Left JOIN `users` as u ON dq.UserId = u.Id  WHERE (dq.IsDeleted != true OR dq.IsDeleted Is Null) AND (u.IsDeleted != true OR u.IsDeleted Is Null)";
+                query = "SELECT u.Id,u.fullname,u.email,u.username,dq.DeviceLimit ,(SELECT count(*) from Devices as d where  d.UserId = u.Id AND (d.IsDeleted!=true OR d.IsDeleted Is Null) ) as currentConsumption FROM `DeviceQuotas` as dq Left JOIN `Users` as u ON dq.UserId = u.Id  WHERE (dq.IsDeleted != true OR dq.IsDeleted Is Null) AND (u.IsDeleted != true OR u.IsDeleted Is Null)";
                 DataTable userEmaillist = dbHelper.ExcecuteQueryDT(query);
                 dbHelper.Close();
                 if (userDevicelist.Rows.Count != 0)
