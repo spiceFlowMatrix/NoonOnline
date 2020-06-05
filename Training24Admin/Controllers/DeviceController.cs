@@ -184,7 +184,7 @@ namespace Training24Admin.Controllers
                 var device = deviceBusiness.GetDevice(int.Parse(tc.Id), deviceId);
                 if (device != null)
                 {
-                    if (deviceBusiness.CheckDeviceQuota(int.Parse(tc.Id)) > 0 || device.IsDeleted == true)
+                    if (deviceBusiness.CheckDeviceQuota(int.Parse(tc.Id)) > 0 || device.IsDeleted == false)
                     {
                         var result = deviceBusiness.activeDeactiveDevice(device, int.Parse(tc.Id));
                         if (result != 0)
@@ -377,7 +377,7 @@ namespace Training24Admin.Controllers
                 var device = deviceBusiness.GetDevice(userId, deviceId);
                 if (device != null)
                 {
-                    if (deviceBusiness.CheckDeviceQuota(userId) > 0 || device.IsDeleted == true)
+                    if (deviceBusiness.CheckDeviceQuota(userId) > 0 || device.IsDeleted == false)
                     {
                         var result = deviceBusiness.activeDeactiveDevice(device, userId);
                         if (result != 0)
