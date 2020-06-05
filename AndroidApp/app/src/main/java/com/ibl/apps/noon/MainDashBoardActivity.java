@@ -123,9 +123,6 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
         sharedPreferences = getSharedPreferences("rolename", MODE_PRIVATE);
         userRoleName = sharedPreferences.getString("userrolename", "");
 
-        SharedPreferences deviceSharedPreferences = getSharedPreferences("deviceStatus", MODE_PRIVATE);
-        deviceStatusCode = deviceSharedPreferences.getString("deviceStatusCode", "");
-
         if (!TextUtils.isEmpty(userRoleName)) {
             if (!userRoleName.equals("Parent")) {
                 mainDashboardLayoutBinding.appBarLayout.contentMain.bottomNavigation.getMenu().removeItem(R.id.action_item4);
@@ -201,35 +198,8 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
                         SyncAPIDatabaseRepository syncAPIDatabaseRepository = new SyncAPIDatabaseRepository();
 
                         List<SyncAPITable> syncAPITableList = syncAPIDatabaseRepository.getSyncUserById(Integer.parseInt(userId));
-                        SharedPreferences sharedPreferencesuser = getSharedPreferences("cacheStatus", MODE_PRIVATE);
 
-                        String flagStatus = sharedPreferencesuser.getString("FlagStatus", "");
-                        Log.e("deviceStatusCode", "setUp: flagStatus" + deviceStatusCode);
-
-                        if (deviceStatusCode.equals("0")) {
-                            switch (flagStatus) {
-                                case "1":
-                                    mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_pending);
-                                    break;
-                                case "2":
-                                    mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_error);
-                                    break;
-                                case "3":
-                                    mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_syncing);
-                                    break;
-                                case "4":
-                                    GlideApp.with(MainDashBoardActivity.this)
-                                            .load(R.drawable.ic_cache_empty)
-                                            .error(R.drawable.ic_cache_empty)
-                                            .into(mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn);
-                                    break;
-                            }
-                        } else {
-                            GlideApp.with(MainDashBoardActivity.this)
-                                    .load(R.drawable.ic_cache_empty)
-                                    .error(R.drawable.ic_cache_empty)
-                                    .into(mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn);
-                        }
+                        handleSyncButton();
 
                         if (syncAPITableList.size() >= 50) {
                             NoonApplication.cacheStatus = 2;
@@ -438,6 +408,37 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
 
     }
 
+    private void handleSyncButton() {
+        SharedPreferences sharedPreferencesuser = getSharedPreferences("cacheStatus", MODE_PRIVATE);
+        String flagStatus = sharedPreferencesuser.getString("FlagStatus", "");
+        Log.e("deviceStatusCode", "setUp: flagStatus" + deviceStatusCode);
+
+        if (deviceStatusCode.equals("0")) {
+            switch (flagStatus) {
+                case "1":
+                    mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_pending);
+                    break;
+                case "2":
+                    mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_error);
+                    break;
+                case "3":
+                    mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_syncing);
+                    break;
+                case "4":
+                    GlideApp.with(MainDashBoardActivity.this)
+                            .load(R.drawable.ic_cache_empty)
+                            .error(R.drawable.ic_cache_empty)
+                            .into(mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn);
+                    break;
+            }
+        } else {
+            GlideApp.with(MainDashBoardActivity.this)
+                    .load(R.drawable.ic_cache_empty)
+                    .error(R.drawable.ic_cache_empty)
+                    .into(mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn);
+        }
+    }
+
     private void callAPIDeviceManagement() {
         WifiManager manager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         WifiInfo info = null;
@@ -503,6 +504,11 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
                                 editor.putString("deviceStatusCode", String.valueOf(deviceStatus));
                                 editor.apply();
                             }
+                            SharedPreferences deviceSharedPreferences = getSharedPreferences("deviceStatus", MODE_PRIVATE);
+                            deviceStatusCode = deviceSharedPreferences.getString("deviceStatusCode", "");
+
+                            handleSyncButton();
+                            setOnClickListener();
 
                             Log.e("deviceStatusCode", "onSuccess: DASH" + String.valueOf(deviceStatus));
                         } catch (IOException e) {
@@ -722,6 +728,7 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
         mainDashboardLayoutBinding.appBarLayout.btnNotification.setOnClickListener(this);
         mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn.setOnClickListener(this);
         mainDashboardLayoutBinding.appBarLayout.txtDevice.setOnClickListener(this);
+        Log.e("deviceStatusCode", "setOnClickListener: " + deviceStatusCode);
     }
 
     @Override
