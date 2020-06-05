@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
@@ -60,11 +61,15 @@ public class CacheEventsListAdapter extends RecyclerView.Adapter<CacheEventsList
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Gson gson = new Gson();
-                String syncAPIData = gson.toJson(model);
-                Intent intent = new Intent(context, CacheEventsDescriptionActivity.class);
-                intent.putExtra("CacheEventsDetail", syncAPIData);
-                context.startActivity(intent);
+                if (model.getStatus().equals(context.getResources().getString(R.string.errored_status))) {
+                    Gson gson = new Gson();
+                    String syncAPIData = gson.toJson(model);
+                    Intent intent = new Intent(context, CacheEventsDescriptionActivity.class);
+                    intent.putExtra("CacheEventsDetail", syncAPIData);
+                    context.startActivity(intent);
+                } else {
+                    Toast.makeText(context, context.getResources().getString(R.string.no_description), Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
