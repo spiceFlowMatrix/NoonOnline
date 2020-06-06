@@ -398,62 +398,63 @@
     <string name="validation_limitDecription">There is limit of only 150 charaters</string>
     <string name="many_attempt">تاسو څو ځلي پټ نوم په ناسمه بڼه دننه کړ، د دې حساب لپاره ستاسې د موبایل ای پي وتړل شوه. د ستونزې د حل په موخه خپل اېمېل ادرس ته ورشئ او یا هم د «ن» زده‌کړو له ادارې سره اړیکه ونیسئ.</string>
 
-    <string name="sign_up_with_trial">Sign Up with Trial</string>
-    <string name="first_name">First Name</string>
-    <string name="last_name">Last Name</string>
-    <string name="login_trial">Login Trial</string>
-    <string name="sign_up_trial">Sign Up Trial</string>
+    <string name="sign_up_with_trial">د لنډمهاله لاسرسي نوم لیکنه</string>
+    <string name="first_name">نوم</string>
+    <string name="last_name">تخلص</string>
+    <string name="login_trial">لنډمهاله لاسرسي ته ننوتل</string>
+    <string name="sign_up_trial">د لنډمهاله لاسرسي نوم لیکنه</string>
 
     <!--Sync Cache Events-->
-    <string name="pending_cache_events">Pending Cache Events</string>
-    <string name="too_many_events_cache">Too many events in cache</string>
-    <string name="cache_limit_message">You will lose progress if you don\'t sync \n your pending cache events.</string>
-    <string name="go_to_pending_cache_events">GO TO PENDING CACHE EVENTS</string>
-    <string name="no_thanks">NO THANKS</string>
-    <string name="empty_cache_events">Empty Cache Events</string>
-    <string name="apptime_track_pending_description">We are using the AppTimeTrack API for tracking users online-offline activity.</string>
-    <string name="progress_add_pending_description">We are using the ProgressSyncAdd API for update users progress activity.</string>
-    <string name="pending_status">Pending</string>
-    <string name="errored_status">Errored</string>
+    <string name="pending_cache_events">د انتظار په حال کې پېښې</string>
+    <string name="too_many_events_cache">له اندازې زیاتې پېښې</string>
+    <string name="cache_limit_message">که چېرته د انتظار په حال کې پېښې همغږي نه کړئ، خپل فعالیت به له لاسه ورکړئ.</string>
+    <string name="go_to_pending_cache_events">د انتظار په حال کې پېښو برخې ته لاړ شئ</string>
+    <string name="no_thanks">نه، مننه</string>
+    <string name="empty_cache_events">د همغږۍ لپاره هېڅ پېښه شتون نلري.</string>
+    <string name="apptime_track_pending_description">-</string>
+    <string name="progress_add_pending_description">-</string>
+    <string name="pending_status">د انتظار په حال کې</string>
+    <string name="errored_status">تېروتنه شوې</string>
 
     <string name="sync_id">ID:</string>
-    <string name="lesson_progressed">Lesson Progressed</string>
-    <string name="app_time_track_progressed">AppTimeTrack Progressed</string>
-    <string name="chapter_progressed">Chapter Progressed</string>
-    <string name="file_progressed">File Progressed</string>
-    <string name="quiz_result_progressed">QuizResult Progressed</string>
-    <string name="quiz_attempted">Quiz Attempted</string>
-    <string name="sync_progress_add">ProgressSyncAdd Progressed</string>
-    <string name="sync_record_progressed">SyncRecords Progressed</string>
+    <string name="lesson_progressed">لوست وکتل شو</string>
+    <string name="app_time_track_progressed">په اپ کې تېر شوی وخت</string>
+    <string name="chapter_progressed">څپرکی وکتل شو</string>
+    <string name="file_progressed">فایل وکتل شو</string>
+    <string name="quiz_result_progressed">د ازموینې پایله</string>
+    <string name="quiz_attempted">ازموینه تېره شوه</string>
+    <string name="sync_progress_add">فعالیت</string>
+    <string name="sync_record_progressed">فعالیت</string>
 
     <!--Device Management-->
-    <string name="activate_deactivate_device">Activate/Deactivate device</string>
-    <string name="clicking_below_button">You can deactivate or activate your device by clicking on the below button.</string>
-    <string name="activate_deactivate">Activate/Deactivate</string>
-    <string name="extend_quote_request">Extend quote request</string>
-    <string name="out_of_device_quota">You are out of device quota</string>
-    <string name="device_activate_instruction">Please deactivate another device or request \na quota extension from the Device Management \ncontrol panel in order to activate this device</string>
-    <string name="go_to_device_management">GO TO DEVICE MANAGEMENT</string>
-    <string name="device_has_deactivated">This device has been deactivated</string>
-    <string name="reactivate_instruction">Please reactivate this device from the Device \nManagement control panel in order to continue \nusing this</string>
-    <string name="device_active">Active</string>
-    <string name="device_deactivated">Deactivated</string>
-    <string name="device_total_quota">Total Quota</string>
-    <string name="device_current_quota">Current Quota</string>
-    <string name="already_pending_quota_request">You have already a pending quota request</string>
-    <string name="this_device">This device</string>
-    <string name="reistering_device">Registering Device</string>
+    <string name="activate_deactivate_device">د دستګاه فعالول/غیر فعالول</string>
+    <string name="clicking_below_button">د لاندې تڼۍ په کېکاږلو سره کولای شئ چې دستګاه فعاله یا غیر فعاله کړئ.</string>
+    <string name="activate_deactivate">فعالول/غیر فعالول</string>
+    <string name="extend_quote_request">د لا ډېرو سهمیو غوښتنه</string>
+    <string name="out_of_device_quota">تاسو له خپلې ټاکلې سهمیې څخه ګټه اخیستې ده</string>
+    <string name="device_activate_instruction">په دې دستګاه کې له اپلېکېشن څخه د ګټه اخیستنې په موخه کنترول پنل ته لاړ شئ او بل بله دستګاه غیر فعاله کړئ او یا هم د لا ډېرو سهمیو لپاره غوښتنه وکړئ.</string>
+    <string name="go_to_device_management">د دستګاه مدیریت ته ولاړ شئ</string>
+    <string name="device_has_deactivated">دا دستګاه غیر فعاله شوې ده</string>
+    <string name="reactivate_instruction">د فعالولو په موخه هیله ده د دستګاه د مدیریت د کنترول پنل برخې ته لاړ شئ.</string>
+    <string name="device_active">فعال</string>
+    <string name="device_deactivated">غیرفعال</string>
+    <string name="device_total_quota">مجموعي سهمیه</string>
+    <string name="device_current_quota">اوسنۍ سهمیه</string>
+    <string name="already_pending_quota_request">تاسو مخکې له مخکې د سهمیې لپاره غوښتنه کړې ده.</string>
+    <string name="this_device">همدا دستګاه</string>
+    <string name="reistering_device">د دستګاه د ثبت په حال کې</string>
 
-    <string name="new_quote_limit">New Quote Limit</string>
-    <string name="logins">Logins</string>
-    <string name="extend_quota">EXTEND QUOTA</string>
-    <string name="request_quota_extension">REQUEST QUOTA EXTENSION</string>
-    <string name="devices">DEVICES</string>
-    <string name="out_of_quota_message">The device quota is full. You can\'t activate this device.</string>
+    <string name="new_quote_limit">د نویو سهمیو شمېر</string>
+    <string name="logins">د دستګاه مدیریت</string>
+    <string name="extend_quota">د سهمیې غوښتنه</string>
+    <string name="request_quota_extension">د نوې سهمیې غوښتنه</string>
+    <string name="devices">د دستګاه مدیریت</string>
+    <string name="out_of_quota_message">تاسو له خپلې ټاکلې سهمیې څخه ګټه اخیستې ده، نو نشئ کولای چې دا دستګاه فعاله کړئ.</string>
 
      <!--Version Update-->
-    <string name="version_update">Update</string>
-    <string name="update_version_message">A new version of Noon app is available please update to version</string>
+    <string name="version_update">نوی اپډېټ</string>
+    <string name="update_version_message">د ن اپلېکېشن له نویو اسانتیاوو څخه برخمن کېدو لپاره هیله ده نوې نسخه یې ترلاسه او اپډېټ کړئ.</string>
+
 
     <!--<string name="pashto_school">مدرسة الباشتو</string>-->
     <!--For Pashto Notification Translation-->

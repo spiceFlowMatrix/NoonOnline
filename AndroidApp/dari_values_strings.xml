@@ -349,14 +349,14 @@
     <string name="private_mode">نمایش تنها بحث‌های خصوصی</string>
 
     <!--Terms & Conditions-->
-    <string name="accept_terms_conditions">اپلکیشن تعلمات ن را قبول دارم&#160;</string>
+    <string name="accept_terms_conditions">اپلکیشن تعلیمات ن را قبول دارم&#160;</string>
     <string name="terms_conditions">شرایط&#160;</string>
     <string name="accept_term_condition">لطفا شرایط را قبول کنید</string>
     <string name="by_acknowledged">برنامه را قبول میکنید.</string>
     <string name="by_signing_app">&#160;&#160;</string>
     <string name="privacy_policy">شرایط&#160;&#160;</string>
     <string name="or">&#160;&#160;یا&#160;&#160;</string>
-    <string name="will"> با داخل شدن به اپلکیشن تعلمات ن، شما تمام </string>
+    <string name="will"> با داخل شدن به اپلکیشن تعلیمات ن، شما تمام </string>
 
     <!--Feedback-->
     <string name="video_issue">مشکل ویدیو</string>
@@ -397,62 +397,62 @@
     <string name="validation_limitDecription">There is limit of only 150 charaters</string>
     <string name="many_attempt">شما رمزعبور را چندین دفعه اشتباه وارد کردید، آی‌پی مبایل شما برای این حساب مسدود شد. برای رفع انسداد به ایمیل آدرس‌تان مراجعه کنید، و یا هم با اداره تعلیمات ن تماس بگیرید. </string>
 
-    <string name="sign_up_with_trial">Sign Up with Trial</string>
-    <string name="first_name">First Name</string>
-    <string name="last_name">Last Name</string>
-    <string name="login_trial">Login Trial</string>
-    <string name="sign_up_trial">Sign Up Trial</string>
+    <string name="sign_up_with_trial">ثبت نام دسترسی موقت</string>
+    <string name="first_name">نام</string>
+    <string name="last_name">تخلص</string>
+    <string name="login_trial">ورود دسترسی موقت</string>
+    <string name="sign_up_trial">ثبت نام دسترسی موقت</string>
 
     <!--Sync Cache Events-->
-    <string name="pending_cache_events">Pending Cache Events</string>
-    <string name="too_many_events_cache">Too many events in cache</string>
-    <string name="cache_limit_message">You will lose progress if you don\'t sync \n your pending cache events.</string>
-    <string name="go_to_pending_cache_events">GO TO PENDING CACHE EVENTS</string>
-    <string name="no_thanks">NO THANKS</string>
-    <string name="empty_cache_events">Empty Cache Events</string>
-    <string name="apptime_track_pending_description">We are using the AppTimeTrack API for tracking users online-offline activity.</string>
-    <string name="progress_add_pending_description">We are using the ProgressSyncAdd API for update users progress activity.</string>
-    <string name="pending_status">Pending</string>
-    <string name="errored_status">Errored</string>
+    <string name="pending_cache_events">رویدادهای در حال انتظار</string>
+    <string name="too_many_events_cache">رویدادهای بیش از حد در حال انتظار</string>
+    <string name="cache_limit_message">اگر رویدادهای در حال انتظار را همگام نسازید، فعالیت خویش را از دست خواهید داد.</string>
+    <string name="go_to_pending_cache_events">به قسمت رویدادهای در حال انتظار بروید</string>
+    <string name="no_thanks">نخیر، تشکر</string>
+    <string name="empty_cache_events">هیچ رویداد برای همگام‌سازی موجود نیست.</string>
+    <string name="apptime_track_pending_description">-</string>
+    <string name="progress_add_pending_description">-</string>
+    <string name="pending_status">در حال انتظار</string>
+    <string name="errored_status">خطا صورت گرفته</string>
 
     <string name="sync_id">ID:</string>
-    <string name="lesson_progressed">Lesson Progressed</string>
-    <string name="app_time_track_progressed">AppTimeTrack Progressed</string>
-    <string name="chapter_progressed">Chapter Progressed</string>
-    <string name="file_progressed">File Progressed</string>
-    <string name="quiz_result_progressed">QuizResult Progressed</string>
-    <string name="quiz_attempted">Quiz Attempted</string>
-    <string name="sync_progress_add">ProgressSyncAdd Progressed</string>
-    <string name="sync_record_progressed">SyncRecords Progressed</string>
+    <string name="lesson_progressed">درس مشاهده شد</string>
+    <string name="app_time_track_progressed">مدت زمان سپری شده در اپ</string>
+    <string name="chapter_progressed">فصل مشاهده شد</string>
+    <string name="file_progressed"> فایل مشاهده شد</string>
+    <string name="quiz_result_progressed">نتیجه امتحان</string>
+    <string name="quiz_attempted">امتحان سپری شد</string>
+    <string name="sync_progress_add">فعالیت</string>
+    <string name="sync_record_progressed">فعالیت</string>
 
     <!--Device Management-->
-    <string name="activate_deactivate_device">Activate/Deactivate device</string>
-    <string name="clicking_below_button">You can deactivate or activate your device by clicking on the below button.</string>
-    <string name="activate_deactivate">Activate/Deactivate</string>
-    <string name="extend_quote_request">Extend quote request</string>
-    <string name="out_of_device_quota">You are out of device quota</string>
-    <string name="device_activate_instruction">Please deactivate another device or request \na quota extension from the Device Management \ncontrol panel in order to activate this device</string>
-    <string name="go_to_device_management">GO TO DEVICE MANAGEMENT</string>
-    <string name="device_has_deactivated">This device has been deactivated</string>
-    <string name="reactivate_instruction">Please reactivate this device from the Device \nManagement control panel in order to continue \nusing this</string>
-    <string name="device_active">Active</string>
-    <string name="device_deactivated">Deactivated</string>
-    <string name="device_total_quota">Total Quota</string>
-    <string name="device_current_quota">Current Quota</string>
-    <string name="already_pending_quota_request">You have already a pending quota request</string>
-    <string name="this_device">This device</string>
-    <string name="reistering_device">Registering Device</string>
+    <string name="activate_deactivate_device">فعال سازی/غیرفعال سازی دستگاه</string>
+    <string name="clicking_below_button">با کلیک روی دکمه ذیل میتوانید دستگاه را فعال یا غیرفعال سازید.</string>
+    <string name="activate_deactivate">فعال سازی/غیرفعال سازی</string>
+    <string name="extend_quote_request">درخواست سهمیه بیشتر</string>
+    <string name="out_of_device_quota">شما از سهمیه معینه خود استفاده نموده‌اید.</string>
+    <string name="device_activate_instruction">به منظور استفاده از برنامه در این دستگاه، لطفا به کنترل پنل رفته و دستگاه دیگر را غیرفعال و یا هم درخواست سهمیه بیشتر نمایید.</string>
+    <string name="go_to_device_management">به مدیریت دستگاه بروید</string>
+    <string name="device_has_deactivated">این دستگاه غیرفعال شده است</string>
+    <string name="reactivate_instruction">لطفا جهت فعال‌سازی به قسمت کنترل پنل مدیریت دستگاه مراجعه نمایید.</string>
+    <string name="device_active">فعال</string>
+    <string name="device_deactivated">غیرفعال</string>
+    <string name="device_total_quota">سهمیه مجموعی</string>
+    <string name="device_current_quota">سهمیه فعلی</string>
+    <string name="already_pending_quota_request">شما از قبل برای سهمیه درخواست نموده‌اید</string>
+    <string name="this_device">همین دستگاه</string>
+    <string name="reistering_device">در حال ثبت دستگاه</string>
 
-    <string name="new_quote_limit">New Quote Limit</string>
-    <string name="logins">Logins</string>
-    <string name="extend_quota">EXTEND QUOTA</string>
-    <string name="request_quota_extension">REQUEST QUOTA EXTENSION</string>
-    <string name="devices">DEVICES</string>
-    <string name="out_of_quota_message">The device quota is full. You can\'t activate this device.</string>
+    <string name="new_quote_limit">تعداد سهمیه جدید</string>
+    <string name="logins">مدیریت دستگاه</string>
+    <string name="extend_quota">درخواست سهمیه</string>
+    <string name="request_quota_extension">درخواست سهمیه جدید</string>
+    <string name="devices">مدیریت دستگاه</string>
+    <string name="out_of_quota_message">شما از سهمیه معینه خود استفاده نموده‌اید، بنابراین نمیتوانید این دستگاه را فعال سازید.</string>
 
      <!--Version Update-->
-    <string name="version_update">Update</string>
-    <string name="update_version_message">A new version of Noon app is available please update to version</string>
+    <string name="version_update">آپدیت جدید</string>
+    <string name="update_version_message">برای استفاده از مزایای جدید اپلکیشن ن لطفا آنرا با نسخه جدید آپدیت نمایید.</string>
 
     
     <!--<string name="pashto_school">مدرسة الباشتو</string>-->
