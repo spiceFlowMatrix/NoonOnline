@@ -83,8 +83,6 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
     public static boolean AppTimeTrack = false;
     private LessonDatabaseRepository lessonDatabaseRepository;
     private QuizDatabaseRepository quizDatabaseRepository;
-    public static Handler h = new Handler();
-    public static boolean IS_CACHE_TRYING = false;
     public static boolean isDownloadable = false;
     SyncAPIDatabaseRepository syncAPIDatabaseRepository;
     LessonRepository lessonRepository;
@@ -398,7 +396,7 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
             String networkSpeed = sharedPreferences1.getString("downloadspeed", "");
 
             CourseDatabaseRepository courseDatabaseRepository = new CourseDatabaseRepository();
-            if (userId == null && userId.isEmpty())
+            if (userId.isEmpty())
                 return;
             SyncTimeTrackingObject syncTimeTrackingObject = courseDatabaseRepository.getSyncTimeTrackById(Integer.parseInt(userId));
 
@@ -536,24 +534,23 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
 
     private void callApiForBackgroundInterval() {
 //        isDownloadable = false;
-        SharedPreferences sharedPreferences = getSharedPreferences("user", MODE_PRIVATE);
-        String SyncUserId = sharedPreferences.getString("uid", "");
-
-        if (SyncUserId.isEmpty())
-            return;
-        syncAPITableList = syncAPIDatabaseRepository.getSyncUserById(Integer.parseInt(SyncUserId));
         final Handler h = new Handler();
         h.postDelayed(new Runnable() {
             @Override
             public void run() {
-                SharedPreferences shared = context.getSharedPreferences("interval", MODE_PRIVATE);
-                boolean isbackground = shared.getBoolean("iscall", false);
-                if (isbackground && isNetworkAvailable() && !isDownloadable) {
-                    Log.e("isbackground", "CACHE EVENTS");
+
+                SharedPreferences sharedPreferences = getSharedPreferences("user", MODE_PRIVATE);
+                String SyncUserId = sharedPreferences.getString("uid", "");
+
+                if (!SyncUserId.isEmpty()) {
                     syncAPITableList = syncAPIDatabaseRepository.getSyncUserById(Integer.parseInt(SyncUserId));
-                    if (syncAPITableList.size() != 0) {
-                        //binding.switchClick.setChecked(true);
-                        callSyncADIBackground(0);
+                    SharedPreferences shared = context.getSharedPreferences("interval", MODE_PRIVATE);
+                    boolean isbackground = shared.getBoolean("iscall", false);
+                    if (isbackground && isNetworkAvailable() && !isDownloadable) {
+                        syncAPITableList = syncAPIDatabaseRepository.getSyncUserById(Integer.parseInt(SyncUserId));
+                        if (syncAPITableList.size() != 0) {
+                            callSyncADIBackground(0);
+                        }
                     }
                 }
                 h.postDelayed(this, 10000);

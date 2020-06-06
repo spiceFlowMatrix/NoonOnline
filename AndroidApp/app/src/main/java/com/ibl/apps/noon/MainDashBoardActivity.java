@@ -411,6 +411,9 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
     private void handleSyncButton() {
         SharedPreferences sharedPreferencesuser = getSharedPreferences("cacheStatus", MODE_PRIVATE);
         String flagStatus = sharedPreferencesuser.getString("FlagStatus", "");
+
+        SharedPreferences deviceSharedPreferences = getSharedPreferences("deviceStatus", MODE_PRIVATE);
+        deviceStatusCode = deviceSharedPreferences.getString("deviceStatusCode", "");
         Log.e("deviceStatusCode", "setUp: flagStatus" + deviceStatusCode);
 
         if (deviceStatusCode.equals("0")) {
@@ -504,8 +507,7 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
                                 editor.putString("deviceStatusCode", String.valueOf(deviceStatus));
                                 editor.apply();
                             }
-                            SharedPreferences deviceSharedPreferences = getSharedPreferences("deviceStatus", MODE_PRIVATE);
-                            deviceStatusCode = deviceSharedPreferences.getString("deviceStatusCode", "");
+
 
                             handleSyncButton();
                             setOnClickListener();
