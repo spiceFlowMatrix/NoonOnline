@@ -80,6 +80,7 @@ import com.ibl.apps.RoomDatabase.entity.QuizProgress;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
 import com.ibl.apps.noon.AssignmentDetailActivity;
 import com.ibl.apps.noon.MainDashBoardActivity;
+import com.ibl.apps.noon.NoonApplication;
 import com.ibl.apps.noon.R;
 import com.ibl.apps.noon.databinding.CourseInnerItemLayoutBinding;
 import com.ibl.apps.noon.databinding.DeletePopupLayoutBinding;
@@ -123,6 +124,7 @@ import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 import pub.devrel.easypermissions.EasyPermissions;
 
+import static android.content.Context.MODE_PRIVATE;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
@@ -1132,6 +1134,15 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
                 .subscribeWith(new DisposableSingleObserver<SignedUrlObject>() {
                     @Override
                     public void onSuccess(SignedUrlObject signedUrlObject) {
+                        NoonApplication.isDownloadable = true;
+                        NoonApplication.cacheStatus = 1;
+                        SharedPreferences sharedPreferencesCache = NoonApplication.getContext().getSharedPreferences("cacheStatus", MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPreferencesCache.edit();
+                        if (editor != null) {
+                            editor.clear();
+                            editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
+                            editor.apply();
+                        }
 
                         //Toast.makeText(ctx, "== API onSuccess = SignedURL= " + signedUrlObject.getData().getUrl(), Toast.LENGTH_SHORT).show();
                         BaseActivity.freeMemory(ctx);
@@ -1195,6 +1206,45 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
                         }
                     }));
         }
+    }
+
+    public void doTimerTask() {
+
+        mTimerTask = new TimerTask() {
+            public void run() {
+                handler.post(new Runnable() {
+                    public void run() {
+                        second++;
+                        SimpleDateFormat sdf = new SimpleDateFormat("mm:ss", Locale.ENGLISH);
+                        Calendar now = Calendar.getInstance();
+                        now.set(Calendar.HOUR, 0);
+                        now.set(Calendar.MINUTE, 0);
+
+                        now.set(Calendar.SECOND, second);
+                        String time = sdf.format(now.getTime());
+
+                        SharedPreferences sharedPreferences = ctx.getSharedPreferences("speed", MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putString("network", time);
+                        editor.apply();
+                        //Log.e("time", time);
+                       /*if (nCounter<10){
+                           tvCheckin.setText("CheckOut (00:0" + nCounter +")");
+                       }else {
+                           tvCheckin.setText("CheckOut (00:" + nCounter +")");
+                       }*/
+                        // update TextView
+
+
+                        //Log.d("TIMER", "TimerTask run");
+                    }
+                });
+            }
+        };
+
+        // public void schedule (TimerTask task, long delay, long period)
+        t.schedule(mTimerTask, 1000, 1000);  //
+
     }
 
     public class DownloadMultipleTask extends AsyncTask<Void, Void, String> {
@@ -1416,7 +1466,7 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
                                                     com.downloader.Status status = PRDownloader.getStatus((int) downloadProgress.getDownloadId());
                                                     if (status.toString().equals("UNKNOWN")) {
                                                         mTimerTask.cancel();
-                                                        SharedPreferences sharedPreferences = ctx.getSharedPreferences("speed", Context.MODE_PRIVATE);
+                                                        SharedPreferences sharedPreferences = ctx.getSharedPreferences("speed", MODE_PRIVATE);
                                                         String time = sharedPreferences.getString("network", "");
                                                         assert time != null;
                                                         String[] tim = time.split(":");
@@ -1425,7 +1475,7 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
                                                             String tTime = tim[1];
                                                             int totalTime = Integer.parseInt(tTime);
                                                             int speed = finalTotalSize1 / totalTime;
-                                                            SharedPreferences sharedPreferences1 = ctx.getSharedPreferences("NetworkSpeed", Context.MODE_PRIVATE);
+                                                            SharedPreferences sharedPreferences1 = ctx.getSharedPreferences("NetworkSpeed", MODE_PRIVATE);
                                                             SharedPreferences.Editor editor = sharedPreferences1.edit();
                                                             editor.putString("downloadspeed", speed + " Kbps");
                                                             editor.apply();
@@ -1550,45 +1600,6 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
                 }
             });
         }
-    }
-
-    public void doTimerTask() {
-
-        mTimerTask = new TimerTask() {
-            public void run() {
-                handler.post(new Runnable() {
-                    public void run() {
-                        second++;
-                        SimpleDateFormat sdf = new SimpleDateFormat("mm:ss", Locale.ENGLISH);
-                        Calendar now = Calendar.getInstance();
-                        now.set(Calendar.HOUR, 0);
-                        now.set(Calendar.MINUTE, 0);
-
-                        now.set(Calendar.SECOND, second);
-                        String time = sdf.format(now.getTime());
-
-                        SharedPreferences sharedPreferences = ctx.getSharedPreferences("speed", Context.MODE_PRIVATE);
-                        SharedPreferences.Editor editor = sharedPreferences.edit();
-                        editor.putString("network", time);
-                        editor.apply();
-                        //Log.e("time", time);
-                       /*if (nCounter<10){
-                           tvCheckin.setText("CheckOut (00:0" + nCounter +")");
-                       }else {
-                           tvCheckin.setText("CheckOut (00:" + nCounter +")");
-                       }*/
-                        // update TextView
-
-
-                        //Log.d("TIMER", "TimerTask run");
-                    }
-                });
-            }
-        };
-
-        // public void schedule (TimerTask task, long delay, long period)
-        t.schedule(mTimerTask, 1000, 1000);  //
-
     }
 
     public void handleDownloadCounterWhenFailAndComplite(DownloadQueueObject downloadQueueObject) {
@@ -2074,7 +2085,7 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
                             public void onDownloadComplete() {
 
                                 //Log.e("COUNTER", "======onDownloadComplete======");
-
+                                NoonApplication.isDownloadable = false;
                                 BaseActivity.freeMemory(ctx);
 
                                 EncryptDecryptObject encryptDecryptObject = new EncryptDecryptObject();

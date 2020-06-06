@@ -176,7 +176,7 @@ public class CacheEventsListActivity extends BaseActivity {
         mProgressDialog.show();
         if (syncAPITableList.get(position).getEndpoint_url().contains("ProgessSync/AppTimeTrack")) {
             JsonArray jsonArray = new Gson().fromJson(syncAPITableList.get(position).getParameters(), JsonArray.class);
-            CallApiForSpendApp(jsonArray, position);
+            CallApiForSpendAppCacheScreen(jsonArray, position);
 
             NoonApplication.cacheStatus = 3;
             SharedPreferences sharedPreferencesCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
@@ -293,7 +293,7 @@ public class CacheEventsListActivity extends BaseActivity {
         }
     }
 
-    public void CallApiForSpendApp(JsonArray jsonArray, final int position) {
+    public void CallApiForSpendAppCacheScreen(JsonArray jsonArray, final int position) {
         try {
             SharedPreferences sharedPreferences = getSharedPreferences("spendtime", MODE_PRIVATE);
             String outtimrsave = sharedPreferences.getString("totaltime", "");
@@ -341,7 +341,7 @@ public class CacheEventsListActivity extends BaseActivity {
                                 .subscribeWith(new DisposableSingleObserver<SyncTimeTracking>() {
                                     @Override
                                     public void onSuccess(SyncTimeTracking syncTimeTracking) {
-                                        if (syncTimeTracking != null && syncTimeTracking.getResponse_code().equals("0")) {
+                                        if (syncTimeTracking != null && syncTimeTracking.getResponse_code().equals("0") && position > 0 && position < syncAPITableList.size()) {
                                             syncAPITableList.remove(position);
                                             syncAPIDatabaseRepository.deleteById(Integer.parseInt(userId));
                                             cacheEventsListAdapter.notifyItemRemoved(position);
@@ -363,6 +363,9 @@ public class CacheEventsListActivity extends BaseActivity {
                                     }
                                 }));
                     }
+                }
+                if (syncAPITableList.size() == 0) {
+                    binding.switchClick.setChecked(false);
                 }
             }
         } catch (JsonSyntaxException e) {
@@ -830,7 +833,7 @@ public class CacheEventsListActivity extends BaseActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        finish();
+        finishAffinity();
         Intent intent1 = new Intent(CacheEventsListActivity.this, MainDashBoardActivity.class);
         startActivity(intent1);
     }

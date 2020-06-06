@@ -60,11 +60,13 @@ public class CacheEventsListAdapter extends RecyclerView.Adapter<CacheEventsList
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Gson gson = new Gson();
-                String syncAPIData = gson.toJson(model);
-                Intent intent = new Intent(context, CacheEventsDescriptionActivity.class);
-                intent.putExtra("CacheEventsDetail", syncAPIData);
-                context.startActivity(intent);
+                if (model.getStatus().equals(context.getResources().getString(R.string.errored_status))) {
+                    Gson gson = new Gson();
+                    String syncAPIData = gson.toJson(model);
+                    Intent intent = new Intent(context, CacheEventsDescriptionActivity.class);
+                    intent.putExtra("CacheEventsDetail", syncAPIData);
+                    context.startActivity(intent);
+                }
             }
         });
     }
