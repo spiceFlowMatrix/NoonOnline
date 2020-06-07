@@ -20,7 +20,6 @@ import androidx.lifecycle.ProcessLifecycleOwner;
 import androidx.multidex.MultiDex;
 import androidx.multidex.MultiDexApplication;
 
-import com.bumptech.glide.load.HttpException;
 import com.crashlytics.android.Crashlytics;
 import com.downloader.PRDownloader;
 import com.downloader.PRDownloaderConfig;
@@ -206,7 +205,7 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
 
                         @Override
                         public void onError(Throwable e) {
-                            HttpException error = (HttpException) e;
+                            //HttpException error = (HttpException) e;
                             //LessonProgress lessonProgress = new Gson().fromJson(Objects.requireNonNull(error.response().errorBody()).string(), LessonProgress.class);
                             if (!userId.equals("")) {
                                 SyncAPITable syncAPITable = new SyncAPITable();
@@ -1163,8 +1162,8 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
                                 }
 
                                 callSyncADIBackground(position + 1);
-                                retrofit2.HttpException error = (retrofit2.HttpException) e;
-                                LessonProgress lessonProgress = new Gson().fromJson(Objects.requireNonNull(error.response().errorBody()).string(), LessonProgress.class);
+//                                retrofit2.HttpException error = (retrofit2.HttpException) e;
+//                                LessonProgress lessonProgress = new Gson().fromJson(Objects.requireNonNull(error.response().errorBody()).string(), LessonProgress.class);
                                 //Log.e(Const.LOG_NOON_TAG, "==lessonProgress==" + lessonProgress);
                             } catch (Exception e1) {
                                 e1.printStackTrace();

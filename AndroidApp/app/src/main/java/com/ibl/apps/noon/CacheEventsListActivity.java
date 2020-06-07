@@ -49,7 +49,6 @@ import com.ibl.apps.util.PrefUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
@@ -814,8 +813,8 @@ public class CacheEventsListActivity extends BaseActivity {
                                 }
 
                                 callSyncAPI(position + 1);
-                                HttpException error = (HttpException) e;
-                                LessonProgress lessonProgress = new Gson().fromJson(Objects.requireNonNull(error.response().errorBody()).string(), LessonProgress.class);
+                                //HttpException error = (HttpException) e;
+                                // LessonProgress lessonProgress = new Gson().fromJson(Objects.requireNonNull(error.response().errorBody()).string(), LessonProgress.class);
                                 //Log.e(Const.LOG_NOON_TAG, "==lessonProgress==" + lessonProgress);
                             } catch (Exception e1) {
                                 e1.printStackTrace();
