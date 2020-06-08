@@ -402,6 +402,8 @@ public class LoginDevicesActivity extends BaseActivity implements View.OnClickLi
     public void onBackPressed() {
         super.onBackPressed();
         finishAffinity();
-        startActivity(new Intent(LoginDevicesActivity.this, MainDashBoardActivity.class));
+        Intent intent = new Intent(LoginDevicesActivity.this, MainDashBoardActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
     }
 }

@@ -83,6 +83,7 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
     private LessonDatabaseRepository lessonDatabaseRepository;
     private QuizDatabaseRepository quizDatabaseRepository;
     public static boolean isDownloadable = false;
+    public static boolean isCheckSyncAPI = false;
     SyncAPIDatabaseRepository syncAPIDatabaseRepository;
     LessonRepository lessonRepository;
     QuizRepository quizRepository;
@@ -221,12 +222,12 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
                                 SyncAPIDatabaseRepository syncAPIDatabaseRepository = new SyncAPIDatabaseRepository();
                                 syncAPIDatabaseRepository.insertSyncData(syncAPITable);
 
-                                NoonApplication.cacheStatus = 2;
+                                cacheStatus = 2;
                                 SharedPreferences sharedPreferencesCache = context.getSharedPreferences("cacheStatus", MODE_PRIVATE);
                                 SharedPreferences.Editor editor = sharedPreferencesCache.edit();
                                 if (editor != null) {
                                     editor.clear();
-                                    editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
+                                    editor.putString("FlagStatus", String.valueOf(cacheStatus));
                                     editor.apply();
                                 }
                             }
@@ -546,8 +547,10 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
                     SharedPreferences shared = context.getSharedPreferences("interval", MODE_PRIVATE);
                     boolean isbackground = shared.getBoolean("iscall", false);
                     if (isbackground && isNetworkAvailable() && !isDownloadable) {
+//                        Log.e("isbackground", "run:== ");
                         syncAPITableList = syncAPIDatabaseRepository.getSyncUserById(Integer.parseInt(SyncUserId));
                         if (syncAPITableList.size() != 0) {
+                            //isCheckSyncAPI = true;
                             callSyncADIBackground(0);
                         }
                     }
@@ -555,6 +558,7 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
                 h.postDelayed(this, 10000);
             }
         }, 10000);
+
     }
 
     private void callSyncADIBackground(int position) {
@@ -567,12 +571,12 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
             JsonArray jsonArray = new Gson().fromJson(syncAPITableList.get(position).getParameters(), JsonArray.class);
             CallApiForSpendApp(jsonArray, position);
 
-            NoonApplication.cacheStatus = 3;
+            cacheStatus = 3;
             SharedPreferences sharedPreferencesCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferencesCache.edit();
             if (editor != null) {
                 editor.clear();
-                editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
+                editor.putString("FlagStatus", String.valueOf(cacheStatus));
                 editor.apply();
             }
 //            Log.e("syncAPITableList", "callSyncAPI:--if " + position + " size - " + syncAPITableList.size());
@@ -581,35 +585,35 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
             //            JsonArray jsonArray = new Gson().fromJson(syncAPITableList.get(position).getParameters(), JsonArray.class);
             callApiSyncLessonProgress(lessonProgressList, position);
 
-            NoonApplication.cacheStatus = 3;
+            cacheStatus = 3;
             SharedPreferences sharedPreferencesCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferencesCache.edit();
             if (editor != null) {
                 editor.clear();
-                editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
+                editor.putString("FlagStatus", String.valueOf(cacheStatus));
                 editor.apply();
             }
         } else if (syncAPITableList.get(position).getEndpoint_url().contains("ChapterProgress/ChapterProgressSync")) {
             callApiSyncChapter(chapterProgressList, position);
 
-            NoonApplication.cacheStatus = 3;
+            cacheStatus = 3;
             SharedPreferences sharedPreferencesCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferencesCache.edit();
             if (editor != null) {
                 editor.clear();
-                editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
+                editor.putString("FlagStatus", String.valueOf(cacheStatus));
                 editor.apply();
             }
 
         } else if (syncAPITableList.get(position).getEndpoint_url().contains("FileProgress/FileProgressSync")) {
             callApiSyncFiles(fileProgressList, position);
 
-            NoonApplication.cacheStatus = 3;
+            cacheStatus = 3;
             SharedPreferences sharedPreferencesCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferencesCache.edit();
             if (editor != null) {
                 editor.clear();
-                editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
+                editor.putString("FlagStatus", String.valueOf(cacheStatus));
                 editor.apply();
             }
 
@@ -621,36 +625,36 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
             JsonObject jsonArray = new Gson().fromJson(syncAPITableList.get(position).getParameters(), JsonObject.class);
             callApiProgessSyncAdd(lessonProgressList, quizUserResults, position, jsonArray);
 
-            NoonApplication.cacheStatus = 3;
+            cacheStatus = 3;
             SharedPreferences sharedPreferencesCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferencesCache.edit();
             if (editor != null) {
                 editor.clear();
-                editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
+                editor.putString("FlagStatus", String.valueOf(cacheStatus));
                 editor.apply();
             }
 
         } else if (syncAPITableList.get(position).getEndpoint_url().contains("QuizProgress/QuizProgressSync")) {
             callApiSyncQuiz(quizProgressList, position);
 
-            NoonApplication.cacheStatus = 3;
+            cacheStatus = 3;
             SharedPreferences sharedPreferencesCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferencesCache.edit();
             if (editor != null) {
                 editor.clear();
-                editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
+                editor.putString("FlagStatus", String.valueOf(cacheStatus));
                 editor.apply();
             }
 
         } else if (syncAPITableList.get(position).getEndpoint_url().contains("ProgessSync/GetSyncRecords")) {
             callApiGetSyncRecords(position);
 
-            NoonApplication.cacheStatus = 3;
+            cacheStatus = 3;
             SharedPreferences sharedPreferencesCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferencesCache.edit();
             if (editor != null) {
                 editor.clear();
-                editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
+                editor.putString("FlagStatus", String.valueOf(cacheStatus));
                 editor.apply();
             }
 
@@ -658,12 +662,12 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
             JsonArray jsonArray = new Gson().fromJson(syncAPITableList.get(position).getParameters(), JsonArray.class);
             getUserQuizResultSync(jsonArray, position);
 
-            NoonApplication.cacheStatus = 3;
+            cacheStatus = 3;
             SharedPreferences sharedPreferencesCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferencesCache.edit();
             if (editor != null) {
                 editor.clear();
-                editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
+                editor.putString("FlagStatus", String.valueOf(cacheStatus));
                 editor.apply();
             }
 
@@ -671,12 +675,12 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
 
         if (syncAPITableList.size() == 1) {
             //mProgressDialog.dismiss();
-            NoonApplication.cacheStatus = 4;
+            cacheStatus = 4;
             SharedPreferences sharedPreferencesCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferencesCache.edit();
             if (editor != null) {
                 editor.clear();
-                editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
+                editor.putString("FlagStatus", String.valueOf(cacheStatus));
                 editor.apply();
             }
         }
@@ -740,12 +744,12 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
 
                                     @Override
                                     public void onError(Throwable e) {
-                                        NoonApplication.cacheStatus = 2;
+                                        cacheStatus = 2;
                                         SharedPreferences sharedPreferencesCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
                                         SharedPreferences.Editor editor = sharedPreferencesCache.edit();
                                         if (editor != null) {
                                             editor.clear();
-                                            editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
+                                            editor.putString("FlagStatus", String.valueOf(cacheStatus));
                                             editor.apply();
                                         }
                                         callSyncADIBackground(position + 1);
@@ -799,12 +803,12 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
 
                     @Override
                     public void onError(Throwable e) {
-                        NoonApplication.cacheStatus = 2;
+                        cacheStatus = 2;
                         SharedPreferences sharedPreferencesCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
                         SharedPreferences.Editor editor = sharedPreferencesCache.edit();
                         if (editor != null) {
                             editor.clear();
-                            editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
+                            editor.putString("FlagStatus", String.valueOf(cacheStatus));
                             editor.apply();
                         }
                         Log.e("onError", "===callApiSyncLessonProgress===: " + e.getMessage());
@@ -854,12 +858,12 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
                     public void onError(Throwable e) {
                         Log.e("onError", "===callApiSyncChapter===: " + e.getMessage());
                         try {
-                            NoonApplication.cacheStatus = 2;
+                            cacheStatus = 2;
                             SharedPreferences sharedPreferencesCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
                             SharedPreferences.Editor editor = sharedPreferencesCache.edit();
                             if (editor != null) {
                                 editor.clear();
-                                editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
+                                editor.putString("FlagStatus", String.valueOf(cacheStatus));
                                 editor.apply();
                             }
                             callSyncADIBackground(position + 1);
@@ -905,12 +909,12 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
 
                     @Override
                     public void onError(Throwable e) {
-                        NoonApplication.cacheStatus = 2;
+                        cacheStatus = 2;
                         SharedPreferences sharedPreferencesCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
                         SharedPreferences.Editor editor = sharedPreferencesCache.edit();
                         if (editor != null) {
                             editor.clear();
-                            editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
+                            editor.putString("FlagStatus", String.valueOf(cacheStatus));
                             editor.apply();
                         }
                         Log.e("onError", "====callApiSyncFiles=====: " + e.getMessage());
@@ -958,12 +962,12 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
 
                     @Override
                     public void onError(Throwable e) {
-                        NoonApplication.cacheStatus = 2;
+                        cacheStatus = 2;
                         SharedPreferences sharedPreferencesCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
                         SharedPreferences.Editor editor = sharedPreferencesCache.edit();
                         if (editor != null) {
                             editor.clear();
-                            editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
+                            editor.putString("FlagStatus", String.valueOf(cacheStatus));
                             editor.apply();
                         }
                         Log.e("onError", "====callApiSyncQuiz====: " + e.getMessage());
@@ -994,12 +998,12 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
 
                     @Override
                     public void onError(Throwable e) {
-                        NoonApplication.cacheStatus = 2;
+                        cacheStatus = 2;
                         SharedPreferences sharedPreferencesCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
                         SharedPreferences.Editor editor = sharedPreferencesCache.edit();
                         if (editor != null) {
                             editor.clear();
-                            editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
+                            editor.putString("FlagStatus", String.valueOf(cacheStatus));
                             editor.apply();
                         }
                         callSyncADIBackground(position + 1);
@@ -1082,12 +1086,12 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
                     @Override
                     public void onError(Throwable e) {
                         try {
-                            NoonApplication.cacheStatus = 2;
+                            cacheStatus = 2;
                             SharedPreferences sharedPreferencesCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
                             SharedPreferences.Editor editor = sharedPreferencesCache.edit();
                             if (editor != null) {
                                 editor.clear();
-                                editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
+                                editor.putString("FlagStatus", String.valueOf(cacheStatus));
                                 editor.apply();
                             }
 
@@ -1152,12 +1156,12 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
                         @Override
                         public void onError(Throwable e) {
                             try {
-                                NoonApplication.cacheStatus = 2;
+                                cacheStatus = 2;
                                 SharedPreferences sharedPreferencesCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
                                 SharedPreferences.Editor editor = sharedPreferencesCache.edit();
                                 if (editor != null) {
                                     editor.clear();
-                                    editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
+                                    editor.putString("FlagStatus", String.valueOf(cacheStatus));
                                     editor.apply();
                                 }
 

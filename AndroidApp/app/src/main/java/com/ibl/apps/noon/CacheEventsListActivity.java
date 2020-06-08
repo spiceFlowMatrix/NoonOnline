@@ -105,9 +105,7 @@ public class CacheEventsListActivity extends BaseActivity {
         userId = sharedPreferences.getString("uid", "");
         syncAPIDatabaseRepository = new SyncAPIDatabaseRepository();
         binding.toolBar.setNavigationOnClickListener(view -> {
-            finish();
-            Intent intent1 = new Intent(CacheEventsListActivity.this, MainDashBoardActivity.class);
-            startActivity(intent1);
+            onBackPressed();
         });
 
         syncAPIDatabaseRepository.getSyncUserById(Integer.parseInt(userId));
@@ -833,7 +831,8 @@ public class CacheEventsListActivity extends BaseActivity {
     public void onBackPressed() {
         super.onBackPressed();
         finishAffinity();
-        Intent intent1 = new Intent(CacheEventsListActivity.this, MainDashBoardActivity.class);
-        startActivity(intent1);
+        Intent intent = new Intent(CacheEventsListActivity.this, MainDashBoardActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
     }
 }

@@ -70,6 +70,7 @@ import com.ibl.apps.RoomDatabase.dao.chapterManagementDatabase.ChapterDatabaseRe
 import com.ibl.apps.RoomDatabase.dao.courseManagementDatabase.CourseDatabaseRepository;
 import com.ibl.apps.RoomDatabase.dao.lessonManagementDatabase.LessonDatabaseRepository;
 import com.ibl.apps.RoomDatabase.dao.quizManagementDatabase.QuizDatabaseRepository;
+import com.ibl.apps.RoomDatabase.dao.syncAPIManagementDatabase.SyncAPIDatabaseRepository;
 import com.ibl.apps.RoomDatabase.dao.userManagementDatabse.UserDatabaseRepository;
 import com.ibl.apps.RoomDatabase.entity.ChapterProgress;
 import com.ibl.apps.RoomDatabase.entity.FileDownloadStatus;
@@ -77,6 +78,7 @@ import com.ibl.apps.RoomDatabase.entity.FileProgress;
 import com.ibl.apps.RoomDatabase.entity.LessonNewProgress;
 import com.ibl.apps.RoomDatabase.entity.LessonProgress;
 import com.ibl.apps.RoomDatabase.entity.QuizProgress;
+import com.ibl.apps.RoomDatabase.entity.SyncAPITable;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
 import com.ibl.apps.noon.AssignmentDetailActivity;
 import com.ibl.apps.noon.MainDashBoardActivity;
@@ -84,7 +86,6 @@ import com.ibl.apps.noon.NoonApplication;
 import com.ibl.apps.noon.R;
 import com.ibl.apps.noon.databinding.CourseInnerItemLayoutBinding;
 import com.ibl.apps.noon.databinding.DeletePopupLayoutBinding;
-import com.ibl.apps.noon.databinding.DownloadPopupLayoutBinding;
 import com.ibl.apps.util.Const;
 import com.ibl.apps.util.CustomTypefaceSpan;
 import com.ibl.apps.util.JWTUtils;
@@ -108,6 +109,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -185,6 +187,8 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
     private UserDatabaseRepository userDatabaseRepository;
     private LessonDatabaseRepository lessonDatabaseRepository;
     private ChapterDatabaseRepository chapterDatabaseRepository;
+    private List<SyncAPITable> syncAPITableList;
+    private SyncAPIDatabaseRepository syncAPIDatabaseRepository;
 
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
@@ -204,6 +208,8 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
         userDatabaseRepository = new UserDatabaseRepository();
         lessonDatabaseRepository = new LessonDatabaseRepository();
         chapterDatabaseRepository = new ChapterDatabaseRepository();
+        syncAPIDatabaseRepository = new SyncAPIDatabaseRepository();
+
 
         this.list = list;
         this.ctx = ctx;
@@ -223,7 +229,7 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
             userIdSlash = userObject.getId() + "/";
             userId = userObject.getId();
         }
-
+        syncAPITableList = syncAPIDatabaseRepository.getSyncUserById(Integer.parseInt(userId));
         this.activityFlag = activityFlag;
         this.lessonID = lessonID;
         this.QuizID = QuizID;
@@ -641,7 +647,11 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
                             courseDatabaseRepository.updateItemIntervalId(String.valueOf(milliseconds), myintervalobject.getIntervalTableID());
                         } else {
                             //Log.e("INTERVALLLLLL", "=====77==");
-                            startDownload(position, holder);
+                            if (syncAPITableList.size() != 0) {
+                                syncAPIAlertDialog();
+                            } else {
+                                startDownload(position, holder);
+                            }
                         }
                     } else {
                         // Log.e("INTERVALLLLLL", "=====55==");
@@ -651,7 +661,13 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
                     }
                 } else {
                     //Log.e("INTERVALLLLLL", "=====33==");
-                    startDownload(position, holder);
+
+                    if (syncAPITableList.size() != 0) {
+                        syncAPIAlertDialog();
+                    } else {
+                        startDownload(position, holder);
+                    }
+
                 }
             }
 
@@ -1135,13 +1151,15 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
                     @Override
                     public void onSuccess(SignedUrlObject signedUrlObject) {
                         NoonApplication.isDownloadable = true;
-                        NoonApplication.cacheStatus = 1;
-                        SharedPreferences sharedPreferencesCache = NoonApplication.getContext().getSharedPreferences("cacheStatus", MODE_PRIVATE);
-                        SharedPreferences.Editor editor = sharedPreferencesCache.edit();
-                        if (editor != null) {
-                            editor.clear();
-                            editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
-                            editor.apply();
+                        if (syncAPITableList.size() != 0) {
+                            NoonApplication.cacheStatus = 1;
+                            SharedPreferences sharedPreferencesCache = NoonApplication.getContext().getSharedPreferences("cacheStatus", MODE_PRIVATE);
+                            SharedPreferences.Editor editor = sharedPreferencesCache.edit();
+                            if (editor != null) {
+                                editor.clear();
+                                editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
+                                editor.apply();
+                            }
                         }
 
                         //Toast.makeText(ctx, "== API onSuccess = SignedURL= " + signedUrlObject.getData().getUrl(), Toast.LENGTH_SHORT).show();
@@ -1936,7 +1954,12 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
             builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int arg1) {
                     dialog.dismiss();
-                    startDownload(position, holder);
+
+                    if (syncAPITableList.size() != 0) {
+                        syncAPIAlertDialog();
+                    } else {
+                        startDownload(position, holder);
+                    }
                 }
             });
             builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -1956,7 +1979,7 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
         }
     }
 
-    public void showCustomDialogcancle(int position, MyViewHolder holder) {
+    /*public void showCustomDialogcancle(int position, MyViewHolder holder) {
         DownloadPopupLayoutBinding downloadPopupLayoutBinding = DataBindingUtil.inflate(LayoutInflater.from(ctx), R.layout.download_popup_layout, null, false);
         AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
 
@@ -1981,7 +2004,7 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
             }
         });
         alertDialog.show();
-    }
+    }*/
 
     ArrayList<CoursePriviewObject.Lessonfiles> lessonfiles = new ArrayList<>();
 
@@ -2336,5 +2359,20 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
                 }
             }
         }
+    }
+
+    private void syncAPIAlertDialog() {
+        SpannableStringBuilder message = setTypeface(ctx, ctx.getResources().getString(R.string.sync_api_running));
+        AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
+        builder.setTitle(R.string.validation_warning);
+        builder.setMessage(message)
+                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Yes button clicked, do something
+                        dialog.dismiss();
+                        //NoonApplication.isCheckSyncAPI = false;
+                    }
+                });
+        builder.show();
     }
 }
