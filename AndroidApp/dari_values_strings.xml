@@ -414,6 +414,7 @@
     <string name="progress_add_pending_description">-</string>
     <string name="pending_status">در حال انتظار</string>
     <string name="errored_status">خطا صورت گرفته</string>
+    <string name="sync_api_running">دستگاه در حال همگام سازی رویدادهای در حال انتظار است، لطفا صبر نمایید تا همگام سازی تکمیل شود.</string>
 
     <string name="sync_id">ID:</string>
     <string name="lesson_progressed">درس مشاهده شد</string>

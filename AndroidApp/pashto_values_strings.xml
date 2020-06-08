@@ -415,6 +415,7 @@
     <string name="progress_add_pending_description">-</string>
     <string name="pending_status">د انتظار په حال کې</string>
     <string name="errored_status">تېروتنه شوې</string>
+    <string name="sync_api_running">دستګاه د د انتظار په حال کې پېښې همغږي کوي ، مهرباني وکړئ همغږي بشپړیدو ته انتظار وکړئ.</string>
 
     <string name="sync_id">ID:</string>
     <string name="lesson_progressed">لوست وکتل شو</string>
