@@ -237,7 +237,6 @@ namespace Training24Admin.Controllers
 
 
         }
-        []
         /// <summary>
         ///  Get my  all user's device profile .
         /// </summary>
