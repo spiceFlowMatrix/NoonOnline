@@ -9,6 +9,7 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -171,6 +172,7 @@ public class CacheEventsListActivity extends BaseActivity {
             return;
         }
         mProgressDialog.show();
+        NoonApplication.isDownloadable = true;
         if (syncAPITableList.get(position).getEndpoint_url().contains("ProgessSync/AppTimeTrack")) {
             JsonArray jsonArray = new Gson().fromJson(syncAPITableList.get(position).getParameters(), JsonArray.class);
             CallApiForSpendAppCacheScreen(jsonArray, position);
@@ -277,6 +279,7 @@ public class CacheEventsListActivity extends BaseActivity {
 
         if (syncAPITableList.size() == 1) {
             mProgressDialog.dismiss();
+            NoonApplication.isDownloadable = false;
             NoonApplication.cacheStatus = 4;
             SharedPreferences sharedPreferencesCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
             SharedPreferences.Editor editor = sharedPreferencesCache.edit();
@@ -338,7 +341,7 @@ public class CacheEventsListActivity extends BaseActivity {
                                 .subscribeWith(new DisposableSingleObserver<SyncTimeTracking>() {
                                     @Override
                                     public void onSuccess(SyncTimeTracking syncTimeTracking) {
-                                        if (syncTimeTracking != null && syncTimeTracking.getResponse_code().equals("0") && position > 0 && position < syncAPITableList.size()) {
+                                        if (syncTimeTracking != null && syncTimeTracking.getResponse_code().equals("0") && position >= 0 && position < syncAPITableList.size()) {
                                             syncAPITableList.remove(position);
                                             syncAPIDatabaseRepository.deleteById(Integer.parseInt(userId));
                                             cacheEventsListAdapter.notifyItemRemoved(position);
@@ -360,9 +363,6 @@ public class CacheEventsListActivity extends BaseActivity {
                                     }
                                 }));
                     }
-                }
-                if (syncAPITableList.size() == 0) {
-                    binding.switchClick.setChecked(false);
                 }
             }
         } catch (JsonSyntaxException e) {
@@ -834,5 +834,30 @@ public class CacheEventsListActivity extends BaseActivity {
         Intent intent = new Intent(CacheEventsListActivity.this, MainDashBoardActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        NoonApplication.isDownloadable = false;
+    }
+
+    private void refreshAdapter() {
+        final Handler h = new Handler();
+        h.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (syncAPIDatabaseRepository.getSyncUserById(Integer.parseInt(userId)) != null && syncAPIDatabaseRepository.getSyncUserById(Integer.parseInt(userId)).size() != 0) {
+                    binding.rcVerticalLayout.rcVertical.setVisibility(View.VISIBLE);
+                    binding.txtEmptyEvents.setVisibility(View.GONE);
+                    cacheEventsListAdapter.notifyDataSetChanged();
+                } else {
+                    binding.rcVerticalLayout.rcVertical.setVisibility(View.GONE);
+                    binding.txtEmptyEvents.setVisibility(View.VISIBLE);
+                }
+                h.postDelayed(this, 10000);
+            }
+        }, 10000);
+
     }
 }

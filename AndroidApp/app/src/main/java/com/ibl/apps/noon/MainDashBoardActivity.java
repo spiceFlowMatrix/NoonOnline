@@ -210,7 +210,9 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
                                 editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
                                 editor.apply();
                             }
-                            if (deviceStatusCode.equals("0")) {
+                            SharedPreferences deviceSharedPreferences = getSharedPreferences("deviceStatus", MODE_PRIVATE);
+                            deviceStatusCode = deviceSharedPreferences.getString("deviceStatusCode", "");
+                            if (deviceStatusCode != null && deviceStatusCode.equals("0")) {
                                 showHitLimitDialog(MainDashBoardActivity.this);
                             }
                         }
@@ -416,7 +418,7 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
         deviceStatusCode = deviceSharedPreferences.getString("deviceStatusCode", "");
         Log.e("deviceStatusCode", "setUp: flagStatus" + deviceStatusCode);
 
-        if (deviceStatusCode.equals("0")) {
+        if (deviceStatusCode != null && deviceStatusCode.equals("0")) {
             switch (flagStatus) {
                 case "1":
                     mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_pending);
@@ -743,14 +745,14 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
                 break;
             case R.id.serachCourseIMag:
                 Log.e("deviceStatusCode", "setUp: serachCourseIMag" + deviceStatusCode);
-                if (deviceStatusCode.equals("0")) {
+                if (deviceStatusCode != null && deviceStatusCode.equals("0")) {
                     Intent i1 = new Intent(MainDashBoardActivity.this, SearchActivity.class);
                     startActivity(i1);
                 }
                 break;
             case R.id.btnNotification:
                 Log.e("deviceStatusCode", "setUp: btnNotification" + deviceStatusCode);
-                if (deviceStatusCode.equals("0")) {
+                if (deviceStatusCode != null && deviceStatusCode.equals("0")) {
                     Intent i3 = new Intent(MainDashBoardActivity.this, NotificationActivity.class);
                     startActivity(i3);
                 }
@@ -758,14 +760,14 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
 
             case R.id.cacheEventsStatusBtn:
                 Log.e("deviceStatusCode", "setUp: cacheEventsStatusBtn" + deviceStatusCode);
-                if (deviceStatusCode.equals("0")) {
+                if (deviceStatusCode != null && deviceStatusCode.equals("0")) {
                     Intent cacheIntent = new Intent(MainDashBoardActivity.this, CacheEventsListActivity.class);
                     startActivity(cacheIntent);
                 }
                 break;
             case R.id.feedbackbtn:
                 Log.e("deviceStatusCode", "setUp: feedbackbtn" + deviceStatusCode);
-                if (deviceStatusCode.equals("0")) {
+                if (deviceStatusCode != null && deviceStatusCode.equals("0")) {
                     if (isNetworkAvailable(MainDashBoardActivity.this)) {
                         Intent i2 = new Intent(MainDashBoardActivity.this, FeedBackActivity.class);
 //                Intent i2 = new Intent(Intent.ACTION_VIEW);

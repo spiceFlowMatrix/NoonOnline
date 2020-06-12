@@ -56,6 +56,7 @@ public class ChapterActivity extends BaseActivity implements View.OnClickListene
     private boolean isLiked;
     private boolean isDisliked;
     public static int pageNo = -1;
+    public static boolean isAdd = false;
     public static MutableLiveData<Integer> pageNo1 = new MutableLiveData<>();
 
     @Override
@@ -307,12 +308,14 @@ public class ChapterActivity extends BaseActivity implements View.OnClickListene
             if (adapter.getCount() != 0) {
                 adapter.notifyDataSetChanged();
                 PRDownloader.cancelAll();
+                NoonApplication.isDownloadable = false;
             }
         }
     }
 
     public void finishActivity() {
         PRDownloader.cancelAll();
+        NoonApplication.isDownloadable = false;
         Intent intent = new Intent(getApplicationContext(), MainDashBoardActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
