@@ -514,15 +514,21 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                             }
                         }
                     }
-                    if (model != null) {
-                        Intent intent = new Intent(getActivity(), AssignmentDetailActivity.class);
-                        intent.putExtra(Const.Assignment, new Gson().toJson(model));
-                        intent.putExtra(Const.Flag, 1);
-                        intent.putExtra("coursename", CourseName);
-                        intent.putExtra("lessonname", LessonName);
-                        getActivity().startActivity(intent);
-                    } else {
-                        Toast.makeText(getActivity(), getActivity().getString(R.string.no_assignment_available), Toast.LENGTH_SHORT).show();
+                    if (AddtionalAssignment != null) {
+                        if (AddtionalAssignment.equals("true")) {
+                            if (model != null) {
+                                Intent intent = new Intent(getActivity(), AssignmentDetailActivity.class);
+                                intent.putExtra(Const.Assignment, new Gson().toJson(model));
+                                intent.putExtra(Const.Flag, 1);
+                                intent.putExtra("coursename", CourseName);
+                                intent.putExtra("lessonname", LessonName);
+                                getActivity().startActivity(intent);
+                            } else {
+                                Toast.makeText(getActivity(), getActivity().getString(R.string.no_assignment_available), Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            Toast.makeText(getActivity(), getActivity().getResources().getString(R.string.assignment_unauthorize_warning), Toast.LENGTH_SHORT).show();
+                        }
                     }
                 } else {
                     showNetworkAlert(getActivity());
@@ -578,7 +584,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
         fragmentCourseItemLayoutBinding.rcVerticalLayout.rcVertical.setHasFixedSize(true);
         fragmentCourseItemLayoutBinding.rcVerticalLayout.rcVertical.setLayoutManager(new WrapContentLinearLayoutManager(NoonApplication.getContext(), LinearLayoutManager.VERTICAL, false));
 
-        courseItemListAdapter = new CourseItemListAdapter(getActivity(), coursePriviewArrayList, this, GradeId, userDetailsObject, ActivityFlag, LessonID, QuizID, isNotification, this, CourseName);
+        courseItemListAdapter = new CourseItemListAdapter(getActivity(), coursePriviewArrayList, this, GradeId, userDetailsObject, ActivityFlag, LessonID, QuizID, isNotification, this, CourseName, AddtionalAssignment);
         fragmentCourseItemLayoutBinding.rcVerticalLayout.rcVertical.setAdapter(courseItemListAdapter);
 
         if (isNetworkAvailable(getActivity())) {
@@ -612,7 +618,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                         @Override
                         public void onSuccess(CoursePriviewObject coursePriviewObject) {
                             coursePriviewObject.setUserId(userId);
-                            courseItemListAdapter = new CourseItemListAdapter(getActivity(), coursePriviewArrayList, CourseItemFragment.this, GradeId, userDetailsObject, ActivityFlag, LessonID, QuizID, isNotification, CourseItemFragment.this, CourseName);
+                            courseItemListAdapter = new CourseItemListAdapter(getActivity(), coursePriviewArrayList, CourseItemFragment.this, GradeId, userDetailsObject, ActivityFlag, LessonID, QuizID, isNotification, CourseItemFragment.this, CourseName, AddtionalAssignment);
                             fragmentCourseItemLayoutBinding.rcVerticalLayout.rcVertical.setAdapter(courseItemListAdapter);
                             new setLocalDataTask(new CourseItemAsyncResponse() {
                                 @Override
