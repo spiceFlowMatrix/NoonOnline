@@ -245,12 +245,16 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                     fragmentCourseItemLayoutBinding.appbarCourseChapter.setVisibility(View.VISIBLE);
                     setUp(fragmentCourseItemLayoutBinding.getRoot());
                     PRDownloader.cancelAll();
+                    NoonApplication.isDownloadable = false;
                     ChapterActivity.pageNo1.setValue(-1);
                 }
 
             }
         };
-        ChapterActivity.pageNo1.observe(getViewLifecycleOwner(), observer);
+        if (!ChapterActivity.isAdd) {
+            ChapterActivity.isAdd = true;
+            ChapterActivity.pageNo1.observe(getViewLifecycleOwner(), observer);
+        }
         return fragmentCourseItemLayoutBinding.getRoot();
     }
 
@@ -325,6 +329,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                         @Override
                         public void onClick(View v) {
                             startActivity(new Intent(NoonApplication.getContext(), CacheEventsListActivity.class));
+                            NoonApplication.isDownloadable = false;
                         }
                     });
 
@@ -351,6 +356,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
     @Override
     public void onDestroy() {
         if (observer != null) {
+            ChapterActivity.isAdd = false;
             ChapterActivity.pageNo1.removeObserver(observer);
         }
         super.onDestroy();

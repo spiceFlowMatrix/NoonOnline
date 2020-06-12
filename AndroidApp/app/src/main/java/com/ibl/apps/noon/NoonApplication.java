@@ -74,6 +74,7 @@ import static com.ibl.apps.Adapter.CourseItemInnerListAdapter.quizProgressList;
 /**
  * Created by iblinfotech on 28/08/18.
  */
+
 public class NoonApplication extends MultiDexApplication implements LifecycleObserver {
 
     private static Context context;
@@ -83,7 +84,6 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
     private LessonDatabaseRepository lessonDatabaseRepository;
     private QuizDatabaseRepository quizDatabaseRepository;
     public static boolean isDownloadable = false;
-    public static boolean isCheckSyncAPI = false;
     SyncAPIDatabaseRepository syncAPIDatabaseRepository;
     LessonRepository lessonRepository;
     QuizRepository quizRepository;
@@ -547,7 +547,7 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
                     SharedPreferences shared = context.getSharedPreferences("interval", MODE_PRIVATE);
                     boolean isbackground = shared.getBoolean("iscall", false);
                     if (isbackground && isNetworkAvailable() && !isDownloadable) {
-//                        Log.e("isbackground", "run:== ");
+//                        Log.e("isbackground", "isDownloadable==false");
                         syncAPITableList = syncAPIDatabaseRepository.getSyncUserById(Integer.parseInt(SyncUserId));
                         if (syncAPITableList.size() != 0) {
                             //isCheckSyncAPI = true;
@@ -734,7 +734,7 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
                                 .subscribeWith(new DisposableSingleObserver<SyncTimeTracking>() {
                                     @Override
                                     public void onSuccess(SyncTimeTracking syncTimeTracking) {
-                                        if (syncTimeTracking != null && syncTimeTracking.getResponse_code().equals("0")) {
+                                        if (syncTimeTracking != null && syncTimeTracking.getResponse_code().equals("0") && position >= 0 && position < syncAPITableList.size()) {
                                             syncAPITableList.remove(position);
                                             syncAPIDatabaseRepository.deleteById(Integer.parseInt(userId));
                                             //cacheEventsListAdapter.notifyItemRemoved(position);
