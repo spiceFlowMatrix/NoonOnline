@@ -43,6 +43,7 @@ public class CourseItemListAdapter extends RecyclerView.Adapter<CourseItemListAd
     String QuizID = "";
     Boolean isNotification = false;
     private String courseName;
+    private String additionalAssignment;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public CourseItemLayoutBinding courseItemLayoutBinding;
@@ -54,7 +55,7 @@ public class CourseItemListAdapter extends RecyclerView.Adapter<CourseItemListAd
         }
     }
 
-    public CourseItemListAdapter(Context ctx, ArrayList<CoursePriviewObject.Chapters> list, CourseInnerItemInterface courseInnerItemInterface, String GradeId, UserDetails userDetailsObject, String activityFlag, String lessonID, String QuizID, Boolean isNotification, CourseHideResponse courseHideResponse, String courseName) {
+    public CourseItemListAdapter(Context ctx, ArrayList<CoursePriviewObject.Chapters> list, CourseInnerItemInterface courseInnerItemInterface, String GradeId, UserDetails userDetailsObject, String activityFlag, String lessonID, String QuizID, Boolean isNotification, CourseHideResponse courseHideResponse, String courseName, String additionalAssignment) {
         this.list = list;
         this.ctx = ctx;
         this.courseInnerItemInterface = courseInnerItemInterface;
@@ -66,6 +67,7 @@ public class CourseItemListAdapter extends RecyclerView.Adapter<CourseItemListAd
         this.QuizID = QuizID;
         this.isNotification = isNotification;
         this.courseName = courseName;
+        this.additionalAssignment = additionalAssignment;
 
         if (userDetailsObject != null) {
             this.userId = userDetailsObject.getId();
@@ -152,7 +154,7 @@ public class CourseItemListAdapter extends RecyclerView.Adapter<CourseItemListAd
 
             holder.courseItemLayoutBinding.rcVerticalLayout.rcVertical.setHasFixedSize(true);
             holder.courseItemLayoutBinding.rcVerticalLayout.rcVertical.setLayoutManager(new WrapContentLinearLayoutManager(NoonApplication.getContext(), LinearLayoutManager.VERTICAL, false));
-            CourseItemInnerListAdapter adp = new CourseItemInnerListAdapter(ctx, listProg, courseInnerItemInterface, isisLastItemViewed, isPlayFirstItem, model.getId(), userDetailsObject, activityFlag, lessonID, QuizID, isNotification, courseHideResponse, assignments, courseName, gradeId);
+            CourseItemInnerListAdapter adp = new CourseItemInnerListAdapter(ctx, listProg, courseInnerItemInterface, isisLastItemViewed, isPlayFirstItem, model.getId(), userDetailsObject, activityFlag, lessonID, QuizID, isNotification, courseHideResponse, assignments, courseName, gradeId, additionalAssignment);
             holder.courseItemLayoutBinding.rcVerticalLayout.rcVertical.setAdapter(adp);
             //   holder.courseItemLayoutBinding.rcVerticalLayout.rcVertical.post(() -> adp.notifyDataSetChanged());
         }

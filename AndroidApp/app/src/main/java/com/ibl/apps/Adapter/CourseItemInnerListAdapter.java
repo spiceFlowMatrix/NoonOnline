@@ -189,6 +189,7 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
     private ChapterDatabaseRepository chapterDatabaseRepository;
     private List<SyncAPITable> syncAPITableList;
     private SyncAPIDatabaseRepository syncAPIDatabaseRepository;
+    private String additionalAssignment;
 
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
@@ -201,7 +202,8 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
         }
     }
 
-    public CourseItemInnerListAdapter(Context ctx, ArrayList<CoursePriviewObject.Lessons> list, CourseInnerItemInterface courseInnerItemInterface, boolean isisLastItemViewed, boolean isPlayFirstItem, String chapterid, UserDetails userDetailsObject, String activityFlag, String lessonID, String QuizID, Boolean isNotification, CourseHideResponse courseHideResponse, ArrayList<CoursePriviewObject.Assignment> assignments, String Coursename, String gradeId) {
+    public CourseItemInnerListAdapter(Context ctx, ArrayList<CoursePriviewObject.Lessons> list, CourseInnerItemInterface courseInnerItemInterface, boolean isisLastItemViewed, boolean isPlayFirstItem, String chapterid, UserDetails userDetailsObject, String activityFlag, String lessonID, String QuizID, Boolean isNotification, CourseHideResponse courseHideResponse, ArrayList<CoursePriviewObject.Assignment> assignments, String Coursename, String gradeId, String additionalAssignment) {
+
         downloadFileRepository = new DownloadFileRepository();
         quizDatabaseRepository = new QuizDatabaseRepository();
         courseDatabaseRepository = new CourseDatabaseRepository();
@@ -221,6 +223,7 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
         this.assignments = assignments;
         this.Coursename = Coursename;
         this.gradeId = gradeId;
+        this.additionalAssignment = additionalAssignment;
         mDroidNet = DroidNet.getInstance();
         mDroidNet.addInternetConnectivityListener(this);
         this.chapterid = chapterid;
@@ -726,16 +729,22 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
                     if (holder.courseInnerItemLayoutBinding.txtfileType.getText().toString().equals(ctx.getResources().getString(R.string.assignment))) {
                         String id = holder.courseInnerItemLayoutBinding.tag.getText().toString();
                         if (isNetworkAvailable(ctx)) {
-                            if (assignments != null && assignments.size() != 0) {
-                                for (int i = 0; i < assignments.size(); i++) {
-                                    if (id.equals(assignments.get(i).getId())) {
-                                        CoursePriviewObject.Assignment assignment = assignments.get(i);
-                                        Intent intent = new Intent(ctx, AssignmentDetailActivity.class);
-                                        intent.putExtra(Const.Assignment, new Gson().toJson(assignment));
-                                        intent.putExtra("coursename", Coursename);
-                                        intent.putExtra("lessonname", assignments.get(i).getName());
-                                        holder.itemView.getContext().startActivity(intent);
+                            if (additionalAssignment != null) {
+                                if (additionalAssignment.equals("true")) {
+                                    if (assignments != null && assignments.size() != 0) {
+                                        for (int i = 0; i < assignments.size(); i++) {
+                                            if (id.equals(assignments.get(i).getId())) {
+                                                CoursePriviewObject.Assignment assignment = assignments.get(i);
+                                                Intent intent = new Intent(ctx, AssignmentDetailActivity.class);
+                                                intent.putExtra(Const.Assignment, new Gson().toJson(assignment));
+                                                intent.putExtra("coursename", Coursename);
+                                                intent.putExtra("lessonname", assignments.get(i).getName());
+                                                holder.itemView.getContext().startActivity(intent);
+                                            }
+                                        }
                                     }
+                                } else {
+                                    Toast.makeText(ctx, ctx.getResources().getString(R.string.assignment_unauthorize_warning), Toast.LENGTH_SHORT).show();
                                 }
                             }
                         } else {
