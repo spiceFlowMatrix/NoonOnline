@@ -41,7 +41,7 @@ namespace Training24Admin.Controllers
         [Authorize]
         [HttpPost]
         [Route("ProgessSyncAdd")]
-        public IActionResult ProgessSyncAdd([FromBody]SyncData data)
+        public async Task<IActionResult> ProgessSyncAdd([FromBody]SyncData data)
         {
             SuccessResponse successResponse = new SuccessResponse();
             UnsuccessResponse unsuccessResponse = new UnsuccessResponse();
@@ -49,31 +49,42 @@ namespace Training24Admin.Controllers
             {
                 if (data != null)
                 {
-                    foreach (var sync in data.progressdata)
-                    {
-                        ProgessSync progess = _ProgessSyncBusiness.CheckRecordExists(sync.GradeId, sync.LessonId, sync.QuizId, sync.UserId);
-                        if (progess != null)
-                        {
-                            ProgessSync updateRecord = _ProgessSyncBusiness.UpdateRecord(sync);
-                        }
-                        else
-                        {
-                            ProgessSync addRecord = _ProgessSyncBusiness.AddRecord(sync);
-                        }
-                    }
 
-                    foreach (var timer in data.timerdata)
+                    if (data.progressdata.Count > 0)
                     {
-                        //QuizTimerSync timerd = _ProgessSyncBusiness.CheckTimerRecordExists(timer.userId, timer.quizId);
-                        //if (timerd != null)
-                        //{
-                        //    QuizTimerSync updateTimer = _ProgessSyncBusiness.UpdateQuizTimerRecord(timer);
-                        //}
-                        //else
-                        //{
-                        QuizTimerSync addTimer = _ProgessSyncBusiness.AddQuizTimerRecord(timer);
-                        //}
+                        var result = await _ProgessSyncBusiness.ProgessSyncRecord(data.progressdata);
+
                     }
+                    if (data.timerdata.Count > 0)
+                    {
+                        var addTimer = await _ProgessSyncBusiness.AddQuizTimerRecordInBulk(data.timerdata);
+                    }
+                    #region Comment old code
+                    //foreach (var sync in data.progressdata)
+                    //{
+                    //    ProgessSync progess = _ProgessSyncBusiness.CheckRecordExists(sync.GradeId, sync.LessonId, sync.QuizId, sync.UserId);
+                    //    if (progess != null)
+                    //    {
+                    //        ProgessSync updateRecord = _ProgessSyncBusiness.UpdateRecord(sync);
+                    //    }
+                    //    else
+                    //    {
+                    //        ProgessSync addRecord = _ProgessSyncBusiness.AddRecord(sync);
+                    //    }
+                    //}
+                    //foreach (var timer in data.timerdata)
+                    //{
+                    //QuizTimerSync timerd = _ProgessSyncBusiness.CheckTimerRecordExists(timer.userId, timer.quizId);
+                    //if (timerd != null)
+                    //{
+                    //    QuizTimerSync updateTimer = _ProgessSyncBusiness.UpdateQuizTimerRecord(timer);
+                    //}
+                    //else
+                    //{
+                    //    QuizTimerSync addTimer = _ProgessSyncBusiness.AddQuizTimerRecord(timer);
+                    //}
+                    //} 
+                    #endregion
 
                     successResponse.response_code = 0;
                     successResponse.message = "Synced";
@@ -134,7 +145,7 @@ namespace Training24Admin.Controllers
         // [Authorize]
         [HttpPost]
         [Route("AppTimeTrack")]
-        public IActionResult AppTimeTrack([FromBody]List<AppTimeTrackDTO> data)
+        public async Task<IActionResult> AppTimeTrack([FromBody]List<AppTimeTrackDTO> data)
         {
             SuccessResponse successResponse = new SuccessResponse();
             UnsuccessResponse unsuccessResponse = new UnsuccessResponse();
@@ -142,30 +153,53 @@ namespace Training24Admin.Controllers
             {
                 if (data.Count > 0)
                 {
-                    foreach (var sync in data)
+                    List<AppTimeTrack> InsertProgress = data.Select(sync => new AppTimeTrack()
                     {
-                        AppTimeTrack appTimeTrack = new AppTimeTrack
-                        {
-                            UserId = sync.userid,
-                            Latitude = sync.latitude,
-                            Longitude = sync.longitude,
-                            ServiceProvider = sync.serviceprovider,
-                            School = sync.school,
-                            SubjectsTaken = sync.subjectstaken,
-                            Grade = sync.grade,
-                            HardwarePlatform = sync.hardwareplatform,
-                            OperatingSystem = sync.operatingsystem,
-                            Version = sync.version,
-                            Isp = sync.isp,
-                            ActivityTime = sync.activitytime,
-                            Outtime = sync.outtime,
-                            NetworkSpeed = sync.networkspeed,
-                            IsDeleted = false,
-                            CreationTime = DateTime.Now.ToString(),
-                            CreatorUserId = Convert.ToInt32(sync.userid)
-                        };
-                        _appTimeTrackBusiness.AddRecord(appTimeTrack);
-                    }
+                        UserId = sync.userid,
+                        Latitude = sync.latitude,
+                        Longitude = sync.longitude,
+                        ServiceProvider = sync.serviceprovider,
+                        School = sync.school,
+                        SubjectsTaken = sync.subjectstaken,
+                        Grade = sync.grade,
+                        HardwarePlatform = sync.hardwareplatform,
+                        OperatingSystem = sync.operatingsystem,
+                        Version = sync.version,
+                        Isp = sync.isp,
+                        ActivityTime = sync.activitytime,
+                        Outtime = sync.outtime,
+                        NetworkSpeed = sync.networkspeed,
+                        IsDeleted = false,
+                        CreationTime = DateTime.Now.ToString(),
+                        CreatorUserId = Convert.ToInt32(sync.userid)
+                    }).ToList();
+                    await _appTimeTrackBusiness.AddRecordBulk(InsertProgress);
+                    #region Comment Odl Code
+                    //foreach (var sync in data)
+                    //{
+                    //    AppTimeTrack appTimeTrack = new AppTimeTrack
+                    //    {
+                    //        UserId = sync.userid,
+                    //        Latitude = sync.latitude,
+                    //        Longitude = sync.longitude,
+                    //        ServiceProvider = sync.serviceprovider,
+                    //        School = sync.school,
+                    //        SubjectsTaken = sync.subjectstaken,
+                    //        Grade = sync.grade,
+                    //        HardwarePlatform = sync.hardwareplatform,
+                    //        OperatingSystem = sync.operatingsystem,
+                    //        Version = sync.version,
+                    //        Isp = sync.isp,
+                    //        ActivityTime = sync.activitytime,
+                    //        Outtime = sync.outtime,
+                    //        NetworkSpeed = sync.networkspeed,
+                    //        IsDeleted = false,
+                    //        CreationTime = DateTime.Now.ToString(),
+                    //        CreatorUserId = Convert.ToInt32(sync.userid)
+                    //    };
+                    //    _appTimeTrackBusiness.AddRecord(appTimeTrack);
+                    //} 
+                    #endregion
                     successResponse.response_code = 0;
                     successResponse.message = "Synced";
                     successResponse.status = "Success";

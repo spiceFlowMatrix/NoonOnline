@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using Trainning24.Abstract.Infrastructure.IGeneric;
 using Trainning24.Domain.Entity;
 using Trainning24.Repository.EF.Generics;
@@ -57,6 +58,14 @@ namespace Trainning24.Repository.EF
         {
             return _context.Update(obj);
         }
+        public async Task<int> AddRecordBulk(List<ProgessSync> obj)
+        {
+            return await _context.SaveAsyncBulk(obj);
+        }
+        public async Task<int> UpdateAsyncBulk(List<ProgessSync> obj)
+        {
+            return await _context.UpdateAsyncBulk(obj);
+        }
     }
 
 
@@ -94,7 +103,14 @@ namespace Trainning24.Repository.EF
         {
             return _context.Insert(obj);
         }
-
+        public async Task<int> AddRecordBulk(List<QuizTimerSync> obj)
+        {
+            return await _context.SaveAsyncBulk(obj);
+        }
+        public async Task<int> UpdateAsyncBulk(List<QuizTimerSync> obj)
+        {
+            return await _context.UpdateAsyncBulk(obj);
+        }
         public IQueryable<QuizTimerSync> ListQuery(Expression<Func<QuizTimerSync, bool>> where)
         {
             return _context.ListQuery(where);

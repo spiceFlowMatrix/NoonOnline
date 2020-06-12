@@ -48,6 +48,10 @@ namespace Trainning24.Repository.EF
         {
             return _context.ListQuery(where);
         }
+        public async Task<int> SaveAsyncBulk(List<AppTimeTrack> obj)
+        {
+            return await _context.SaveAsyncBulk(obj);
+        }
 
         public int Save()
         {

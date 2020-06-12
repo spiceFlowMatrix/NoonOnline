@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Trainning24.Domain.Entity;
 using Trainning24.Repository.EF;
 
@@ -36,7 +37,18 @@ namespace Trainning24.BL.Business
         {
             return _eFLessonProgressSync.GetById(b => b.ChapterId == ChapterId && b.LessonId == LessonId && b.UserId == UserId);
         }
-
+        public async Task<int> AddRecordBulk(List<LessonProgress> obj)
+        {
+            return await _eFLessonProgressSync.SaveAsyncBulk(obj);
+        }
+        public async Task<int> UpdateAsyncBulk(List<LessonProgress> obj)
+        {
+            return await _eFLessonProgressSync.UpdateAsyncBulk(obj);
+        }
+        public List<LessonProgress> GetAllByUser(List<long> userId)
+        {
+            return _eFLessonProgressSync.ListQuery(b => b.IsDeleted != true && userId.Contains(b.UserId)).ToList();
+        }
         public List<LessonProgress> GetLessonProgresses(List<int> studentid, int courseid)
         {
             if (courseid != 0)
