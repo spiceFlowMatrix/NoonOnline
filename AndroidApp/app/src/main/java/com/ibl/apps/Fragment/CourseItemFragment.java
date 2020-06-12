@@ -192,6 +192,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
     Observer<Integer> observer;
     private SyncAPIDatabaseRepository syncAPIDatabaseRepository;
     private String gradeName;
+    private CoursePriviewObject coursePriviewObjectList;
 
     public CourseItemFragment() {
         // Required empty public constructor
@@ -623,17 +624,18 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                             new setLocalDataTask(new CourseItemAsyncResponse() {
                                 @Override
                                 public CoursePriviewObject getCoursePriviewObject(CoursePriviewObject coursePriviewObject) {
+                                    coursePriviewObjectList = coursePriviewObject;
                                     if (coursePriviewObject != null) {
-                                        if (fileProgressList.size() > 0) {
+                                       /* if (fileProgressList.size() > 0) {
                                             callApiSyncFiles(fileProgressList);
-                                        }
-                                        if (lessonProgressList.size() > 0) {
+                                        }*/
+                                        if (lessonProgressList.size() >= 0) {
                                             callApiSyncLessonProgress(lessonProgressList);
                                         }
-                                        if (quizProgressList.size() > 0) {
+                                        if (quizProgressList.size() >= 0) {
                                             callApiSyncQuiz(quizProgressList);
                                         }
-                                        if (chapterProgressList.size() > 0) {
+                                        if (chapterProgressList.size() >= 0) {
                                             callApiSyncChapter(chapterProgressList);
                                         }
 
@@ -705,128 +707,132 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                 JsonObject jsonObject = new JsonObject();
 
                 try {
-                    // if (!lessonNewProgress.get(i).getProgress().equals("0")) {
-                    jsonObject.addProperty("chapterid", Integer.parseInt(lessonNewProgress.get(i).getChapterId()));
-                    jsonObject.addProperty("lessonid", Integer.parseInt(lessonNewProgress.get(i).getLessonId()));
-                    jsonObject.addProperty("userid", Integer.parseInt(lessonNewProgress.get(i).getUserId()));
-                    jsonObject.addProperty("progress", Integer.parseInt(lessonNewProgress.get(i).getProgress()));
-                    array.add(jsonObject);
-                    // }
+                    if (!lessonNewProgress.get(i).getProgress().equals("0")) {
+                        jsonObject.addProperty("chapterid", Integer.parseInt(lessonNewProgress.get(i).getChapterId()));
+                        jsonObject.addProperty("lessonid", Integer.parseInt(lessonNewProgress.get(i).getLessonId()));
+                        jsonObject.addProperty("userid", Integer.parseInt(lessonNewProgress.get(i).getUserId()));
+                        jsonObject.addProperty("progress", Integer.parseInt(lessonNewProgress.get(i).getProgress()));
+                        array.add(jsonObject);
+                    }
                 } catch (JsonSyntaxException e) {
                     e.printStackTrace();
                 }
             }
         }
-
-        disposable.add(lessonRepository.getLessonProgressSync(array)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(new DisposableSingleObserver<RestResponse>() {
-                    @Override
-                    public void onSuccess(RestResponse restResponse) {
-                        if (restResponse.getResponse_code().equals("0")) {
-                            //  Log.e("getLessonProgressSync", "onSuccess: " + array.get(0).getAsString());
-                            lessonProgressList.clear();
-                        }
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Log.e("onError", "===callApiSyncLessonProgress===: " + e.getMessage());
-                        try {
-                            if (!userId.equals("")) {
-                                SyncAPITable syncAPITable = new SyncAPITable();
-
-                                syncAPITable.setApi_name(getString(R.string.lesson_progressed));
-                                syncAPITable.setEndpoint_url("LessonProgress/LessonProgressSync");
-                                syncAPITable.setParameters(String.valueOf(array));
-                                syncAPITable.setHeaders(PrefUtils.getAuthid(getActivity()));
-                                syncAPITable.setStatus(getString(R.string.errored_status));
-                                syncAPITable.setDescription(e.getMessage());
-                                syncAPITable.setCreated_time(getUTCTime());
-                                syncAPITable.setGradeName(gradeName);
-                                syncAPITable.setCourseName(CourseName);
-                                syncAPITable.setUserid(Integer.parseInt(userId));
-                                syncAPIDatabaseRepository.insertSyncData(syncAPITable);
-
-                                NoonApplication.cacheStatus = 2;
-                                SharedPreferences sharedPreferencesCache = getActivity().getSharedPreferences("cacheStatus", MODE_PRIVATE);
-                                SharedPreferences.Editor editor = sharedPreferencesCache.edit();
-                                if (editor != null) {
-                                    editor.clear();
-                                    editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
-                                    editor.apply();
-                                }
+        if (array.size() != 0) {
+            disposable.add(lessonRepository.getLessonProgressSync(array)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeWith(new DisposableSingleObserver<RestResponse>() {
+                        @Override
+                        public void onSuccess(RestResponse restResponse) {
+                            if (restResponse.getResponse_code().equals("0")) {
+                                //  Log.e("getLessonProgressSync", "onSuccess: " + array.get(0).getAsString());
+                                lessonProgressList.clear();
                             }
-                        } catch (JsonSyntaxException exeption) {
-                            exeption.printStackTrace();
                         }
 
-                    }
-                }));
+                        @Override
+                        public void onError(Throwable e) {
+                            Log.e("onError", "===callApiSyncLessonProgress===: " + e.getMessage());
+                            try {
+                                if (!userId.equals("")) {
+                                    SyncAPITable syncAPITable = new SyncAPITable();
+
+                                    syncAPITable.setApi_name(getString(R.string.lesson_progressed));
+                                    syncAPITable.setEndpoint_url("LessonProgress/LessonProgressSync");
+                                    syncAPITable.setParameters(String.valueOf(array));
+                                    syncAPITable.setHeaders(PrefUtils.getAuthid(getActivity()));
+                                    syncAPITable.setStatus(getString(R.string.errored_status));
+                                    syncAPITable.setDescription(e.getMessage());
+                                    syncAPITable.setCreated_time(getUTCTime());
+                                    syncAPITable.setGradeName(gradeName);
+                                    syncAPITable.setCourseName(CourseName);
+                                    syncAPITable.setUserid(Integer.parseInt(userId));
+                                    syncAPIDatabaseRepository.insertSyncData(syncAPITable);
+
+                                    NoonApplication.cacheStatus = 2;
+                                    SharedPreferences sharedPreferencesCache = getActivity().getSharedPreferences("cacheStatus", MODE_PRIVATE);
+                                    SharedPreferences.Editor editor = sharedPreferencesCache.edit();
+                                    if (editor != null) {
+                                        editor.clear();
+                                        editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
+                                        editor.apply();
+                                    }
+                                }
+                            } catch (JsonSyntaxException exeption) {
+                                exeption.printStackTrace();
+                            }
+
+                        }
+                    }));
+        }
     }
 
     private void callApiSyncChapter(ArrayList<ChapterProgress> chapterprogress) {
         JsonArray array = new JsonArray();
         if (!chapterprogress.isEmpty()) {
             for (int i = 0; i < chapterprogress.size(); i++) {
-                JsonObject jsonObject = new JsonObject();//done ?
+                JsonObject jsonObject = new JsonObject();
                 try {
-                    jsonObject.addProperty("courseid", Integer.parseInt(chapterprogress.get(i).getCourseId()));
-                    jsonObject.addProperty("chapterid", Integer.parseInt(chapterprogress.get(i).getChapterId()));
-                    jsonObject.addProperty("userid", Integer.parseInt(chapterprogress.get(i).getUserId()));
-                    jsonObject.addProperty("progress", Integer.parseInt(chapterprogress.get(i).getProgress()));
-                    array.add(jsonObject);
+                    if (!chapterprogress.get(i).getProgress().equals("0")) {
+                        jsonObject.addProperty("courseid", Integer.parseInt(chapterprogress.get(i).getCourseId()));
+                        jsonObject.addProperty("chapterid", Integer.parseInt(chapterprogress.get(i).getChapterId()));
+                        jsonObject.addProperty("userid", Integer.parseInt(chapterprogress.get(i).getUserId()));
+                        jsonObject.addProperty("progress", Integer.parseInt(chapterprogress.get(i).getProgress()));
+                        array.add(jsonObject);
+                    }
                 } catch (JsonSyntaxException e) {
                     e.printStackTrace();
                 }
             }
 
         }
-
-        disposable.add(lessonRepository.getChapterProgressSync(array).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(new DisposableSingleObserver<RestResponse>() {
-                    @Override
-                    public void onSuccess(RestResponse restResponse) {
-                        if (restResponse.getResponse_code().equals("0")) {
-                            chapterProgressList.clear();
-                        }
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Log.e("onError", "===callApiSyncChapter===: " + e.getMessage());
-                        try {
-                            if (!userId.equals("")) {
-                                SyncAPITable syncAPITable = new SyncAPITable();
-
-                                syncAPITable.setApi_name(getString(R.string.chapter_progressed));
-                                syncAPITable.setEndpoint_url("ChapterProgress/ChapterProgressSync");
-                                syncAPITable.setParameters(String.valueOf(array));
-                                syncAPITable.setHeaders(PrefUtils.getAuthid(getActivity()));
-                                syncAPITable.setStatus(getString(R.string.errored_status));
-                                syncAPITable.setDescription(e.getMessage());
-                                syncAPITable.setCreated_time(getUTCTime());
-                                syncAPITable.setGradeName(gradeName);
-                                syncAPITable.setCourseName(CourseName);
-                                syncAPITable.setUserid(Integer.parseInt(userId));
-                                syncAPIDatabaseRepository.insertSyncData(syncAPITable);
-
-                                NoonApplication.cacheStatus = 2;
-                                SharedPreferences sharedPreferencesCache = getActivity().getSharedPreferences("cacheStatus", MODE_PRIVATE);
-                                SharedPreferences.Editor editor = sharedPreferencesCache.edit();
-                                if (editor != null) {
-                                    editor.clear();
-                                    editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
-                                    editor.apply();
-                                }
+        if (array.size() != 0) {
+            disposable.add(lessonRepository.getChapterProgressSync(array).subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeWith(new DisposableSingleObserver<RestResponse>() {
+                        @Override
+                        public void onSuccess(RestResponse restResponse) {
+                            if (restResponse.getResponse_code().equals("0")) {
+                                chapterProgressList.clear();
                             }
-                        } catch (JsonSyntaxException exeption) {
-                            exeption.printStackTrace();
                         }
-                    }
-                }));
+
+                        @Override
+                        public void onError(Throwable e) {
+                            Log.e("onError", "===callApiSyncChapter===: " + e.getMessage());
+                            try {
+                                if (!userId.equals("")) {
+                                    SyncAPITable syncAPITable = new SyncAPITable();
+
+                                    syncAPITable.setApi_name(getString(R.string.chapter_progressed));
+                                    syncAPITable.setEndpoint_url("ChapterProgress/ChapterProgressSync");
+                                    syncAPITable.setParameters(String.valueOf(array));
+                                    syncAPITable.setHeaders(PrefUtils.getAuthid(getActivity()));
+                                    syncAPITable.setStatus(getString(R.string.errored_status));
+                                    syncAPITable.setDescription(e.getMessage());
+                                    syncAPITable.setCreated_time(getUTCTime());
+                                    syncAPITable.setGradeName(gradeName);
+                                    syncAPITable.setCourseName(CourseName);
+                                    syncAPITable.setUserid(Integer.parseInt(userId));
+                                    syncAPIDatabaseRepository.insertSyncData(syncAPITable);
+
+                                    NoonApplication.cacheStatus = 2;
+                                    SharedPreferences sharedPreferencesCache = getActivity().getSharedPreferences("cacheStatus", MODE_PRIVATE);
+                                    SharedPreferences.Editor editor = sharedPreferencesCache.edit();
+                                    if (editor != null) {
+                                        editor.clear();
+                                        editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
+                                        editor.apply();
+                                    }
+                                }
+                            } catch (JsonSyntaxException exeption) {
+                                exeption.printStackTrace();
+                            }
+                        }
+                    }));
+        }
     }
 
     private void callApiSyncFiles(ArrayList<FileProgress> fileProgressList) {
@@ -835,63 +841,66 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
         if (!fileProgressList.isEmpty()) {
             for (int i = 0; i < fileProgressList.size(); i++) {
                 JsonObject jsonObject = new JsonObject();
-
+                Log.e("getProgress", "callApiSyncFiles: " + fileProgressList.get(i).getProgress());
                 try {
-                    jsonObject.addProperty("lessonid", Integer.parseInt(fileProgressList.get(i).getLessonId()));
-                    jsonObject.addProperty("fileid", Integer.parseInt(fileProgressList.get(i).getFileId()));
-                    jsonObject.addProperty("userid", Integer.parseInt(fileProgressList.get(i).getUserId()));
-                    jsonObject.addProperty("progress", Integer.parseInt(fileProgressList.get(i).getProgress()));
-                    array.add(jsonObject);
+                    if (!fileProgressList.get(i).getProgress().equals("0")) {
+                        jsonObject.addProperty("lessonid", Integer.parseInt(fileProgressList.get(i).getLessonId()));
+                        jsonObject.addProperty("fileid", Integer.parseInt(fileProgressList.get(i).getFileId()));
+                        jsonObject.addProperty("userid", Integer.parseInt(fileProgressList.get(i).getUserId()));
+                        jsonObject.addProperty("progress", Integer.parseInt(fileProgressList.get(i).getProgress()));
+                        array.add(jsonObject);
+                    }
                 } catch (JsonSyntaxException e) {
                     e.printStackTrace();
                 }
             }
         }
 
-        disposable.add(lessonRepository.getFileProgressSync(array).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(new DisposableSingleObserver<RestResponse>() {
-                    @Override
-                    public void onSuccess(RestResponse restResponse) {
-                        if (restResponse.getResponse_code().equals("0")) {
-                            fileProgressList.clear();
-                        }
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Log.e("onError", "====callApiSyncFiles=====: " + e.getMessage());
-                        try {
-                            if (!userId.equals("")) {
-                                SyncAPITable syncAPITable = new SyncAPITable();
-
-                                syncAPITable.setApi_name(getString(R.string.file_progressed));
-                                syncAPITable.setEndpoint_url("FileProgress/FileProgressSync");
-                                syncAPITable.setParameters(String.valueOf(array));
-                                syncAPITable.setHeaders(PrefUtils.getAuthid(getActivity()));
-                                syncAPITable.setStatus(getString(R.string.errored_status));
-                                syncAPITable.setDescription(e.getMessage());
-                                syncAPITable.setCreated_time(getUTCTime());
-                                syncAPITable.setGradeName(gradeName);
-                                syncAPITable.setCourseName(CourseName);
-                                syncAPITable.setUserid(Integer.parseInt(userId));
-                                syncAPIDatabaseRepository.insertSyncData(syncAPITable);
-
-                                NoonApplication.cacheStatus = 2;
-                                SharedPreferences sharedPreferencesCache = getActivity().getSharedPreferences("cacheStatus", MODE_PRIVATE);
-                                SharedPreferences.Editor editor = sharedPreferencesCache.edit();
-                                if (editor != null) {
-                                    editor.clear();
-                                    editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
-                                    editor.apply();
-                                }
+        if (array.size() != 0)
+            disposable.add(lessonRepository.getFileProgressSync(array).subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeWith(new DisposableSingleObserver<RestResponse>() {
+                        @Override
+                        public void onSuccess(RestResponse restResponse) {
+                            if (restResponse.getResponse_code().equals("0")) {
+                                fileProgressList.clear();
                             }
-                        } catch (JsonSyntaxException exeption) {
-                            exeption.printStackTrace();
                         }
 
-                    }
-                }));
+                        @Override
+                        public void onError(Throwable e) {
+                            Log.e("onError", "====callApiSyncFiles=====: " + e.getMessage());
+                            try {
+                                if (!userId.equals("")) {
+                                    SyncAPITable syncAPITable = new SyncAPITable();
+
+                                    syncAPITable.setApi_name(getString(R.string.file_progressed));
+                                    syncAPITable.setEndpoint_url("FileProgress/FileProgressSync");
+                                    syncAPITable.setParameters(String.valueOf(array));
+                                    syncAPITable.setHeaders(PrefUtils.getAuthid(getActivity()));
+                                    syncAPITable.setStatus(getString(R.string.errored_status));
+                                    syncAPITable.setDescription(e.getMessage());
+                                    syncAPITable.setCreated_time(getUTCTime());
+                                    syncAPITable.setGradeName(gradeName);
+                                    syncAPITable.setCourseName(CourseName);
+                                    syncAPITable.setUserid(Integer.parseInt(userId));
+                                    syncAPIDatabaseRepository.insertSyncData(syncAPITable);
+
+                                    NoonApplication.cacheStatus = 2;
+                                    SharedPreferences sharedPreferencesCache = getActivity().getSharedPreferences("cacheStatus", MODE_PRIVATE);
+                                    SharedPreferences.Editor editor = sharedPreferencesCache.edit();
+                                    if (editor != null) {
+                                        editor.clear();
+                                        editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
+                                        editor.apply();
+                                    }
+                                }
+                            } catch (JsonSyntaxException exeption) {
+                                exeption.printStackTrace();
+                            }
+
+                        }
+                    }));
     }
 
     private void callApiSyncQuiz(ArrayList<QuizProgress> quizProgress) {
@@ -901,60 +910,63 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                 JsonObject jsonObject = new JsonObject();
 
                 try {
-                    jsonObject.addProperty("chapterid", Integer.parseInt(quizProgress.get(0).getChapterId()));
-                    jsonObject.addProperty("quizid", Integer.parseInt(quizProgress.get(0).getQuizId()));
-                    jsonObject.addProperty("userid", Integer.parseInt(quizProgress.get(0).getUserId()));
-                    jsonObject.addProperty("progress", Integer.parseInt(quizProgress.get(0).getProgress()));
-                    array.add(jsonObject);
+                    if (!quizProgress.get(i).getProgress().equals("0")) {
+                        jsonObject.addProperty("chapterid", Integer.parseInt(quizProgress.get(i).getChapterId()));
+                        jsonObject.addProperty("quizid", Integer.parseInt(quizProgress.get(i).getQuizId()));
+                        jsonObject.addProperty("userid", Integer.parseInt(quizProgress.get(i).getUserId()));
+                        jsonObject.addProperty("progress", Integer.parseInt(quizProgress.get(i).getProgress()));
+                        array.add(jsonObject);
+                    }
                 } catch (JsonSyntaxException e) {
                     e.printStackTrace();
                 }
             }
         }
-
-        disposable.add(quizRepository.getQuizProgressSync(array).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(new DisposableSingleObserver<RestResponse>() {
-                    @Override
-                    public void onSuccess(RestResponse restResponse) {
-                        if (restResponse.getResponse_code().equals("0")) {
-                            quizProgressList.clear();
-                        }
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Log.e("onError", "====callApiSyncQuiz====: " + e.getMessage());
-                        try {
-                            if (!userId.equals("")) {
-                                SyncAPITable syncAPITable = new SyncAPITable();
-
-                                syncAPITable.setApi_name(getString(R.string.quiz_attempted));
-                                syncAPITable.setEndpoint_url("QuizProgress/QuizProgressSync");
-                                syncAPITable.setParameters(String.valueOf(array));
-                                syncAPITable.setHeaders(PrefUtils.getAuthid(getActivity()));
-                                syncAPITable.setStatus(getString(R.string.errored_status));
-                                syncAPITable.setDescription(e.getMessage());
-                                syncAPITable.setCreated_time(getUTCTime());
-                                syncAPITable.setGradeName(gradeName);
-                                syncAPITable.setCourseName(CourseName);
-                                syncAPITable.setUserid(Integer.parseInt(userId));
-                                syncAPIDatabaseRepository.insertSyncData(syncAPITable);
-
-                                NoonApplication.cacheStatus = 2;
-                                SharedPreferences sharedPreferencesCache = getActivity().getSharedPreferences("cacheStatus", MODE_PRIVATE);
-                                SharedPreferences.Editor editor = sharedPreferencesCache.edit();
-                                if (editor != null) {
-                                    editor.clear();
-                                    editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
-                                    editor.apply();
-                                }
+        if (array.size() != 0) {
+            disposable.add(quizRepository.getQuizProgressSync(array).subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeWith(new DisposableSingleObserver<RestResponse>() {
+                        @Override
+                        public void onSuccess(RestResponse restResponse) {
+                            if (restResponse.getResponse_code().equals("0")) {
+                                quizProgressList.clear();
                             }
-                        } catch (JsonSyntaxException exeption) {
-                            exeption.printStackTrace();
                         }
-                    }
-                }));
+
+                        @Override
+                        public void onError(Throwable e) {
+                            Log.e("onError", "====callApiSyncQuiz====: " + e.getMessage());
+                            try {
+                                if (!userId.equals("")) {
+                                    SyncAPITable syncAPITable = new SyncAPITable();
+
+                                    syncAPITable.setApi_name(getString(R.string.quiz_attempted));
+                                    syncAPITable.setEndpoint_url("QuizProgress/QuizProgressSync");
+                                    syncAPITable.setParameters(String.valueOf(array));
+                                    syncAPITable.setHeaders(PrefUtils.getAuthid(getActivity()));
+                                    syncAPITable.setStatus(getString(R.string.errored_status));
+                                    syncAPITable.setDescription(e.getMessage());
+                                    syncAPITable.setCreated_time(getUTCTime());
+                                    syncAPITable.setGradeName(gradeName);
+                                    syncAPITable.setCourseName(CourseName);
+                                    syncAPITable.setUserid(Integer.parseInt(userId));
+                                    syncAPIDatabaseRepository.insertSyncData(syncAPITable);
+
+                                    NoonApplication.cacheStatus = 2;
+                                    SharedPreferences sharedPreferencesCache = getActivity().getSharedPreferences("cacheStatus", MODE_PRIVATE);
+                                    SharedPreferences.Editor editor = sharedPreferencesCache.edit();
+                                    if (editor != null) {
+                                        editor.clear();
+                                        editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
+                                        editor.apply();
+                                    }
+                                }
+                            } catch (JsonSyntaxException exeption) {
+                                exeption.printStackTrace();
+                            }
+                        }
+                    }));
+        }
     }
 
     @Override
@@ -1012,7 +1024,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
 
                     boolean isPlayingVideoview = fragmentCourseItemLayoutBinding.videoViewer.videoView.getPlayer().isPlaying();
                     String videoviewTagValue = (String) fragmentCourseItemLayoutBinding.videoViewer.videoView.getTag(R.string.playvideotag_key);
-                    if (isPlayingVideoview == true && !TextUtils.isEmpty(videoviewTagValue)) {
+                    if (isPlayingVideoview && !TextUtils.isEmpty(videoviewTagValue)) {
                         if (videoviewTagValue.equalsIgnoreCase(fileid)) {
                             //Toast.makeText(ctx, "not cnay chaneg go back", Toast.LENGTH_SHORT).show();
                             //fragmentCourseItemLayoutBinding.videoViewer.videoView.getPlayer().seekTo(0);
@@ -1064,6 +1076,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                             public void onClick(View view) {
                                 fragmentCourseItemLayoutBinding.videoViewer.videoView.getPlayer().pause();
 
+
                                 final Dialog dialog = new Dialog(getActivity(), android.R.style.Theme_Translucent_NoTitleBar);
                                 dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
                                 dialog.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
@@ -1110,6 +1123,10 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                                         editor.apply();
                                     }
                                     showHitLimitDialog(NoonApplication.getContext());
+                                }
+                                Log.e("getProgress", "pdfViewLayout:");
+                                if (fileProgressList.size() > 0) {
+                                    callApiSyncFiles(fileProgressList);
                                 }
 
                                 try {
@@ -1164,12 +1181,13 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                                     });
                                 } catch (Exception e) {
                                     e.printStackTrace();
-
                                 }
 
                                 dialogViewerItemLayoutBinding.pdfViewLayout.pdfviewLay.setVisibility(View.VISIBLE);
                                 dialogViewerItemLayoutBinding.pdfViewLayout.pdfCourseName.setText(CourseName);
                                 dialogViewerItemLayoutBinding.pdfViewLayout.pdflessonName.setText(LessonName);
+
+
                                 dialogViewerItemLayoutBinding.pdfViewLayout.backPdfButton.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View view) {
@@ -1291,6 +1309,9 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                             fragmentCourseItemLayoutBinding.videoViewer.videoView.setVisibility(View.GONE);
                             fragmentCourseItemLayoutBinding.videoViewer.appvideoloadingLay.setVisibility(View.VISIBLE);
 
+                            if (fileProgressList.size() > 0) {
+                                callApiSyncFiles(fileProgressList);
+                            }
 //                        fragmentCourseItemLayoutBinding.textPdfAssignmentLay.setVisibility(View.VISIBLE);
 //                        fragmentCourseItemLayoutBinding.courseitemView.setVisibility(View.VISIBLE);
 
@@ -1522,6 +1543,8 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                                 });
                             } catch (Exception e) {
                                 e.printStackTrace();
+
+
                                 // Log.e(Const.LOG_NOON_TAG, "4444" + "NO Space" + e.getMessage());
                                 //Toast.makeText(getActivity(), R.string.error_no_space, Toast.LENGTH_LONG).show();
                             }
@@ -3147,7 +3170,6 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
         super.setUserVisibleHint(isVisibleToUser);
         if (isVisibleToUser && ChapterActivity.pageNo == 0) {
             if (getFragmentManager() != null) {
-
 
             }
         }

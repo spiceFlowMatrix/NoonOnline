@@ -190,6 +190,7 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
     private List<SyncAPITable> syncAPITableList;
     private SyncAPIDatabaseRepository syncAPIDatabaseRepository;
     private String additionalAssignment;
+    private CoursePriviewObject.Lessonfiles lessonsModel;
 
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
@@ -383,7 +384,7 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
                     }
                 });
                 for (int i = 0; i < lessonfiles.size(); i++) {
-                    CoursePriviewObject.Lessonfiles lessonsModel = lessonfiles.get(i);
+                    lessonsModel = lessonfiles.get(i);
                     LessonProgress lessonProgressPrv = lessonDatabaseRepository.getItemLessonProgressData(model.getId(), lessonsModel.getFiles().getId(), userId);
                     if (lessonProgressPrv != null && !lessonProgressPrv.getLessonProgress().isEmpty()) {
                         lessonprogress += Integer.parseInt(lessonProgressPrv.getLessonProgress());
@@ -394,32 +395,37 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
                         holder.courseInnerItemLayoutBinding.tvProgress.setText(("0").concat(" ").concat(holder.itemView.getContext().getString(R.string.completed1)));
                     }
 
-                    FileProgress progress = lessonDatabaseRepository.getFileProgressData(lessonsModel.getFiles().getId(), model.getId());
+                    //fileSyncMethod(lessonsModel, model);
+
+                    /*FileProgress progress = lessonDatabaseRepository.getFileProgressData(lessonsModel.getFiles().getId(), model.getId());
                     if (progress != null && progress.getLessonId().equals(model.getId()) && progress.getFileId().equals(lessonsModel.getFiles().getId())) {
                         FileProgress fileProgress = new FileProgress();
-                        /*if (i == lessonfiles.size() - 1) {
+                        */
+
+                    /*if (i == lessonfiles.size() - 1) {
                             chapterPro += model.getProgressVal();
-                        }*/
+                        }*//*
                         fileProgress.setUserId(userId);
                         fileProgress.setLessonId(model.getId());
                         fileProgress.setFileId(lessonsModel.getFiles().getId());
                         fileProgress.setProgress(String.valueOf(model.getProgressVal()));
                         lessonDatabaseRepository.updateFileProgressData(fileProgress);
                         fileProgressList.add(fileProgress);
-
+                        Log.e("fileProgressList", "updateFileProgressData:" + fileProgressList.toString() + " SIZE : " + fileProgressList.size());
 
                     } else {
                         FileProgress fileProgress = new FileProgress();
-                        /*if (i == lessonfiles.size() - 1) {
+                        *//*if (i == lessonfiles.size() - 1) {
                             chapterPro += model.getProgressVal();
-                        }*/
+                        }*//*
                         fileProgress.setUserId(userId);
                         fileProgress.setLessonId(model.getId());
                         fileProgress.setFileId(lessonsModel.getFiles().getId());
                         fileProgress.setProgress(String.valueOf(model.getProgressVal()));
                         lessonDatabaseRepository.insertFileProgressData(fileProgress);
                         fileProgressList.add(fileProgress);
-                    }
+                        Log.e("fileProgressList", "insertFileProgressData:" + fileProgressList.toString() + " SIZE : " + fileProgressList.size());
+                    }*/
 
                     /*if (lessonfiles.size() == 1) {
                         lessonsModel = lessonfiles.get(0);
@@ -745,6 +751,7 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
                                     }
                                 } else {
                                     Toast.makeText(ctx, ctx.getResources().getString(R.string.assignment_unauthorize_warning), Toast.LENGTH_SHORT).show();
+                                    holder.courseInnerItemLayoutBinding.cardItemLayout.setEnabled(true);
                                 }
                             }
                         } else {
@@ -777,6 +784,36 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
                 //showCustomDialogDelete(position, holder);
             }
         });
+    }
+
+    private void fileSyncMethod(CoursePriviewObject.Lessonfiles lessonsModel, CoursePriviewObject.Lessons model) {
+        FileProgress progress = lessonDatabaseRepository.getFileProgressData(lessonsModel.getFiles().getId(), model.getId());
+        if (progress != null && progress.getLessonId().equals(model.getId()) && progress.getFileId().equals(lessonsModel.getFiles().getId())) {
+            FileProgress fileProgress = new FileProgress();
+                        /*if (i == lessonfiles.size() - 1) {
+                            chapterPro += model.getProgressVal();
+                        }*/
+            fileProgress.setUserId(userId);
+            fileProgress.setLessonId(model.getId());
+            fileProgress.setFileId(lessonsModel.getFiles().getId());
+            fileProgress.setProgress(String.valueOf(model.getProgressVal()));
+            lessonDatabaseRepository.updateFileProgressData(fileProgress);
+            fileProgressList.add(fileProgress);
+            Log.e("fileProgressList", "updateFileProgressData:" + fileProgressList.toString() + " SIZE : " + fileProgressList.size());
+
+        } else {
+            FileProgress fileProgress = new FileProgress();
+                        /*if (i == lessonfiles.size() - 1) {
+                            chapterPro += model.getProgressVal();
+                        }*/
+            fileProgress.setUserId(userId);
+            fileProgress.setLessonId(model.getId());
+            fileProgress.setFileId(lessonsModel.getFiles().getId());
+            fileProgress.setProgress(String.valueOf(model.getProgressVal()));
+            lessonDatabaseRepository.insertFileProgressData(fileProgress);
+            fileProgressList.add(fileProgress);
+            Log.e("fileProgressList", "insertFileProgressData:" + fileProgressList.toString() + " SIZE : " + fileProgressList.size());
+        }
     }
 
 
@@ -999,6 +1036,7 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
                                 encrypted_path = selectedVideoPath.substring(0, selectedVideoPath.lastIndexOf("/")) + "/" + str;
                                 String decryptpath = EncrypterDecryptAlgo.decrypt(keyFromKeydata, paramSpec, new FileInputStream(outFile), encrypted_path);
                                 Log.d("file_____", String.valueOf(decryptpath));
+                                fileSyncMethod(lessonsModel, model);
                                 courseInnerItemInterface.courseInnerItem(ctx, lessonsModel.getFiles().getFiletypeid(), lessonsModel.getFiles().getFiletypename(), decryptpath, position, model.getId(), model.getProgressVal(), "", 0, chapterid, lessonsModel.getFiles().getId(), model.getName());
 
                             } else if (lessonsModel.getFiles().getFiletypeid().equals("2")) {
@@ -1015,6 +1053,7 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
                                 encrypted_path = selectedVideoPath.substring(0, selectedVideoPath.lastIndexOf("/")) + "/" + str;
                                 String decryptpath = EncrypterDecryptAlgo.decrypt(keyFromKeydata, paramSpec, new FileInputStream(outFile), encrypted_path);
                                 Log.d("file_____", String.valueOf(decryptpath));
+                                fileSyncMethod(lessonsModel, model);
                                 courseInnerItemInterface.courseInnerItem(ctx, lessonsModel.getFiles().getFiletypeid(), lessonsModel.getFiles().getFiletypename(), decryptpath, position, model.getId(), model.getProgressVal(), "", playpushflag, chapterid, lessonsModel.getFiles().getId(), model.getName());
                             }
 

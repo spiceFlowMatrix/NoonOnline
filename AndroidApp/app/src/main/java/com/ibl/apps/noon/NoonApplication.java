@@ -583,7 +583,8 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
 
         } else if (syncAPITableList.get(position).getEndpoint_url().contains("LessonProgress/LessonProgressSync")) {
             //            JsonArray jsonArray = new Gson().fromJson(syncAPITableList.get(position).getParameters(), JsonArray.class);
-            callApiSyncLessonProgress(lessonProgressList, position);
+            if (lessonProgressList.size() >= 0)
+                callApiSyncLessonProgress(lessonProgressList, position);
 
             cacheStatus = 3;
             SharedPreferences sharedPreferencesCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
@@ -594,7 +595,8 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
                 editor.apply();
             }
         } else if (syncAPITableList.get(position).getEndpoint_url().contains("ChapterProgress/ChapterProgressSync")) {
-            callApiSyncChapter(chapterProgressList, position);
+            if (chapterProgressList.size() >= 0)
+                callApiSyncChapter(chapterProgressList, position);
 
             cacheStatus = 3;
             SharedPreferences sharedPreferencesCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
@@ -606,7 +608,8 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
             }
 
         } else if (syncAPITableList.get(position).getEndpoint_url().contains("FileProgress/FileProgressSync")) {
-            callApiSyncFiles(fileProgressList, position);
+            if (fileProgressList.size() >= 0)
+                callApiSyncFiles(fileProgressList, position);
 
             cacheStatus = 3;
             SharedPreferences sharedPreferencesCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
@@ -635,7 +638,8 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
             }
 
         } else if (syncAPITableList.get(position).getEndpoint_url().contains("QuizProgress/QuizProgressSync")) {
-            callApiSyncQuiz(quizProgressList, position);
+            if (quizProgressList.size() >= 0)
+                callApiSyncQuiz(quizProgressList, position);
 
             cacheStatus = 3;
             SharedPreferences sharedPreferencesCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
@@ -771,13 +775,13 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
                 JsonObject jsonObject = new JsonObject();
 
                 try {
-                    // if (!lessonNewProgress.get(i).getProgress().equals("0")) {
-                    jsonObject.addProperty("chapterid", Integer.parseInt(lessonNewProgress.get(i).getChapterId()));
-                    jsonObject.addProperty("lessonid", Integer.parseInt(lessonNewProgress.get(i).getLessonId()));
-                    jsonObject.addProperty("userid", Integer.parseInt(lessonNewProgress.get(i).getUserId()));
-                    jsonObject.addProperty("progress", Integer.parseInt(lessonNewProgress.get(i).getProgress()));
-                    array.add(jsonObject);
-                    // }
+                    if (!lessonNewProgress.get(i).getProgress().equals("0")) {
+                        jsonObject.addProperty("chapterid", Integer.parseInt(lessonNewProgress.get(i).getChapterId()));
+                        jsonObject.addProperty("lessonid", Integer.parseInt(lessonNewProgress.get(i).getLessonId()));
+                        jsonObject.addProperty("userid", Integer.parseInt(lessonNewProgress.get(i).getUserId()));
+                        jsonObject.addProperty("progress", Integer.parseInt(lessonNewProgress.get(i).getProgress()));
+                        array.add(jsonObject);
+                    }
                 } catch (JsonSyntaxException e) {
                     e.printStackTrace();
                 }
@@ -794,7 +798,8 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
                             //  Log.e("getLessonProgressSync", "onSuccess: " + array.get(0).getAsString());
                             lessonProgressList.clear();
                             syncAPITableList.remove(position);
-                            syncAPIDatabaseRepository.deleteById(Integer.parseInt(userId));
+                            if (!userId.isEmpty())
+                                syncAPIDatabaseRepository.deleteById(Integer.parseInt(userId));
                             //cacheEventsListAdapter.notifyItemRemoved(position);
                             callSyncADIBackground(position);
                         }
@@ -828,11 +833,13 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
             for (int i = 0; i < chapterprogress.size(); i++) {
                 JsonObject jsonObject = new JsonObject();
                 try {
-                    jsonObject.addProperty("courseid", Integer.parseInt(chapterprogress.get(i).getCourseId()));
-                    jsonObject.addProperty("chapterid", Integer.parseInt(chapterprogress.get(i).getChapterId()));
-                    jsonObject.addProperty("userid", Integer.parseInt(chapterprogress.get(i).getUserId()));
-                    jsonObject.addProperty("progress", Integer.parseInt(chapterprogress.get(i).getProgress()));
-                    array.add(jsonObject);
+                    if (!chapterprogress.get(i).getProgress().equals("0")) {
+                        jsonObject.addProperty("courseid", Integer.parseInt(chapterprogress.get(i).getCourseId()));
+                        jsonObject.addProperty("chapterid", Integer.parseInt(chapterprogress.get(i).getChapterId()));
+                        jsonObject.addProperty("userid", Integer.parseInt(chapterprogress.get(i).getUserId()));
+                        jsonObject.addProperty("progress", Integer.parseInt(chapterprogress.get(i).getProgress()));
+                        array.add(jsonObject);
+                    }
                 } catch (JsonSyntaxException e) {
                     e.printStackTrace();
                 }
@@ -882,11 +889,13 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
                 JsonObject jsonObject = new JsonObject();
 
                 try {
-                    jsonObject.addProperty("lessonid", Integer.parseInt(fileProgressList.get(i).getLessonId()));
-                    jsonObject.addProperty("fileid", Integer.parseInt(fileProgressList.get(i).getFileId()));
-                    jsonObject.addProperty("userid", Integer.parseInt(fileProgressList.get(i).getUserId()));
-                    jsonObject.addProperty("progress", Integer.parseInt(fileProgressList.get(i).getProgress()));
-                    array.add(jsonObject);
+                    if (!fileProgressList.get(i).getProgress().equals("0")) {
+                        jsonObject.addProperty("lessonid", Integer.parseInt(fileProgressList.get(i).getLessonId()));
+                        jsonObject.addProperty("fileid", Integer.parseInt(fileProgressList.get(i).getFileId()));
+                        jsonObject.addProperty("userid", Integer.parseInt(fileProgressList.get(i).getUserId()));
+                        jsonObject.addProperty("progress", Integer.parseInt(fileProgressList.get(i).getProgress()));
+                        array.add(jsonObject);
+                    }
                 } catch (JsonSyntaxException e) {
                     e.printStackTrace();
                 }
@@ -935,11 +944,13 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
                 JsonObject jsonObject = new JsonObject();
 
                 try {
-                    jsonObject.addProperty("chapterid", Integer.parseInt(quizProgress.get(0).getChapterId()));
-                    jsonObject.addProperty("quizid", Integer.parseInt(quizProgress.get(0).getQuizId()));
-                    jsonObject.addProperty("userid", Integer.parseInt(quizProgress.get(0).getUserId()));
-                    jsonObject.addProperty("progress", Integer.parseInt(quizProgress.get(0).getProgress()));
-                    array.add(jsonObject);
+                    if (!quizProgress.get(i).getProgress().equals("0")) {
+                        jsonObject.addProperty("chapterid", Integer.parseInt(quizProgress.get(i).getChapterId()));
+                        jsonObject.addProperty("quizid", Integer.parseInt(quizProgress.get(i).getQuizId()));
+                        jsonObject.addProperty("userid", Integer.parseInt(quizProgress.get(i).getUserId()));
+                        jsonObject.addProperty("progress", Integer.parseInt(quizProgress.get(i).getProgress()));
+                        array.add(jsonObject);
+                    }
                 } catch (JsonSyntaxException e) {
                     e.printStackTrace();
                 }
