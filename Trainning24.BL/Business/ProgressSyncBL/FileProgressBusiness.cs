@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Trainning24.Domain.Entity;
 using Trainning24.Repository.EF;
 
@@ -27,6 +28,19 @@ namespace Trainning24.BL.Business
             return _eFFileProgressSync.Insert(obj);
         }
 
+        public async Task<int> AddRecordBulk(List<FileProgress> obj)
+        {
+            return await _eFFileProgressSync.SaveAsyncBulk(obj);
+        }
+        public async Task<int> UpdateAsyncBulk(List<FileProgress> obj)
+        {
+            return await _eFFileProgressSync.UpdateAsyncBulk(obj);
+        }
+
+        public List<FileProgress> GetAllByUser(List<long> userId)
+        {
+            return _eFFileProgressSync.ListQuery(b => b.IsDeleted != true && userId.Contains(b.UserId)).ToList();
+        }
         public int UpdateRecord(FileProgress obj)
         {
             return _eFFileProgressSync.Update(obj);

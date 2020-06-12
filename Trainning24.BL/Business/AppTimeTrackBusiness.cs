@@ -24,7 +24,10 @@ namespace Trainning24.BL.Business
             _eFAppTimeTrackSync.Insert(obj);
             return obj;
         }
-
+        public async Task<int> AddRecordBulk(List<AppTimeTrack> obj)
+        {
+            return await _eFAppTimeTrackSync.SaveAsyncBulk(obj);
+        }
         public List<AppTimeTrack> GetTimeTrackingByUserId(List<int> userId)
         {
             return _eFAppTimeTrackSync.ListQuery(b => userId.Contains((int)b.UserId) && b.ActivityTime != null && b.Outtime != null && b.DeletionTime == null && b.IsDeleted != true).ToList();

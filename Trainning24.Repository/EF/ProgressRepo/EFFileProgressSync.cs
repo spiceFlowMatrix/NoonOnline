@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using Trainning24.Abstract.Infrastructure.IGeneric;
 using Trainning24.Domain.Entity;
 using Trainning24.Repository.EF.Generics;
@@ -43,6 +44,15 @@ namespace Trainning24.Repository.EF
             return _context.Insert(obj);
         }
 
+        public async Task<int> SaveAsyncBulk(List<FileProgress> obj)
+        {
+            return await _context.SaveAsyncBulk(obj);
+        }
+
+        public async Task<int> UpdateAsyncBulk(List<FileProgress> obj)
+        {
+            return await _context.UpdateAsyncBulk(obj);
+        }
         public IQueryable<FileProgress> ListQuery(Expression<Func<FileProgress, bool>> where)
         {
             return _context.ListQuery(where);

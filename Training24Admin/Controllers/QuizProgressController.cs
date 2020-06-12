@@ -32,7 +32,7 @@ namespace Training24Admin.Controllers
         #region TimeInterval Services
         [Authorize]
         [HttpPost("QuizProgressSync")]
-        public IActionResult QuizProgressSync([FromBody]List<QuizProgressDTO> obj)
+        public async Task<IActionResult> QuizProgressSync([FromBody]List<QuizProgressDTO> obj)
         {
             SuccessResponse successResponse = new SuccessResponse();
             UnsuccessResponse unsuccessResponse = new UnsuccessResponse();
@@ -43,33 +43,88 @@ namespace Training24Admin.Controllers
             {
                 if (obj.Count > 0)
                 {
-                    foreach (var data in obj)
+                    obj.RemoveAll(x => x.progress == 0);
+                    if (obj.Count == 0)
                     {
-                        var _progress = _quizProgressBusiness.GetExistRecord(data.chapterid, data.quizid, data.userid);
-                        if (_progress == null)
+                        unsuccessResponse.response_code = 1;
+                        unsuccessResponse.message = "no data to sync";
+                        unsuccessResponse.status = "Unsuccess";
+                        return StatusCode(406, unsuccessResponse);
+                    }
+                    var userIds = obj.Select(a => a.userid).ToList();
+                    var _progressAll = _quizProgressBusiness.GetAllByUser(userIds);
+                    if (_progressAll.Count > 0)
+                    {
+                        var UpdateRecordList = _progressAll.Where(a => obj.Where(b => b.chapterid == a.ChapterId && b.quizid == a.QuizId && b.userid == a.UserId).Any()).ToList();
+                        var insertRecordList = obj.Where(a => !_progressAll.Where(b => b.ChapterId == a.chapterid && b.QuizId == a.quizid && b.UserId == a.userid).Any()).ToList();
+                        if (UpdateRecordList.Count > 0)
                         {
-                            QuizProgress _quizProgress = new QuizProgress
+                            UpdateRecordList.Select(a =>
                             {
-                                ChapterId = data.chapterid,
-                                QuizId = data.quizid,
-                                UserId = data.userid,
-                                Progress = data.progress,
+                                a.Progress = obj.Where(b => b.chapterid == a.ChapterId && b.quizid == a.QuizId && b.userid == a.UserId).FirstOrDefault().progress;
+                                a.LastModificationTime = DateTime.Now.ToString();
+                                a.LastModifierUserId = int.Parse(tc.Id);
+                                return a;
+                            }).ToList();
+                            await _quizProgressBusiness.UpdateAsyncBulk(UpdateRecordList);
+                        }
+                        if (insertRecordList.Count > 0)
+                        {
+                            List<QuizProgress> InsertProgress = insertRecordList.Select(a => new QuizProgress()
+                            {
+                                ChapterId = a.chapterid,
+                                QuizId = a.quizid,
+                                UserId = a.userid,
+                                Progress = a.progress,
                                 CreatorUserId = int.Parse(tc.Id),
                                 CreationTime = DateTime.UtcNow.ToString()
-                            };
-                            _quizProgressBusiness.AddRecord(_quizProgress);
-                        }
-                        else
-                        {
-                            if (_progress.Progress < 100)
-                            {
-                                _progress.Progress = data.progress;
-                                _progress.LastModificationTime = DateTime.UtcNow.ToString();
-                                _progress.LastModifierUserId = int.Parse(tc.Id);
-                                _quizProgressBusiness.UpdateRecord(_progress);
-                            }
+                            }).ToList();
+                            await _quizProgressBusiness.AddRecordBulk(InsertProgress);
                         }
                     }
+                    else
+                    {
+                        List<QuizProgress> InsertProgress = obj.Select(a => new QuizProgress()
+                        {
+                            ChapterId = a.chapterid,
+                            QuizId = a.quizid,
+                            UserId = a.userid,
+                            Progress = a.progress,
+                            CreatorUserId = int.Parse(tc.Id),
+                            CreationTime = DateTime.UtcNow.ToString()
+                        }).ToList();
+                        await _quizProgressBusiness.AddRecordBulk(InsertProgress);
+                    }
+
+                    #region Commeted Old code
+                    //foreach (var data in obj)
+                    //{
+                    //    var _progress = _quizProgressBusiness.GetExistRecord(data.chapterid, data.quizid, data.userid);
+                    //    if (_progress == null)
+                    //    {
+                    //        QuizProgress _quizProgress = new QuizProgress
+                    //        {
+                    //            ChapterId = data.chapterid,
+                    //            QuizId = data.quizid,
+                    //            UserId = data.userid,
+                    //            Progress = data.progress,
+                    //            CreatorUserId = int.Parse(tc.Id),
+                    //            CreationTime = DateTime.UtcNow.ToString()
+                    //        };
+                    //        _quizProgressBusiness.AddRecord(_quizProgress);
+                    //    }
+                    //    else
+                    //    {
+                    //        if (_progress.Progress < 100)
+                    //        {
+                    //            _progress.Progress = data.progress;
+                    //            _progress.LastModificationTime = DateTime.UtcNow.ToString();
+                    //            _progress.LastModifierUserId = int.Parse(tc.Id);
+                    //            _quizProgressBusiness.UpdateRecord(_progress);
+                    //        }
+                    //    }
+                    //} 
+                    #endregion
                     successResponse.response_code = 0;
                     successResponse.message = "quiz progress synced";
                     successResponse.status = "Success";

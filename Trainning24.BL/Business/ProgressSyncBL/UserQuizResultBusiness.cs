@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Trainning24.Domain.Entity;
 using Trainning24.Repository.EF;
 
@@ -26,7 +27,10 @@ namespace Trainning24.BL.Business
         {
             return _eFUserQuizResultSync.Insert(obj);
         }
-
+        public async Task<int> AddRecordBulk(List<UserQuizResult> obj)
+        {
+            return await _eFUserQuizResultSync.SaveAsyncBulk(obj);
+        }
         public int UpdateRecord(UserQuizResult obj)
         {
             return _eFUserQuizResultSync.Update(obj);

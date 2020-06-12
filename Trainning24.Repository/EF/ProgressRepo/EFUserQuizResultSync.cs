@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using Trainning24.Abstract.Infrastructure.IGeneric;
 using Trainning24.Domain.Entity;
 using Trainning24.Repository.EF.Generics;
@@ -42,7 +43,10 @@ namespace Trainning24.Repository.EF
         {
             return _context.Insert(obj);
         }
-
+        public async Task<int> SaveAsyncBulk(List<UserQuizResult> obj)
+        {
+            return await _context.SaveAsyncBulk(obj);
+        }
         public IQueryable<UserQuizResult> ListQuery(Expression<Func<UserQuizResult, bool>> where)
         {
             return _context.ListQuery(where);

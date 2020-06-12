@@ -32,7 +32,7 @@ namespace Training24Admin.Controllers
         #region TimeInterval Services
         //[Authorize]
         [HttpPost("UserQuizResultSync")]
-        public IActionResult UserQuizResultSync([FromBody]List<UserQuizResultDTO> obj)
+        public async Task<IActionResult> UserQuizResultSync([FromBody]List<UserQuizResultDTO> obj)
         {
             SuccessResponse successResponse = new SuccessResponse();
             UnsuccessResponse unsuccessResponse = new UnsuccessResponse();
@@ -43,26 +43,41 @@ namespace Training24Admin.Controllers
             {
                 if (obj.Count > 0)
                 {
-                    foreach (var data in obj)
+                    List<UserQuizResult> InsertProgress = obj.Select(data => new UserQuizResult()
                     {
-                        // var _progress = _userQuizResultBusiness.GetExistRecord(data.quizid, data.userid);
-                        // if (_progress == null)
-                        // {
-                        UserQuizResult _userQuizResult = new UserQuizResult
-                        {
-                            QuizId = data.quizid,
-                            UserId = data.userid,
-                            TotalQuestion = data.totalquestion,
-                            AnsweredQuestion = data.answeredquestion,
-                            PerformDate = data.performdate,
-                            PassingScore = data.passingscore,
-                            Score = data.score,
-                            CreatorUserId = int.Parse(tc.Id),
-                            CreationTime = DateTime.Now.ToString()
-                        };
-                        _userQuizResultBusiness.AddRecord(_userQuizResult);
-                        // }
-                    }
+                        QuizId = data.quizid,
+                        UserId = data.userid,
+                        TotalQuestion = data.totalquestion,
+                        AnsweredQuestion = data.answeredquestion,
+                        PerformDate = data.performdate,
+                        PassingScore = data.passingscore,
+                        Score = data.score,
+                        CreatorUserId = int.Parse(tc.Id),
+                        CreationTime = DateTime.Now.ToString()
+                    }).ToList();
+                    await _userQuizResultBusiness.AddRecordBulk(InsertProgress);
+                    #region commted Old code
+                    //foreach (var data in obj)
+                    //{
+                    //    var _progress = _userQuizResultBusiness.GetExistRecord(data.quizid, data.userid);
+                    //    if (_progress == null)
+                    //    {
+                    //        UserQuizResult _userQuizResult = new UserQuizResult
+                    //    {
+                    //        QuizId = data.quizid,
+                    //        UserId = data.userid,
+                    //        TotalQuestion = data.totalquestion,
+                    //        AnsweredQuestion = data.answeredquestion,
+                    //        PerformDate = data.performdate,
+                    //        PassingScore = data.passingscore,
+                    //        Score = data.score,
+                    //        CreatorUserId = int.Parse(tc.Id),
+                    //        CreationTime = DateTime.Now.ToString()
+                    //    };
+                    //    _userQuizResultBusiness.AddRecord(_userQuizResult);
+                    //     }
+                    //} 
+                    #endregion
                     successResponse.response_code = 0;
                     successResponse.message = "user quiz result synced";
                     successResponse.status = "Success";
