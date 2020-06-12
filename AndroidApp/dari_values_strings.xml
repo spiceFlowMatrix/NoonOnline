@@ -455,6 +455,8 @@
     <string name="version_update">آپدیت جدید</string>
     <string name="update_version_message">برای استفاده از مزایای جدید اپلکیشن ن لطفا آنرا با نسخه جدید آپدیت نمایید.</string>
 
+    <string name="assignment_unauthorize_warning">شما به بخش کارخانگی دسترسی ندارید، لطفا با اداره تعلیمات ن برای دسترسی بتماس شوید.</string>
+
     
     <!--<string name="pashto_school">مدرسة الباشتو</string>-->
     <!--For Pashto Notification Translation-->

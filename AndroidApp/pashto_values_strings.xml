@@ -455,6 +455,9 @@
      <!--Version Update-->
     <string name="version_update">نوی اپډېټ</string>
     <string name="update_version_message">د ن اپلېکېشن له نویو اسانتیاوو څخه برخمن کېدو لپاره هیله ده نوې نسخه یې ترلاسه او اپډېټ کړئ.</string>
+    
+    <string name="assignment_unauthorize_warning">تاسو کورنی دنده ته لاسرسی نلرئ، مهرباني وکړئ له ن زده‌کړې د اداري سره اړیکه ونیسئ.</string>
+
 
 
     <!--<string name="pashto_school">مدرسة الباشتو</string>-->
