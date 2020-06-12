@@ -56,31 +56,31 @@ namespace Training24Admin.Controllers
                     if (_progressAll.Count > 0)
                     {
                         var UpdateRecordList = _progressAll.Where(a => obj.Where(b => b.courseid == a.CourseId && b.chapterid == a.ChapterId && b.userid == a.UserId).Any()).ToList();
-                    var insertRecordList = obj.Where(a => !_progressAll.Where(b => b.CourseId == a.courseid && b.ChapterId == a.chapterid && b.UserId == a.userid).Any()).ToList();
-                    if (UpdateRecordList.Count > 0)
-                    {
-                        UpdateRecordList.Select(a =>
+                        var insertRecordList = obj.Where(a => !_progressAll.Where(b => b.CourseId == a.courseid && b.ChapterId == a.chapterid && b.UserId == a.userid).Any()).ToList();
+                        if (UpdateRecordList.Count > 0)
                         {
-                            a.Progress = obj.Where(b => b.chapterid == a.ChapterId && b.courseid == a.CourseId && b.userid == a.UserId).FirstOrDefault().progress;
-                            a.LastModificationTime = DateTime.Now.ToString();
-                            a.LastModifierUserId = int.Parse(tc.Id);
-                            return a;
-                        }).ToList();
-                        await _chapterProgressBusiness.UpdateAsyncBulk(UpdateRecordList);
-                    }
-                    if (insertRecordList.Count > 0)
-                    {
-                        List<ChapterProgress> InsertProgress = insertRecordList.Select(a => new ChapterProgress()
+                            UpdateRecordList.Select(a =>
+                            {
+                                a.Progress = obj.Where(b => b.chapterid == a.ChapterId && b.courseid == a.CourseId && b.userid == a.UserId).FirstOrDefault().progress;
+                                a.LastModificationTime = DateTime.Now.ToString();
+                                a.LastModifierUserId = int.Parse(tc.Id);
+                                return a;
+                            }).ToList();
+                            await _chapterProgressBusiness.UpdateAsyncBulk(UpdateRecordList);
+                        }
+                        if (insertRecordList.Count > 0)
                         {
-                            CourseId = a.courseid,
-                            ChapterId = a.chapterid,
-                            UserId = a.userid,
-                            Progress = a.progress,
-                            CreatorUserId = int.Parse(tc.Id),
-                            CreationTime = DateTime.Now.ToString()
-                        }).ToList();
-                        await _chapterProgressBusiness.AddRecordBulk(InsertProgress);
-                    }
+                            List<ChapterProgress> InsertProgress = insertRecordList.Select(a => new ChapterProgress()
+                            {
+                                CourseId = a.courseid,
+                                ChapterId = a.chapterid,
+                                UserId = a.userid,
+                                Progress = a.progress,
+                                CreatorUserId = int.Parse(tc.Id),
+                                CreationTime = DateTime.Now.ToString()
+                            }).ToList();
+                            await _chapterProgressBusiness.AddRecordBulk(InsertProgress);
+                        }
                     }
                     else
                     {

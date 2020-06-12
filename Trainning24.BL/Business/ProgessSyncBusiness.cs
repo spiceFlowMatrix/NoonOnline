@@ -77,7 +77,7 @@ namespace Trainning24.BL.Business
                 CreationTime = DateTime.Now.ToString(),
                 CreatorUserId = Convert.ToInt32(a.userId)
             }).ToList();
-            return  await _eFQuizTimerSync.AddRecordBulk(InsertProgress);
+            return await _eFQuizTimerSync.AddRecordBulk(InsertProgress);
         }
 
         public ProgessSync CheckRecordExists(long? gradeId, long? lessionId, long? quizId, long userId)
@@ -125,13 +125,21 @@ namespace Trainning24.BL.Business
                     var insertRecordList = obj.Where(a => !_progressAll.Where(b => (b.UserId == a.UserId && b.LessonId == a.LessonId) || (b.UserId == a.UserId && b.QuizId == a.QuizId)).Any()).ToList();
                     if (UpdateRecordList.Count > 0)
                     {
-                        UpdateRecordList.Select(a =>
+                        UpdateRecordList.ForEach(a =>
                         {
+                            var updator = obj.Where(b => (b.UserId == a.UserId && b.LessonId == a.LessonId) || (b.UserId == a.UserId && b.QuizId == a.QuizId)).FirstOrDefault();
+                            a.GradeId = updator.GradeId;
+                            a.FileId = updator.FileId;
                             a.IsStatus = true;
-                            a.LessonProgress = obj.Where(b => (b.UserId == a.UserId && b.LessonId == a.LessonId) || (b.UserId == a.UserId && b.QuizId == a.QuizId)).FirstOrDefault().LessonProgress;
-                            a.TotalRecords = obj.Where(b => (b.UserId == a.UserId && b.LessonId == a.LessonId) || (b.UserId == a.UserId && b.QuizId == a.QuizId)).FirstOrDefault().TotalRecords;
-                            return a;
-                        }).ToList();
+                            a.LessonProgressId = updator.LessonProgressId;
+                            a.LessonId = updator.LessonId;
+                            a.LessonProgress = updator.LessonProgress;
+                            a.QuizId = updator.QuizId;
+                            a.TotalRecords = updator.TotalRecords;
+                            a.UserId = updator.UserId;
+                            a.LastModificationTime = DateTime.Now.ToString();
+                            a.LastModifierUserId = Convert.ToInt32(a.UserId);
+                        });
                         await _eFProgressSync.UpdateAsyncBulk(UpdateRecordList);
                     }
                     if (insertRecordList.Count > 0)

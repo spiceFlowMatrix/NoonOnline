@@ -57,7 +57,7 @@ namespace Training24Admin.Controllers
                     }
                     if (data.timerdata.Count > 0)
                     {
-                        var addTimer = _ProgessSyncBusiness.AddQuizTimerRecordInBulk(data.timerdata);
+                        var addTimer = await _ProgessSyncBusiness.AddQuizTimerRecordInBulk(data.timerdata);
                     }
                     #region Comment old code
                     //foreach (var sync in data.progressdata)

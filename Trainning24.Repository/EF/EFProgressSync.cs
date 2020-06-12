@@ -107,7 +107,10 @@ namespace Trainning24.Repository.EF
         {
             return await _context.SaveAsyncBulk(obj);
         }
-
+        public async Task<int> UpdateAsyncBulk(List<QuizTimerSync> obj)
+        {
+            return await _context.UpdateAsyncBulk(obj);
+        }
         public IQueryable<QuizTimerSync> ListQuery(Expression<Func<QuizTimerSync, bool>> where)
         {
             return _context.ListQuery(where);
