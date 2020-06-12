@@ -193,6 +193,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
     private SyncAPIDatabaseRepository syncAPIDatabaseRepository;
     private String gradeName;
     private CoursePriviewObject coursePriviewObjectList;
+    private String assignmentSubscription;
 
     public CourseItemFragment() {
         // Required empty public constructor
@@ -303,6 +304,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                 if (userDetails != null) {
                     userDetailsObject = userDetails;
                     userId = userDetailsObject.getId();
+                    assignmentSubscription = userDetailsObject.getIs_assignment_authorized();
                     loadData();
                     SyncAPIDatabaseRepository syncAPIDatabaseRepository = new SyncAPIDatabaseRepository();
 
@@ -515,8 +517,9 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                             }
                         }
                     }
-                    if (AddtionalAssignment != null) {
-                        if (AddtionalAssignment.equals("true")) {
+                    Log.e("AddtionalAssignment", "onClick: " + assignmentSubscription);
+                    if (assignmentSubscription != null) {
+                        if (assignmentSubscription.equals("true")) {
                             if (model != null) {
                                 Intent intent = new Intent(getActivity(), AssignmentDetailActivity.class);
                                 intent.putExtra(Const.Assignment, new Gson().toJson(model));
@@ -585,7 +588,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
         fragmentCourseItemLayoutBinding.rcVerticalLayout.rcVertical.setHasFixedSize(true);
         fragmentCourseItemLayoutBinding.rcVerticalLayout.rcVertical.setLayoutManager(new WrapContentLinearLayoutManager(NoonApplication.getContext(), LinearLayoutManager.VERTICAL, false));
 
-        courseItemListAdapter = new CourseItemListAdapter(getActivity(), coursePriviewArrayList, this, GradeId, userDetailsObject, ActivityFlag, LessonID, QuizID, isNotification, this, CourseName, AddtionalAssignment);
+        courseItemListAdapter = new CourseItemListAdapter(getActivity(), coursePriviewArrayList, this, GradeId, userDetailsObject, ActivityFlag, LessonID, QuizID, isNotification, this, CourseName, assignmentSubscription);
         fragmentCourseItemLayoutBinding.rcVerticalLayout.rcVertical.setAdapter(courseItemListAdapter);
 
         if (isNetworkAvailable(getActivity())) {
@@ -619,7 +622,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                         @Override
                         public void onSuccess(CoursePriviewObject coursePriviewObject) {
                             coursePriviewObject.setUserId(userId);
-                            courseItemListAdapter = new CourseItemListAdapter(getActivity(), coursePriviewArrayList, CourseItemFragment.this, GradeId, userDetailsObject, ActivityFlag, LessonID, QuizID, isNotification, CourseItemFragment.this, CourseName, AddtionalAssignment);
+                            courseItemListAdapter = new CourseItemListAdapter(getActivity(), coursePriviewArrayList, CourseItemFragment.this, GradeId, userDetailsObject, ActivityFlag, LessonID, QuizID, isNotification, CourseItemFragment.this, CourseName, assignmentSubscription);
                             fragmentCourseItemLayoutBinding.rcVerticalLayout.rcVertical.setAdapter(courseItemListAdapter);
                             new setLocalDataTask(new CourseItemAsyncResponse() {
                                 @Override
