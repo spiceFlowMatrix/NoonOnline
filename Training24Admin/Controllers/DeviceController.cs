@@ -169,6 +169,7 @@ namespace Training24Admin.Controllers
                     }
                     else
                     {
+                        UniqMacList.Remove(objData.macAddress);
                         unsuccessResponse.response_code = 2;
                         unsuccessResponse.message = "Invalid input";
                         unsuccessResponse.status = "Failure";
@@ -177,11 +178,13 @@ namespace Training24Admin.Controllers
                 }
                 else
                 {
+                    UniqMacList.Remove(objData.macAddress);
                     return StatusCode(406, ModelState);
                 }
             }
             catch (Exception ex)
             {
+                UniqMacList.Remove(objData.macAddress);
                 unsuccessResponse.response_code = 2;
                 unsuccessResponse.message = ex.Message;
                 unsuccessResponse.status = "Failure";
