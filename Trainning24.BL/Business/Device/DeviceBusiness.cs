@@ -115,13 +115,14 @@ namespace Trainning24.BL.Business.Device
         /// <param name="userId">Id of user</param>
         /// <param name="deviceId">Id of device</param>
         /// <returns></returns> 
-        public int activeDeactiveDevice(Devices devices, int UserId)
+        public int activeDeactiveDevice(Devices devices, int UserId,int LastModifierUserId = 0)
         {
            // Devices devices = _eFDeviceRepository.GetById(b => b.Id == deviceId && b.UserId == UserId);
             if (devices != null)
             {
                 devices.IsDeleted = devices.IsDeleted != true;
                 devices.DeleterUserId = UserId;
+                devices.LastModifierUserId = LastModifierUserId > 0 ? LastModifierUserId : UserId;
                 devices.DeletionTime = devices.IsDeleted != true ? DateTime.UtcNow.ToString("MM/dd/yyyy hh:mm:ss tt", CultureInfo.InvariantCulture) : null;
                 _eFDeviceRepository.Update(devices);
                 if (devices.IsDeleted != true)
@@ -134,6 +135,7 @@ namespace Trainning24.BL.Business.Device
         {
             return _eFDeviceRepository.GetById(b => b.Id == deviceId && b.UserId == UserId);
         }
+
         /// <summary>
         ///  return device quota limit for user and if user quota is not exist then default quota limit will set 1.
         /// </summary>
@@ -236,6 +238,8 @@ namespace Trainning24.BL.Business.Device
                                     {
                                         id = x.Id,
                                         userId=x.UserId,
+                                        macaddress = x.MacAddress,
+                                        ipaddress = x.IpAddress,
                                         approvedOn = x.CreationTime,
                                         modelName = x.ModelName,
                                         modelNumber = x.ModelNumber,
@@ -344,6 +348,7 @@ namespace Trainning24.BL.Business.Device
 
 
         }
+
         private string getconnectionstring()
         {
             return Environment.GetEnvironmentVariable("ASPNET_DB_CONNECTIONSTRING");

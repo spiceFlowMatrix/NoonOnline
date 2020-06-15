@@ -113,13 +113,31 @@ namespace Training24Admin.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    var deviceExist = deviceBusiness.GetDevicesByMacAdd(objData.macAddress, int.Parse(tc.Id));
-                    if (deviceExist == null)
+                    if (!String.IsNullOrEmpty(objData.macAddress) && !String.IsNullOrEmpty(objData.ipAddress))
                     {
-                        if (deviceBusiness.CheckDeviceQuota(int.Parse(tc.Id)) > 0)
+                        var deviceExist = deviceBusiness.GetDevicesByMacAdd(objData.macAddress, int.Parse(tc.Id));
+                        if (deviceExist == null)
                         {
-                            var deviceDetails = deviceBusiness.Create(objData, int.Parse(tc.Id));
-                            successResponse.data = deviceDetails;
+                            if (deviceBusiness.CheckDeviceQuota(int.Parse(tc.Id)) > 0)
+                            {
+                                var deviceDetails = deviceBusiness.Create(objData, int.Parse(tc.Id));
+                                successResponse.data = deviceDetails;
+                                successResponse.response_code = 0;
+                                successResponse.message = "Device registered and activated";
+                                successResponse.status = "Success";
+                                return StatusCode(200, successResponse);
+                            }
+                            else
+                            {
+                                unsuccessResponse.response_code = 3;
+                                unsuccessResponse.message = "you are out of device quota";
+                                unsuccessResponse.status = "Unsuccess";
+                                return StatusCode(406, unsuccessResponse);
+                            }
+                        }
+                        else if (deviceExist != null && deviceExist.IsDeleted != true)
+                        {
+                            successResponse.data = deviceExist;
                             successResponse.response_code = 0;
                             successResponse.message = "Device registered and activated";
                             successResponse.status = "Success";
@@ -127,28 +145,19 @@ namespace Training24Admin.Controllers
                         }
                         else
                         {
-                            unsuccessResponse.response_code = 3;
-                            unsuccessResponse.message = "you are out of device quota";
+                            unsuccessResponse.response_code = 2;
+                            unsuccessResponse.message = "This device has been deactivated.";
                             unsuccessResponse.status = "Unsuccess";
                             return StatusCode(406, unsuccessResponse);
                         }
                     }
-                    else if (deviceExist != null && deviceExist.IsDeleted != true)
-                    {
-                        successResponse.data = deviceExist;
-                        successResponse.response_code = 0;
-                        successResponse.message = "Device registered and activated";
-                        successResponse.status = "Success";
-                        return StatusCode(200, successResponse);
-                    }
                     else
                     {
                         unsuccessResponse.response_code = 2;
-                        unsuccessResponse.message = "This device has been deactivated.";
-                        unsuccessResponse.status = "Unsuccess";
-                        return StatusCode(406, unsuccessResponse);
+                        unsuccessResponse.message = "Invalid input";
+                        unsuccessResponse.status = "Failure";
+                        return StatusCode(500, unsuccessResponse);
                     }
-
                 }
                 else
                 {
@@ -228,7 +237,6 @@ namespace Training24Admin.Controllers
 
 
         }
-
         /// <summary>
         ///  Get my  all user's device profile .
         /// </summary>
@@ -379,7 +387,7 @@ namespace Training24Admin.Controllers
                 {
                     if (deviceBusiness.CheckDeviceQuota(userId) > 0 || device.IsDeleted == false)
                     {
-                        var result = deviceBusiness.activeDeactiveDevice(device, userId);
+                        var result = deviceBusiness.activeDeactiveDevice(device, userId, int.Parse(tc.Id));
                         if (result != 0)
                         {
                             successResponse.response_code = 0;

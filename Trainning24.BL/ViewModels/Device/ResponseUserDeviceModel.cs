@@ -23,6 +23,8 @@ namespace Trainning24.BL.ViewModels.Device
         public long id { get; set; }
         public long userId { get; set; }
         public string approvedOn { get; set; }
+        public string macaddress { get; set; }
+        public string ipaddress { get; set; }
         public string modelName { get; set; }
         public string modelNumber { get; set; }
         public bool? IsActive { get; set; }
