@@ -12,14 +12,14 @@
     <!-- Refere Link http://libeasy.alwaysdata.net/libmedia/license/ -->
     <string name="YOUR_API_KEY" translatable="false">KmMvWTVKl9tBs/dgS8paH2B53Dyjch2xbMhYlrOQ8UA1BKwMhD390Y/zcfLSwtRestJYOALCSoxIJ7ETQt9Xml7jAelfCo7pijGOL4guky+dLIJohzeNZttqzW+GMY0=</string>
 
-    <!-- <string name="app_scheme" translatable="false">noon</string>
-     <string name="com_auth0_client_id" translatable="false">2a7660n1nw4iAP5sOoYyHUlAIgRGfzeo</string>
-     <string name="com_auth0_domain" translatable="false">satyamdev.auth0.com</string>
-     <string name="com_auth0_audience" translatable="false"> https://satyamdev.auth0.com/api/v2/</string>
-     <string name="com_auth0_database_connection" translatable="false">Username-Password-Authentication</string>
-     <string name="com_auth0_scope" translatable="false">openid offline_access</string>
-     <string name="BASE_URL" translatable="false">http://13.233.31.69/api/v1/</string>
-     &lt;!&ndash;Encrypt Decrypt API KEY for 30 days trial  [Valid until: July 12, 2020]&ndash;&gt;
-     &lt;!&ndash; Refere Link http://libeasy.alwaysdata.net/libmedia/license/ &ndash;&gt;
-     <string name="YOUR_API_KEY" translatable="false">KmMvWTVKl9tBs/dgS8paH2B53Dyjch2xbMhYlrOQ8UA1BKwMhD390Y/zcfLSwtRestJYOALCSoxIJ7ETQt9Xml7jAelfCo7pijGOL4guky+dLIJohzeNZttqzW+GMY0=</string>-->
+    <!--<string name="app_scheme" translatable="false">noon</string>
+    <string name="com_auth0_client_id" translatable="false">2a7660n1nw4iAP5sOoYyHUlAIgRGfzeo</string>
+    <string name="com_auth0_domain" translatable="false">satyamdev.auth0.com</string>
+    <string name="com_auth0_audience" translatable="false"> https://satyamdev.auth0.com/api/v2/</string>
+    <string name="com_auth0_database_connection" translatable="false">Username-Password-Authentication</string>
+    <string name="com_auth0_scope" translatable="false">openid offline_access</string>
+    <string name="BASE_URL" translatable="false">http://116.74.70.95:9898/api/v1/</string>
+    &lt;!&ndash;Encrypt Decrypt API KEY for 30 days trial  [Valid until: July 12, 2020]&ndash;&gt;
+    &lt;!&ndash; Refere Link http://libeasy.alwaysdata.net/libmedia/license/ &ndash;&gt;
+    <string name="YOUR_API_KEY" translatable="false">KmMvWTVKl9tBs/dgS8paH2B53Dyjch2xbMhYlrOQ8UA1BKwMhD390Y/zcfLSwtRestJYOALCSoxIJ7ETQt9Xml7jAelfCo7pijGOL4guky+dLIJohzeNZttqzW+GMY0=</string>-->
 </resources>
