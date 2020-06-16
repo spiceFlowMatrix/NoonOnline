@@ -131,7 +131,8 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
         if (!userId.equals("")) {
             List<LessonProgress> lessonProgressList = lessonDatabaseRepository.getAllLessonProgressData(false, userId);
             List<QuizUserResult> quizUserResults = quizDatabaseRepository.getAllQuizuserResult(false, userId);
-            callApiProgessSyncAdd(lessonProgressList, quizUserResults, userId);
+            if (isNetworkAvailable())
+                callApiProgessSyncAdd(lessonProgressList, quizUserResults, userId);
         }
 
         // Enabling database for resume support even after the application is killed:

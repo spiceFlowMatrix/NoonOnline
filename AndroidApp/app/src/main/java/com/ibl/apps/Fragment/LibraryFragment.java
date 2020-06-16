@@ -1,15 +1,12 @@
 package com.ibl.apps.Fragment;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.text.format.Formatter;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -21,31 +18,29 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import com.ibl.apps.Adapter.LibraryGradeListAdapter;
 import com.ibl.apps.Adapter.LibraryListAdapter;
 import com.ibl.apps.Base.BaseFragment;
-import com.ibl.apps.DeviceManagement.DeviceManagementRepository;
 import com.ibl.apps.Interface.BackInterface;
 import com.ibl.apps.LibraryManagement.LibraryRepository;
 import com.ibl.apps.Model.LibraryGradeObject;
 import com.ibl.apps.Model.LibraryObject;
-import com.ibl.apps.Model.deviceManagement.registeruser.DeviceRegisterModel;
 import com.ibl.apps.RoomDatabase.dao.libraryManagementDatabase.LibraryDatabaseRepository;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
 import com.ibl.apps.Service.BookImageManager;
+import com.ibl.apps.noon.ChapterActivity;
+import com.ibl.apps.noon.LoginDevicesActivity;
+import com.ibl.apps.noon.MainDashBoardActivity;
 import com.ibl.apps.noon.R;
 import com.ibl.apps.noon.databinding.LibraryLayoutBinding;
 import com.ibl.apps.util.Const;
-import com.ibl.apps.util.LoadMoreData.RecyclerViewLoadMoreScroll;
 import com.ibl.apps.util.PrefUtils;
 
-import java.io.IOException;
 import java.net.NetworkInterface;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -56,10 +51,8 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 import retrofit2.HttpException;
-import retrofit2.Response;
 
 import static android.content.Context.MODE_PRIVATE;
-import static com.ibl.apps.util.Const.deviceStatus;
 
 
 public class LibraryFragment extends BaseFragment implements View.OnClickListener {
@@ -80,11 +73,6 @@ public class LibraryFragment extends BaseFragment implements View.OnClickListene
     String ActivityFlag = "";
     String LessonID = "";
     String QuizID = "";
-    private RecyclerViewLoadMoreScroll scrollListener;
-
-    boolean isLoad = true;
-    int pageNumber = 1;
-    String perpagerecord = "10";
     String userRoleName = "";
     boolean bookLayout = false;
     LibraryListAdapter libraryListAdapter;
@@ -94,9 +82,9 @@ public class LibraryFragment extends BaseFragment implements View.OnClickListene
     BackInterface backInterface;
     private LibraryRepository libraryRepository;
     private LibraryDatabaseRepository libraryDatabaseRepository;
-    private String macAddress, ipAddress;
-    private Long errorCode;
     private String deviceStatusCode;
+    private Observer<Integer> observer;
+    private Observer<Integer> chapterObserver;
 
     public LibraryFragment() {
         // Required empty public constructor
@@ -123,6 +111,85 @@ public class LibraryFragment extends BaseFragment implements View.OnClickListene
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         libraryLayoutBinding = DataBindingUtil.inflate(inflater, R.layout.library_layout, container, false);
+        observer = new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer integer) {
+                if (getFragmentManager() != null && integer == 1) {
+                    callAPIDeviceManagement();
+                    MainDashBoardActivity.coursePageNoArray.setValue(-1);
+                }
+            }
+        };
+        MainDashBoardActivity.coursePageNoArray.observe(getViewLifecycleOwner(), observer);
+
+
+        chapterObserver = new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer integer) {
+                if (getFragmentManager() != null && integer == 2) {
+//                    callAPIDeviceManagement();
+                    libraryLayoutBinding.deactivatedDeviceQuota.deviceDeactivateLay.setVisibility(View.GONE);
+                    libraryLayoutBinding.outOfDeviceQuota.deviceQuotaLay.setVisibility(View.GONE);
+                    libraryLayoutBinding.rcVerticalLayout.rcVertical.setVisibility(View.VISIBLE);
+                    PrefUtils.MyAsyncTask asyncTask = (PrefUtils.MyAsyncTask) new PrefUtils.MyAsyncTask(new PrefUtils.MyAsyncTask.AsyncResponse() {
+                        @Override
+                        public UserDetails getLocalUserDetails(UserDetails userDetails) {
+                            if (userDetails != null) {
+                                userDetailsObject = userDetails;
+                                userId = userDetailsObject.getId();
+                                if (userDetails.getRoleName() != null) {
+                                    userRoleName = userDetails.getRoleName().get(0);
+                                }
+
+                                AddtionalLibrary = userDetails.getIs_library_authorized();
+                                AddtionalAssignment = userDetails.getIs_assignment_authorized();
+                                AddtionalDiscussions = userDetails.getIs_discussion_authorized();
+
+                                if (!TextUtils.isEmpty(AddtionalLibrary)) {
+                                    AddtionalLibraryBoolean = Boolean.parseBoolean(AddtionalLibrary);
+                                }
+
+                                if (AddtionalLibraryBoolean) {
+                                    setBookLayout(bookLayout);
+                                    libraryLayoutBinding.additionalServicetxt.setVisibility(View.GONE);
+                                    libraryLayoutBinding.rcVerticalLayout.rcVertical.setVisibility(View.VISIBLE);
+                                } else {
+                                    libraryLayoutBinding.additionalServicetxt.setVisibility(View.VISIBLE);
+                                    libraryLayoutBinding.rcVerticalLayout.rcVertical.setVisibility(View.GONE);
+                                }
+                            }
+                            return null;
+                        }
+
+                    }).execute();
+
+                    libraryLayoutBinding.booksearchview.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+
+                        @Override
+                        public boolean onQueryTextChange(String newText) {
+
+                            try {
+                                if (TextUtils.isEmpty(newText)) {
+                                    CallApiLibrarySearch(newText, bookLayout);
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            return true;
+                        }
+
+                        @Override
+                        public boolean onQueryTextSubmit(String query) {
+                            CallApiLibrarySearch(query, bookLayout);
+                            return true;
+                        }
+                    });
+                    ChapterActivity.pageNo1.setValue(-1);
+                }
+            }
+        };
+        ChapterActivity.pageNo1.observe(getViewLifecycleOwner(), chapterObserver);
+
         return libraryLayoutBinding.getRoot();
     }
 
@@ -133,6 +200,7 @@ public class LibraryFragment extends BaseFragment implements View.OnClickListene
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT) {
             libraryLayoutBinding.libraryText.setTextSize(35);
         }
+
         Bundle bundle = this.getArguments();
         if (bundle != null) {
             GradeId = bundle.getString(Const.GradeID, "");
@@ -140,14 +208,12 @@ public class LibraryFragment extends BaseFragment implements View.OnClickListene
             ActivityFlag = bundle.getString(Const.ActivityFlag, "");
             LessonID = bundle.getString(Const.LessonID, "");
             QuizID = bundle.getString(Const.QuizID, "");
-
-
         }
         setToolbar(libraryLayoutBinding.toolBar);
         //showBackArrow(getString(R.string.item_5));
         libraryLayoutBinding.libraryText.setText(getString(R.string.item_5));
 
-        callAPIDeviceManagement();
+
         backInterface = (BackInterface) getActivity();
         setOnClickListener();
     }
@@ -183,36 +249,85 @@ public class LibraryFragment extends BaseFragment implements View.OnClickListene
     }
 
     private void callAPIDeviceManagement() {
-        WifiManager manager = (WifiManager) getActivity().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        WifiInfo info = null;
-        if (manager != null) {
-            info = manager.getConnectionInfo();
-//            macAddress = info.getMacAddress();
-            ipAddress = Formatter.formatIpAddress(manager.getConnectionInfo().getIpAddress());
+        SharedPreferences deviceSharedPreferences = getActivity().getSharedPreferences("deviceStatus", MODE_PRIVATE);
+        deviceStatusCode = deviceSharedPreferences.getString("deviceStatusCode", "");
+        Log.e("deviceStatusCode", "setUp: LIBRARYNEW" + deviceStatusCode);
+
+        if (deviceStatusCode != null) {
+            switch (deviceStatusCode) {
+                case "0":
+                    libraryLayoutBinding.deactivatedDeviceQuota.deviceDeactivateLay.setVisibility(View.GONE);
+                    libraryLayoutBinding.outOfDeviceQuota.deviceQuotaLay.setVisibility(View.GONE);
+                    libraryLayoutBinding.rcVerticalLayout.rcVertical.setVisibility(View.VISIBLE);
+                    PrefUtils.MyAsyncTask asyncTask = (PrefUtils.MyAsyncTask) new PrefUtils.MyAsyncTask(new PrefUtils.MyAsyncTask.AsyncResponse() {
+                        @Override
+                        public UserDetails getLocalUserDetails(UserDetails userDetails) {
+                            if (userDetails != null) {
+                                userDetailsObject = userDetails;
+                                userId = userDetailsObject.getId();
+                                if (userDetails.getRoleName() != null) {
+                                    userRoleName = userDetails.getRoleName().get(0);
+                                }
+
+                                AddtionalLibrary = userDetails.getIs_library_authorized();
+                                AddtionalAssignment = userDetails.getIs_assignment_authorized();
+                                AddtionalDiscussions = userDetails.getIs_discussion_authorized();
+
+                                if (!TextUtils.isEmpty(AddtionalLibrary)) {
+                                    AddtionalLibraryBoolean = Boolean.parseBoolean(AddtionalLibrary);
+                                }
+
+                                if (AddtionalLibraryBoolean) {
+                                    setBookLayout(bookLayout);
+                                    libraryLayoutBinding.additionalServicetxt.setVisibility(View.GONE);
+                                    libraryLayoutBinding.rcVerticalLayout.rcVertical.setVisibility(View.VISIBLE);
+                                } else {
+                                    libraryLayoutBinding.additionalServicetxt.setVisibility(View.VISIBLE);
+                                    libraryLayoutBinding.rcVerticalLayout.rcVertical.setVisibility(View.GONE);
+                                }
+                            }
+                            return null;
+                        }
+
+                    }).execute();
+
+                    libraryLayoutBinding.booksearchview.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+
+                        @Override
+                        public boolean onQueryTextChange(String newText) {
+
+                            try {
+                                if (TextUtils.isEmpty(newText)) {
+                                    CallApiLibrarySearch(newText, bookLayout);
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            return true;
+                        }
+
+                        @Override
+                        public boolean onQueryTextSubmit(String query) {
+                            CallApiLibrarySearch(query, bookLayout);
+                            return true;
+                        }
+                    });
+                    hideDialog();
+                    break;
+                case "2":
+                    libraryLayoutBinding.deactivatedDeviceQuota.deviceDeactivateLay.setVisibility(View.VISIBLE);
+                    libraryLayoutBinding.outOfDeviceQuota.deviceQuotaLay.setVisibility(View.GONE);
+                    libraryLayoutBinding.rcVerticalLayout.rcVertical.setVisibility(View.GONE);
+                    break;
+                case "3":
+                    libraryLayoutBinding.deactivatedDeviceQuota.deviceDeactivateLay.setVisibility(View.GONE);
+                    libraryLayoutBinding.outOfDeviceQuota.deviceQuotaLay.setVisibility(View.VISIBLE);
+                    libraryLayoutBinding.rcVerticalLayout.rcVertical.setVisibility(View.GONE);
+                    break;
+            }
         }
 
-        //OS
-        JsonObject jsonOs = new JsonObject();
-        jsonOs.addProperty(Const.name, Const.var_deviceType);
-        jsonOs.addProperty(Const.version, Build.VERSION.RELEASE);
-
-        //tag
-        JsonArray jsonArray = new JsonArray();
-        JsonObject j = new JsonObject();
-        j.addProperty(Const.name, "");
-        jsonArray.add(j);
-
-        //main
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty(Const.macAddress, getWifiMacAddress());
-        jsonObject.addProperty(Const.ipAddress, ipAddress);
-        jsonObject.addProperty(Const.modelName, Build.MODEL);
-        jsonObject.addProperty(Const.modelNumber, Build.SERIAL);
-        jsonObject.add(Const.operatingSystem, jsonOs);
-        jsonObject.add(Const.tags, jsonArray);
-
-
-        DeviceManagementRepository deviceManagementRepository = new DeviceManagementRepository();
+         /*DeviceManagementRepository deviceManagementRepository = new DeviceManagementRepository();
         disposable.add(deviceManagementRepository.registerDeviceDetail(jsonObject)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -366,7 +481,7 @@ public class LibraryFragment extends BaseFragment implements View.OnClickListene
                             libraryLayoutBinding.rcVerticalLayout.rcVertical.setVisibility(View.GONE);
                         }
                     }
-                }));
+                }));*/
     }
 
     public void setOnClickListener() {
@@ -376,6 +491,8 @@ public class LibraryFragment extends BaseFragment implements View.OnClickListene
         libraryLayoutBinding.serachMenu.setOnClickListener(this);
         libraryLayoutBinding.btnbackLibrary.setOnClickListener(this);
         libraryLayoutBinding.gradeMenu.setOnClickListener(this);
+        libraryLayoutBinding.outOfDeviceQuota.imgOutQuota.setOnClickListener(this);
+        libraryLayoutBinding.deactivatedDeviceQuota.imgDeactivate.setOnClickListener(this);
     }
 
     public void setBookLayout(boolean bookLayout) {
@@ -919,6 +1036,13 @@ public class LibraryFragment extends BaseFragment implements View.OnClickListene
                     setBookLayout(bookLayout);
                 }
                 break;
+            case R.id.imgOutQuota:
+            case R.id.imgDeactivate:
+                if (getActivity() != null)
+                    if (isNetworkAvailable(getActivity()))
+                        startActivity(new Intent(getActivity(), LoginDevicesActivity.class));
+                    else showNetworkAlert(getActivity());
+                break;
         }
     }
 
@@ -931,5 +1055,19 @@ public class LibraryFragment extends BaseFragment implements View.OnClickListene
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (observer != null) {
+            MainDashBoardActivity.courseIsAdd = false;
+            MainDashBoardActivity.coursePageNoArray.removeObserver(observer);
+        }
+
+        if (chapterObserver != null) {
+            ChapterActivity.pageNo1.removeObserver(chapterObserver);
+        }
+        super.onDestroy();
     }
 }

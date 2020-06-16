@@ -30,6 +30,7 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.MutableLiveData;
 import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -104,6 +105,9 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
     CourseDatabaseRepository courseDatabaseRepository;
     private String deviceStatusCode;
     private String ipAddress;
+    public static int coursePageNo = -1;
+    public static boolean courseIsAdd = false;
+    public static MutableLiveData<Integer> coursePageNoArray = new MutableLiveData<>();
 
     @Override
     protected int getContentView() {
@@ -193,30 +197,349 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
 //                                mainDashboardLayoutBinding.appBarLayout.contentMain.bottomNavigation.getMenu().removeItem(R.id.action_item4);
 //                            }
 //                        }
-
                         callAPIDeviceManagement();
-                        SyncAPIDatabaseRepository syncAPIDatabaseRepository = new SyncAPIDatabaseRepository();
+//                        handleSyncButton();
+                        SyncEventReceiver.setupAlarm(MainDashBoardActivity.this);
+                    }
+                }
+                SharedPreferences sharedPreferences = getSharedPreferences("user", MODE_PRIVATE);
+                userId = sharedPreferences.getString("uid", "");
 
-                        List<SyncAPITable> syncAPITableList = syncAPIDatabaseRepository.getSyncUserById(Integer.parseInt(userId));
+                assert userId != null;
+                if (!userId.equals("")) {
+                    SyncTimeTrackingObject syncTimeTrackingObject = courseDatabaseRepository.getSyncTimeTrackById(Integer.parseInt(userId));
+                    if (syncTimeTrackingObject != null) {
+                        syncTimeTrackingObject.setLatitude("");
+                        syncTimeTrackingObject.setLongitude("");
+                        syncTimeTrackingObject.setOperatingsystem(Const.var_deviceType);
+                        syncTimeTrackingObject.setHardwareplatform(Build.MODEL);
+                        syncTimeTrackingObject.setServiceprovider(getCarierName());
+                        syncTimeTrackingObject.setVersion(Build.VERSION.RELEASE);
+                        syncTimeTrackingObject.setUserid(Integer.parseInt(userId));
+                        courseDatabaseRepository.updateSyncTimeTracking(syncTimeTrackingObject);
+                    } else {
+                        SyncTimeTrackingObject syncTimeTrackingObjectinsert = new SyncTimeTrackingObject();
+                        syncTimeTrackingObjectinsert.setLatitude("");
+                        syncTimeTrackingObjectinsert.setLongitude("");
+                        syncTimeTrackingObjectinsert.setOperatingsystem(Const.var_deviceType);
+                        syncTimeTrackingObjectinsert.setHardwareplatform(Build.MODEL);
+                        syncTimeTrackingObjectinsert.setServiceprovider(getCarierName());
+                        syncTimeTrackingObjectinsert.setVersion(Build.VERSION.RELEASE);
+                        syncTimeTrackingObjectinsert.setActivitytime(getUTCTime());
+                        syncTimeTrackingObjectinsert.setUserid(Integer.parseInt(userId));
+                        courseDatabaseRepository.insertSyncTimeTrackingData(syncTimeTrackingObjectinsert);
+                    }
+                }
+                return null;
+            }
+        }).execute();
 
-                        handleSyncButton();
+        //setOnClickListener();
+        /*if (userDetails!=null&&!userDetails.getRoleName().get(0).equals("Parent")) {
+            mainDashboardLayoutBinding.appBarLayout.contentMain.bottomNavigation.getMenu().removeItem(R.id.action_item4);
+//            mainDashboardLayoutBinding.appBarLayout.contentMain.bottomNavigation.getMenu().add(R.id.action_item4);
+        }else{
+            userDetails=new UserDetails();
+            List<String> list=new ArrayList<>();
+            list.add("");
+            userDetails.setRoleName(list);
+            if (!userDetails.getRoleName().get(0).equals("Parent")) {
+                mainDashboardLayoutBinding.appBarLayout.contentMain.bottomNavigation.getMenu().removeItem(R.id.action_item4);
+//            mainDashboardLayoutBinding.appBarLayout.contentMain.bottomNavigation.getMenu().add(R.id.action_item4);
+            }
+        }*/
 
-                        if (syncAPITableList.size() >= 50) {
-                            NoonApplication.cacheStatus = 2;
-                            SharedPreferences sharedPreferencesCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
-                            SharedPreferences.Editor editor = sharedPreferencesCache.edit();
-                            if (editor != null) {
-                                editor.clear();
-                                editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
+    }
+
+    private void handleSyncButton() {
+        SharedPreferences sharedPreferencesuser = getSharedPreferences("cacheStatus", MODE_PRIVATE);
+        String flagStatus = sharedPreferencesuser.getString("FlagStatus", "");
+
+        SharedPreferences deviceSharedPreferences = getSharedPreferences("deviceStatus", MODE_PRIVATE);
+        deviceStatusCode = deviceSharedPreferences.getString("deviceStatusCode", "");
+        Log.e("deviceStatusCode", "setUp: flagStatus" + deviceStatusCode);
+
+        if (deviceStatusCode != null && deviceStatusCode.equals("0")) {
+            switch (flagStatus) {
+                case "1":
+                    mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_pending);
+                    break;
+                case "2":
+                    mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_error);
+                    break;
+                case "3":
+                    mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_syncing);
+                    break;
+                case "4":
+                    GlideApp.with(MainDashBoardActivity.this)
+                            .load(R.drawable.ic_cache_empty)
+                            .error(R.drawable.ic_cache_empty)
+                            .into(mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn);
+                    break;
+            }
+        } else {
+            GlideApp.with(MainDashBoardActivity.this)
+                    .load(R.drawable.ic_cache_empty)
+                    .error(R.drawable.ic_cache_empty)
+                    .into(mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn);
+        }
+        SyncAPIDatabaseRepository syncAPIDatabaseRepository = new SyncAPIDatabaseRepository();
+
+        List<SyncAPITable> syncAPITableList = syncAPIDatabaseRepository.getSyncUserById(Integer.parseInt(userId));
+        if (syncAPITableList.size() >= 50) {
+            NoonApplication.cacheStatus = 2;
+            SharedPreferences sharedPreferencesCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferencesCache.edit();
+            if (editor != null) {
+                editor.clear();
+                editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
+                editor.apply();
+            }
+            if (deviceStatusCode != null && deviceStatusCode.equals("0")) {
+                showHitLimitDialog(MainDashBoardActivity.this);
+            }
+        }
+
+    }
+
+    private void callAPIDeviceManagement() {
+        mainDashboardLayoutBinding.appBarLayout.contentMain.courseViewpager.setOffscreenPageLimit(3);
+        WifiManager manager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        WifiInfo info = null;
+        if (manager != null) {
+            info = manager.getConnectionInfo();
+            //macAddress = info.getMacAddress();
+            ipAddress = Formatter.formatIpAddress(manager.getConnectionInfo().getIpAddress());
+        }
+
+        //OS
+        JsonObject jsonOs = new JsonObject();
+        jsonOs.addProperty(Const.name, Const.var_deviceType);
+        jsonOs.addProperty(Const.version, Build.VERSION.RELEASE);
+
+        //tag
+        JsonArray jsonArray = new JsonArray();
+        JsonObject j = new JsonObject();
+        j.addProperty(Const.name, "");
+        jsonArray.add(j);
+
+        //main
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty(Const.macAddress, getWifiMacAddress());
+        jsonObject.addProperty(Const.ipAddress, ipAddress);
+        jsonObject.addProperty(Const.modelName, Build.MODEL);
+        jsonObject.addProperty(Const.modelNumber, Build.SERIAL);
+        jsonObject.add(Const.operatingSystem, jsonOs);
+        jsonObject.add(Const.tags, jsonArray);
+
+        CompositeDisposable disposable = new CompositeDisposable();
+        DeviceManagementRepository deviceManagementRepository = new DeviceManagementRepository();
+        disposable.add(deviceManagementRepository.registerDeviceDetail(jsonObject)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(new DisposableSingleObserver<Response<DeviceRegisterModel>>() {
+                    @Override
+                    public void onSuccess(Response<DeviceRegisterModel> deviceListModel) {
+
+                        try {
+                            if ((deviceListModel.errorBody() != null)) {
+
+                                Long errorCode = new Gson().fromJson(deviceListModel.errorBody().string(), DeviceRegisterModel.class).getResponseCode();
+
+                                if (errorCode == 2) {
+                                    deviceStatus = 2;
+                                    SharedPreferences deviceStatusPreferences = getSharedPreferences("deviceStatus", MODE_PRIVATE);
+                                    SharedPreferences.Editor editor = deviceStatusPreferences.edit();
+                                    editor.putString("deviceStatusCode", String.valueOf(deviceStatus));
+                                    editor.apply();
+                                } else if (errorCode == 3) {
+                                    deviceStatus = 3;
+                                    SharedPreferences deviceStatusPreferences = getSharedPreferences("deviceStatus", MODE_PRIVATE);
+                                    SharedPreferences.Editor editor = deviceStatusPreferences.edit();
+                                    editor.putString("deviceStatusCode", String.valueOf(deviceStatus));
+                                    editor.apply();
+                                }
+                            }
+
+                            if (deviceListModel.body() != null && deviceListModel.body().getResponseCode() == 0) {
+                                deviceStatus = 0;
+                                SharedPreferences deviceStatusPreferences = getSharedPreferences("deviceStatus", MODE_PRIVATE);
+                                SharedPreferences.Editor editor = deviceStatusPreferences.edit();
+                                editor.putString("deviceStatusCode", String.valueOf(deviceStatus));
                                 editor.apply();
                             }
-                            SharedPreferences deviceSharedPreferences = getSharedPreferences("deviceStatus", MODE_PRIVATE);
-                            deviceStatusCode = deviceSharedPreferences.getString("deviceStatusCode", "");
-                            if (deviceStatusCode != null && deviceStatusCode.equals("0")) {
-                                showHitLimitDialog(MainDashBoardActivity.this);
-                            }
-                        }
 
+                            handleSyncButton();
+                            setOnClickListener();
+                            mainDashboardLayoutBinding.appBarLayout.contentMain.bottomNavigation.setOnNavigationItemSelectedListener(
+                                    new BottomNavigationView.OnNavigationItemSelectedListener() {
+                                        @Override
+                                        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                                            if (userDetail != null && userDetail.getRoleName().get(0).equals("Parent")) {
+                                                switch (item.getItemId()) {
+                                                    case R.id.action_item1:
+                                                        coursePageNo = 0;
+                                                        mainDashboardLayoutBinding.appBarLayout.contentMain.courseViewpager.setCurrentItem(0);
+                                                        mainDashboardLayoutBinding.appBarLayout.toolbarTitle.setText(getResources().getString(R.string.my_courses));
+                                                        mainDashboardLayoutBinding.appBarLayout.toolbarButtonLay.setVisibility(View.VISIBLE);
+                                                        mainDashboardLayoutBinding.appBarLayout.toolbarresetPassLay.setVisibility(View.GONE);
+                                                        mainDashboardLayoutBinding.appBarLayout.toolBar.setVisibility(View.VISIBLE);
+                                                        break;
+                                                    case R.id.action_item2:
+                                                        coursePageNo = 1;
+                                                        mainDashboardLayoutBinding.appBarLayout.toolBar.setVisibility(View.GONE);
+                                                        mainDashboardLayoutBinding.appBarLayout.contentMain.courseViewpager.setCurrentItem(1);
+                                                        break;
+                                                    case R.id.action_item4:
+                                                        coursePageNo = 2;
+                                                        mainDashboardLayoutBinding.appBarLayout.toolBar.setVisibility(View.GONE);
+                                                        mainDashboardLayoutBinding.appBarLayout.contentMain.courseViewpager.setCurrentItem(2);
+                                                        break;
+                                                    case R.id.action_item3:
+                                                        coursePageNo = 3;
+
+                                                        mainDashboardLayoutBinding.appBarLayout.toolBar.setVisibility(View.VISIBLE);
+                                                        mainDashboardLayoutBinding.appBarLayout.contentMain.courseViewpager.setCurrentItem(3);
+                                                        setPos2View();
+                                                        break;
+                                                }
+                                            } else {
+                                                switch (item.getItemId()) {
+                                                    case R.id.action_item1:
+                                                        coursePageNo = 0;
+                                                        mainDashboardLayoutBinding.appBarLayout.contentMain.courseViewpager.setCurrentItem(0);
+                                                        mainDashboardLayoutBinding.appBarLayout.toolbarTitle.setText(getResources().getString(R.string.my_courses));
+                                                        mainDashboardLayoutBinding.appBarLayout.toolbarButtonLay.setVisibility(View.VISIBLE);
+                                                        mainDashboardLayoutBinding.appBarLayout.toolbarresetPassLay.setVisibility(View.GONE);
+                                                        mainDashboardLayoutBinding.appBarLayout.toolBar.setVisibility(View.VISIBLE);
+                                                        break;
+                                                    case R.id.action_item2:
+                                                        coursePageNo = 1;
+                                                        mainDashboardLayoutBinding.appBarLayout.toolBar.setVisibility(View.GONE);
+                                                        mainDashboardLayoutBinding.appBarLayout.contentMain.courseViewpager.setCurrentItem(1);
+                                                        break;
+
+                                                    case R.id.action_item3:
+                                                        coursePageNo = 2;
+                                                        mainDashboardLayoutBinding.appBarLayout.toolBar.setVisibility(View.VISIBLE);
+                                                        mainDashboardLayoutBinding.appBarLayout.contentMain.courseViewpager.setCurrentItem(2);
+                                                        setPos2View();
+                                                        break;
+                                                }
+                                                //coursePageNoArray.setValue(coursePageNo);
+                                            }
+
+                                            return false;
+                                        }
+                                    });
+                            mainDashboardLayoutBinding.appBarLayout.contentMain.courseViewpager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+                                @Override
+                                public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                                    Log.e("coursePageNo", "onPageScrolled: ");
+                                    coursePageNo = position;
+                                    if (userDetail != null && userDetail.getRoleName().get(0).equals("Parent")) {
+                                        switch (position) {
+                                            case 0:
+                                                break;
+                                            case 1:
+                                                break;
+                                            case 2:
+                                                //generalDiscussionsFragment.DiscussionsFragment();
+                                                break;
+                                            case 3:
+                                                mainDashboardLayoutBinding.appBarLayout.toolBar.setVisibility(View.VISIBLE);
+                                                setPos2View();
+                                                break;
+                                        }
+                                    } else {
+                                        switch (position) {
+                                            case 0:
+                                                break;
+                                            case 1:
+                                                break;
+                                            case 2:
+                                                mainDashboardLayoutBinding.appBarLayout.toolBar.setVisibility(View.VISIBLE);
+                                                setPos2View();
+                                                break;
+                                        }
+                                    }
+
+                                }
+
+                                @Override
+                                public void onPageSelected(int position) {
+                                    Log.e("coursePageNo", "onPageSelected: ");
+                                    if (userDetail != null && userDetail.getRoleName().get(0).equals("Parent")) {
+                                        switch (position) {
+                                            case 0:
+                                                mainDashboardLayoutBinding.appBarLayout.toolBar.setVisibility(View.VISIBLE);
+                                                mainDashboardLayoutBinding.appBarLayout.toolbarButtonLay.setVisibility(View.VISIBLE);
+                                                mainDashboardLayoutBinding.appBarLayout.toolbarresetPassLay.setVisibility(View.GONE);
+                                                break;
+                                            case 1:
+                                                mainDashboardLayoutBinding.appBarLayout.toolBar.setVisibility(View.GONE);
+                                                break;
+
+                                            case 2:
+                                                mainDashboardLayoutBinding.appBarLayout.toolBar.setVisibility(View.GONE);
+                                                break;
+                                            case 3:
+                                                mainDashboardLayoutBinding.appBarLayout.toolbarButtonLay.setVisibility(View.GONE);
+                                                mainDashboardLayoutBinding.appBarLayout.toolbarresetPassLay.setVisibility(View.VISIBLE);
+                                                mainDashboardLayoutBinding.appBarLayout.toolBar.setVisibility(View.VISIBLE);
+                                                break;
+                                        }
+                                    } else {
+                                        switch (position) {
+                                            case 0:
+                                                mainDashboardLayoutBinding.appBarLayout.toolBar.setVisibility(View.VISIBLE);
+                                                mainDashboardLayoutBinding.appBarLayout.toolbarButtonLay.setVisibility(View.VISIBLE);
+                                                mainDashboardLayoutBinding.appBarLayout.toolbarresetPassLay.setVisibility(View.GONE);
+                                                break;
+                                            case 1:
+                                                mainDashboardLayoutBinding.appBarLayout.toolBar.setVisibility(View.GONE);
+                                                break;
+
+                                            case 2:
+                                                mainDashboardLayoutBinding.appBarLayout.toolbarButtonLay.setVisibility(View.GONE);
+                                                mainDashboardLayoutBinding.appBarLayout.toolbarresetPassLay.setVisibility(View.VISIBLE);
+                                                mainDashboardLayoutBinding.appBarLayout.toolBar.setVisibility(View.VISIBLE);
+                                                break;
+                                        }
+                                    }
+
+
+                                    if (prevMenuItem != null) {
+                                        prevMenuItem.setChecked(false);
+                                    } else {
+                                        mainDashboardLayoutBinding.appBarLayout.contentMain.bottomNavigation.getMenu().getItem(0).setChecked(false);
+                                    }
+                                    mainDashboardLayoutBinding.appBarLayout.contentMain.bottomNavigation.getMenu().getItem(position).setChecked(true);
+                                    prevMenuItem = mainDashboardLayoutBinding.appBarLayout.contentMain.bottomNavigation.getMenu().getItem(position);
+                                    coursePageNoArray.setValue(position);
+                                }
+
+                                @Override
+                                public void onPageScrollStateChanged(int state) {
+
+                                }
+                            });
+                            setupViewPager(mainDashboardLayoutBinding.appBarLayout.contentMain.courseViewpager);
+                            Log.e("deviceStatusCode", "onSuccess: DASH" + String.valueOf(deviceStatus));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        hideDialog();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        hideDialog();
+                        SharedPreferences deviceSharedPreferences = getSharedPreferences("deviceStatus", MODE_PRIVATE);
+                        String deviceStatusCode = deviceSharedPreferences.getString("deviceStatusCode", "");
+
+                        handleSyncButton();
+                        setOnClickListener();
                         mainDashboardLayoutBinding.appBarLayout.contentMain.bottomNavigation.setOnNavigationItemSelectedListener(
                                 new BottomNavigationView.OnNavigationItemSelectedListener() {
                                     @Override
@@ -359,172 +682,8 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
                             }
                         });
                         setupViewPager(mainDashboardLayoutBinding.appBarLayout.contentMain.courseViewpager);
-                        SyncEventReceiver.setupAlarm(MainDashBoardActivity.this);
-                    }
-                }
-                SharedPreferences sharedPreferences = getSharedPreferences("user", MODE_PRIVATE);
-                userId = sharedPreferences.getString("uid", "");
-
-                assert userId != null;
-                if (!userId.equals("")) {
-                    SyncTimeTrackingObject syncTimeTrackingObject = courseDatabaseRepository.getSyncTimeTrackById(Integer.parseInt(userId));
-                    if (syncTimeTrackingObject != null) {
-                        syncTimeTrackingObject.setLatitude("");
-                        syncTimeTrackingObject.setLongitude("");
-                        syncTimeTrackingObject.setOperatingsystem(Const.var_deviceType);
-                        syncTimeTrackingObject.setHardwareplatform(Build.MODEL);
-                        syncTimeTrackingObject.setServiceprovider(getCarierName());
-                        syncTimeTrackingObject.setVersion(Build.VERSION.RELEASE);
-                        syncTimeTrackingObject.setUserid(Integer.parseInt(userId));
-                        courseDatabaseRepository.updateSyncTimeTracking(syncTimeTrackingObject);
-                    } else {
-                        SyncTimeTrackingObject syncTimeTrackingObjectinsert = new SyncTimeTrackingObject();
-                        syncTimeTrackingObjectinsert.setLatitude("");
-                        syncTimeTrackingObjectinsert.setLongitude("");
-                        syncTimeTrackingObjectinsert.setOperatingsystem(Const.var_deviceType);
-                        syncTimeTrackingObjectinsert.setHardwareplatform(Build.MODEL);
-                        syncTimeTrackingObjectinsert.setServiceprovider(getCarierName());
-                        syncTimeTrackingObjectinsert.setVersion(Build.VERSION.RELEASE);
-                        syncTimeTrackingObjectinsert.setActivitytime(getUTCTime());
-                        syncTimeTrackingObjectinsert.setUserid(Integer.parseInt(userId));
-                        courseDatabaseRepository.insertSyncTimeTrackingData(syncTimeTrackingObjectinsert);
-                    }
-                }
-                return null;
-            }
-        }).execute();
-        setOnClickListener();
-        /*if (userDetails!=null&&!userDetails.getRoleName().get(0).equals("Parent")) {
-            mainDashboardLayoutBinding.appBarLayout.contentMain.bottomNavigation.getMenu().removeItem(R.id.action_item4);
-//            mainDashboardLayoutBinding.appBarLayout.contentMain.bottomNavigation.getMenu().add(R.id.action_item4);
-        }else{
-            userDetails=new UserDetails();
-            List<String> list=new ArrayList<>();
-            list.add("");
-            userDetails.setRoleName(list);
-            if (!userDetails.getRoleName().get(0).equals("Parent")) {
-                mainDashboardLayoutBinding.appBarLayout.contentMain.bottomNavigation.getMenu().removeItem(R.id.action_item4);
-//            mainDashboardLayoutBinding.appBarLayout.contentMain.bottomNavigation.getMenu().add(R.id.action_item4);
-            }
-        }*/
-
-    }
-
-    private void handleSyncButton() {
-        SharedPreferences sharedPreferencesuser = getSharedPreferences("cacheStatus", MODE_PRIVATE);
-        String flagStatus = sharedPreferencesuser.getString("FlagStatus", "");
-
-        SharedPreferences deviceSharedPreferences = getSharedPreferences("deviceStatus", MODE_PRIVATE);
-        deviceStatusCode = deviceSharedPreferences.getString("deviceStatusCode", "");
-        Log.e("deviceStatusCode", "setUp: flagStatus" + deviceStatusCode);
-
-        if (deviceStatusCode != null && deviceStatusCode.equals("0")) {
-            switch (flagStatus) {
-                case "1":
-                    mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_pending);
-                    break;
-                case "2":
-                    mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_error);
-                    break;
-                case "3":
-                    mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_syncing);
-                    break;
-                case "4":
-                    GlideApp.with(MainDashBoardActivity.this)
-                            .load(R.drawable.ic_cache_empty)
-                            .error(R.drawable.ic_cache_empty)
-                            .into(mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn);
-                    break;
-            }
-        } else {
-            GlideApp.with(MainDashBoardActivity.this)
-                    .load(R.drawable.ic_cache_empty)
-                    .error(R.drawable.ic_cache_empty)
-                    .into(mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn);
-        }
-    }
-
-    private void callAPIDeviceManagement() {
-        WifiManager manager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        WifiInfo info = null;
-        if (manager != null) {
-            info = manager.getConnectionInfo();
-            //macAddress = info.getMacAddress();
-            ipAddress = Formatter.formatIpAddress(manager.getConnectionInfo().getIpAddress());
-        }
-
-        //OS
-        JsonObject jsonOs = new JsonObject();
-        jsonOs.addProperty(Const.name, Const.var_deviceType);
-        jsonOs.addProperty(Const.version, Build.VERSION.RELEASE);
-
-        //tag
-        JsonArray jsonArray = new JsonArray();
-        JsonObject j = new JsonObject();
-        j.addProperty(Const.name, "");
-        jsonArray.add(j);
-
-        //main
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty(Const.macAddress, getWifiMacAddress());
-        jsonObject.addProperty(Const.ipAddress, ipAddress);
-        jsonObject.addProperty(Const.modelName, Build.MODEL);
-        jsonObject.addProperty(Const.modelNumber, Build.SERIAL);
-        jsonObject.add(Const.operatingSystem, jsonOs);
-        jsonObject.add(Const.tags, jsonArray);
-
-        CompositeDisposable disposable = new CompositeDisposable();
-        DeviceManagementRepository deviceManagementRepository = new DeviceManagementRepository();
-        disposable.add(deviceManagementRepository.registerDeviceDetail(jsonObject)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(new DisposableSingleObserver<Response<DeviceRegisterModel>>() {
-                    @Override
-                    public void onSuccess(Response<DeviceRegisterModel> deviceListModel) {
-
-                        try {
-                            if ((deviceListModel.errorBody() != null)) {
-
-                                Long errorCode = new Gson().fromJson(deviceListModel.errorBody().string(), DeviceRegisterModel.class).getResponseCode();
-
-                                if (errorCode == 2) {
-                                    deviceStatus = 2;
-                                    SharedPreferences deviceStatusPreferences = getSharedPreferences("deviceStatus", MODE_PRIVATE);
-                                    SharedPreferences.Editor editor = deviceStatusPreferences.edit();
-                                    editor.putString("deviceStatusCode", String.valueOf(deviceStatus));
-                                    editor.apply();
-                                } else if (errorCode == 3) {
-                                    deviceStatus = 3;
-                                    SharedPreferences deviceStatusPreferences = getSharedPreferences("deviceStatus", MODE_PRIVATE);
-                                    SharedPreferences.Editor editor = deviceStatusPreferences.edit();
-                                    editor.putString("deviceStatusCode", String.valueOf(deviceStatus));
-                                    editor.apply();
-                                }
-                            }
-
-                            if (deviceListModel.body() != null && deviceListModel.body().getResponseCode() == 0) {
-                                deviceStatus = 0;
-                                SharedPreferences deviceStatusPreferences = getSharedPreferences("deviceStatus", MODE_PRIVATE);
-                                SharedPreferences.Editor editor = deviceStatusPreferences.edit();
-                                editor.putString("deviceStatusCode", String.valueOf(deviceStatus));
-                                editor.apply();
-                            }
-
-
-                            handleSyncButton();
-                            setOnClickListener();
-
-                            Log.e("deviceStatusCode", "onSuccess: DASH" + String.valueOf(deviceStatus));
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        hideDialog();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-
-                        hideDialog();
+                        Log.e("deviceStatusCode", "onError: " + deviceStatusCode);
+                        //Toast.makeText(MainDashBoardActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 }));
     }

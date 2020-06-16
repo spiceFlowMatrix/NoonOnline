@@ -2,13 +2,9 @@ package com.ibl.apps.Fragment;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import androidx.databinding.DataBindingUtil;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +13,12 @@ import android.widget.CompoundButton;
 import android.widget.SearchView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.Observer;
+import androidx.recyclerview.widget.LinearLayoutManager;
+
 import com.google.gson.Gson;
 import com.ibl.apps.Adapter.DiscussionsListAdapter;
 import com.ibl.apps.Base.BaseFragment;
@@ -24,13 +26,14 @@ import com.ibl.apps.DiscussionManagement.DiscussionRepository;
 import com.ibl.apps.Interface.BackInterface;
 import com.ibl.apps.Model.DiscssionsAllTopics;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
+import com.ibl.apps.noon.ChapterActivity;
+import com.ibl.apps.noon.DiscussionsAddActivity;
+import com.ibl.apps.noon.R;
+import com.ibl.apps.noon.databinding.FragmentDiscussionsLayoutBinding;
 import com.ibl.apps.util.Const;
 import com.ibl.apps.util.LoadMoreData.OnLoadMoreListener;
 import com.ibl.apps.util.LoadMoreData.RecyclerViewLoadMoreScroll;
 import com.ibl.apps.util.PrefUtils;
-import com.ibl.apps.noon.DiscussionsAddActivity;
-import com.ibl.apps.noon.R;
-import com.ibl.apps.noon.databinding.FragmentDiscussionsLayoutBinding;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -75,6 +78,7 @@ public class DiscussionsFragment extends BaseFragment implements View.OnClickLis
     BackInterface backInterface;
     private String keyWord = " ";
     private DiscussionRepository discussionRepository;
+    private Observer<Integer> observer;
 
     public DiscussionsFragment() {
         // Required empty public constructor
@@ -101,6 +105,66 @@ public class DiscussionsFragment extends BaseFragment implements View.OnClickLis
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         fragmentDiscussionsLayoutBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_discussions_layout, container, false);
+        observer = new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer integer) {
+
+                if (getFragmentManager() != null && integer == 1) {
+                    PrefUtils.MyAsyncTask asyncTask = (PrefUtils.MyAsyncTask) new PrefUtils.MyAsyncTask(new PrefUtils.MyAsyncTask.AsyncResponse() {
+                        @Override
+                        public UserDetails getLocalUserDetails(UserDetails userDetails) {
+                            Log.e("discussions", "getLocalUserDetails: ");
+                            if (userDetails != null) {
+                                userDetailsObject = userDetails;
+                                userId = userDetailsObject.getId();
+                                discussion_authorized = userDetailsObject.getIs_discussion_authorized();
+                                if (userDetails.getRoleName() != null) {
+                                    userRoleName = userDetails.getRoleName().get(0);
+                                }
+
+                                fragmentDiscussionsLayoutBinding.rcVerticalLayout.rcVertical.setHasFixedSize(true);
+                                LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
+                                linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+                                fragmentDiscussionsLayoutBinding.rcVerticalLayout.rcVertical.setLayoutManager(linearLayoutManager);
+
+                                discussionsListAdapter = new DiscussionsListAdapter(getActivity(),
+                                        discussionAllData,
+                                        userDetailsObject,
+                                        GradeId,
+                                        CourseName,
+                                        ActivityFlag,
+                                        LessonID,
+                                        QuizID,
+                                        AddtionalLibrary,
+                                        AddtionalAssignment,
+                                        AddtionalDiscussions);
+                                fragmentDiscussionsLayoutBinding.rcVerticalLayout.rcVertical.setAdapter(discussionsListAdapter);
+
+                                scrollListener = new RecyclerViewLoadMoreScroll(linearLayoutManager);
+                                scrollListener.setOnLoadMoreListener(new OnLoadMoreListener() {
+                                    @Override
+                                    public void onLoadMore() {
+                                        if (isLoad) {
+                                            fragmentDiscussionsLayoutBinding.progressDialogLay.itemProgressbar.setVisibility(View.VISIBLE);
+                                            CallApiDiscussionsList();
+                                        } else {
+                                            fragmentDiscussionsLayoutBinding.progressDialogLay.itemProgressbar.setVisibility(View.GONE);
+                                        }
+                                    }
+                                });
+                                fragmentDiscussionsLayoutBinding.rcVerticalLayout.rcVertical.addOnScrollListener(scrollListener);
+
+                                DiscussionsFragment();
+                            }
+                            return null;
+                        }
+                    }).execute();
+                    ChapterActivity.pageNo1.setValue(-1);
+                }
+
+            }
+        };
+        ChapterActivity.pageNo1.observe(getViewLifecycleOwner(), observer);
         return fragmentDiscussionsLayoutBinding.getRoot();
     }
 
@@ -447,7 +511,16 @@ public class DiscussionsFragment extends BaseFragment implements View.OnClickLis
         }
     }
 
-   /* @Override
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (observer != null) {
+            ChapterActivity.isAdd = false;
+            ChapterActivity.pageNo1.removeObserver(observer);
+        }
+    }
+
+    /* @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:

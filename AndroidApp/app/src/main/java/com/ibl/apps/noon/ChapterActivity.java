@@ -75,7 +75,7 @@ public class ChapterActivity extends BaseActivity implements View.OnClickListene
             public UserDetails getLocalUserDetails(UserDetails userDetails) {
                 if (userDetails != null) {
                     userDetailsObject = userDetails;
-                    //chapterMainBinding.fragmentViewpager.setOffscreenPageLimit(0);
+                    chapterMainBinding.fragmentViewpager.setOffscreenPageLimit(3);
                     setupViewPager(chapterMainBinding.fragmentViewpager);
                 }
                 return null;
@@ -102,7 +102,7 @@ public class ChapterActivity extends BaseActivity implements View.OnClickListene
                                 break;
 
                         }
-                        pageNo1.setValue(pageNo);
+                        /*pageNo1.setValue(pageNo);*/
                         return false;
                     }
                 });
@@ -149,6 +149,8 @@ public class ChapterActivity extends BaseActivity implements View.OnClickListene
                     case 3:
                         break;
                 }
+
+                pageNo1.setValue(position);
             }
 
             @Override
