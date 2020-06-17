@@ -1180,5 +1180,33 @@ namespace Training24Admin.Controllers
             }
         }
 
+        [HttpGet("GetCourseStatusIsExpire")]
+        public IActionResult GetCourseStatusIsExpire(int courseId)
+        {
+
+            SuccessResponse successResponse = new SuccessResponse();
+            UnsuccessResponse unsuccessResponse = new UnsuccessResponse();
+            try
+            {
+                //string Authorization = Request.Headers["Authorization"];
+                string Authorization = Request.Headers["id_token"];
+
+                TokenClaims tc = General.GetClaims(Authorization);
+                tc.Id = LessonBusiness.getUserId(tc.sub);
+                
+                successResponse.data = CourseBusiness.CheckCourseIsExpire(int.Parse(tc.Id), courseId);
+                successResponse.response_code = 0;
+                successResponse.message = "Course status.";
+                successResponse.status = "Success";
+                return StatusCode(200, successResponse);
+            }
+            catch (Exception ex)
+            {
+                unsuccessResponse.response_code = 2;
+                unsuccessResponse.message = ex.Message;
+                unsuccessResponse.status = "Failure";
+                return StatusCode(500, unsuccessResponse);
+            }
+        }
     }
 }

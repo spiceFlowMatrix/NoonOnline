@@ -123,6 +123,18 @@ namespace Trainning24.BL.Business
 
             _training24Context.SaveChanges();
         }
+        public bool CheckCourseIsExpire(long userid, int courseId)
+        {
+            var userCourse = (from usercourse in _training24Context.UserCourse
+                              join courses in _training24Context.Course on usercourse.CourseId equals courses.Id
+                              where usercourse.UserId == userid && usercourse.CourseId == courseId && usercourse.IsExpire == true && usercourse.IsDeleted != true
+                              select usercourse).FirstOrDefault();
+            if (userCourse != null)
+                return true;
+            else
+                return false;
+
+        }
 
         public Course Create(AddCourseModel AddCourseModel, int id)
         {
