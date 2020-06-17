@@ -24,6 +24,7 @@ namespace Training24Admin.Controllers
 
         private readonly LessonBusiness LessonBusiness;
         private readonly DeviceBusiness deviceBusiness;
+        public static List<string> UniqMacList = new List<string>();
 
 
         public DeviceController(LessonBusiness LessonBusiness, DeviceBusiness deviceBusiness
@@ -115,13 +116,35 @@ namespace Training24Admin.Controllers
                 {
                     if (!String.IsNullOrEmpty(objData.macAddress) && !String.IsNullOrEmpty(objData.ipAddress))
                     {
-                        var deviceExist = deviceBusiness.GetDevicesByMacAdd(objData.macAddress, int.Parse(tc.Id));
-                        if (deviceExist == null)
+                        if (!UniqMacList.Contains(objData.macAddress))
                         {
-                            if (deviceBusiness.CheckDeviceQuota(int.Parse(tc.Id)) > 0)
+                            UniqMacList.Add(objData.macAddress);
+                            var deviceExist = deviceBusiness.GetDevicesByMacAdd(objData.macAddress, int.Parse(tc.Id));
+                            if (deviceExist == null)
                             {
-                                var deviceDetails = deviceBusiness.Create(objData, int.Parse(tc.Id));
-                                successResponse.data = deviceDetails;
+                                if (deviceBusiness.CheckDeviceQuota(int.Parse(tc.Id)) > 0)
+                                {
+                                    UniqMacList.Remove(objData.macAddress);
+                                    var deviceDetails = deviceBusiness.Create(objData, int.Parse(tc.Id));
+                                    successResponse.data = deviceDetails;
+                                    successResponse.response_code = 0;
+                                    successResponse.message = "Device registered and activated";
+                                    successResponse.status = "Success";
+                                    return StatusCode(200, successResponse);
+                                }
+                                else
+                                {
+                                    UniqMacList.Remove(objData.macAddress);
+                                    unsuccessResponse.response_code = 3;
+                                    unsuccessResponse.message = "you are out of device quota";
+                                    unsuccessResponse.status = "Unsuccess";
+                                    return StatusCode(406, unsuccessResponse);
+                                }
+                            }
+                            else if (deviceExist != null && deviceExist.IsDeleted != true)
+                            {
+                                UniqMacList.Remove(objData.macAddress);
+                                successResponse.data = deviceExist;
                                 successResponse.response_code = 0;
                                 successResponse.message = "Device registered and activated";
                                 successResponse.status = "Success";
@@ -129,30 +152,24 @@ namespace Training24Admin.Controllers
                             }
                             else
                             {
-                                unsuccessResponse.response_code = 3;
-                                unsuccessResponse.message = "you are out of device quota";
+                                UniqMacList.Remove(objData.macAddress);
+                                unsuccessResponse.response_code = 2;
+                                unsuccessResponse.message = "This device has been deactivated.";
                                 unsuccessResponse.status = "Unsuccess";
                                 return StatusCode(406, unsuccessResponse);
                             }
                         }
-                        else if (deviceExist != null && deviceExist.IsDeleted != true)
-                        {
-                            successResponse.data = deviceExist;
-                            successResponse.response_code = 0;
-                            successResponse.message = "Device registered and activated";
-                            successResponse.status = "Success";
-                            return StatusCode(200, successResponse);
-                        }
                         else
                         {
-                            unsuccessResponse.response_code = 2;
-                            unsuccessResponse.message = "This device has been deactivated.";
+                            unsuccessResponse.response_code = 1;
+                            unsuccessResponse.message = "This user's request already in the queue.";
                             unsuccessResponse.status = "Unsuccess";
                             return StatusCode(406, unsuccessResponse);
                         }
                     }
                     else
                     {
+                        UniqMacList.Remove(objData.macAddress);
                         unsuccessResponse.response_code = 2;
                         unsuccessResponse.message = "Invalid input";
                         unsuccessResponse.status = "Failure";
@@ -161,11 +178,13 @@ namespace Training24Admin.Controllers
                 }
                 else
                 {
+                    UniqMacList.Remove(objData.macAddress);
                     return StatusCode(406, ModelState);
                 }
             }
             catch (Exception ex)
             {
+                UniqMacList.Remove(objData.macAddress);
                 unsuccessResponse.response_code = 2;
                 unsuccessResponse.message = ex.Message;
                 unsuccessResponse.status = "Failure";
