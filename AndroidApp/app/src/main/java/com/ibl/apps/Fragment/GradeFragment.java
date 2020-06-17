@@ -11,8 +11,6 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -21,7 +19,6 @@ import android.os.HandlerThread;
 import android.os.Message;
 import android.os.Process;
 import android.telephony.TelephonyManager;
-import android.text.format.Formatter;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,6 +30,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.Observer;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
@@ -42,24 +40,20 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.location.LocationSettingsStatusCodes;
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import com.ibl.apps.Adapter.CourseListAdapter;
 import com.ibl.apps.Base.BaseFragment;
 import com.ibl.apps.CourseManagement.CourseRepository;
-import com.ibl.apps.DeviceManagement.DeviceManagementRepository;
 import com.ibl.apps.Interface.CourseAsyncResponse;
 import com.ibl.apps.Model.CourseObject;
 import com.ibl.apps.Model.IntervalObject;
 import com.ibl.apps.Model.IntervalTableObject;
-import com.ibl.apps.Model.deviceManagement.registeruser.DeviceRegisterModel;
 import com.ibl.apps.RoomDatabase.dao.courseManagementDatabase.CourseDatabaseRepository;
 import com.ibl.apps.RoomDatabase.dao.lessonManagementDatabase.LessonDatabaseRepository;
 import com.ibl.apps.RoomDatabase.entity.SyncTimeTrackingObject;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
 import com.ibl.apps.Service.CourseImageManager;
 import com.ibl.apps.noon.LoginDevicesActivity;
+import com.ibl.apps.noon.MainDashBoardActivity;
 import com.ibl.apps.noon.NoonApplication;
 import com.ibl.apps.noon.R;
 import com.ibl.apps.noon.databinding.GradeLayoutBinding;
@@ -67,7 +61,6 @@ import com.ibl.apps.util.Const;
 import com.ibl.apps.util.PrefUtils;
 import com.ibl.apps.util.SingleShotLocationProvider;
 
-import java.io.IOException;
 import java.net.NetworkInterface;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -83,12 +76,10 @@ import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 import pub.devrel.easypermissions.EasyPermissions;
-import retrofit2.Response;
 import tcking.github.com.giraffeplayer2.LazyLoadManager;
 import tcking.github.com.giraffeplayer2.VideoInfo;
 
 import static android.content.Context.MODE_PRIVATE;
-import static com.ibl.apps.util.Const.deviceStatus;
 import static tcking.github.com.giraffeplayer2.GiraffePlayer.MSG_CTRL_PLAYING;
 
 
@@ -112,14 +103,11 @@ public class GradeFragment extends BaseFragment implements View.OnClickListener,
     UserDetails userDetailsObject;
     String userId = "0";
     private static LocationManager manager;
-    boolean isAgree = false;
     private CourseRepository courseRepository; //22 use
     private CourseDatabaseRepository courseDatabaseRepository;
     private LessonDatabaseRepository lessonDatabaseRepository;
-    private String macAddress;
-    private String ipAddress;
-    private String deviceToken = "";
-    private Long errorCode;
+    private String deviceStatusCode;
+    private Observer<Integer> observer;
 
     public GradeFragment() {
         // Required empty public constructor
@@ -144,6 +132,26 @@ public class GradeFragment extends BaseFragment implements View.OnClickListener,
         courseRepository = new CourseRepository();
         courseDatabaseRepository = new CourseDatabaseRepository();
         lessonDatabaseRepository = new LessonDatabaseRepository();
+    }
+
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        gradeLayoutBinding = DataBindingUtil.inflate(inflater, R.layout.grade_layout, container, false);
+        observer = new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer integer) {
+                if (getFragmentManager() != null && integer == 0) {
+                    setUp(gradeLayoutBinding.getRoot());
+                    MainDashBoardActivity.coursePageNoArray.setValue(-1);
+                }
+
+            }
+        };
+        if (!MainDashBoardActivity.courseIsAdd) {
+            MainDashBoardActivity.courseIsAdd = true;
+            MainDashBoardActivity.coursePageNoArray.observe(getViewLifecycleOwner(), observer);
+        }
+        return gradeLayoutBinding.getRoot();
     }
 
     @Override
@@ -249,37 +257,65 @@ public class GradeFragment extends BaseFragment implements View.OnClickListener,
     }
 
     private void callAPIDeviceManagement() {
-        WifiManager manager = (WifiManager) Objects.requireNonNull(getActivity()).getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        SharedPreferences deviceSharedPreferences = getActivity().getSharedPreferences("deviceStatus", MODE_PRIVATE);
+        deviceStatusCode = deviceSharedPreferences.getString("deviceStatusCode", "");
+        Log.e("deviceStatusCode", "setUp: GRADE" + deviceStatusCode);
 
-        WifiInfo info = null;
-        if (manager != null) {
-            info = manager.getConnectionInfo();
-            //macAddress = info.getMacAddress();
-            ipAddress = Formatter.formatIpAddress(manager.getConnectionInfo().getIpAddress());
+        if (deviceStatusCode != null) {
+            switch (deviceStatusCode) {
+                case "0":
+                    gradeLayoutBinding.deactivatedDeviceQuota.deviceDeactivateLay.setVisibility(View.GONE);
+                    gradeLayoutBinding.outOfDeviceQuota.deviceQuotaLay.setVisibility(View.GONE);
+                    //gradeLayoutBinding.advanceSearchLayout.mainAdvanceSearchLayout.setVisibility(View.GONE);
+                    gradeLayoutBinding.rcVerticalLayout.rcVertical.setVisibility(View.VISIBLE);
+                    PrefUtils.MyAsyncTask asyncTask = (PrefUtils.MyAsyncTask) new PrefUtils.MyAsyncTask(new PrefUtils.MyAsyncTask.AsyncResponse() {
+                        @Override
+                        public UserDetails getLocalUserDetails(UserDetails userDetails) {
+                            if (userDetails != null) {
+                                userDetailsObject = userDetails;
+                                userId = userDetailsObject.getId();
+                                SharedPreferences sharedPreferences = (Objects.requireNonNull(getActivity())).getSharedPreferences("user", MODE_PRIVATE);
+                                SharedPreferences.Editor editor = sharedPreferences.edit();
+                                editor.putString("uid", userId);
+                                editor.apply();
+                                if (isNetworkAvailable(getActivity())) {
+                                    loadData(SearchText, SpinnerGradeId);
+                                } else {
+                                    new setLocalDataTask(new CourseAsyncResponse() {
+                                        @Override
+                                        public List<CourseObject.Data> getLocalUserDetails(List<CourseObject.Data> courseListl) {
+                                            gradeLayoutBinding.rcVerticalLayout.rcVertical.setHasFixedSize(true);
+                                            adp = new CourseListAdapter(getActivity(), courseListl, userDetailsObject);
+                                            gradeLayoutBinding.rcVerticalLayout.rcVertical.setAdapter(adp);
+                                            adp.notifyDataSetChanged();
+                                            hideDialog();
+                                            return null;
+                                        }
+                                    }).execute();
+                                }
+                            }
+                            return null;
+                        }
+
+                    }).execute();
+                    break;
+                case "2":
+                    gradeLayoutBinding.deactivatedDeviceQuota.deviceDeactivateLay.setVisibility(View.VISIBLE);
+                    gradeLayoutBinding.outOfDeviceQuota.deviceQuotaLay.setVisibility(View.GONE);
+                    //gradeLayoutBinding.advanceSearchLayout.mainAdvanceSearchLayout.setVisibility(View.GONE);
+                    gradeLayoutBinding.rcVerticalLayout.rcVertical.setVisibility(View.GONE);
+                    break;
+                case "3":
+                    gradeLayoutBinding.deactivatedDeviceQuota.deviceDeactivateLay.setVisibility(View.GONE);
+                    gradeLayoutBinding.outOfDeviceQuota.deviceQuotaLay.setVisibility(View.VISIBLE);
+                    //gradeLayoutBinding.advanceSearchLayout.mainAdvanceSearchLayout.setVisibility(View.GONE);
+                    gradeLayoutBinding.rcVerticalLayout.rcVertical.setVisibility(View.GONE);
+                    break;
+            }
         }
+        hideDialog();
 
-        //OS
-        JsonObject jsonOs = new JsonObject();
-        jsonOs.addProperty(Const.name, Const.var_deviceType);
-        jsonOs.addProperty(Const.version, Build.VERSION.RELEASE);
-
-        //tag
-        JsonArray jsonArray = new JsonArray();
-        JsonObject j = new JsonObject();
-        j.addProperty(Const.name, "");
-        jsonArray.add(j);
-
-        //main
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty(Const.macAddress, getWifiMacAddress());
-        jsonObject.addProperty(Const.ipAddress, ipAddress);
-        jsonObject.addProperty(Const.modelName, Build.MODEL);
-        jsonObject.addProperty(Const.modelNumber, Build.SERIAL);
-        jsonObject.add(Const.operatingSystem, jsonOs);
-        jsonObject.add(Const.tags, jsonArray);
-
-
-        DeviceManagementRepository deviceManagementRepository = new DeviceManagementRepository();
+        /*DeviceManagementRepository deviceManagementRepository = new DeviceManagementRepository();
         disposable.add(deviceManagementRepository.registerDeviceDetail(jsonObject)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -420,7 +456,8 @@ public class GradeFragment extends BaseFragment implements View.OnClickListener,
                         }
                         hideDialog();
                     }
-                }));
+                }));*/
+
     }
 
     private void getCurrentLocation() {
@@ -546,11 +583,6 @@ public class GradeFragment extends BaseFragment implements View.OnClickListener,
         return gmtTime;
     }
 
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        gradeLayoutBinding = DataBindingUtil.inflate(inflater, R.layout.grade_layout, container, false);
-        return gradeLayoutBinding.getRoot();
-    }
 
     public void setOnClickListener() {
         gradeLayoutBinding.outOfDeviceQuota.imgOutQuota.setOnClickListener(this);
@@ -929,4 +961,23 @@ public class GradeFragment extends BaseFragment implements View.OnClickListener,
         alert.show();
     }
 
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser && MainDashBoardActivity.coursePageNo == 0) {
+            if (getFragmentManager() != null) {
+
+            }
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (observer != null) {
+            MainDashBoardActivity.courseIsAdd = false;
+            MainDashBoardActivity.coursePageNoArray.removeObserver(observer);
+        }
+        super.onDestroy();
+    }
 }

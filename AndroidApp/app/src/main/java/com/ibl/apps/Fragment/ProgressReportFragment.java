@@ -98,7 +98,6 @@ import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 
 import static android.content.Context.MODE_PRIVATE;
-import static com.ibl.apps.util.Const.deviceStatus;
 
 
 public class ProgressReportFragment extends BaseFragment implements View.OnClickListener {
@@ -148,25 +147,30 @@ public class ProgressReportFragment extends BaseFragment implements View.OnClick
 
         SharedPreferences deviceSharedPreferences = getActivity().getSharedPreferences("deviceStatus", MODE_PRIVATE);
         deviceStatusCode = deviceSharedPreferences.getString("deviceStatusCode", "");
-        Log.e("deviceStatusCode", "setUp:progress " + deviceStatus);
-        if (deviceStatusCode.equals("0")) {
-            fragmentProgressReportBinding.deactivatedDeviceQuota.deviceDeactivateLay.setVisibility(View.GONE);
-            fragmentProgressReportBinding.outOfDeviceQuota.deviceQuotaLay.setVisibility(View.GONE);
-            fragmentProgressReportBinding.nestedScrollView.setVisibility(View.VISIBLE);
-            setUpAllSpinners();
-            setonclicklistner();
+        Log.e("deviceStatusCode", "setUp:progress " + deviceStatusCode);
+        if (deviceStatusCode != null)
+            switch (deviceStatusCode) {
+                case "0":
+                    fragmentProgressReportBinding.deactivatedDeviceQuota.deviceDeactivateLay.setVisibility(View.GONE);
+                    fragmentProgressReportBinding.outOfDeviceQuota.deviceQuotaLay.setVisibility(View.GONE);
+                    fragmentProgressReportBinding.nestedScrollView.setVisibility(View.VISIBLE);
+                    setUpAllSpinners();
+                    setonclicklistner();
 
-        } else if (deviceStatus == 2) {
-            fragmentProgressReportBinding.deactivatedDeviceQuota.deviceDeactivateLay.setVisibility(View.VISIBLE);
-            fragmentProgressReportBinding.outOfDeviceQuota.deviceQuotaLay.setVisibility(View.GONE);
-            //fragmentProgressReportBinding.advanceSearchLayout.mainAdvanceSearchLayout.setVisibility(View.GONE);
-            fragmentProgressReportBinding.nestedScrollView.setVisibility(View.GONE);
-        } else if (deviceStatus == 3) {
-            fragmentProgressReportBinding.deactivatedDeviceQuota.deviceDeactivateLay.setVisibility(View.GONE);
-            fragmentProgressReportBinding.outOfDeviceQuota.deviceQuotaLay.setVisibility(View.VISIBLE);
-            //fragmentProgressReportBinding.advanceSearchLayout.mainAdvanceSearchLayout.setVisibility(View.GONE);
-            fragmentProgressReportBinding.nestedScrollView.setVisibility(View.GONE);
-        }
+                    break;
+                case "2":
+                    fragmentProgressReportBinding.deactivatedDeviceQuota.deviceDeactivateLay.setVisibility(View.VISIBLE);
+                    fragmentProgressReportBinding.outOfDeviceQuota.deviceQuotaLay.setVisibility(View.GONE);
+                    //fragmentProgressReportBinding.advanceSearchLayout.mainAdvanceSearchLayout.setVisibility(View.GONE);
+                    fragmentProgressReportBinding.nestedScrollView.setVisibility(View.GONE);
+                    break;
+                case "3":
+                    fragmentProgressReportBinding.deactivatedDeviceQuota.deviceDeactivateLay.setVisibility(View.GONE);
+                    fragmentProgressReportBinding.outOfDeviceQuota.deviceQuotaLay.setVisibility(View.VISIBLE);
+                    //fragmentProgressReportBinding.advanceSearchLayout.mainAdvanceSearchLayout.setVisibility(View.GONE);
+                    fragmentProgressReportBinding.nestedScrollView.setVisibility(View.GONE);
+                    break;
+            }
 
 
         backInterface = (BackInterface) getActivity();
@@ -417,8 +421,6 @@ public class ProgressReportFragment extends BaseFragment implements View.OnClick
                     }
                 }));
     }
-
-    ;
 
     private void callMonthSpinner(ArrayList<Integer> userArray) {
         if (userArray.size() == 1) {
