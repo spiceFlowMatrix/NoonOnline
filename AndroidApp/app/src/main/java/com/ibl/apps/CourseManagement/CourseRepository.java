@@ -2,6 +2,7 @@ package com.ibl.apps.CourseManagement;
 
 import com.ibl.apps.Model.CourseObject;
 import com.ibl.apps.Model.IntervalObject;
+import com.ibl.apps.Model.NotificationCourseType1;
 import com.ibl.apps.Model.SearchObject;
 import com.ibl.apps.Network.ApiClient;
 import com.ibl.apps.noon.NoonApplication;
@@ -28,5 +29,10 @@ public class CourseRepository implements CourseApiService {
     @Override
     public Single<SearchObject> SearchDetails(int pagenumber, int perpagerecord, String search, String filter, String bygrade) {
         return courseApiService.SearchDetails(pagenumber, perpagerecord, search, filter, bygrade);
+    }
+
+    @Override
+    public Single<NotificationCourseType1> GetCourseStatusIsExpire() {
+        return courseApiService.GetCourseStatusIsExpire();
     }
 }

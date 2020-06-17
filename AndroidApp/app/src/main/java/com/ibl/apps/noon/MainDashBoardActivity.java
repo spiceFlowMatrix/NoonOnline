@@ -284,19 +284,20 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
                     .into(mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn);
         }
         SyncAPIDatabaseRepository syncAPIDatabaseRepository = new SyncAPIDatabaseRepository();
-
-        List<SyncAPITable> syncAPITableList = syncAPIDatabaseRepository.getSyncUserById(Integer.parseInt(userId));
-        if (syncAPITableList.size() >= 50) {
-            NoonApplication.cacheStatus = 2;
-            SharedPreferences sharedPreferencesCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
-            SharedPreferences.Editor editor = sharedPreferencesCache.edit();
-            if (editor != null) {
-                editor.clear();
-                editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
-                editor.apply();
-            }
-            if (deviceStatusCode != null && deviceStatusCode.equals("0")) {
-                showHitLimitDialog(MainDashBoardActivity.this);
+        if (!userId.isEmpty()) {
+            List<SyncAPITable> syncAPITableList = syncAPIDatabaseRepository.getSyncUserById(Integer.parseInt(userId));
+            if (syncAPITableList.size() >= 50) {
+                NoonApplication.cacheStatus = 2;
+                SharedPreferences sharedPreferencesCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferencesCache.edit();
+                if (editor != null) {
+                    editor.clear();
+                    editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
+                    editor.apply();
+                }
+                if (deviceStatusCode != null && deviceStatusCode.equals("0")) {
+                    showHitLimitDialog(MainDashBoardActivity.this);
+                }
             }
         }
 
@@ -432,6 +433,7 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
                                             return false;
                                         }
                                     });
+
                             mainDashboardLayoutBinding.appBarLayout.contentMain.courseViewpager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
                                 @Override
                                 public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {

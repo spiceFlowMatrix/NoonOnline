@@ -3,6 +3,7 @@ package com.ibl.apps.CourseManagement;
 
 import com.ibl.apps.Model.CourseObject;
 import com.ibl.apps.Model.IntervalObject;
+import com.ibl.apps.Model.NotificationCourseType1;
 import com.ibl.apps.Model.SearchObject;
 
 import io.reactivex.Single;
@@ -28,4 +29,7 @@ public interface CourseApiService {
                                        @Query("search") String search,
                                        @Query(value = "filter", encoded = true) String filter,
                                        @Query("bygrade") String bygrade);
+
+    @GET("Course/GetCourseStatusIsExpire")
+    Single<NotificationCourseType1> GetCourseStatusIsExpire();
 }
