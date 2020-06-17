@@ -458,6 +458,8 @@
     
     <string name="assignment_unauthorize_warning">تاسو کورنی دنده ته لاسرسی نلرئ، مهرباني وکړئ له ن زده‌کړې د اداري سره اړیکه ونیسئ.</string>
 
+    <string name="expired">ستاسو د کورس موده ختم شوی ، مهرباني وکړئ د تمدید لپاره د ن زده کړې ادارې سره اړیکه ونیسئ.</string>
+
 
 
     <!--<string name="pashto_school">مدرسة الباشتو</string>-->
