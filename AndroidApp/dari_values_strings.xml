@@ -459,6 +459,9 @@
 
     <string name="expired">کورس‌تان منقضی شده است، لطفا با اداره تعلیمات ن بخاطر تمدید وقت تماس بگیرید.</string>
 
+    <string name="cache">رویدادها</string>
+    <string name="sync">همگام‌سازی</string>
+
     
     <!--<string name="pashto_school">مدرسة الباشتو</string>-->
     <!--For Pashto Notification Translation-->

@@ -461,6 +461,11 @@
     <string name="expired">ستاسو د کورس موده ختم شوی ، مهرباني وکړئ د تمدید لپاره د ن زده کړې ادارې سره اړیکه ونیسئ.</string>
 
 
+    <string name="cache">پیښې</string>
+    <string name="sync">همغږي کول</string>
+    
+
+
 
     <!--<string name="pashto_school">مدرسة الباشتو</string>-->
     <!--For Pashto Notification Translation-->
