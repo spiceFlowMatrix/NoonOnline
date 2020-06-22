@@ -116,25 +116,23 @@ public class ReportProblemActivity extends BaseActivity implements View.OnClickL
 
         setToolbar(binding.toolBar);
         showBackArrow(getResources().getString(R.string.submit_feedback));
-        binding.cacheEventsStatusBtn.setVisibility(View.VISIBLE);
-
         SyncAPIDatabaseRepository syncAPIDatabaseRepository = new SyncAPIDatabaseRepository();
         SharedPreferences sharedPreferenceCache = getSharedPreferences("cacheStatus", MODE_PRIVATE);
         String flagStatus = sharedPreferenceCache.getString("FlagStatus", "");
         switch (flagStatus) {
             case "1":
-                binding.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_pending);
+                binding.cacheEventsStatusBtn.setImageResource(R.drawable.svg_pending);
                 break;
             case "2":
-                binding.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_error);
+                binding.cacheEventsStatusBtn.setImageResource(R.drawable.svg_error);
                 break;
             case "3":
-                binding.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_syncing);
+                binding.cacheEventsStatusBtn.setImageResource(R.drawable.svg_sync);
                 break;
             case "4":
                 GlideApp.with(ReportProblemActivity.this)
-                        .load(R.drawable.ic_cache_empty)
-                        .error(R.drawable.ic_cache_empty)
+                        .load(R.drawable.svg_empty)
+                        .error(R.drawable.svg_empty)
                         .into(binding.cacheEventsStatusBtn);
                 break;
         }

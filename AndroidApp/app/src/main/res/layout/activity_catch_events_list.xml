@@ -23,19 +23,37 @@
                     android:id="@+id/txtCacheTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
                     android:text="@string/pending_cache_events"
                     android:textColor="@color/black"
                     android:textSize="@dimen/_16sdp" />
 
-                <Switch
-                    android:id="@+id/switchClick"
+                <LinearLayout
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="@dimen/_35sdp"
                     android:layout_alignParentEnd="true"
                     android:layout_centerInParent="true"
                     android:layout_marginEnd="@dimen/_20sdp"
-                    android:checked="false"
-                    android:textColor="@color/black" />
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <Switch
+                        android:id="@+id/switchClick"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="false"
+                        android:textColor="@color/black" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/_minus3sdp"
+                        android:paddingStart="@dimen/_10sdp"
+                        android:paddingEnd="@dimen/_10sdp"
+                        android:text="@string/sync"
+                        android:textColor="@color/black"
+                        android:textSize="15sp" />
+                </LinearLayout>
             </RelativeLayout>
         </androidx.appcompat.widget.Toolbar>
 

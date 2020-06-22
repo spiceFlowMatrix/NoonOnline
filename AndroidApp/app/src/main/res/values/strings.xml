@@ -456,6 +456,8 @@
     <string name="sync_api_running">You need to wait until Sync API is running in your background process</string>
     <string name="assignment_unauthorize_warning">You have not subscribed for the assignment module</string>
     <string name="expired">Expired</string>
+    <string name="cache">Cache</string>
+    <string name="sync">Sync</string>
 
     <!--<string name="pashto_school">مدرسة الباشتو</string>-->
     <!--For Pashto Notification Translation-->
