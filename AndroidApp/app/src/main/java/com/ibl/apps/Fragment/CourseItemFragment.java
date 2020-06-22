@@ -312,18 +312,18 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                     String flagStatus = sharedPreferenceCache.getString("FlagStatus", "");
                     switch (flagStatus) {
                         case "1":
-                            fragmentCourseItemLayoutBinding.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_pending);
+                            fragmentCourseItemLayoutBinding.cacheEventsStatusBtn.setImageResource(R.drawable.svg_pending);
                             break;
                         case "2":
-                            fragmentCourseItemLayoutBinding.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_error);
+                            fragmentCourseItemLayoutBinding.cacheEventsStatusBtn.setImageResource(R.drawable.svg_error);
                             break;
                         case "3":
-                            fragmentCourseItemLayoutBinding.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_syncing);
+                            fragmentCourseItemLayoutBinding.cacheEventsStatusBtn.setImageResource(R.drawable.svg_sync);
                             break;
                         case "4":
                             GlideApp.with(getActivity())
-                                    .load(R.drawable.ic_cache_empty)
-                                    .error(R.drawable.ic_cache_empty)
+                                    .load(R.drawable.svg_empty)
+                                    .error(R.drawable.svg_empty)
                                     .into(fragmentCourseItemLayoutBinding.cacheEventsStatusBtn);
                             break;
                     }
@@ -1092,18 +1092,18 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                                 String flagStatus = sharedPreferenceCache.getString("FlagStatus", "");
                                 switch (flagStatus) {
                                     case "1":
-                                        dialogViewerItemLayoutBinding.pdfViewLayout.pdfCacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_pending);
+                                        dialogViewerItemLayoutBinding.pdfViewLayout.pdfCacheEventsStatusBtn.setImageResource(R.drawable.svg_pending);
                                         break;
                                     case "2":
-                                        dialogViewerItemLayoutBinding.pdfViewLayout.pdfCacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_error);
+                                        dialogViewerItemLayoutBinding.pdfViewLayout.pdfCacheEventsStatusBtn.setImageResource(R.drawable.svg_error);
                                         break;
                                     case "3":
-                                        dialogViewerItemLayoutBinding.pdfViewLayout.pdfCacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_syncing);
+                                        dialogViewerItemLayoutBinding.pdfViewLayout.pdfCacheEventsStatusBtn.setImageResource(R.drawable.svg_sync);
                                         break;
                                     case "4":
                                         GlideApp.with(getActivity())
-                                                .load(R.drawable.ic_cache_empty)
-                                                .error(R.drawable.ic_cache_empty)
+                                                .load(R.drawable.svg_empty)
+                                                .error(R.drawable.svg_empty)
                                                 .into(dialogViewerItemLayoutBinding.pdfViewLayout.pdfCacheEventsStatusBtn);
                                         break;
                                 }

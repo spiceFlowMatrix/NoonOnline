@@ -38,16 +38,31 @@
                         android:textColor="@color/black"
                         android:textSize="@dimen/_16sdp" />
 
-                    <ImageView
-                        android:id="@+id/cacheEventsStatusBtn"
-                        android:layout_width="@dimen/_25sdp"
-                        android:layout_height="@dimen/_25sdp"
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
                         android:layout_centerHorizontal="true"
-                        android:layout_marginTop="@dimen/_5sdp"
+                        android:layout_marginTop="@dimen/_3sdp"
                         android:layout_marginEnd="@dimen/_10sdp"
-                        android:src="@drawable/ic_cache_empty"
-                        android:visibility="visible" />
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:visibility="visible">
+
+                        <ImageView
+                            android:id="@+id/cacheEventsStatusBtn"
+                            android:layout_width="@dimen/_18sdp"
+                            android:layout_height="@dimen/_18sdp"
+                            app:srcCompat="@drawable/svg_empty" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/_minus2sdp"
+                            android:text="@string/cache"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/_7sdp" />
+                    </LinearLayout>
                 </RelativeLayout>
             </androidx.appcompat.widget.Toolbar>
 

@@ -262,25 +262,25 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
         if (deviceStatusCode != null && deviceStatusCode.equals("0")) {
             switch (flagStatus) {
                 case "1":
-                    mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_pending);
+                    mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.svg_pending);
                     break;
                 case "2":
-                    mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_error);
+                    mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.svg_error);
                     break;
                 case "3":
-                    mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.ic_cache_syncing);
+                    mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn.setImageResource(R.drawable.svg_sync);
                     break;
                 case "4":
                     GlideApp.with(MainDashBoardActivity.this)
-                            .load(R.drawable.ic_cache_empty)
-                            .error(R.drawable.ic_cache_empty)
+                            .load(R.drawable.svg_empty)
+                            .error(R.drawable.svg_empty)
                             .into(mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn);
                     break;
             }
         } else {
             GlideApp.with(MainDashBoardActivity.this)
-                    .load(R.drawable.ic_cache_empty)
-                    .error(R.drawable.ic_cache_empty)
+                    .load(R.drawable.svg_empty)
+                    .error(R.drawable.svg_empty)
                     .into(mainDashboardLayoutBinding.appBarLayout.cacheEventsStatusBtn);
         }
         SyncAPIDatabaseRepository syncAPIDatabaseRepository = new SyncAPIDatabaseRepository();
