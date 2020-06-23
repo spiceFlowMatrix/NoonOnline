@@ -462,6 +462,10 @@
     <string name="cache">رویدادها</string>
     <string name="sync">همگام‌سازی</string>
 
+
+    <string name="invalid_mac_ip">شما در حال تلاش برای ورود با یک مک‌آرس و یا آی‌پی غیرمعتبر هستید، لطفا با اداره تعلیمات ن بخاطر معلومات بیشتر تماس بگیرید.</string>
+
+
     
     <!--<string name="pashto_school">مدرسة الباشتو</string>-->
     <!--For Pashto Notification Translation-->
