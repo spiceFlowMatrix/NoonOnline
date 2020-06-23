@@ -170,10 +170,10 @@ namespace Training24Admin.Controllers
                     else
                     {
                         UniqMacList.Remove(objData.macAddress);
-                        unsuccessResponse.response_code = 2;
+                        unsuccessResponse.response_code = 4;
                         unsuccessResponse.message = "Invalid input";
                         unsuccessResponse.status = "Failure";
-                        return StatusCode(500, unsuccessResponse);
+                        return StatusCode(406, unsuccessResponse);
                     }
                 }
                 else
