@@ -324,6 +324,9 @@ public class LibraryFragment extends BaseFragment implements View.OnClickListene
                     libraryLayoutBinding.outOfDeviceQuota.deviceQuotaLay.setVisibility(View.VISIBLE);
                     libraryLayoutBinding.rcVerticalLayout.rcVertical.setVisibility(View.GONE);
                     break;
+                case "4":
+                    Toast.makeText(getActivity(), getActivity().getResources().getString(R.string.invalid_mac_ip), Toast.LENGTH_LONG).show();
+                    break;
             }
         }
 

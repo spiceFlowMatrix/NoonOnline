@@ -458,6 +458,7 @@
     <string name="expired">Expired</string>
     <string name="cache">Cache</string>
     <string name="sync">Sync</string>
+    <string name="invalid_mac_ip">Invalid mac address or IP address</string>
 
     <!--<string name="pashto_school">مدرسة الباشتو</string>-->
     <!--For Pashto Notification Translation-->

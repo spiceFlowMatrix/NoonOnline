@@ -359,6 +359,12 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
                                     SharedPreferences.Editor editor = deviceStatusPreferences.edit();
                                     editor.putString("deviceStatusCode", String.valueOf(deviceStatus));
                                     editor.apply();
+                                } else if (errorCode == 4) {
+                                    deviceStatus = 4;
+                                    SharedPreferences deviceStatusPreferences = getSharedPreferences("deviceStatus", MODE_PRIVATE);
+                                    SharedPreferences.Editor editor = deviceStatusPreferences.edit();
+                                    editor.putString("deviceStatusCode", String.valueOf(deviceStatus));
+                                    editor.apply();
                                 }
                             }
 
