@@ -19,6 +19,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -169,6 +170,9 @@ public class ProgressReportFragment extends BaseFragment implements View.OnClick
                     fragmentProgressReportBinding.outOfDeviceQuota.deviceQuotaLay.setVisibility(View.VISIBLE);
                     //fragmentProgressReportBinding.advanceSearchLayout.mainAdvanceSearchLayout.setVisibility(View.GONE);
                     fragmentProgressReportBinding.nestedScrollView.setVisibility(View.GONE);
+                    break;
+                case "4":
+                    Toast.makeText(getActivity(), getActivity().getResources().getString(R.string.invalid_mac_ip), Toast.LENGTH_LONG).show();
                     break;
             }
 

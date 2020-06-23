@@ -25,6 +25,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -310,6 +311,9 @@ public class GradeFragment extends BaseFragment implements View.OnClickListener,
                     gradeLayoutBinding.outOfDeviceQuota.deviceQuotaLay.setVisibility(View.VISIBLE);
                     //gradeLayoutBinding.advanceSearchLayout.mainAdvanceSearchLayout.setVisibility(View.GONE);
                     gradeLayoutBinding.rcVerticalLayout.rcVertical.setVisibility(View.GONE);
+                    break;
+                case "4":
+                    Toast.makeText(getActivity(), getActivity().getResources().getString(R.string.invalid_mac_ip), Toast.LENGTH_LONG).show();
                     break;
             }
         }
