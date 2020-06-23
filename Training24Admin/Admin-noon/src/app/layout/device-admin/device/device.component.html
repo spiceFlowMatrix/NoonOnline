@@ -100,3 +100,5 @@
   </tr>
   <tr mat-row *matRowDef="let row; columns: ['expandedDetail']; let in = index" class="example-detail-row"></tr>
 </table>
+<mat-paginator [length]="length" [pageSize]="filterModal.pageRecord" (page)="PageChange($event)">
+</mat-paginator>
