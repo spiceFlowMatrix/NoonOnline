@@ -24,6 +24,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { MAT_MOMENT_DATE_FORMATS, MomentDateAdapter } from '@angular/material-moment-adapter'
 import { SatDatepickerModule, SatNativeDateModule, DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from 'saturn-datepicker';
 import { FormsModule } from '@angular/forms';
+import { MatPaginatorModule } from '@angular/material/paginator';
 
 @NgModule({
     imports: [
@@ -36,6 +37,7 @@ import { FormsModule } from '@angular/forms';
         MatIconModule,
         MatInputModule,
         MatMenuModule,
+        MatPaginatorModule,
         MatListModule,
         MatNativeDateModule,
         SatDatepickerModule,

@@ -86,3 +86,4 @@
   <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
   <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 </table>
+<mat-paginator [length]="length" [pageSize]="filterModal.perpagerecord" (page)="PageChange($event)">

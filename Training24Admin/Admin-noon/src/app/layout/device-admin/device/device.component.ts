@@ -104,6 +104,7 @@ export class DeviceComponent implements OnInit {
     userId: 0,
     search: ''
   }
+  length: any = 0;
   open: boolean = false;
   constructor(public deviceService: DeviceService) { }
 
@@ -115,16 +116,17 @@ export class DeviceComponent implements OnInit {
       console.log(res);
       this.userEmails = res.data.userEmails;
       for (let i = 0; i < res.data.userDeviceModels.length; i++) {
-              res.data.userDeviceModels[i]['open'] = false;       
+        res.data.userDeviceModels[i]['open'] = false;
       }
       this.dataSource = res.data.userDeviceModels;
+      this.length = res.totalcount;
     })
   }
   getUserDevice(id, index) {
     console.log(index);
     this.open = !this.open;
     console.log(this.dataSource);
-    
+
     this.dataSource[index]['open'] = !this.dataSource[index]['open'];
     this.devices = null;
     this.deviceService.getUserDevice(id).subscribe((res) => {
@@ -139,5 +141,9 @@ export class DeviceComponent implements OnInit {
       console.log(res);
     })
 
+  }
+  PageChange(event) {
+    this.filterModal.page = event.pageIndex + 1;
+    this.getDevice();
   }
 }

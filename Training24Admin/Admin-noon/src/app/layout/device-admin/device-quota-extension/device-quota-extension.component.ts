@@ -25,7 +25,7 @@ export class DeviceQuotaExtensionComponent implements OnInit {
   filterModal: any = {};
   userEmails: any;
   sub_date: any;
-
+  length: any = 0;
   constructor(public deviceService: DeviceService) { }
 
   ngOnInit(): void {
@@ -48,6 +48,7 @@ export class DeviceQuotaExtensionComponent implements OnInit {
       console.log(res);
       this.userEmails = res.data.userEmails;
       this.dataSource = res.data.deviceQuotaExtensionList;
+      this.length = res.totalcount;
     })
   }
   acceptReject(id, i, status) {
@@ -59,5 +60,9 @@ export class DeviceQuotaExtensionComponent implements OnInit {
         this.dataSource[i].status = "Rejected"
       }
     })
+  }
+  PageChange(event) {
+    this.filterModal.pagenumber = event.pageIndex + 1;
+    this.getRequest();
   }
 }
