@@ -114,8 +114,11 @@ namespace Training24Admin.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    if (!String.IsNullOrEmpty(objData.macAddress) && !String.IsNullOrEmpty(objData.ipAddress))
+                    if (!String.IsNullOrEmpty(objData.macAddress)) // for Ipadress && !String.IsNullOrEmpty(objData.ipAddress)
                     {
+                        objData.ipAddress = !String.IsNullOrEmpty(objData.ipAddress)? objData.ipAddress : HttpContext.Connection.RemoteIpAddress.ToString();// Current.Request.UserHostAddress;
+                      
+                        //  var remoteIpAddress = request.HttpContext.Connection.RemoteIpAddress;
                         if (!UniqMacList.Contains(objData.macAddress))
                         {
                             UniqMacList.Add(objData.macAddress);
