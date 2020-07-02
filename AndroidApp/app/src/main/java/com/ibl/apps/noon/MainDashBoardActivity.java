@@ -359,12 +359,6 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
                                     SharedPreferences.Editor editor = deviceStatusPreferences.edit();
                                     editor.putString("deviceStatusCode", String.valueOf(deviceStatus));
                                     editor.apply();
-                                } else if (errorCode == 4) {
-                                    deviceStatus = 4;
-                                    SharedPreferences deviceStatusPreferences = getSharedPreferences("deviceStatus", MODE_PRIVATE);
-                                    SharedPreferences.Editor editor = deviceStatusPreferences.edit();
-                                    editor.putString("deviceStatusCode", String.valueOf(deviceStatus));
-                                    editor.apply();
                                 }
                             }
 
@@ -697,6 +691,18 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
     }
 
     public String getWifiMacAddress() {
+        String pseudoId = Build.BOARD.length() % 10
+                + Build.BRAND.length() % 10
+                + Build.DEVICE.length() % 10
+                + Build.DISPLAY.length() % 10
+                + Build.HOST.length() % 10
+                + Build.ID.length() % 10
+                + Build.MANUFACTURER.length() % 10
+                + Build.MODEL.length() % 10
+                + Build.PRODUCT.length() % 10
+                + Build.TAGS.length() % 10
+                + Build.TYPE + Build.USER.length() % 10;
+
         try {
             String interfaceName = "wlan0";
             List<NetworkInterface> interfaces = Collections.list(NetworkInterface.getNetworkInterfaces());
@@ -722,7 +728,7 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
         } catch (Exception ex) {
             ex.getMessage();
         } // for now eat exceptions
-        return "";
+        return pseudoId;
     }
 
 
