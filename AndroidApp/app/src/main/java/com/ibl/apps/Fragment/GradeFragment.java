@@ -25,7 +25,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -62,10 +61,8 @@ import com.ibl.apps.util.Const;
 import com.ibl.apps.util.PrefUtils;
 import com.ibl.apps.util.SingleShotLocationProvider;
 
-import java.net.NetworkInterface;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -228,35 +225,6 @@ public class GradeFragment extends BaseFragment implements View.OnClickListener,
 
     }
 
-    public String getWifiMacAddress() {
-        try {
-            String interfaceName = "wlan0";
-            List<NetworkInterface> interfaces = Collections.list(NetworkInterface.getNetworkInterfaces());
-            for (NetworkInterface intf : interfaces) {
-                if (!intf.getName().equalsIgnoreCase(interfaceName)) {
-                    continue;
-                }
-
-                byte[] mac = intf.getHardwareAddress();
-                if (mac == null) {
-                    return "";
-                }
-
-                StringBuilder buf = new StringBuilder();
-                for (byte aMac : mac) {
-                    buf.append(String.format("%02X:", aMac));
-                }
-                if (buf.length() > 0) {
-                    buf.deleteCharAt(buf.length() - 1);
-                }
-                return buf.toString();
-            }
-        } catch (Exception ex) {
-            ex.getMessage();
-        } // for now eat exceptions
-        return "";
-    }
-
     private void callAPIDeviceManagement() {
         SharedPreferences deviceSharedPreferences = getActivity().getSharedPreferences("deviceStatus", MODE_PRIVATE);
         deviceStatusCode = deviceSharedPreferences.getString("deviceStatusCode", "");
@@ -311,9 +279,6 @@ public class GradeFragment extends BaseFragment implements View.OnClickListener,
                     gradeLayoutBinding.outOfDeviceQuota.deviceQuotaLay.setVisibility(View.VISIBLE);
                     //gradeLayoutBinding.advanceSearchLayout.mainAdvanceSearchLayout.setVisibility(View.GONE);
                     gradeLayoutBinding.rcVerticalLayout.rcVertical.setVisibility(View.GONE);
-                    break;
-                case "4":
-                    Toast.makeText(getActivity(), getActivity().getResources().getString(R.string.invalid_mac_ip), Toast.LENGTH_LONG).show();
                     break;
             }
         }
