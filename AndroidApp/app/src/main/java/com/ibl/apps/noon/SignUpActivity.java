@@ -1046,6 +1046,14 @@ public class SignUpActivity extends BaseActivity implements View.OnClickListener
             activitySignUpBinding.signupPasswordWrapper.setErrorEnabled(false);
         }
 
+        if (!Validator.checkPassword(activitySignUpBinding.signupPassword)) {
+            hideKeyBoard(activitySignUpBinding.signupPassword);
+            activitySignUpBinding.signupPasswordWrapper.setError(getString(R.string.validation_passwordStrong));
+        } else {
+            hideKeyBoard(activitySignUpBinding.signupPassword);
+            activitySignUpBinding.signupPasswordWrapper.setErrorEnabled(false);
+        }
+
         if (!Validator.checkEmpty(activitySignUpBinding.signupConfirmPassword)) {
             hideKeyBoard(activitySignUpBinding.signupConfirmPassword);
             activitySignUpBinding.signupConfirmPasswordWrapper.setError(getResources().getString(R.string.validation_enterConfirmPassword));
