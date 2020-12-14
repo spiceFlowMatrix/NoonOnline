@@ -406,6 +406,13 @@ public abstract class BaseActivity extends AppCompatActivity implements DroidLis
             deviceManagementEditor.apply();
         }
 
+        SharedPreferences preferences = getSharedPreferences("rolename", MODE_PRIVATE);
+        SharedPreferences.Editor editorRolename = preferences.edit();
+        if (editorRolename != null) {
+            editorRolename.putString("userrolename", "");
+            editorRolename.apply();
+        }
+
         PrefUtils.clearSharedPreferences(getApplicationContext());
         PrefUtils.storeReminderTokenKey(getApplicationContext(), reminderObject);
         PrefUtils.storerefreshedToken(getApplicationContext(), refreshedToken);
