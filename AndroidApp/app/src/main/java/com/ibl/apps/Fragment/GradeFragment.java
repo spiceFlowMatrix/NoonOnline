@@ -190,7 +190,7 @@ public class GradeFragment extends BaseFragment implements View.OnClickListener,
     @Override
     protected void setUp(View view) {
 
-        showDialog(NoonApplication.getContext().getResources().getString(R.string.loading));
+       // showDialog(NoonApplication.getContext().getResources().getString(R.string.loading));
         callAPIDeviceManagement();
 
         if (!EasyPermissions.hasPermissions(Objects.requireNonNull(getActivity()), PERMISSIONS)) {
@@ -250,6 +250,7 @@ public class GradeFragment extends BaseFragment implements View.OnClickListener,
                                 if (isNetworkAvailable(getActivity())) {
                                     loadData(SearchText, SpinnerGradeId);
                                 } else {
+                                    hideDialog();
                                     new setLocalDataTask(new CourseAsyncResponse() {
                                         @Override
                                         public List<CourseObject.Data> getLocalUserDetails(List<CourseObject.Data> courseListl) {
@@ -584,7 +585,7 @@ public class GradeFragment extends BaseFragment implements View.OnClickListener,
                             new setOnlineDataTask(new CourseAsyncResponse() {
                                 @Override
                                 public List<CourseObject.Data> getLocalUserDetails(List<CourseObject.Data> courseListl) {
-
+                                    hideDialog();
                                     gradeLayoutBinding.rcVerticalLayout.rcVertical.setHasFixedSize(true);
                                     adp = new CourseListAdapter(getActivity(), courseListl, userDetailsObject);
                                     gradeLayoutBinding.rcVerticalLayout.rcVertical.setAdapter(adp);

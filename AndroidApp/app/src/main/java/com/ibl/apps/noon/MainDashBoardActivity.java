@@ -124,14 +124,15 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
         callApiForVersionUpdate();
         courseDatabaseRepository = new CourseDatabaseRepository();
 
-        sharedPreferences = getSharedPreferences("rolename", MODE_PRIVATE);
-        userRoleName = sharedPreferences.getString("userrolename", "");
+//        sharedPreferences = getSharedPreferences("rolename", MODE_PRIVATE);
+//        userRoleName = sharedPreferences.getString("userrolename", "");
+//
+//        if (!TextUtils.isEmpty(userRoleName)) {
+//            if (!userRoleName.equals("Parent")) {
+//                mainDashboardLayoutBinding.appBarLayout.contentMain.bottomNavigation.getMenu().removeItem(R.id.action_item4);
+//            }
+//        }
 
-        if (!TextUtils.isEmpty(userRoleName)) {
-            if (!userRoleName.equals("Parent")) {
-                mainDashboardLayoutBinding.appBarLayout.contentMain.bottomNavigation.getMenu().removeItem(R.id.action_item4);
-            }
-        }
         //showDailog();
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, mainDashboardLayoutBinding.drawerLayout, mainDashboardLayoutBinding.appBarLayout.toolBar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         mainDashboardLayoutBinding.drawerLayout.setDrawerListener(toggle);
@@ -184,6 +185,18 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
                     userDetail = userDetails;
                     userId = userDetailsObject.getId();
                     if (userDetails.getRoleName() != null) {
+                        userRoleName = userDetails.getRoleName().get(0);
+                        sharedPreferences = getSharedPreferences("rolename", MODE_PRIVATE);
+                        userRoleName = sharedPreferences.getString("userrolename", "");
+
+                        if (!TextUtils.isEmpty(userDetails.getRoleName().get(0))) {
+                            if (!userDetails.getRoleName().get(0).equals("Parent")) {
+                                mainDashboardLayoutBinding.appBarLayout.contentMain.bottomNavigation.getMenu().removeItem(R.id.action_item4);
+                            }
+                        }
+//                        Log.e("UserDetails", "userRoleName: " + userRoleName);
+//                        Log.e("UserDetails", "userDetails: " + userDetails.getRoleName().get(0));
+
 //                        SharedPreferences preferences = getSharedPreferences("rolename", MODE_PRIVATE);
 //                        SharedPreferences.Editor editor = preferences.edit();
 //                        editor.putString("userrolename", userRoleName);
@@ -191,7 +204,7 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
 
 //                        SharedPreferences sharedPreferences = getSharedPreferences("rolename", MODE_PRIVATE);
 //                        userRoleName = sharedPreferences.getString("userrolename", "");
-                        userRoleName = userDetails.getRoleName().get(0);
+
 //                        if (!TextUtils.isEmpty(userRoleName)) {
 //                            if (!userRoleName.equals("Parent")) {
 //                                mainDashboardLayoutBinding.appBarLayout.contentMain.bottomNavigation.getMenu().removeItem(R.id.action_item4);
