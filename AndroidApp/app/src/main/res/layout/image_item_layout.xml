@@ -26,7 +26,7 @@
             android:layout_gravity="center"
             android:adjustViewBounds="true"
             android:background="@color/colorBlack"
-            android:scaleType="centerCrop" />
+            android:scaleType="fitCenter" />
 
         <ImageView
             android:id="@+id/quiznextImage"
