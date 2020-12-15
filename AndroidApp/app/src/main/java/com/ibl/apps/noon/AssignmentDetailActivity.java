@@ -67,7 +67,9 @@ import com.ibl.apps.Model.DiscussionsDetails;
 import com.ibl.apps.Model.EncryptDecryptObject;
 import com.ibl.apps.Model.RestResponse;
 import com.ibl.apps.Model.SignedUrlObject;
+import com.ibl.apps.Model.assignment.AssignmentData;
 import com.ibl.apps.Model.assignment.CommentResponse;
+import com.ibl.apps.Model.assignment.FileUploadResponse;
 import com.ibl.apps.Model.assignment.StudentDetailData;
 import com.ibl.apps.Model.assignment.SubmissionFiles;
 import com.ibl.apps.RoomDatabase.entity.UserDetails;
@@ -95,6 +97,7 @@ import java.security.spec.AlgorithmParameterSpec;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.crypto.NoSuchPaddingException;
@@ -108,7 +111,15 @@ import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 import ir.sohreco.androidfilechooser.ExternalStorageNotAvailableException;
 import ir.sohreco.androidfilechooser.FileChooser;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
 import retrofit2.HttpException;
+import retrofit2.Response;
+
+import static com.ibl.apps.noon.AssignmentAddActivity.fileUploadList;
 
 
 public class AssignmentDetailActivity extends BaseActivity implements View.OnClickListener, ViewFiles {
@@ -146,7 +157,7 @@ public class AssignmentDetailActivity extends BaseActivity implements View.OnCli
     private DownloadFileRepository downloadFileRepository;
     private AssignmentRepository assignmentRepository;
 
-    static String getMimeType(@NonNull File file, String selectedFilePath) {
+    static String getMimeType1(@NonNull File file, String selectedFilePath) {
         String type = null;
         int fileType = -1;
         final String url = file.toString();
@@ -716,7 +727,7 @@ public class AssignmentDetailActivity extends BaseActivity implements View.OnCli
                             Toast.makeText(this, getString(R.string.please_select_student), Toast.LENGTH_SHORT).show();
                         }
                     } else {
-                        Intent intent = new Intent(getApplicationContext(), AssignmentAddActivity.class);
+                        Intent intent = new Intent(getApplicationContext(), AssignmentDetailActivity.class);
                         intent.putExtra(Const.Assignment, new Gson().toJson(assignment));
                         intent.putExtra(Const.Flag, flag);
                         startActivityForResult(intent, 200);
@@ -725,14 +736,34 @@ public class AssignmentDetailActivity extends BaseActivity implements View.OnCli
 
                 break;
             case R.id.cardCommentpicker:
-                fileuploadlist.clear();
-                int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
-                if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(this,
-                            new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                            READ_EXTERNAL_STORAGE_PERMISSION_REQUEST_CODE);
-                } else {
-                    addFileChooserFragment(false);
+                if (!TextUtils.isEmpty(userRoleName)) {
+                    if (userRoleName.equals(Const.TeacherKEY)) {
+                        if (Validate()) {
+                            if (dataObject != null) {
+                                fileuploadlist.clear();
+                                int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
+                                if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+                                    ActivityCompat.requestPermissions(this,
+                                            new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                                            READ_EXTERNAL_STORAGE_PERMISSION_REQUEST_CODE);
+                                } else {
+                                    addFileChooserFragment(String.valueOf(dataObject.getId()));
+                                }
+                            } else {
+                                Toast.makeText(this, getString(R.string.please_select_student), Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    } else {
+                        fileuploadlist.clear();
+                        int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
+                        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+                            ActivityCompat.requestPermissions(this,
+                                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                                    READ_EXTERNAL_STORAGE_PERMISSION_REQUEST_CODE);
+                        } else {
+                            addFileChooserFragment(userId);
+                        }
+                    }
                 }
                 break;
             case R.id.studentlay:
@@ -741,7 +772,7 @@ public class AssignmentDetailActivity extends BaseActivity implements View.OnCli
         }
     }
 
-    private void addFileChooserFragment(boolean clickflag) {
+    private void addFileChooserFragmentBool(boolean clickflag) {
 
         assignmentDetailLayoutBinding.filechooserFragment.setVisibility(View.VISIBLE);
 
@@ -1003,7 +1034,7 @@ public class AssignmentDetailActivity extends BaseActivity implements View.OnCli
     public void OpenAnyFile(File file, int filetypeid, SubmissionFiles model) {
         MimeTypeMap myMime = MimeTypeMap.getSingleton();
         Intent newIntent = new Intent(Intent.ACTION_VIEW);
-        String mimeType = getMimeType(file, String.valueOf(Uri.fromFile(file)));
+        String mimeType = getMimeType1(file, String.valueOf(Uri.fromFile(file)));
         Uri uri = Uri.fromFile(file);
 
         Uri apkURI = FileProvider.getUriForFile(
@@ -1831,5 +1862,259 @@ public class AssignmentDetailActivity extends BaseActivity implements View.OnCli
             return null;
         }
     }
+
+    private void addFileChooserFragment(String userNewId) {
+        assignmentDetailLayoutBinding.filechooserFragment.setVisibility(View.VISIBLE);
+        builder = new FileChooser.Builder(FileChooser.ChooserType.FILE_CHOOSER,
+                (FileChooser.ChooserListener) path -> {
+                    assignmentDetailLayoutBinding.filechooserFragment.setVisibility(View.GONE);
+                    assignmentDetailLayoutBinding.progressDialogLay.itemProgressbar.setVisibility(View.VISIBLE);
+                    if (!TextUtils.isEmpty(path)) {
+                        String[] selectedFilePaths = path.split(FileChooser.FILE_NAMES_SEPARATOR);
+                        //fileUploadAdapter.addFile(selectedFilePaths[0]);
+                        uploadFile(selectedFilePaths[0], userNewId);
+                    } else {
+                        Toast.makeText(AssignmentDetailActivity.this, R.string.no_file_chosen, Toast.LENGTH_SHORT).show();
+                    }
+                })
+
+                //.setMultipleFileSelectionEnabled(true)
+                // Word document,PDF file,Powerpoint file,Excel file,GIF file,JPG file ,PNG file,Text file ,Video files
+                .setFileFormats(new String[]{".jpg", ".png", ".jpeg", ".gif", ".3gp", ".mpg", ".mpeg", ".mpe", ".mp4", ".avi", ".txt", ".xls", ".xlsx", ".ppt", ".pptx", ".pdf", ".docx", ".doc"});
+
+        try {
+            getSupportFragmentManager().beginTransaction().replace(R.id.filechooserFragment, builder.build()).commit();
+        } catch (ExternalStorageNotAvailableException e) {
+            Toast.makeText(this, R.string.no_external_storage, Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
+        }
+    }
+
+    private void uploadFile(String selectedFilePath, String userNewId) {
+        setButtonEnable(false);
+        File file = new File(selectedFilePath);
+        if (isNetworkAvailable(AssignmentDetailActivity.this)) {
+            int type = getMimeType(file, selectedFilePath);
+            RequestBody requestFile;
+            switch (type) {
+                case 1:
+                    requestFile = RequestBody.create(MediaType.parse("application/pdf"), file);
+                    break;
+                case 2:
+                    requestFile = RequestBody.create(MediaType.parse("video/*"), file);
+                    break;
+                case 3:
+                    requestFile = RequestBody.create(MediaType.parse("image/*"), file);
+                    break;
+                case 6:
+                case 7:
+                case 8:
+                    requestFile = RequestBody.create(MediaType.parse("*/*"), file);
+                    break;
+                default:
+                    // Error
+                    Toast.makeText(this, "No file chooser", Toast.LENGTH_SHORT).show();
+                    return;
+            }
+
+//            String typeid = String.valueOf(type);
+//            int filetypeid = Integer.valueOf(typeid);
+            MultipartBody.Part body = MultipartBody.Part.createFormData(Const.uploadTopicFile, file.getName(), requestFile);
+            RequestBody fileTypeId = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(type));
+            RequestBody duration = RequestBody.create(MediaType.parse("text/plain"), "");
+            RequestBody filesize = RequestBody.create(MediaType.parse("text/plain"), "");
+            RequestBody totalpages = RequestBody.create(MediaType.parse("text/plain"), "0");
+
+            Call<RestResponse<FileUploadResponse>> call = assignmentRepository.uploadAssignmentFile(body, fileTypeId, duration, filesize, totalpages);
+            call.enqueue(new Callback<RestResponse<FileUploadResponse>>() {
+                @Override
+                public void onResponse(@NonNull Call<RestResponse<FileUploadResponse>> call, @NonNull Response<RestResponse<FileUploadResponse>> response) {
+                    setButtonEnable(true);
+                    assert response.body() != null;
+                    if (response.body().getResponse_code().equalsIgnoreCase("0")) {
+                        fileUploadList.clear();
+                        fileUploadList.add(String.valueOf(response.body().getData().getId()));
+                        assignmentDetailLayoutBinding.progressDialogLay.itemProgressbar.setVisibility(View.GONE);
+                        if (fileUploadList != null && fileUploadList.size() != 0) {
+                            if (isNetworkAvailable(AssignmentDetailActivity.this)) {
+                                createdAssigmentSubmission(userNewId);
+                            } else {
+                                showNetworkAlert(AssignmentDetailActivity.this);
+                            }
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(@NonNull Call<RestResponse<FileUploadResponse>> call, @NonNull Throwable t) {
+                    setButtonEnable(true);
+                    assignmentDetailLayoutBinding.progressDialogLay.itemProgressbar.setVisibility(View.GONE);
+                }
+            });
+        }
+
+    }
+
+    public void createdAssigmentSubmission(String userNewId) {
+        if (flag == 1) {
+            submitAssignmentLession(userNewId);
+        } else {
+            submitAssignment(userNewId);
+        }
+    }
+
+    private void submitAssignmentLession(String userNewId) {
+        Gson gson = new Gson();
+        JsonParser parser = new JsonParser();
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put(Const.assignmentid, assignment.getId());
+        hashMap.put(Const.issubmission, true);
+        hashMap.put(Const.userid, userNewId);
+        hashMap.put(Const.files, fileUploadList);
+
+        showDialog(getString(R.string.loading));
+        disposable.add(assignmentRepository.submitAssignmentLession((JsonObject) parser.parse(gson.toJson(hashMap)))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(new DisposableSingleObserver<RestResponse<AssignmentData>>() {
+                    @Override
+                    public void onSuccess(RestResponse<AssignmentData> assignmentDataRestResponse) {
+                        hideDialog();
+                        Toast.makeText(getApplicationContext(), assignmentDataRestResponse.getMessage(), Toast.LENGTH_SHORT).show();
+
+                        if (!TextUtils.isEmpty(userRoleName)) {
+                            if (userRoleName.equals(Const.TeacherKEY)) {
+                                flagPassApiCallCommentsTeacher(Integer.parseInt(userNewId));
+                            } else {
+                                flagPassApiCallComments();
+                            }
+
+                        }
+
+                        //PrivousScreen();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        hideDialog();
+                        showError(e);
+                    }
+                }));
+    }
+
+    private void submitAssignment(String userNewId) {
+        Gson gson = new Gson();
+        JsonParser parser = new JsonParser();
+        HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put(Const.assignmentid, assignment.getId());
+        hashMap.put(Const.issubmission, true);
+        hashMap.put(Const.userid, userNewId);
+        hashMap.put(Const.files, fileUploadList);
+
+        showDialog(getString(R.string.loading));
+        disposable.add(assignmentRepository.submitAssignment((JsonObject) parser.parse(gson.toJson(hashMap)))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(new DisposableSingleObserver<RestResponse<AssignmentData>>() {
+                    @Override
+                    public void onSuccess(RestResponse<AssignmentData> assignmentDataRestResponse) {
+                        hideDialog();
+                        Toast.makeText(getApplicationContext(), assignmentDataRestResponse.getMessage(), Toast.LENGTH_SHORT).show();
+                        //PrivousScreen();
+                        if (!TextUtils.isEmpty(userRoleName)) {
+                            if (userRoleName.equals(Const.TeacherKEY)) {
+                                flagPassApiCallCommentsTeacher(Integer.parseInt(userNewId));
+                            } else {
+                                flagPassApiCallComments();
+                            }
+
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        hideDialog();
+                        showError(e);
+                    }
+                }));
+    }
+
+
+    @NonNull
+    static int getMimeType(@NonNull File file, String selectedFilePath) {
+        String type = null;
+        int fileType = -1;
+        final String url = file.toString();
+        final String extension = MimeTypeMap.getFileExtensionFromUrl(url);
+        if (extension != null) {
+            type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension.toLowerCase());
+            Log.e("type", "getMimeType: " + type);
+        }
+        if (type == null) {
+            if (selectedFilePath.substring(selectedFilePath.lastIndexOf(".") + 1).equalsIgnoreCase("xls")
+                    || selectedFilePath.substring(selectedFilePath.lastIndexOf(".") + 1).equalsIgnoreCase("xlsx")
+                    || selectedFilePath.substring(selectedFilePath.lastIndexOf(".") + 1).equalsIgnoreCase("csv")
+                    || selectedFilePath.substring(selectedFilePath.lastIndexOf(".") + 1).equalsIgnoreCase("dbf")
+                    || selectedFilePath.substring(selectedFilePath.lastIndexOf(".") + 1).equalsIgnoreCase("dif")
+                    || selectedFilePath.substring(selectedFilePath.lastIndexOf(".") + 1).equalsIgnoreCase("ods")
+                    || selectedFilePath.substring(selectedFilePath.lastIndexOf(".") + 1).equalsIgnoreCase("prn")
+                    || selectedFilePath.substring(selectedFilePath.lastIndexOf(".") + 1).equalsIgnoreCase("slk")
+                    || selectedFilePath.substring(selectedFilePath.lastIndexOf(".") + 1).equalsIgnoreCase("xla")
+                    || selectedFilePath.substring(selectedFilePath.lastIndexOf(".") + 1).equalsIgnoreCase("xlam")
+                    || selectedFilePath.substring(selectedFilePath.lastIndexOf(".") + 1).equalsIgnoreCase("xlsb")
+                    || selectedFilePath.substring(selectedFilePath.lastIndexOf(".") + 1).equalsIgnoreCase("xlt")
+                    || selectedFilePath.substring(selectedFilePath.lastIndexOf(".") + 1).equalsIgnoreCase("xlsm")
+                    || selectedFilePath.substring(selectedFilePath.lastIndexOf(".") + 1).equalsIgnoreCase("xltm")
+                    || selectedFilePath.substring(selectedFilePath.lastIndexOf(".") + 1).equalsIgnoreCase("xltx")
+                    || selectedFilePath.substring(selectedFilePath.lastIndexOf(".") + 1).equalsIgnoreCase("xlw")) {
+                fileType = 6;
+            } else if (selectedFilePath.substring(selectedFilePath.lastIndexOf(".") + 1).equalsIgnoreCase("doc")
+                    || selectedFilePath.substring(selectedFilePath.lastIndexOf(".") + 1).equalsIgnoreCase("docx")
+                    || selectedFilePath.substring(selectedFilePath.lastIndexOf(".") + 1).equalsIgnoreCase("docs")
+                    || selectedFilePath.substring(selectedFilePath.lastIndexOf(".") + 1).equalsIgnoreCase("docm")
+                    || selectedFilePath.substring(selectedFilePath.lastIndexOf(".") + 1).equalsIgnoreCase("dot")
+                    || selectedFilePath.substring(selectedFilePath.lastIndexOf(".") + 1).equalsIgnoreCase("dotm")
+                    || selectedFilePath.substring(selectedFilePath.lastIndexOf(".") + 1).equalsIgnoreCase("dotx")
+                    || selectedFilePath.substring(selectedFilePath.lastIndexOf(".") + 1).equalsIgnoreCase("odt")
+                    || selectedFilePath.substring(selectedFilePath.lastIndexOf(".") + 1).equalsIgnoreCase("rtf")
+                    || selectedFilePath.substring(selectedFilePath.lastIndexOf(".") + 1).equalsIgnoreCase("txt")
+                    || selectedFilePath.substring(selectedFilePath.lastIndexOf(".") + 1).equalsIgnoreCase("wps")
+                    || selectedFilePath.substring(selectedFilePath.lastIndexOf(".") + 1).equalsIgnoreCase("xml")
+                    || selectedFilePath.substring(selectedFilePath.lastIndexOf(".") + 1).equalsIgnoreCase("xps")) {
+                fileType = 7;
+            } else if (selectedFilePath.substring(selectedFilePath.lastIndexOf(".") + 1).equalsIgnoreCase("pptx")
+                    || selectedFilePath.substring(selectedFilePath.lastIndexOf(".") + 1).equalsIgnoreCase("ppt")
+                    || selectedFilePath.substring(selectedFilePath.lastIndexOf(".") + 1).equalsIgnoreCase("pptm")
+                    || selectedFilePath.substring(selectedFilePath.lastIndexOf(".") + 1).equalsIgnoreCase("potx")
+                    || selectedFilePath.substring(selectedFilePath.lastIndexOf(".") + 1).equalsIgnoreCase("potm")
+                    || selectedFilePath.substring(selectedFilePath.lastIndexOf(".") + 1).equalsIgnoreCase("odp")) {
+                fileType = 8;
+            }
+//            } else {
+//                fileType = 0;
+//            }
+        } else {
+            if (type.contains("image")) {
+                fileType = 3;
+            } else if (type.contains("video")) {
+                fileType = 2;
+            } else if (type.contains("pdf")) {
+                fileType = 1;
+            } else if (type.contains("excel")) {
+                fileType = 6;
+            } else if (type.contains("msword")) {
+                fileType = 7;
+            } else if (type.contains("vnd.ms-powerpoint")) {
+                fileType = 8;
+            }
+        }
+        return fileType;
+    }
+
+    private void setButtonEnable(boolean isEnable) {
+        assignmentDetailLayoutBinding.txtbox.setEnabled(isEnable);
+        assignmentDetailLayoutBinding.txtbox.setAlpha(isEnable ? 1f : 0.5f);
+    }
+
 
 }

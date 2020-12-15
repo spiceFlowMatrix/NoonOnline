@@ -288,7 +288,7 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
                 if (isPlayFirstItem) {
                     isPlayFirstItem = false;
                     if (activityFlag.equals("0")) {
-                        playItem(position, 0, holder, true);
+                        //playItem(position, 0, holder, true);
                     }
                     holder.courseInnerItemLayoutBinding.disableLay.setVisibility(GONE);
                 } else {

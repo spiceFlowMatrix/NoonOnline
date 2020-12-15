@@ -116,20 +116,21 @@ public class NotificationListAdapter extends RecyclerView.Adapter<NotificationLi
                 CourseDatabaseRepository courseDatabaseRepository = new CourseDatabaseRepository();
                 CourseObject courseObject = courseDatabaseRepository.getAllCourseObject(userId);
                 if (courseObject != null) {
-                    if (!isCourseExpire(model.getCourse().getId(), courseObject.getData())) {
-                        //Toast.makeText(ctx, "====" + model.getType() + "====", Toast.LENGTH_LONG).show();
-                        //holder.notificationItemLayoutBinding.txtIsRead.setVisibility(View.INVISIBLE);
-                        list.get(position).setIsRead("true");
-                        notifyDataSetChanged();
-                        String notiType = model.getType();
+                    if (model.getCourse() != null && model.getCourse().getId() != null) {
+                        if (!isCourseExpire(model.getCourse().getId(), courseObject.getData())) {
+                            //Toast.makeText(ctx, "====" + model.getType() + "====", Toast.LENGTH_LONG).show();
+                            //holder.notificationItemLayoutBinding.txtIsRead.setVisibility(View.INVISIBLE);
+                            list.get(position).setIsRead("true");
+                            notifyDataSetChanged();
+                            String notiType = model.getType();
 
-                        switch (notiType) {
-                            case "1":
-                                intent = new Intent(ctx, MainDashBoardActivity.class);
-                                intent.putExtra(Const.isNotification, true);
-                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                ctx.startActivity(intent);
+                            switch (notiType) {
+                                case "1":
+                                    intent = new Intent(ctx, MainDashBoardActivity.class);
+                                    intent.putExtra(Const.isNotification, true);
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                    ctx.startActivity(intent);
 //                                checkExpiryDate(model.getCourse().getId());
                         /*CompositeDisposable disposable = new CompositeDisposable();
                         CourseRepository courseRepository = new CourseRepository();
@@ -160,185 +161,186 @@ public class NotificationListAdapter extends RecyclerView.Adapter<NotificationLi
                                     public void onError(Throwable e) {
                                     }
                                 }));*/
-                                break;
-                            case "3":
-                                if (model.getCourse().getId() != null) {
-                                    intent = new Intent(ctx, ChapterActivity.class);
-                                    intent.putExtra(Const.isNotification, true);
-                                    intent.putExtra(Const.GradeID, model.getCourse().getId());
-                                    intent.putExtra(Const.CourseName, model.getCourse().getName());
-                                    intent.putExtra(Const.ActivityFlag, "0");
-                                    intent.putExtra(Const.LessonID, model.getLessionId());
-                                    intent.putExtra(Const.QuizID, "0");
-                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                    ctx.startActivity(intent);
-                                }
-                                break;
-                            case "4":
-                                if (model.getDiscussion() != null) {
-                                    intent = new Intent(ctx, ChapterActivity.class);
-                                    intent.putExtra(Const.isDiscussions, true);
-                                    intent.putExtra(Const.isNotification, true);
-                                    intent.putExtra(Const.GradeID, model.getDiscussion().getCourseid());
-                                    intent.putExtra(Const.topicId, model.getDiscussion().getId());
-                                    intent.putExtra(Const.topicname, model.getDiscussion().getTitle());
-                                    intent.putExtra(Const.isprivate, model.getDiscussion().getIsprivate());
-                                    intent.putExtra(Const.CourseName, "");
-                                    intent.putExtra(Const.ActivityFlag, "0");
-                                    intent.putExtra(Const.LessonID, "");
-                                    intent.putExtra(Const.QuizID, "");
-                                    intent.putExtra(Const.profileurl, model.getUser().getProfilepicurl());
-                                    intent.putExtra(Const.userName, model.getUser().getUsername());
-                                    intent.putExtra(Const.createdtime, " ");
-                                    intent.putExtra(Const.iseditable, model.getDiscussion().isIseditable());
-                                    intent.putExtra(Const.likecount, model.getDiscussion().getLikecount());
-                                    intent.putExtra(Const.dislikecount, model.getDiscussion().getDislikecount());
-                                    intent.putExtra(Const.like, model.getDiscussion().isLiked());
-                                    intent.putExtra(Const.dislike, model.getDiscussion().isDisliked());
-                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                    ctx.startActivity(intent);
-                                }
-                                break;
-                            case "6":
-                                if (model.getDiscussion() != null) {
-                                    intent = new Intent(ctx, ChapterActivity.class);
-                                    intent.putExtra(Const.isDiscussions, true);
-                                    intent.putExtra(Const.isNotification, true);
-                                    intent.putExtra(Const.GradeID, model.getDiscussion().getCourseid());
-                                    intent.putExtra(Const.topicId, model.getDiscussion().getId());
-                                    intent.putExtra(Const.topicname, model.getDiscussion().getTitle());
-                                    intent.putExtra(Const.isprivate, model.getDiscussion().getIsprivate());
-                                    intent.putExtra(Const.CourseName, "");
-                                    intent.putExtra(Const.ActivityFlag, "0");
-                                    intent.putExtra(Const.LessonID, "");
-                                    intent.putExtra(Const.QuizID, "");
-                                    intent.putExtra(Const.profileurl, model.getUser().getProfilepicurl());
-                                    intent.putExtra(Const.userName, model.getUser().getUsername());
-                                    intent.putExtra(Const.createdtime, " ");
-                                    intent.putExtra(Const.iseditable, model.getDiscussion().isIseditable());
-                                    intent.putExtra(Const.likecount, model.getDiscussion().getLikecount());
-                                    intent.putExtra(Const.dislikecount, model.getDiscussion().getDislikecount());
-                                    boolean islike = model.getDiscussion().isLiked();
-                                    boolean isDislike = model.getDiscussion().isDisliked();
-                                    intent.putExtra(Const.like, model.getDiscussion().isLiked());
-                                    intent.putExtra(Const.dislike, model.getDiscussion().isDisliked());
-                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                    ctx.startActivity(intent);
-                                }
-                                break;
-                            case "7":
-                                if (model.getDiscussion() != null) {
-                                    intent = new Intent(ctx, ChapterActivity.class);
-                                    intent.putExtra(Const.isDiscussions, true);
-                                    intent.putExtra(Const.isNotification, true);
-                                    intent.putExtra(Const.GradeID, model.getDiscussion().getCourseid());
-                                    intent.putExtra(Const.topicId, model.getDiscussion().getId());
-                                    intent.putExtra(Const.topicname, model.getDiscussion().getTitle());
-                                    intent.putExtra(Const.isprivate, model.getDiscussion().getIsprivate());
-                                    intent.putExtra(Const.CourseName, "");
-                                    intent.putExtra(Const.ActivityFlag, "0");
-                                    intent.putExtra(Const.LessonID, "");
-                                    intent.putExtra(Const.QuizID, "");
-                                    intent.putExtra(Const.profileurl, model.getUser().getProfilepicurl());
-                                    intent.putExtra(Const.userName, model.getUser().getUsername());
-                                    intent.putExtra(Const.createdtime, " ");
-                                    intent.putExtra(Const.iseditable, model.getDiscussion().isIseditable());
-                                    intent.putExtra(Const.likecount, model.getDiscussion().getLikecount());
-                                    intent.putExtra(Const.dislikecount, model.getDiscussion().getDislikecount());
-                                    intent.putExtra(Const.like, model.getDiscussion().isLiked());
-                                    intent.putExtra(Const.dislike, model.getDiscussion().isDisliked());
-                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                    ctx.startActivity(intent);
-                                }
-                                break;
-                            case "8":
-                                if (model.getCourse().getId() != null) {
-                                    intent = new Intent(ctx, ChapterActivity.class);
-                                    intent.putExtra(Const.isNotification, true);
-                                    intent.putExtra(Const.GradeID, model.getCourse().getId());
-                                    intent.putExtra(Const.CourseName, model.getCourse().getName());
-                                    intent.putExtra(Const.ActivityFlag, "0");
-                                    intent.putExtra(Const.LessonID, "0");
-                                    intent.putExtra(Const.QuizID, "0");
-                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                    ctx.startActivity(intent);
-                                }
-                                break;
-                            case "9":
-                                if (model.getCourse().getId() != null) {
-                                    intent = new Intent(ctx, ChapterActivity.class);
-                                    intent.putExtra(Const.isNotification, true);
-                                    intent.putExtra(Const.GradeID, model.getCourse().getId());
-                                    intent.putExtra(Const.CourseName, model.getCourse().getName());
-                                    intent.putExtra(Const.ActivityFlag, "0");
-                                    intent.putExtra(Const.LessonID, "0");
-                                    intent.putExtra(Const.QuizID, model.getQuizId());
-                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                    ctx.startActivity(intent);
-                                }
-                                break;
-                            case "11":
-                                if (model.getDiscussion() != null) {
-                                    intent = new Intent(ctx, MainDashBoardActivity.class);
-                                    intent.putExtra(Const.isDiscussions, true);
-                                    intent.putExtra(Const.isNotification, true);
-                                    intent.putExtra(Const.GradeID, model.getDiscussion().getCourseid());
-                                    intent.putExtra(Const.topicId, model.getDiscussion().getId());
-                                    intent.putExtra(Const.topicname, model.getDiscussion().getTitle());
-                                    intent.putExtra(Const.isprivate, model.getDiscussion().getIsprivate());
-                                    intent.putExtra(Const.CourseName, "");
-                                    intent.putExtra(Const.ActivityFlag, "0");
-                                    intent.putExtra(Const.LessonID, "");
-                                    intent.putExtra(Const.QuizID, "");
-                                    intent.putExtra(Const.profileurl, model.getUser().getProfilepicurl());
-                                    intent.putExtra(Const.userName, model.getUser().getUsername());
-                                    intent.putExtra(Const.createdtime, " ");
-                                    intent.putExtra(Const.iseditable, model.getDiscussion().isIseditable());
-                                    intent.putExtra(Const.likecount, model.getDiscussion().getLikecount());
-                                    intent.putExtra(Const.dislikecount, model.getDiscussion().getDislikecount());
-                                    intent.putExtra(Const.like, model.getDiscussion().isLiked());
-                                    intent.putExtra(Const.dislike, model.getDiscussion().isDisliked());
-                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                    ctx.startActivity(intent);
-                                }
-                                break;
-                            case "12":
-                                if (model.getDiscussion() != null) {
-                                    intent = new Intent(ctx, MainDashBoardActivity.class);
-                                    intent.putExtra(Const.isDiscussions, true);
-                                    intent.putExtra(Const.isNotification, true);
-                                    intent.putExtra(Const.GradeID, model.getDiscussion().getCourseid());
-                                    intent.putExtra(Const.topicId, model.getDiscussion().getId());
-                                    intent.putExtra(Const.topicname, model.getDiscussion().getTitle());
-                                    intent.putExtra(Const.isprivate, model.getDiscussion().getIsprivate());
-                                    intent.putExtra(Const.CourseName, "");
-                                    intent.putExtra(Const.ActivityFlag, "0");
-                                    intent.putExtra(Const.LessonID, "");
-                                    intent.putExtra(Const.QuizID, "");
-                                    intent.putExtra(Const.profileurl, model.getUser().getProfilepicurl());
-                                    intent.putExtra(Const.userName, model.getUser().getUsername());
-                                    intent.putExtra(Const.createdtime, " ");
-                                    intent.putExtra(Const.iseditable, model.getDiscussion().isIseditable());
-                                    intent.putExtra(Const.likecount, model.getDiscussion().getLikecount());
-                                    intent.putExtra(Const.dislikecount, model.getDiscussion().getDislikecount());
-                                    intent.putExtra(Const.like, model.getDiscussion().isLiked());
-                                    intent.putExtra(Const.dislike, model.getDiscussion().isDisliked());
-                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                    ctx.startActivity(intent);
-                                }
-                                break;
+                                    break;
+                                case "3":
+                                    if (model.getCourse().getId() != null) {
+                                        intent = new Intent(ctx, ChapterActivity.class);
+                                        intent.putExtra(Const.isNotification, true);
+                                        intent.putExtra(Const.GradeID, model.getCourse().getId());
+                                        intent.putExtra(Const.CourseName, model.getCourse().getName());
+                                        intent.putExtra(Const.ActivityFlag, "0");
+                                        intent.putExtra(Const.LessonID, model.getLessionId());
+                                        intent.putExtra(Const.QuizID, "0");
+                                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                        ctx.startActivity(intent);
+                                    }
+                                    break;
+                                case "4":
+                                    if (model.getDiscussion() != null) {
+                                        intent = new Intent(ctx, ChapterActivity.class);
+                                        intent.putExtra(Const.isDiscussions, true);
+                                        intent.putExtra(Const.isNotification, true);
+                                        intent.putExtra(Const.GradeID, model.getDiscussion().getCourseid());
+                                        intent.putExtra(Const.topicId, model.getDiscussion().getId());
+                                        intent.putExtra(Const.topicname, model.getDiscussion().getTitle());
+                                        intent.putExtra(Const.isprivate, model.getDiscussion().getIsprivate());
+                                        intent.putExtra(Const.CourseName, "");
+                                        intent.putExtra(Const.ActivityFlag, "0");
+                                        intent.putExtra(Const.LessonID, "");
+                                        intent.putExtra(Const.QuizID, "");
+                                        intent.putExtra(Const.profileurl, model.getUser().getProfilepicurl());
+                                        intent.putExtra(Const.userName, model.getUser().getUsername());
+                                        intent.putExtra(Const.createdtime, " ");
+                                        intent.putExtra(Const.iseditable, model.getDiscussion().isIseditable());
+                                        intent.putExtra(Const.likecount, model.getDiscussion().getLikecount());
+                                        intent.putExtra(Const.dislikecount, model.getDiscussion().getDislikecount());
+                                        intent.putExtra(Const.like, model.getDiscussion().isLiked());
+                                        intent.putExtra(Const.dislike, model.getDiscussion().isDisliked());
+                                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                        ctx.startActivity(intent);
+                                    }
+                                    break;
+                                case "6":
+                                    if (model.getDiscussion() != null) {
+                                        intent = new Intent(ctx, ChapterActivity.class);
+                                        intent.putExtra(Const.isDiscussions, true);
+                                        intent.putExtra(Const.isNotification, true);
+                                        intent.putExtra(Const.GradeID, model.getDiscussion().getCourseid());
+                                        intent.putExtra(Const.topicId, model.getDiscussion().getId());
+                                        intent.putExtra(Const.topicname, model.getDiscussion().getTitle());
+                                        intent.putExtra(Const.isprivate, model.getDiscussion().getIsprivate());
+                                        intent.putExtra(Const.CourseName, "");
+                                        intent.putExtra(Const.ActivityFlag, "0");
+                                        intent.putExtra(Const.LessonID, "");
+                                        intent.putExtra(Const.QuizID, "");
+                                        intent.putExtra(Const.profileurl, model.getUser().getProfilepicurl());
+                                        intent.putExtra(Const.userName, model.getUser().getUsername());
+                                        intent.putExtra(Const.createdtime, " ");
+                                        intent.putExtra(Const.iseditable, model.getDiscussion().isIseditable());
+                                        intent.putExtra(Const.likecount, model.getDiscussion().getLikecount());
+                                        intent.putExtra(Const.dislikecount, model.getDiscussion().getDislikecount());
+                                        boolean islike = model.getDiscussion().isLiked();
+                                        boolean isDislike = model.getDiscussion().isDisliked();
+                                        intent.putExtra(Const.like, model.getDiscussion().isLiked());
+                                        intent.putExtra(Const.dislike, model.getDiscussion().isDisliked());
+                                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                        ctx.startActivity(intent);
+                                    }
+                                    break;
+                                case "7":
+                                    if (model.getDiscussion() != null) {
+                                        intent = new Intent(ctx, ChapterActivity.class);
+                                        intent.putExtra(Const.isDiscussions, true);
+                                        intent.putExtra(Const.isNotification, true);
+                                        intent.putExtra(Const.GradeID, model.getDiscussion().getCourseid());
+                                        intent.putExtra(Const.topicId, model.getDiscussion().getId());
+                                        intent.putExtra(Const.topicname, model.getDiscussion().getTitle());
+                                        intent.putExtra(Const.isprivate, model.getDiscussion().getIsprivate());
+                                        intent.putExtra(Const.CourseName, "");
+                                        intent.putExtra(Const.ActivityFlag, "0");
+                                        intent.putExtra(Const.LessonID, "");
+                                        intent.putExtra(Const.QuizID, "");
+                                        intent.putExtra(Const.profileurl, model.getUser().getProfilepicurl());
+                                        intent.putExtra(Const.userName, model.getUser().getUsername());
+                                        intent.putExtra(Const.createdtime, " ");
+                                        intent.putExtra(Const.iseditable, model.getDiscussion().isIseditable());
+                                        intent.putExtra(Const.likecount, model.getDiscussion().getLikecount());
+                                        intent.putExtra(Const.dislikecount, model.getDiscussion().getDislikecount());
+                                        intent.putExtra(Const.like, model.getDiscussion().isLiked());
+                                        intent.putExtra(Const.dislike, model.getDiscussion().isDisliked());
+                                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                        ctx.startActivity(intent);
+                                    }
+                                    break;
+                                case "8":
+                                    if (model.getCourse().getId() != null) {
+                                        intent = new Intent(ctx, ChapterActivity.class);
+                                        intent.putExtra(Const.isNotification, true);
+                                        intent.putExtra(Const.GradeID, model.getCourse().getId());
+                                        intent.putExtra(Const.CourseName, model.getCourse().getName());
+                                        intent.putExtra(Const.ActivityFlag, "0");
+                                        intent.putExtra(Const.LessonID, "0");
+                                        intent.putExtra(Const.QuizID, "0");
+                                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                        ctx.startActivity(intent);
+                                    }
+                                    break;
+                                case "9":
+                                    if (model.getCourse().getId() != null) {
+                                        intent = new Intent(ctx, ChapterActivity.class);
+                                        intent.putExtra(Const.isNotification, true);
+                                        intent.putExtra(Const.GradeID, model.getCourse().getId());
+                                        intent.putExtra(Const.CourseName, model.getCourse().getName());
+                                        intent.putExtra(Const.ActivityFlag, "0");
+                                        intent.putExtra(Const.LessonID, "0");
+                                        intent.putExtra(Const.QuizID, model.getQuizId());
+                                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                        ctx.startActivity(intent);
+                                    }
+                                    break;
+                                case "11":
+                                    if (model.getDiscussion() != null) {
+                                        intent = new Intent(ctx, MainDashBoardActivity.class);
+                                        intent.putExtra(Const.isDiscussions, true);
+                                        intent.putExtra(Const.isNotification, true);
+                                        intent.putExtra(Const.GradeID, model.getDiscussion().getCourseid());
+                                        intent.putExtra(Const.topicId, model.getDiscussion().getId());
+                                        intent.putExtra(Const.topicname, model.getDiscussion().getTitle());
+                                        intent.putExtra(Const.isprivate, model.getDiscussion().getIsprivate());
+                                        intent.putExtra(Const.CourseName, "");
+                                        intent.putExtra(Const.ActivityFlag, "0");
+                                        intent.putExtra(Const.LessonID, "");
+                                        intent.putExtra(Const.QuizID, "");
+                                        intent.putExtra(Const.profileurl, model.getUser().getProfilepicurl());
+                                        intent.putExtra(Const.userName, model.getUser().getUsername());
+                                        intent.putExtra(Const.createdtime, " ");
+                                        intent.putExtra(Const.iseditable, model.getDiscussion().isIseditable());
+                                        intent.putExtra(Const.likecount, model.getDiscussion().getLikecount());
+                                        intent.putExtra(Const.dislikecount, model.getDiscussion().getDislikecount());
+                                        intent.putExtra(Const.like, model.getDiscussion().isLiked());
+                                        intent.putExtra(Const.dislike, model.getDiscussion().isDisliked());
+                                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                        ctx.startActivity(intent);
+                                    }
+                                    break;
+                                case "12":
+                                    if (model.getDiscussion() != null) {
+                                        intent = new Intent(ctx, MainDashBoardActivity.class);
+                                        intent.putExtra(Const.isDiscussions, true);
+                                        intent.putExtra(Const.isNotification, true);
+                                        intent.putExtra(Const.GradeID, model.getDiscussion().getCourseid());
+                                        intent.putExtra(Const.topicId, model.getDiscussion().getId());
+                                        intent.putExtra(Const.topicname, model.getDiscussion().getTitle());
+                                        intent.putExtra(Const.isprivate, model.getDiscussion().getIsprivate());
+                                        intent.putExtra(Const.CourseName, "");
+                                        intent.putExtra(Const.ActivityFlag, "0");
+                                        intent.putExtra(Const.LessonID, "");
+                                        intent.putExtra(Const.QuizID, "");
+                                        intent.putExtra(Const.profileurl, model.getUser().getProfilepicurl());
+                                        intent.putExtra(Const.userName, model.getUser().getUsername());
+                                        intent.putExtra(Const.createdtime, " ");
+                                        intent.putExtra(Const.iseditable, model.getDiscussion().isIseditable());
+                                        intent.putExtra(Const.likecount, model.getDiscussion().getLikecount());
+                                        intent.putExtra(Const.dislikecount, model.getDiscussion().getDislikecount());
+                                        intent.putExtra(Const.like, model.getDiscussion().isLiked());
+                                        intent.putExtra(Const.dislike, model.getDiscussion().isDisliked());
+                                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                        ctx.startActivity(intent);
+                                    }
+                                    break;
 
+                            }
+                        } else {
+                            Toast.makeText(ctx, ctx.getResources().getString(R.string.expired), Toast.LENGTH_SHORT).show();
                         }
-                    } else {
-                        Toast.makeText(ctx, ctx.getResources().getString(R.string.expired), Toast.LENGTH_SHORT).show();
                     }
                 }
 
