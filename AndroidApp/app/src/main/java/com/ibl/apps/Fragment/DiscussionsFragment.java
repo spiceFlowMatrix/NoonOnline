@@ -442,7 +442,6 @@ public class DiscussionsFragment extends BaseFragment implements View.OnClickLis
     }
 
     private void CallApiDiscussionsList() {
-
         fragmentDiscussionsLayoutBinding.noAccessDiscussion.setVisibility(View.GONE);
         fragmentDiscussionsLayoutBinding.layDiscussionList.setVisibility(View.VISIBLE);
         fragmentDiscussionsLayoutBinding.addButton.setVisibility(View.VISIBLE);
@@ -457,6 +456,7 @@ public class DiscussionsFragment extends BaseFragment implements View.OnClickLis
                         if (discssionsAllTopics.getData() != null) {
                             if (discssionsAllTopics.getData().size() != 0) {
                                 pageNumber++;
+                                discussionAllData.clear();
                                 discussionAllData.addAll(discssionsAllTopics.getData());
                                 discussionsListAdapter.notifyDataSetChanged();
                                 scrollListener.setLoaded();

@@ -18,7 +18,7 @@
     <string name="com_auth0_audience" translatable="false">https://edgsolutions.eu.auth0.com/api/v2/</string>
     <string name="com_auth0_database_connection" translatable="false">Username-Password-Authentication</string>
     <string name="com_auth0_scope" translatable="false">openid offline_access</string>
-    <string name="BASE_URL" translatable="false">https://dari-production-apps.noon-online.com/api/v1/</string>
+    <string name="BASE_URL" translatable="false">https://dari-staging-apps.noon-online.com/api/v1/</string>
     <!--Encrypt Decrypt API KEY for 30 days trial  [Valid until: 13 Jan 2021]-->
     <!-- Refere Link http://libeasy.alwaysdata.net/libmedia/license/ -->
     <string name="YOUR_API_KEY" translatable="false">eywY6sFtAwdurG8nz+kI3hXJfNStKGxiCDbRWdg1kli6IT8iqqoujmH/m5dRTSsGGHi8sbiu8vzUt4azVtR6dl/XXlRf/utUNzC6cDUvp3AgLbY3Oja5OWZr+TA7MLk=</string>
