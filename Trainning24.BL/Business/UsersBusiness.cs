@@ -15,6 +15,8 @@ using System.Net.Mail;
 using Microsoft.Extensions.Options;
 using Trainning24.BL.ViewModels.AddtionalServices;
 using Trainning24.BL.ViewModels.Erp;
+using Trainning24.Domain.Helper;
+using System.Data;
 
 namespace Trainning24.BL.Business
 {
@@ -775,6 +777,34 @@ namespace Trainning24.BL.Business
             }
         }
 
+        public List<long> GetTeachersByCourseIdUsingDBHelper(long courseid)
+        {
+            DBHelper dbHelper = new DBHelper(DBHelper.getconnectionstring());
+            List<long> teacherIdList = new List<long>();
+            try
+            {
+                dbHelper.Open();
+                DataTable teacherList = dbHelper.ExcecuteQueryDT("SELECT u.Id FROM `UserCourse` as uc  Join `Users` as u ON uc.UserId = u.Id join `UserRole` as ur ON u.Id = ur.UserId WHERE(uc.IsDeleted != true OR uc.IsDeleted Is Null) AND(u.IsDeleted != true OR u.IsDeleted Is Null)  AND(ur.IsDeleted != true OR ur.IsDeleted Is Null) AND ur.RoleId = 3 AND uc.CourseId = " + courseid + ";");
+                if (teacherList.Rows.Count != 0)
+                {
+                    foreach (DataRow usercourse in teacherList.Rows)
+                    {
+                        teacherIdList.Add(Convert.ToInt64(usercourse["Id"].ToString()));
+                    }
+                }
+                dbHelper.Close();
+            }
+            catch (Exception ex)
+            {
+                dbHelper.Close();
+                throw ex;
+            }
+            finally
+            {
+                dbHelper.Dispose();
+            }
+            return teacherIdList;
+        }
         public List<long> GetTeachersByCourseId(long courseid)
         {
             var usersList = _EFUsersRepository.GetAll();
@@ -789,7 +819,35 @@ namespace Trainning24.BL.Business
             return obj;
         }
 
-        public List<long> GetStudentsByCourseId(long courseid)
+        public List<long> GetStudentsByCourseIdUsingDBHelper(long courseid)
+        {
+            DBHelper dbHelper = new DBHelper(DBHelper.getconnectionstring());
+            List<long> studentIdList = new List<long>();
+            try
+            {
+                dbHelper.Open();
+                DataTable teacherList = dbHelper.ExcecuteQueryDT("SELECT Distinct u.Id FROM `UserCourse` as uc  Join `Users` as u ON uc.UserId = u.Id join `UserRole` as ur ON u.Id = ur.UserId WHERE(uc.IsDeleted != true OR uc.IsDeleted Is Null) AND(u.IsDeleted != true OR u.IsDeleted Is Null)  AND(ur.IsDeleted != true OR ur.IsDeleted Is Null) AND ur.RoleId = 4 AND u.is_discussion_authorized = true AND uc.CourseId = " + courseid + ";");
+                if (teacherList.Rows.Count != 0)
+                {
+                    foreach (DataRow usercourse in teacherList.Rows)
+                    {
+                        studentIdList.Add(Convert.ToInt64(usercourse["Id"].ToString()));
+                    }
+                }
+                dbHelper.Close();
+            }
+            catch (Exception ex)
+            {
+                dbHelper.Close();
+                throw ex;
+            }
+            finally
+            {
+                dbHelper.Dispose();
+            }
+            return studentIdList;
+        }
+            public List<long> GetStudentsByCourseId(long courseid)
         {
             var usersList = _EFUsersRepository.GetAll();
             var userCourseList = _EFStudentCourseRepository.GetAll();

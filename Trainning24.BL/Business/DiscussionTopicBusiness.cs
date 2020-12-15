@@ -114,7 +114,7 @@ namespace Trainning24.BL.Business
         {
             List<DiscussionTopic> getPrivateRecords = new List<DiscussionTopic>();
             List<DiscussionTopic> getPublicList = new List<DiscussionTopic>();
-            getPrivateRecords = _EFDiscussionTopicRepository.ListQuery(p => p.CreatorUserId == userid && p.CourseId == courseid && p.IsPrivate == true).ToList();
+            getPrivateRecords = _EFDiscussionTopicRepository.ListQuery(p => p.CreatorUserId == userid && p.CourseId == courseid && p.IsPrivate == true && p.IsDeleted != true).ToList();
             getPublicList = _EFDiscussionTopicRepository.ListQuery(b => b.IsDeleted != true && b.CourseId == courseid && b.IsPrivate == false).ToList();
 
             if (getPrivateRecords.Count > 0)
@@ -219,7 +219,7 @@ namespace Trainning24.BL.Business
 
         public int SendNotificationToTeachers(DiscussionTopicViewModel obj, string Certificate)
         {
-            List<long> userList = GetTeacherByCourse(obj.courseid);
+            List<long> userList = UsersBusiness.GetTeachersByCourseIdUsingDBHelper(obj.courseid);
             CourseDto course = courseBusiness.GetCourseById(obj.courseid, Certificate);
             UserDetails user = UsersBusiness.GetNotificationUserById(obj.createduserid, Certificate);
             DiscussionTopicDto discussion = GetNotificationTopicById(obj.id);
@@ -260,7 +260,7 @@ namespace Trainning24.BL.Business
 
         public int SendNotificationToStudents(DiscussionTopicViewModel obj, string Certificate)
         {
-            List<long> userList = GetStudentsByCourseId(obj.courseid);
+            List<long> userList = UsersBusiness.GetStudentsByCourseIdUsingDBHelper(obj.courseid);
             CourseDto course = courseBusiness.GetCourseById(obj.courseid, Certificate);
             UserDetails user = UsersBusiness.GetNotificationUserById(obj.createduserid, Certificate);
             DiscussionTopicDto discussion = GetNotificationTopicById(obj.id);
