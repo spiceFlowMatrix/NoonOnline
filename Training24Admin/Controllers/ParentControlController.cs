@@ -842,32 +842,26 @@ namespace Training24Admin.Controllers
                 double lessonAvarage = 0;
 
                 List<AssignmentSubmission> assignmentProgresses = new List<AssignmentSubmission>();
-                List<UserQuizResult> quizProgresses = new List<UserQuizResult>();
+                List<QuizProgress> quizProgresses = new List<QuizProgress>();
                 List<LessonProgress> lessonProgresses = new List<LessonProgress>();
 
                 if (dto.content == 3)
                 {
                     assignmentProgresses = _assignmentSubmissionBusinees.GetAssignmentProgressByCourseId(dto.id, dto.courseid);
-                    totalAssignment = _assignmentBusiness.GetAssignmentCount(dto.id, dto.courseid);
                 }
                 else if (dto.content == 2)
                 {
-                    quizProgresses = _userQuizResultBusiness.GetQuizProgressByCourseId(dto.id, dto.courseid);
-                    totalQuiz = _chapterQuizBusiness.GetQuizCount(dto.id, dto.courseid);
+                    quizProgresses = _userQuizResultBusiness.GetQuizProgressesByStdCouserId(dto.id, dto.courseid);
                 }
                 else if (dto.content == 1)
                 {
                     lessonProgresses = _lessonProgressBusiness.GetLessonProgresses(dto.id, dto.courseid);
-                    totalLesson = _lessonBusiness.GetLessonCount(dto.id, dto.courseid);
                 }
                 else
                 {
                     assignmentProgresses = _assignmentSubmissionBusinees.GetAssignmentProgressByCourseId(dto.id, dto.courseid);
-                    quizProgresses = _userQuizResultBusiness.GetQuizProgressByCourseId(dto.id, dto.courseid);
+                    quizProgresses = _userQuizResultBusiness.GetQuizProgressesByStdCouserId(dto.id, dto.courseid);
                     lessonProgresses = _lessonProgressBusiness.GetLessonProgresses(dto.id, dto.courseid);
-                    totalAssignment = _assignmentBusiness.GetAssignmentCount(dto.id, dto.courseid);
-                    totalQuiz = _chapterQuizBusiness.GetQuizCount(dto.id, dto.courseid);
-                    totalLesson = _lessonBusiness.GetLessonCount(dto.id, dto.courseid);
                 }
 
                 if (assignmentProgresses.Count > 0)
@@ -881,7 +875,7 @@ namespace Training24Admin.Controllers
                                                                           datetime = Convert.ToDateTime(x.CreationTime)
                                                                       }).ToList();
                     var filteredRecords = assignmentChartDTOs.Where(x => x.datetime > DateTime.UtcNow.AddMonths(-dto.month)).ToList();
-
+                    totalAssignment = filteredRecords.Count();
                     var getPassedAssignment = filteredRecords
                          .Where(b => 90 <= b.progress)
                          .GroupBy(x => x.assignmentid)
@@ -916,22 +910,14 @@ namespace Training24Admin.Controllers
                                                            {
                                                                id = x.Id,
                                                                quizid = x.QuizId,
-                                                               progress = x.Score,
-                                                               passmark = x.PassingScore,
+                                                               progress = x.Progress,
                                                                datetime = Convert.ToDateTime(x.CreationTime)
                                                            }).ToList();
 
                     var filteredRecords = quizChartDTOs.Where(x => x.datetime > DateTime.UtcNow.AddMonths(-dto.month)).ToList();
-
-                    var getPassedQuiz = filteredRecords
-                       .Where(b => b.passmark <= b.progress)
-                       .GroupBy(x => x.quizid)
-                       .Select(x => x.OrderByDescending(y => y.id)
-                       .FirstOrDefault())
-                       .ToList();
+                    totalQuiz = filteredRecords.Count();
 
                     var activityGroup = filteredRecords
-                        .Where(x => !getPassedQuiz.Any(d => d.quizid == x.quizid))
                         .GroupBy(x => x.quizid)
                         .Select(x => x.OrderByDescending(y => y.id)
                         .FirstOrDefault())
@@ -945,11 +931,6 @@ namespace Training24Admin.Controllers
                             progress += dt.progress;
                         }
                         var avarage = progress / 100;
-                        quizAvarage += avarage;
-                    }
-                    if (getPassedQuiz.Count > 0)
-                    {
-                        var avarage = 1 * getPassedQuiz.Count();
                         quizAvarage += avarage;
                     }
                 }
@@ -966,7 +947,7 @@ namespace Training24Admin.Controllers
                                                                   }).ToList();
 
                     var filteredRecords = lessonPieChartDTOs.Where(x => x.datetime > DateTime.UtcNow.AddMonths(-dto.month)).ToList();
-
+                    totalLesson = filteredRecords.Count();
                     var activityGroup = filteredRecords
                         .GroupBy(x => x.lessonid)
                         .Select(x => x.OrderByDescending(y => y.id)

@@ -10,14 +10,17 @@ namespace Trainning24.BL.Business
     public class UserQuizResultBusiness
     {
         private readonly EFUserQuizResultSync _eFUserQuizResultSync;
+        private readonly EFQuizProgressSync _eFQuizProgressSync;
         private readonly EFChapterRepository _eFChapterRepository;
         private readonly EFChapterQuizRepository _eFChapterQuizRepository;
         public UserQuizResultBusiness(
             EFUserQuizResultSync eFUserQuizResultSync,
             EFChapterRepository eFChapterRepository,
-            EFChapterQuizRepository eFChapterQuizRepository
+            EFChapterQuizRepository eFChapterQuizRepository,
+            EFQuizProgressSync eFQuizProgressSync
         )
         {
+             _eFQuizProgressSync = eFQuizProgressSync;
             _eFUserQuizResultSync = eFUserQuizResultSync;
             _eFChapterRepository = eFChapterRepository;
             _eFChapterQuizRepository = eFChapterQuizRepository;
@@ -68,6 +71,35 @@ namespace Trainning24.BL.Business
             else
             {
                 return _eFUserQuizResultSync.ListQuery(b => studentid.Contains((int)b.UserId) && b.IsDeleted != true).ToList();
+            }
+        }
+        public List<QuizProgress> GetQuizProgressesByStdCouserId(List<int> studentid, int courseid)
+        {
+            if(courseid != 0)
+            {
+                List<QuizProgress> quizProgresseslst = new List<QuizProgress>();
+                List<long> chapterQuiz = new List<long>();
+                var chapterIds = _eFChapterRepository.ListQuery(b => b.CourseId == courseid && b.IsDeleted != true).Select(s => s.Id).ToList();
+                if (chapterIds.Count > 0)
+                {
+                    chapterQuiz = _eFChapterQuizRepository.ListQuery(b => chapterIds.Contains(b.ChapterId) && b.IsDeleted != true).Select(s => s.QuizId).ToList();
+                    if (chapterQuiz.Count > 0)
+                    {
+                        foreach (var quizid in chapterQuiz)
+                        {
+                            var quizprogress = _eFQuizProgressSync.ListQuery(b => studentid.Contains((int)b.UserId) && b.QuizId == quizid && b.IsDeleted != true).ToList();
+                            if (quizprogress.Count > 0)
+                            {
+                                quizProgresseslst.AddRange(quizprogress);
+                            }
+                        }
+                    }
+                }
+                return quizProgresseslst;
+            }
+            else
+            {
+                return _eFQuizProgressSync.ListQuery(b => studentid.Contains((int)b.UserId) && b.IsDeleted != true).ToList();
             }
         }
     }
