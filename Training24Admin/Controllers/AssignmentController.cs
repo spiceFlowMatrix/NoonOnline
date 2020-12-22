@@ -619,6 +619,7 @@ namespace Training24Admin.Controllers
         {
             SuccessResponse successResponse = new SuccessResponse();
             UnsuccessResponse unsuccessResponse = new UnsuccessResponse();
+            
             try
             {
                 string Authorization = Request.Headers["id_token"];
