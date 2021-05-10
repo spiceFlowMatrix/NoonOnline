@@ -122,6 +122,8 @@ namespace Trainning24.Repository.EF
             return allQuestions;
         }
 
+
+
         public List<Question> GetQuestionsByQuizId(long QuizId, DateTime? lastModifiedDate)
         {
             var context = _updateContext.QuizQuestion.Include("Question").Where(f => f.QuizId == QuizId);
