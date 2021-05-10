@@ -416,6 +416,7 @@ namespace Trainning24.BL.Business
         }
 
 
+
         public NewResponseQuestionModel1 GetCompleteQuizDetail(long id, long studentid, DateTime? lastModifiedDate)
         {
             Quiz quiz = _EFQuizRepository.GetById(b => b.Id == id && b.IsDeleted != true);

@@ -382,6 +382,7 @@ namespace Training24Admin.Controllers
         }
 
 
+
         [HttpGet("CompleteQuizPreview/{id}/{modifiedDate?}")]
         public IActionResult CompleteQuizPreview(int id, string modifiedDate = null)
         {

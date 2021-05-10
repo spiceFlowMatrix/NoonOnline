@@ -32,6 +32,7 @@ namespace Trainning24.BL.ViewModels.Question
         public List<QuestionAnswerModel1> answers { get; set; }
     }
 
+
     public enum QuestionStatus
     {
         None = 0,
