@@ -415,6 +415,113 @@ namespace Trainning24.BL.Business
             return quizDetail;
         }
 
+
+        public NewResponseQuestionModel1 GetCompleteQuizDetail(long id, long studentid, DateTime? lastModifiedDate)
+        {
+            Quiz quiz = _EFQuizRepository.GetById(b => b.Id == id && b.IsDeleted != true);
+            if (quiz == null)
+            {
+                return null;
+            }
+            NewResponseQuestionModel1 quizDetail = new NewResponseQuestionModel1();
+            quizDetail.quizid = id;
+            quizDetail.passmark = quiz.PassMark;
+            QuizSummary quizSummary = _EFQuizRepository.GetQuizSummary(b => b.QuizId == quiz.Id && b.StudentId == studentid);
+
+            if (quizSummary != null)
+            {
+                QuizSummaryResponse quizSummaryRes = new QuizSummaryResponse();
+                quizSummaryRes.id = quizSummary.Id;
+                quizSummaryRes.Attempts = quizSummary.Attempts;
+                quizSummaryRes.QSummary = quizSummary.QSummary;
+                quizDetail.QuizSummaryResponse = quizSummaryRes;
+            }
+
+            List<Question> quizQuestions = EFQuestionRepository.GetQuestionsByQuizId(id, lastModifiedDate);
+            List<QuestionModel1> questionList = new List<QuestionModel1>();
+            foreach (var quizQuestion in quizQuestions)
+            {
+                List<UpdateQuestionFileModel> questionfiles = new List<UpdateQuestionFileModel>();
+
+                QuestionModel1 questionModel = new QuestionModel1();
+                questionModel.id = quizQuestion.Id;
+                questionModel.ismultianswer = quizQuestion.IsMultiAnswer;
+                questionModel.questiontext = quizQuestion.QuestionText;
+                questionModel.questiontypeid = quizQuestion.QuestionTypeId;
+                questionModel.explanation = quizQuestion.Explanation;
+
+                if (lastModifiedDate != null)
+                {
+                    if (quizQuestion.IsDeleted == true)
+                    {
+                        questionModel.Status = QuestionStatus.Deleted;
+                    }
+                    else
+                    {
+                        questionModel.Status = QuestionStatus.Modified;
+                    }
+                }
+                
+
+                List<QuestionFile> questionFiles = _EFQuizRepository.ListQuestionFile(b => b.QuestionId == quizQuestion.Id && b.IsDeleted != true).ToList();
+
+                List<UpdateQuestionFileModel> images = new List<UpdateQuestionFileModel>();
+                foreach (var file in questionFiles)
+                {
+                    Files singleFile = FilesBusiness.getFilesById(file.FileId);
+                    UpdateQuestionFileModel updateQuestionFileModel = new UpdateQuestionFileModel();
+                    updateQuestionFileModel.fileid = singleFile.Id;
+                    updateQuestionFileModel.Url = singleFile.Url;
+                    images.Add(updateQuestionFileModel);
+                }
+
+                questionModel.images = images;
+
+                List<QuestionAnswer> questionAnswers = QuestionAnswerBusiness.GetAnswersByQuestionId(quizQuestion.Id);
+                List<QuestionAnswerModel1> answerPreviewModels = new List<QuestionAnswerModel1>();
+
+                foreach (var questionAnswer in questionAnswers)
+                {
+                    QuestionAnswerModel1 answerPreviewModel = new QuestionAnswerModel1();
+                    answerPreviewModel.id = questionAnswer.Id;
+                    answerPreviewModel.answer = questionAnswer.Answer;
+                    answerPreviewModel.extratext = questionAnswer.ExtraText;
+                    answerPreviewModel.iscorrect = questionAnswer.IsCorrect;
+
+                    List<AnswerFile> answerFiles = _EFQuizRepository.ListAnswerFile(b => b.AnswerId == questionAnswer.Id && b.IsDeleted != true).ToList();
+
+                    List<UpdateQuestionFileModel> ansfiles = new List<UpdateQuestionFileModel>();
+                    foreach (var file in answerFiles)
+                    {
+                        Files singleFile = FilesBusiness.getFilesById(file.FileId);
+                        UpdateQuestionFileModel updateQuestionFileModel = new UpdateQuestionFileModel();
+                        updateQuestionFileModel.fileid = singleFile.Id;
+                        updateQuestionFileModel.Url = singleFile.Url;
+                        ansfiles.Add(updateQuestionFileModel);
+
+                    }
+
+                    answerPreviewModel.images = ansfiles;
+
+                    answerPreviewModels.Add(answerPreviewModel);
+                }
+
+                questionModel.answers = answerPreviewModels;
+
+                QuestionPreviewModel questionPreviewModel = new QuestionPreviewModel();
+                questionPreviewModel.id = quizQuestion.Id;
+                questionPreviewModel.ismultianswer = quizQuestion.IsMultiAnswer;
+                questionPreviewModel.questiontext = quizQuestion.QuestionText;
+                questionPreviewModel.questiontypeid = quizQuestion.QuestionTypeId;
+                questionPreviewModel.explanation = quizQuestion.Explanation;
+
+                questionList.Add(questionModel);
+            }
+
+            quizDetail.questions = questionList;
+            return quizDetail;
+        }
+
         public QuizDTO GetQuizDataById(Quiz obj)
         {
             QuizDTO quiz = new QuizDTO();

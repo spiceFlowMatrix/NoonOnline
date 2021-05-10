@@ -381,5 +381,52 @@ namespace Training24Admin.Controllers
             }
         }
 
+
+        [HttpGet("CompleteQuizPreview/{id}/{modifiedDate?}")]
+        public IActionResult CompleteQuizPreview(int id, string modifiedDate = null)
+        {
+            SuccessResponse successResponse = new SuccessResponse();
+            UnsuccessResponse unsuccessResponse = new UnsuccessResponse();
+            try
+            {
+                DateTime? lastModifiedDate = null;
+
+                if (DateTime.TryParse(modifiedDate, out DateTime dt) == true)
+                {
+                    lastModifiedDate = dt;
+                }
+
+                //string Authorization = Request.Headers["Authorization"];
+                string Authorization = Request.Headers["id_token"];
+                TokenClaims tc = General.GetClaims(Authorization);
+                tc.Id = LessonBusiness.getUserId(tc.sub);
+                NewResponseQuestionModel1 quizDetail = new NewResponseQuestionModel1();
+                quizDetail = QuizBusiness.GetCompleteQuizDetail(id, long.Parse(tc.Id), lastModifiedDate);
+                if (quizDetail == null)
+                {
+                    unsuccessResponse.response_code = 1;
+                    unsuccessResponse.message = "Quiz not found.";
+                    unsuccessResponse.status = "Unsuccess";
+                    return StatusCode(404, unsuccessResponse);
+                }
+                else
+                {
+                    ResponseQuestionModel responseQuestionModel = new ResponseQuestionModel();
+
+                    successResponse.data = quizDetail;
+                    successResponse.response_code = 0;
+                    successResponse.message = "Question detail";
+                    successResponse.status = "Success";
+                    return StatusCode(200, successResponse);
+                }
+            }
+            catch (Exception ex)
+            {
+                unsuccessResponse.response_code = 2;
+                unsuccessResponse.message = ex.Message;
+                unsuccessResponse.status = "Failure";
+                return StatusCode(500, unsuccessResponse);
+            }
+        }
     }
 }
