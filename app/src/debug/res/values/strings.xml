@@ -1,0 +1,27 @@
+<resources>
+    <!-- <string name="app_scheme" translatable="false">noon</string>
+     <string name="com_auth0_client_id" translatable="false">Wb13x2ew21CKvj7kji8ZMAhjmvnlN8tD</string>
+     <string name="com_auth0_domain" translatable="false">edgsolutions.eu.auth0.com</string>
+     <string name="com_auth0_audience" translatable="false">https://edgsolutions.eu.auth0.com/api/v2/</string>
+     <string name="com_auth0_database_connection" translatable="false">Username-Password-Authentication</string>
+     <string name="com_auth0_scope" translatable="false">openid offline_access</string>
+     &lt;!&ndash;    <string name="BASE_URL" translatable="false">https://coreapistaging.noon-online.com/api/v1/</string>&ndash;&gt;
+     &lt;!&ndash;    <string name="BASE_URL" translatable="false">https://dari-production-apps.noon-online.com/api/v1/</string>&ndash;&gt;
+     <string name="BASE_URL" translatable="false">https://dari-staging-apps.noon-online.com/api/v1/</string>
+     &lt;!&ndash;Encrypt Decrypt API KEY for 30 days trial  [Valid until: July 12, 2020]&ndash;&gt;
+     &lt;!&ndash; Refere Link http://libeasy.alwaysdata.net/libmedia/license/ &ndash;&gt;
+     <string name="YOUR_API_KEY" translatable="false">KmMvWTVKl9tBs/dgS8paH2B53Dyjch2xbMhYlrOQ8UA1BKwMhD390Y/zcfLSwtRestJYOALCSoxIJ7ETQt9Xml7jAelfCo7pijGOL4guky+dLIJohzeNZttqzW+GMY0=</string>-->
+    <!--TODO :: DD APPLY CHANGES HERE -->
+    <string name="app_scheme" translatable="false">noon</string>
+    <string name="com_auth0_client_id" translatable="false">Wb13x2ew21CKvj7kji8ZMAhjmvnlN8tD</string>
+    <string name="com_auth0_domain" translatable="false">edgsolutions.eu.auth0.com</string>
+    <string name="com_auth0_audience" translatable="false">https://edgsolutions.eu.auth0.com/api/v2/</string>
+    <string name="com_auth0_database_connection" translatable="false">Username-Password-Authentication</string>
+    <string name="com_auth0_scope" translatable="false">openid offline_access</string>
+<!--        <string name="BASE_URL" translatable="false">https://dari-production-apps.noon-online.com/api/v1/</string>-->
+    <string name="BASE_URL" translatable="false">https://dari-staging-apps.noon-online.com/api/v1/</string>
+    <!--Encrypt Decrypt API KEY for 30 days trial  [Valid until: 13 Jan 2021]-->
+    <!-- Refere Link http://libeasy.alwaysdata.net/libmedia/license/ -->
+    <string name="YOUR_API_KEY" translatable="false">ZCh1qNzc9oGjoDjOqIP85BFksVwSj8WUUx2j9jWC/DjMR0uUnniJUiAFAsPejRTBv7UeHLC9NzUCKkSJpM8sWFwnfmAAAAAAAzNKUAEsV1AULkYXDjVJGVJoCRAPM0k=</string>
+    <!--    <string name="YOUR_API_KEY" translatable="false">eywY6sFtAwdurG8nz+kI3hXJfNStKGxiCDbRWdg1kli6IT8iqqoujmH/m5dRTSsGGHi8sbiu8vzUt4azVtR6dl/XXlRf/utUNzC6cDUvp3AgLbY3Oja5OWZr+TA7MLk=</string>-->
+</resources>
