@@ -123,6 +123,34 @@ namespace Trainning24.Repository.EF
         }
 
 
+
+        public List<Question> GetQuestionsByQuizId(long QuizId, DateTime? lastModifiedDate)
+        {
+            var context = _updateContext.QuizQuestion.Include("Question").Where(f => f.QuizId == QuizId);
+            if (lastModifiedDate.HasValue == true)
+            {
+                context = context.Where(f => (f.LastModificationTime != null && DateTime.Parse(f.LastModificationTime) > lastModifiedDate) || (f.IsDeleted == true && DateTime.Parse(f.DeletionTime) > lastModifiedDate));
+            }
+            else
+            {
+                context = context.Where(f => f.IsDeleted != true);
+            }
+
+            List<Question> allQuestions = context.Select(f => new Question()
+            {
+                Id = f.Question.Id,
+                QuestionTypeId = f.Question.QuestionTypeId,
+                QuestionText = f.Question.QuestionText,
+                Explanation = f.Question.Explanation,
+                IsMultiAnswer = f.Question.IsMultiAnswer,
+                QuestionType = f.Question.QuestionType,
+                IsDeleted = f.Question.IsDeleted,
+            }).ToList();
+
+            return allQuestions;
+        }
+
+
         public List<Question> GetQuestionsByQuizId1(long QuizId)
         {
 
