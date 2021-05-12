@@ -247,6 +247,7 @@ buildSalesAppDari:
     - rm -rf package-lock.json node_modules
     - npm cache clean --force
     - npm i --unsafe-perm node-sass
+    - npm install --unsafe-perm -g @angular/cli@6.0.0
     - npm install --quiet
     - rm -f src/environments/environment.ts
     - rm -f src/environments/environment.prod.ts
@@ -287,6 +288,7 @@ buildSalesAppPashto:
     - rm -rf package-lock.json node_modules
     - npm cache clean --force
     - npm i --unsafe-perm node-sass
+    - npm install --unsafe-perm -g @angular/cli@6.0.0
     - npm install --quiet
     - rm -f src/environments/environment.ts
     - rm -f src/environments/environment.prod.ts
@@ -328,6 +330,7 @@ buildFeedbackAppDari:
     - rm -rf package-lock.json node_modules
     - npm cache clean --force
     - npm i --unsafe-perm node-sass
+    - npm install --unsafe-perm -g @angular/cli@6.0.0
     - npm install --quiet
     - rm -f src/environments/environment.ts
     - rm -f src/environments/environment.prod.ts
@@ -368,6 +371,7 @@ buildFeedbackAppPashto:
     - rm -rf package-lock.json node_modules
     - npm cache clean --force
     - npm i --unsafe-perm node-sass
+    - npm install --unsafe-perm -g @angular/cli@6.0.0
     - npm install --quiet
     - rm -f src/environments/environment.ts
     - rm -f src/environments/environment.prod.ts
