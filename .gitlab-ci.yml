@@ -249,6 +249,8 @@ buildSalesAppDari:
     - npm i --unsafe-perm node-sass
     - npm install --unsafe-perm -g @angular/cli@6.0.0
     - npm install --quiet
+    - npm install rxjs@6.2.2 --save
+    - npm install --save @types/lodash@4.14.116 --quiet
     - rm -f src/environments/environment.ts
     - rm -f src/environments/environment.prod.ts
   script:
@@ -290,6 +292,8 @@ buildSalesAppPashto:
     - npm i --unsafe-perm node-sass
     - npm install --unsafe-perm -g @angular/cli@6.0.0
     - npm install --quiet
+    - npm install rxjs@6.2.2 --save
+    - npm install --save @types/lodash@4.14.116 --quiet
     - rm -f src/environments/environment.ts
     - rm -f src/environments/environment.prod.ts
   script:
@@ -332,6 +336,8 @@ buildFeedbackAppDari:
     - npm i --unsafe-perm node-sass
     - npm install --unsafe-perm -g @angular/cli@6.0.0
     - npm install --quiet
+    - npm install rxjs@6.2.2 --save
+    - npm install --save @types/lodash@4.14.116 --quiet
     - rm -f src/environments/environment.ts
     - rm -f src/environments/environment.prod.ts
   script:
@@ -373,6 +379,8 @@ buildFeedbackAppPashto:
     - npm i --unsafe-perm node-sass
     - npm install --unsafe-perm -g @angular/cli@6.0.0
     - npm install --quiet
+    - npm install rxjs@6.2.2 --save
+    - npm install --save @types/lodash@4.14.116 --quiet
     - rm -f src/environments/environment.ts
     - rm -f src/environments/environment.prod.ts
   script:
