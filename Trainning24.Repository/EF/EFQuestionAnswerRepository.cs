@@ -91,6 +91,19 @@ namespace Trainning24.Repository.EF
             return null;
         }
 
+        public List<long> GetAnswersIDsByQuestionId(long QuestionId)
+        {
+            try
+            {
+                return _context.ListQuery(b => b.QuestionId == QuestionId && b.IsDeleted == false).Select(f => f.Id).ToList();
+            }
+            catch (Exception ex)
+            {
+            }
+
+            return null;
+        }
+
         public QuestionAnswer QuestionAnswerExistById(QuestionAnswer QuestionAnswer)
         {
             QuestionAnswer result = null;

@@ -381,7 +381,33 @@ namespace Training24Admin.Controllers
             }
         }
 
+        [HttpGet("CompleteQuizFiles/{id}/{modifiedDate?}")]
+        public IActionResult CompleteQuizFiles(int id, string modifiedDate = null)
+        {
+            UnsuccessResponse unsuccessResponse = new UnsuccessResponse();
 
+            try
+            {
+                DateTime? lastModifiedDate = null;
+
+                if (DateTime.TryParse(modifiedDate, out DateTime dt) == true)
+                {
+                    lastModifiedDate = dt;
+                }
+                string Authorization = Request.Headers["id_token"];
+                TokenClaims tc = General.GetClaims(Authorization);
+                tc.Id = LessonBusiness.getUserId(tc.sub);
+                var fileBytes = QuizBusiness.GetCompleteQuizFiles(id, long.Parse(tc.Id), lastModifiedDate);
+                return File(fileBytes, "application/octet-stream", $"{id}.zip");
+            }
+            catch (Exception ex)
+            {
+                unsuccessResponse.response_code = 2;
+                unsuccessResponse.message = ex.Message;
+                unsuccessResponse.status = "Failure";
+                return StatusCode(500, unsuccessResponse);
+            }
+        }
 
         [HttpGet("CompleteQuizPreview/{id}/{modifiedDate?}")]
         public IActionResult CompleteQuizPreview(int id, string modifiedDate = null)
