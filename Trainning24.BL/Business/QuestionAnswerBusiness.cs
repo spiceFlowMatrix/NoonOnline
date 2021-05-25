@@ -183,6 +183,11 @@ namespace Trainning24.BL.Business
             return _EFQuestionAnswerRepository.GetAnswersByQuestionId(id);
         }
 
+        public List<long> GetAnswersIDsByQuestionId(long id)
+        {
+            return _EFQuestionAnswerRepository.GetAnswersIDsByQuestionId(id);
+        }
+
         public QuestionAnswer QuestionAnswerExistanceById(long id)
         {
             QuestionAnswer _QuestionAnswer = new QuestionAnswer

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -415,7 +417,64 @@ namespace Trainning24.BL.Business
             return quizDetail;
         }
 
+        public byte[] GetCompleteQuizFiles(long id, long studentID, DateTime? lastModifiedDate)
+        {
 
+            using (var memoryStream = new MemoryStream())
+            {
+                using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
+                {
+                    List<long> quizQuestions = EFQuestionRepository.GetQuestionIDsByQuizId(id, lastModifiedDate);
+                    List<QuestionModel1> questionList = new List<QuestionModel1>();
+                    foreach (var questionID in quizQuestions)
+                    {
+                        List<UpdateQuestionFileModel> questionfiles = new List<UpdateQuestionFileModel>();
+
+                        QuestionModel1 questionModel = new QuestionModel1();
+
+                        List<QuestionFile> questionFiles = _EFQuizRepository.ListQuestionFile(b => b.QuestionId == questionID && b.IsDeleted != true).ToList();
+
+                        List<UpdateQuestionFileModel> images = new List<UpdateQuestionFileModel>();
+                        foreach (var file in questionFiles)
+                        {
+                            Files singleFile = FilesBusiness.getFilesById(file.FileId);
+                            string entryName = singleFile.Id + System.IO.Path.GetExtension(singleFile.FileName);
+                            var entryFile = archive.CreateEntry(entryName);
+                            using (var entryStream = entryFile.Open())
+                            using (var writer = new BinaryWriter(entryStream))
+                            {
+                                System.Net.WebClient client = new System.Net.WebClient();
+                                byte[] bytes = client.DownloadData(singleFile.Url);
+                                writer.Write(bytes);
+                            }
+                        }
+
+                        List<long> questionAnswers = QuestionAnswerBusiness.GetAnswersIDsByQuestionId(questionID);
+
+                        foreach (var questionAnswerId in questionAnswers)
+                        {
+                            List<AnswerFile> answerFiles = _EFQuizRepository.ListAnswerFile(b => b.AnswerId == questionAnswerId && b.IsDeleted != true).ToList();
+
+                            foreach (var file in answerFiles)
+                            {
+                                Files singleFile = FilesBusiness.getFilesById(file.FileId);
+                                string entryName = singleFile.Id + System.IO.Path.GetExtension(singleFile.FileName);
+                                var entryFile = archive.CreateEntry(entryName);
+                                using (var entryStream = entryFile.Open())
+                                using (var writer = new BinaryWriter(entryStream))
+                                {
+                                    System.Net.WebClient client = new System.Net.WebClient();
+                                    byte[] bytes = client.DownloadData(singleFile.Url);
+                                    writer.Write(bytes);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                return memoryStream.ToArray();
+            }
+        }
 
         public NewResponseQuestionModel1 GetCompleteQuizDetail(long id, long studentid, DateTime? lastModifiedDate)
         {
