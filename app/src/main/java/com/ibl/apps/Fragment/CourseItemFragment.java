@@ -30,6 +30,12 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.work.Constraints;
+import androidx.work.Data;
+import androidx.work.NetworkType;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkInfo;
+import androidx.work.WorkManager;
 
 import com.downloader.Error;
 import com.downloader.OnDownloadListener;
@@ -63,10 +69,16 @@ import com.ibl.apps.Model.ProgressItem;
 import com.ibl.apps.Model.QuizMainObject;
 import com.ibl.apps.Model.RestResponse;
 import com.ibl.apps.QuizManament.QuizRepository;
+import com.ibl.apps.QuizModule.entities.AnswerEntity;
+import com.ibl.apps.QuizModule.entities.QuestionWithAnswerEntity;
+import com.ibl.apps.QuizModule.entities.QuizEntity;
+import com.ibl.apps.QuizModule.entities.QuizWithQuestionEntity;
+import com.ibl.apps.QuizModule.workers.FetchQuestionWorker;
 import com.ibl.apps.RoomDatabase.dao.courseManagementDatabase.CourseDatabaseRepository;
 import com.ibl.apps.RoomDatabase.dao.lessonManagementDatabase.LessonDatabaseRepository;
 import com.ibl.apps.RoomDatabase.dao.quizManagementDatabase.QuizDatabaseRepository;
 import com.ibl.apps.RoomDatabase.dao.syncAPIManagementDatabase.SyncAPIDatabaseRepository;
+import com.ibl.apps.RoomDatabase.database.AppDatabase;
 import com.ibl.apps.RoomDatabase.entity.ChapterProgress;
 import com.ibl.apps.RoomDatabase.entity.FileProgress;
 import com.ibl.apps.RoomDatabase.entity.LessonNewProgress;
@@ -1573,6 +1585,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                         }
                         break;
                     case "10":
+                        Log.e("MMMMM", "Inside case 10");
                         setupvideoinlandscapmode();
                         toolbarHideInterface.toolbarHide(getActivity(), true, LessonName);
                         fragmentCourseItemLayoutBinding.appbarCourseChapter.setVisibility(View.VISIBLE);
@@ -1584,7 +1597,6 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                         fragmentCourseItemLayoutBinding.textPdfAssignmentLay.setVisibility(View.GONE);
                         fragmentCourseItemLayoutBinding.courseitemView.setVisibility(View.GONE);
                         CallApiQuestionList(fragmentCourseItemLayoutBinding, getActivity(), quizID, position);
-
                         break;
                 }
 
@@ -1897,8 +1909,10 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
 
     private void CallApiQuestionList(CourselessonLayoutBinding dialogViewerItemLayoutBinding, Context ctx, String quizID, int position) {
         try {
+            Log.e("IIIIII",">>>>>>>>>>>>>>>TEST<<<<<<<<<<<<<<<<<");
+            Log.e("IIIIII","QUIZ ID: "+quizID);
+            Log.e("MMMMM","Call API question list called");
             //showDialog(getString(R.string.loading));
-
             dialogViewerItemLayoutBinding.quizViewLayout.progressDialogLay.progressBar.setVisibility(View.VISIBLE);
             dialogViewerItemLayoutBinding.quizViewLayout.resultLayout.mainResultView.setVisibility(View.GONE);
             dialogViewerItemLayoutBinding.quizViewLayout.ProgressButton.removeAllViews();
@@ -1912,65 +1926,181 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                 }
             }.execute();
 
-            if (isNetworkAvailable(ctx)) {
-                disposable.add(quizRepository.fetchQuizData(quizID)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeWith(new DisposableSingleObserver<QuizMainObject>() {
+            AppDatabase appDatabase = AppDatabase.getAppDatabase(getContext());
+            QuizEntity quizEntity = appDatabase.quizDao().getById(Long.parseLong(quizID));
+            Log.e("IIIIII", new Gson().toJson(quizEntity));
+            if(quizEntity == null){
+                Log.e("IIIIII", "Inside if");
+                Constraints constraints = new Constraints.Builder()
+                        .setRequiredNetworkType(NetworkType.CONNECTED)
+                        .build();
+
+                Data inputData = new Data.Builder()
+                        .putString("quiz_id", quizID)
+                        .build();
+
+                OneTimeWorkRequest workRequest = new OneTimeWorkRequest.Builder(FetchQuestionWorker.class)
+                        .setConstraints(constraints)
+                        .setInputData(inputData)
+                        .build();
+
+                WorkManager.getInstance(getActivity()).enqueue(workRequest);
+                WorkManager.getInstance(getActivity()).getWorkInfoByIdLiveData(workRequest.getId())
+                        .observe(this, new Observer<WorkInfo>() {
                             @Override
-                            public void onSuccess(QuizMainObject quizMainObject) {
-                                if (quizMainObject != null) {
+                            public void onChanged(WorkInfo workInfo) {
+                                if(workInfo.getState() == WorkInfo.State.SUCCEEDED){
+                                    Log.e("IIIII","work manager ran successfully");
+                                    QuizWithQuestionEntity quizWithQuestionEntity = appDatabase
+                                            .quizDao().getQuizWithQuestionAndAnswer(quizEntity.getId());
+                                    QuizMainObject quizMainObject = convertDataToQuizMainObject(quizWithQuestionEntity);
                                     setQuizMainView(dialogViewerItemLayoutBinding, ctx, quizMainObject);
                                     quizMainObject.setNewquizId(quizID);
                                     quizMainObject.setUserId(userId);
-                                    quizDatabaseRepository.insertQuizAnswerData(quizMainObject);
+//                                    quizDatabaseRepository.insertQuizAnswerData(quizMainObject);
                                     dialogViewerItemLayoutBinding.quizViewLayout.progressDialogLay.progressBar.setVisibility(View.GONE);
                                 }
-
-                            }
-
-                            @Override
-                            public void onError(Throwable e) {
-                                //hideDialog();
-                                dialogViewerItemLayoutBinding.quizViewLayout.progressDialogLay.progressBar.setVisibility(View.GONE);
-                                try {
-                                    HttpException error = (HttpException) e;
-                                    //QuizMainObject quizMainObject = new Gson().fromJson(error.response().errorBody().string(), QuizMainObject.class);
-                                    //showSnackBar(fragmentCourseItemLayoutBinding.mainFragmentCourseLayout, quizMainObject.getMessage());
-                                    if (userId != null && !userId.isEmpty()) {
+                                if(workInfo.getState() == WorkInfo.State.FAILED){
+                                    Log.e("IIIII","work manager failed");
+                                    dialogViewerItemLayoutBinding.quizViewLayout.progressDialogLay.progressBar.setVisibility(View.GONE);
+                                    try {
+//                                        HttpException error = (HttpException) e;
+                                        //QuizMainObject quizMainObject = new Gson().fromJson(error.response().errorBody().string(), QuizMainObject.class);
+                                        //showSnackBar(fragmentCourseItemLayoutBinding.mainFragmentCourseLayout, quizMainObject.getMessage());
+                                        if (userId != null && !userId.isEmpty()) {
+                                            QuizMainObject quizMainObject = quizDatabaseRepository.getQuizByUserId(userId, quizID);
+                                            if (quizMainObject != null) {
+                                                setQuizMainView(dialogViewerItemLayoutBinding, ctx, quizMainObject);
+                                                dialogViewerItemLayoutBinding.quizViewLayout.progressDialogLay.progressBar.setVisibility(View.GONE);
+                                            } else {
+//                                                showError(e);
+                                            }
+                                        }
+                                    } catch (Exception e1) {
                                         QuizMainObject quizMainObject = quizDatabaseRepository.getQuizByUserId(userId, quizID);
                                         if (quizMainObject != null) {
                                             setQuizMainView(dialogViewerItemLayoutBinding, ctx, quizMainObject);
                                             dialogViewerItemLayoutBinding.quizViewLayout.progressDialogLay.progressBar.setVisibility(View.GONE);
                                         } else {
-                                            showError(e);
+//                                            showError(e);
                                         }
-                                    }
-
-                                } catch (Exception e1) {
-                                    QuizMainObject quizMainObject = quizDatabaseRepository.getQuizByUserId(userId, quizID);
-                                    if (quizMainObject != null) {
-                                        setQuizMainView(dialogViewerItemLayoutBinding, ctx, quizMainObject);
-                                        dialogViewerItemLayoutBinding.quizViewLayout.progressDialogLay.progressBar.setVisibility(View.GONE);
-                                    } else {
-                                        showError(e);
                                     }
                                 }
                             }
-                        }));
-            } else {
-                QuizMainObject quizMainObject = quizDatabaseRepository.getQuizByUserId(userId, quizID);
+                        });
+            } else{
+                // We will convert it to quiz main
+                QuizWithQuestionEntity quizWithQuestionEntity = appDatabase
+                        .quizDao().getQuizWithQuestionAndAnswer(quizEntity.getId());
+                Log.e("IIIII", "Inside else");
+                QuizMainObject quizMainObject = convertDataToQuizMainObject(quizWithQuestionEntity);
+//                QuizMainObject quizMainObject = quizDatabaseRepository.getQuizByUserId(userId, quizID);
                 setQuizMainView(dialogViewerItemLayoutBinding, ctx, quizMainObject);
                 dialogViewerItemLayoutBinding.quizViewLayout.progressDialogLay.progressBar.setVisibility(View.GONE);
             }
 
+//            if (isNetworkAvailable(ctx)) {
+//                disposable.add(quizRepository.fetchQuizData(quizID)
+//                        .subscribeOn(Schedulers.io())
+//                        .observeOn(AndroidSchedulers.mainThread())
+//                        .subscribeWith(new DisposableSingleObserver<QuizMainObject>() {
+//                            @Override
+//                            public void onSuccess(QuizMainObject quizMainObject) {
+//                                if (quizMainObject != null) {
+//                                    setQuizMainView(dialogViewerItemLayoutBinding, ctx, quizMainObject);
+//                                    quizMainObject.setNewquizId(quizID);
+//                                    quizMainObject.setUserId(userId);
+//                                    quizDatabaseRepository.insertQuizAnswerData(quizMainObject);
+//                                    dialogViewerItemLayoutBinding.quizViewLayout.progressDialogLay.progressBar.setVisibility(View.GONE);
+//                                }
+//                            }
+//
+//                            @Override
+//                            public void onError(Throwable e) {
+//                                //hideDialog();
+//                                dialogViewerItemLayoutBinding.quizViewLayout.progressDialogLay.progressBar.setVisibility(View.GONE);
+//                                try {
+//                                    HttpException error = (HttpException) e;
+//                                    //QuizMainObject quizMainObject = new Gson().fromJson(error.response().errorBody().string(), QuizMainObject.class);
+//                                    //showSnackBar(fragmentCourseItemLayoutBinding.mainFragmentCourseLayout, quizMainObject.getMessage());
+//                                    if (userId != null && !userId.isEmpty()) {
+//                                        QuizMainObject quizMainObject = quizDatabaseRepository.getQuizByUserId(userId, quizID);
+//                                        if (quizMainObject != null) {
+//                                            setQuizMainView(dialogViewerItemLayoutBinding, ctx, quizMainObject);
+//                                            dialogViewerItemLayoutBinding.quizViewLayout.progressDialogLay.progressBar.setVisibility(View.GONE);
+//                                        } else {
+//                                            showError(e);
+//                                        }
+//                                    }
+//
+//                                } catch (Exception e1) {
+//                                    QuizMainObject quizMainObject = quizDatabaseRepository.getQuizByUserId(userId, quizID);
+//                                    if (quizMainObject != null) {
+//                                        setQuizMainView(dialogViewerItemLayoutBinding, ctx, quizMainObject);
+//                                        dialogViewerItemLayoutBinding.quizViewLayout.progressDialogLay.progressBar.setVisibility(View.GONE);
+//                                    } else {
+//                                        showError(e);
+//                                    }
+//                                }
+//                            }
+//                        }));
+//            } else {
+//                QuizMainObject quizMainObject = quizDatabaseRepository.getQuizByUserId(userId, quizID);
+//                setQuizMainView(dialogViewerItemLayoutBinding, ctx, quizMainObject);
+//                dialogViewerItemLayoutBinding.quizViewLayout.progressDialogLay.progressBar.setVisibility(View.GONE);
+//            }
         } catch (Exception e) {
+            Log.e("IIIII", e.getLocalizedMessage());
             e.printStackTrace();
+            Toast.makeText(getContext(), e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
+    public QuizMainObject convertDataToQuizMainObject(QuizWithQuestionEntity quizWithQuestionEntity){
+        QuizMainObject quizMainObject = new QuizMainObject();
+        quizMainObject.setNewquizId(quizWithQuestionEntity.getQuiz().getId().toString());
+
+        QuizMainObject.Data data = new QuizMainObject.Data();
+        data.setQuizid(quizWithQuestionEntity.getQuiz().getId().toString());
+        data.setPassmark(quizWithQuestionEntity.getQuiz().getPassMark().toString());
+
+        List<QuizMainObject.Questions> questions = new ArrayList<>();
+        for(QuestionWithAnswerEntity questionWithAnswerEntity: quizWithQuestionEntity.getQuestions()){
+            QuizMainObject.Questions question = new QuizMainObject.Questions();
+            question.setId(questionWithAnswerEntity.getQuestionEntity().getId().toString());
+            question.setQuestiontext(questionWithAnswerEntity.getQuestionEntity().getQuestionText());
+            question.setQuestiontype(questionWithAnswerEntity.getQuestionEntity().getQuestionType().toString());
+            question.setQuestiontypeid(questionWithAnswerEntity.getQuestionEntity().getQuestionTypeId().toString());
+            question.setExplanation(questionWithAnswerEntity.getQuestionEntity().getExplanation());
+            question.setIsmultianswer(questionWithAnswerEntity.getQuestionEntity().getMultiAnswer().toString());
+            question.setImages(new QuizMainObject.Images[0]);
+
+            List<QuizMainObject.Answers> answersList = new ArrayList<>();
+            QuizMainObject.Answers[] answers =
+                    new QuizMainObject.Answers[questionWithAnswerEntity.getAnswers().size()];
+            for(AnswerEntity answerEntity: questionWithAnswerEntity.getAnswers()){
+                QuizMainObject.Answers answer = new QuizMainObject.Answers();
+                answer.setId(answerEntity.getId().toString());
+                answer.setQuizid(quizWithQuestionEntity.getQuiz().getId().toString());
+                answer.setQuestionid(answerEntity.getQuestionId().toString());
+                answer.setAnswer(answerEntity.getAnswer());
+                answer.setExtratext(answerEntity.getExtraText());
+                answer.setIscorrect(answerEntity.getCorrect().toString());
+                answer.setImages(new QuizMainObject.Images[0]);
+                answersList.add(answer);
+            }
+            question.setAnswers(answersList.toArray(answers));
+            questions.add(question);
+        }
+        data.setQuestions(questions);
+        quizMainObject.setData(data);
+        return quizMainObject;
+    }
+
     public void setQuizMainView(CourselessonLayoutBinding dialogViewerItemLayoutBinding, Context ctx, QuizMainObject quizMainObject) {
+        Log.e("MMMMM","Quiz Main View called");
         if (quizMainObject != null) {
+            Log.e("MMMMM", "Quiz Main Object is not null");
             quizQuestionsObjectList.clear();
             dialogViewerItemLayoutBinding.quizViewLayout.questionLayout.setVisibility(View.VISIBLE);
             quizQuestionsObjectList = quizMainObject.getData().getQuestions();
@@ -2082,7 +2212,6 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
 
         return String.valueOf(number);
     }
-
 
     private void goNextPage(CourselessonLayoutBinding dialogViewerItemLayoutBinding, Context ctx, String nextID, String answerID, String questionID, List<QuizMainObject.Questions> quizQuestionsObjectList, int position, String passingMarks) {
         new AsyncTask<Void, Void, String>() {

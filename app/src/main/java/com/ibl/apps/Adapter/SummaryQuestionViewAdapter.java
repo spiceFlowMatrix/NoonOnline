@@ -70,7 +70,6 @@ public class SummaryQuestionViewAdapter extends RecyclerView.Adapter<SummaryQues
 
 //        if(quizQuestionsObjectList.get(position).getAnswers())
         holder.QuestionsummaryitemLayoutBinding.txtQuestion.setWebViewClient(new WebViewClient() {
-
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 // Start PROGRESS DIALOG
@@ -83,7 +82,6 @@ public class SummaryQuestionViewAdapter extends RecyclerView.Adapter<SummaryQues
                 holder.QuestionsummaryitemLayoutBinding.itemProgressbar.setVisibility(View.GONE);
                 //HIDE PROGRESS DIALOG LOADING IT HAS FINISHED
             }
-
         });
 
         if (model.getImages().length != 0) {

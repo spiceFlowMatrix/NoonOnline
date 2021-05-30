@@ -517,6 +517,7 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
         }
         //todo dd
         else if (!TextUtils.isEmpty(model.getNumquestions())) {
+            Log.e("MMMMM", new Gson().toJson(model));
             holder.courseInnerItemLayoutBinding.layPlayContent.setVisibility(GONE);
             holder.courseInnerItemLayoutBinding.imgquizContent.setVisibility(VISIBLE);
             //holder.courseInnerItemLayoutBinding.imageFileIcon.setImageResource(R.drawable.ic_quiz);
@@ -544,8 +545,9 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
                 quizProgressList.add(quizProgress);
             }
 
+            Log.e("MMMMM", userId);
             QuizMainObject quizMainObject = quizDatabaseRepository.getQuizByUserId(userId, model.getId());
-
+            Log.e("MMMMM", new Gson().toJson(quizMainObject));
             if (quizMainObject != null) {
                 holder.courseInnerItemLayoutBinding.disableLay.setVisibility(GONE);
             } else {
