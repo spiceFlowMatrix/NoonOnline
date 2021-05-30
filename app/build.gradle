@@ -201,8 +201,12 @@ dependencies {
 //    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
 //    implementation 'com.github.PhilJay:MPAndroidChart:v2.2.4'
     implementation 'com.google.android.gms:play-services-location:16.0.0'
-    implementation 'androidx.work:work-runtime:2.0.1'
-
+    // WorkManager
+    implementation 'androidx.work:work-runtime:2.6.0-alpha02'
+    // ViewModel
+    implementation("androidx.lifecycle:lifecycle-viewmodel:2.3.1")
+    // LiveData
+    implementation("androidx.lifecycle:lifecycle-livedata:2.3.1")
 
     //For Map
     implementation 'com.google.maps.android:android-maps-utils:0.5'

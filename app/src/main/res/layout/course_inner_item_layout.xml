@@ -155,7 +155,7 @@
                                 android:layout_height="@dimen/_20sdp"
                                 android:layout_gravity="center"
                                 android:visibility="gone"
-                                app:srcCompat="@drawable/ic_arrow_right" />
+                                app:srcCompat="@drawable/ic_download_content" />
 
                             <TextView
                                 android:id="@+id/tag"
