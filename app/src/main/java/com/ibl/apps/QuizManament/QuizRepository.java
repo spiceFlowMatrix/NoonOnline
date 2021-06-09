@@ -37,4 +37,9 @@ public class QuizRepository implements QuizApiService {
     public Call<ResponseBody> fetchAllQuestionData(String Id) {
         return null;
     }
+
+    @Override
+    public Call<ResponseBody> downloadQuizFiles(String Id) {
+        return null;
+    }
 }
