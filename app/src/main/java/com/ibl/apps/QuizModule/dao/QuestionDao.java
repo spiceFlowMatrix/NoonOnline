@@ -39,6 +39,12 @@ public interface QuestionDao {
     @Update
     void updateAll(List<QuestionEntity> questionEntities);
 
+    @Query("UPDATE questions SET is_question_picked = 1 WHERE id IN (:ids)")
+    void updateQuestionToPicked(long[] ids);
+
+    @Query("UPDATE questions SET is_question_picked = 0")
+    void updateAllQuestionToUnpicked();
+
     @Delete
     void delete(QuestionEntity questionEntity);
 

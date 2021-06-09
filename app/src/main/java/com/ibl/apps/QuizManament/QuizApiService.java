@@ -12,6 +12,7 @@ import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
+import retrofit2.http.Url;
 
 public interface QuizApiService {
 
@@ -27,4 +28,7 @@ public interface QuizApiService {
 
     @GET("Quiz/CompleteQuizPreview/{id}")
     Call<ResponseBody> fetchAllQuestionData(@Path("id") String Id);
+
+    @GET("Quiz/CompleteQuizFiles/{id}")
+    Call<ResponseBody> downloadQuizFiles(@Path("id") String Id);
 }
