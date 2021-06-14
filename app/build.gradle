@@ -46,7 +46,7 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         manifestPlaceholders = [auth0Domain: "@string/com_auth0_domain", auth0Scheme: "@string/app_scheme"]
     }
-    /*signingConfigs {
+    signingConfigs {
         release {
             // You need to specify either an absolute path or include the
             // keystore file in the same directory as the build.gradle file.
@@ -55,7 +55,7 @@ android {
             keyAlias secretProperties['signing_key_alias']
             keyPassword secretProperties['signing_key_password']
         }
-    }*/
+    }
     buildTypes {
         debug {
             minifyEnabled true
