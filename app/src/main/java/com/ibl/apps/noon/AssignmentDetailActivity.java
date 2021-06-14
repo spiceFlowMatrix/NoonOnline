@@ -727,7 +727,6 @@ public class AssignmentDetailActivity extends BaseActivity implements View.OnCli
                             Toast.makeText(this, getString(R.string.please_select_student), Toast.LENGTH_SHORT).show();
                         }
                     } else {
-                        //Todo :: Updated to Add Assignment Activity For Student Login
                         Intent intent = new Intent(getApplicationContext(), AssignmentAddActivity.class);
                         intent.putExtra(Const.Assignment, new Gson().toJson(assignment));
                         intent.putExtra(Const.Flag, flag);
@@ -736,7 +735,6 @@ public class AssignmentDetailActivity extends BaseActivity implements View.OnCli
                 }
 
                 break;
-                //todo fix here
             case R.id.cardCommentpicker:
                 if (!TextUtils.isEmpty(userRoleName)) {
                     if (userRoleName.equals(Const.TeacherKEY)) {

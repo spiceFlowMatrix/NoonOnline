@@ -148,7 +148,6 @@ import static com.ibl.apps.Adapter.CourseItemInnerListAdapter.lessonProgressList
 import static com.ibl.apps.Adapter.CourseItemInnerListAdapter.quizProgressList;
 import static com.ibl.apps.Base.BaseActivity.freeMemory;
 
-//todo DD :: On click of course from home
 public class CourseItemFragment extends BaseFragment implements View.OnClickListener, View.OnTouchListener, CourseInnerItemInterface, IOnBackPressed, CourseHideResponse {
 
     CourselessonLayoutBinding fragmentCourseItemLayoutBinding;
@@ -165,7 +164,6 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
     String GradeId, CourseName, LessonName;
