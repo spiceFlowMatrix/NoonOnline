@@ -1,0 +1,354 @@
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/toolbarLay"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <com.google.android.material.appbar.AppBarLayout
+                android:id="@+id/appbarCourseChapter"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_50sdp"
+                android:background="@color/colorWhite"
+                android:gravity="center"
+                android:theme="@style/AppTheme.AppBarOverlay">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/_10sdp">
+
+                    <ImageView
+                        android:id="@+id/btnbackProgress"
+                        android:layout_width="@dimen/_22sdp"
+                        android:layout_height="@dimen/_22sdp"
+                        android:layout_centerVertical="true"
+                        android:layout_marginTop="@dimen/_1sdp"
+                        app:srcCompat="@drawable/ic_arrow_back" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toEndOf="@id/btnbackProgress"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/CourseName"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/_25sdp"
+                            android:padding="@dimen/_4sdp"
+                            android:text="@string/progress_report"
+                            android:textColor="@color/colorBlack"
+                            android:textSize="@dimen/_18sdp"
+                            android:textStyle="bold" />
+
+                    </LinearLayout>
+                </RelativeLayout>
+
+            </com.google.android.material.appbar.AppBarLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/colorGray"
+                android:elevation="@dimen/_5sdp"
+                tools:targetApi="lollipop" />
+
+
+        </LinearLayout>
+
+        <include
+            android:id="@+id/outOfDeviceQuota"
+            layout="@layout/device_quote_out_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <include
+            android:id="@+id/deactivatedDeviceQuota"
+            layout="@layout/device_deactivate_error_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <ScrollView
+            android:id="@+id/nestedScrollView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/colorWhite"
+                android:orientation="vertical">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:id="@+id/sp_user_lay"
+                        android:layout_width="@dimen/_100sdp"
+                        android:layout_height="@dimen/_30sdp"
+                        android:layout_marginStart="@dimen/_14sdp"
+                        android:layout_marginTop="@dimen/_7sdp"
+                        android:background="@drawable/spinner_background_red"
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        android:text="Select User">
+
+                        <TextView
+                            android:id="@+id/sp_user"
+                            android:layout_width="0dp"
+                            android:layout_height="@dimen/_30sdp"
+                            android:layout_weight=".6"
+                            android:gravity="center"
+                            android:text="@string/all_users" />
+
+                        <TextView
+                            android:id="@+id/all_user"
+                            android:layout_width="0dp"
+                            android:layout_height="@dimen/_30sdp"
+                            android:layout_marginStart="@dimen/_minus5sdp"
+                            android:layout_weight=".4"
+                            android:gravity="center"
+                            android:text="" />
+
+                    </LinearLayout>
+
+                    <Spinner
+                        android:id="@+id/studentName"
+                        android:layout_width="@dimen/_100sdp"
+                        android:layout_height="@dimen/_30sdp"
+                        android:layout_marginStart="@dimen/_14sdp"
+                        android:layout_marginTop="@dimen/_7sdp"
+                        android:background="@drawable/spinner_background_red"
+                        android:paddingEnd="@dimen/_5sdp"
+                        android:visibility="gone" />
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true">
+
+                        <TextView
+                            android:id="@+id/tvLastonlinetitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/_5sdp"
+                            android:layout_marginEnd="@dimen/_5sdp"
+                            android:text="@string/lastonline"
+                            android:textColor="@color/gray_text"
+                            android:textSize="@dimen/_10sdp" />
+
+                        <TextView
+                            android:id="@+id/tvLastonline"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/_5sdp"
+                            android:layout_marginEnd="@dimen/_14sdp"
+                            android:text=""
+                            android:textColor="@color/gray_text"
+                            android:textSize="@dimen/_10sdp" />
+                    </LinearLayout>
+                </RelativeLayout>
+
+                <!--For Main Screen progress-->
+
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:id="@+id/chart_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/_200sdp"
+                        android:layout_below="@+id/timeSpentLay"
+                        android:layout_marginStart="@dimen/_10sdp"
+                        android:layout_marginTop="@dimen/_minus10sdp"
+                        android:layout_marginEnd="@dimen/_10sdp"
+                        android:orientation="horizontal"
+                        android:visibility="visible">
+
+                        <TextView
+                            android:id="@+id/txt_nodata"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:text="@string/no_data_found"
+                            android:textAlignment="center"
+                            android:textColor="@color/colorBlack"
+                            android:textSize="@dimen/_15sdp"
+                            android:visibility="gone" />
+
+                        <com.github.mikephil.charting.charts.LineChart
+                            android:id="@+id/lineChart"
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/_200sdp" />
+
+                        <TextView
+                            android:id="@+id/sticky_label"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@id/lineChart"
+                            android:background="#ffffff"
+                            android:textColor="#000000" />
+                    </LinearLayout>
+
+                    <RelativeLayout
+                        android:id="@+id/timeSpentLay"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentTop="true"
+                        android:layout_marginStart="@dimen/_14sdp"
+                        android:layout_marginTop="@dimen/_3sdp"
+                        android:layout_marginEnd="@dimen/_14sdp"
+                        android:visibility="visible">
+
+                        <TextView
+                            android:id="@+id/txtTimeSpent"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentStart="true"
+                            android:singleLine="true"
+                            android:text="@string/time_spend_in_the_app"
+                            android:textSize="@dimen/_17sdp" />
+
+                        <Spinner
+                            android:id="@+id/monthsSpinner"
+                            android:layout_width="@dimen/_100sdp"
+                            android:layout_height="@dimen/_30sdp"
+                            android:layout_alignParentEnd="true"
+                            android:layout_marginTop="@dimen/_5sdp"
+                            android:background="@drawable/spinner_background_red"
+                            android:paddingEnd="@dimen/_5sdp" />
+                    </RelativeLayout>
+                </RelativeLayout>
+
+                <FrameLayout
+                    android:id="@+id/mapLay"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/_250sdp"
+                    android:visibility="gone">
+
+                    <fragment
+                        android:id="@+id/map"
+                        android:name="com.ibl.apps.util.WorkaroundMapFragment"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/_250sdp"
+                        android:layout_margin="@dimen/_10sdp" />
+
+                </FrameLayout>
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/_70sdp"
+                    android:layout_marginTop="@dimen/_8sdp"
+                    android:orientation="vertical"
+                    android:visibility="visible">
+
+                    <RelativeLayout
+                        android:id="@+id/overAllLay"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="@dimen/_6sdp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/overall_progress"
+                            android:textSize="@dimen/_12sdp" />
+
+                        <ImageView
+                            android:layout_width="@dimen/_20sdp"
+                            android:layout_height="@dimen/_20sdp"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerInParent="true"
+                            android:layout_gravity="end"
+                            android:layout_marginRight="@dimen/_13sdp"
+                            app:srcCompat="@drawable/ic_arrow_right" />
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:id="@+id/quizLay"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="@dimen/_6sdp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/quizzes_progress"
+                            android:textSize="@dimen/_12sdp" />
+
+                        <ImageView
+                            android:layout_width="@dimen/_20sdp"
+                            android:layout_height="@dimen/_20sdp"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerInParent="true"
+                            android:layout_gravity="end"
+                            android:layout_marginRight="@dimen/_13sdp"
+                            app:srcCompat="@drawable/ic_arrow_right" />
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:id="@+id/assignmentLay"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="@dimen/_6sdp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/assignment_progress"
+                            android:textSize="@dimen/_12sdp" />
+
+                        <ImageView
+                            android:layout_width="@dimen/_20sdp"
+                            android:layout_height="@dimen/_20sdp"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerInParent="true"
+                            android:layout_gravity="end"
+                            android:layout_marginRight="@dimen/_13sdp"
+                            app:srcCompat="@drawable/ic_arrow_right" />
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:id="@+id/GPALay"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="@dimen/_6sdp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/gpa"
+                            android:textSize="@dimen/_12sdp" />
+
+                        <ImageView
+                            android:layout_width="@dimen/_20sdp"
+                            android:layout_height="@dimen/_20sdp"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerInParent="true"
+                            android:layout_gravity="end"
+                            android:layout_marginRight="@dimen/_13sdp"
+                            app:srcCompat="@drawable/ic_arrow_right" />
+                    </RelativeLayout>
+                </LinearLayout>
+
+            </LinearLayout>
+        </ScrollView>
+
+    </LinearLayout>
+</layout>

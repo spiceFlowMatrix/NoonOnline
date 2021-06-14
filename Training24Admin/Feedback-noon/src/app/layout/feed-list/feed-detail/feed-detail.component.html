@@ -1,0 +1,117 @@
+<div class="main-container">
+    <noon-loader *ngIf="isCallingApi"></noon-loader>
+    <div class="feed-list-header">
+        <mat-icon (click)="back()">arrow_back</mat-icon>
+        <mat-label class="title">Feedback Detail</mat-label>
+        <ng-container *ngIf="feedbackDetail.status === 1">
+            <mat-icon class="done" (click)="moveToStage('progressfromQueue')">done</mat-icon>
+            <mat-label class="progress-text" (click)="moveToStage('progressfromQueue')">Move to In Progress</mat-label>
+            <mat-icon class="close" (click)="moveToStage('archivefromQueue')">close</mat-icon>
+            <mat-label class="archive" (click)="moveToStage('archivefromQueue')">Close</mat-label>
+        </ng-container>
+        <ng-container *ngIf="feedbackDetail.status === 2">
+            <mat-icon class="done" (click)="moveToStage('complete')">done</mat-icon>
+            <mat-label class="progress-text" (click)="moveToStage('complete')">Mark as completed</mat-label>
+            <mat-icon class="close" (click)="moveToStage('archivefromProcess')">close</mat-icon>
+            <mat-label class="archive" (click)="moveToStage('archivefromProcess')">Archive</mat-label>
+        </ng-container>
+        <ng-container *ngIf="feedbackDetail.status === 4">
+            <mat-icon class="done" (click)="moveToStage('progressfromArchive')">done</mat-icon>
+            <mat-label class="progress-text" (click)="moveToStage('progressfromArchive')">Move to In Progress
+            </mat-label>
+        </ng-container>
+        <mat-form-field>
+            <mat-label>Assigned to</mat-label>
+            <mat-select [(value)]="userid" (selectionChange)="assignUsers($event)">
+                <mat-option value=0>None</mat-option>
+                <mat-option *ngFor="let user of users" value="{{user.id}}">{{user.username}}</mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
+    <mat-divider></mat-divider>
+    <div class="table-container" *ngIf="feedbackDetail">
+        <p class="issue-title" *ngIf="feedbackDetail && feedbackDetail.category">{{feedbackDetail.category.name}}</p>
+        <table class="table table-striped">
+            <tbody>
+                <tr>
+                    <th scope="row">Submitted By</th>
+                    <td *ngIf="feedbackDetail && feedbackDetail.user">
+                        {{feedbackDetail.user.username}}
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">Submission Date</th>
+                    <td>
+                        {{feedbackDetail.submitteddate | date: 'shortDate'}}
+                    </td>
+                </tr>
+                <tr *ngIf="feedbackDetail.device">
+                    <th scope="row">Device</th>
+                    <td>
+                        {{feedbackDetail.device}}
+                    </td>
+                </tr>
+                <tr *ngIf="feedbackDetail.operatingsystem">
+                    <th scope="row">Operating System</th>
+                    <td>
+                        {{feedbackDetail.operatingsystem}}
+                    </td>
+                </tr>
+                <tr *ngIf="feedbackDetail.version">
+                    <th scope="row">Version</th>
+                    <td>
+                        {{feedbackDetail.version}}
+                    </td>
+                </tr>
+                <tr *ngIf="feedbackDetail.appversion">
+                    <th scope="row">App Version</th>
+                    <td>
+                        {{feedbackDetail.appversion}}
+                    </td>
+                </tr>
+                <tr *ngIf="feedbackDetail.grade">
+                    <th scope="row">Grade</th>
+                    <td>
+                        {{feedbackDetail.grade.name}}
+                    </td>
+                </tr>
+                <tr *ngIf="feedbackDetail.course">
+                    <th scope="row">Course</th>
+                    <td>
+                        {{feedbackDetail.course.name}}
+                    </td>
+                </tr>
+                <tr *ngIf="feedbackDetail.time && feedbackDetail.category.id == 2">
+                    <th scope="row">Time</th>
+                    <td>
+                        {{feedbackDetail.time}}
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">Start Date</th>
+                    <td *ngIf="feedbackDetail.startdate">
+                        {{feedbackDetail.startdate | date: 'shortDate'}}
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">Completed Date</th>
+                    <td *ngIf="feedbackDetail.complateddate">
+                        {{feedbackDetail.complateddate | date: 'shortDate'}}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="desc-container" *ngIf="feedbackDetail.description">
+            <p class="desc">Descriptions</p>
+            <p class="text">{{feedbackDetail.description}}</p>
+        </div>
+        <div class="attach-container" *ngIf="feedbackDetail.files && feedbackDetail.files.length != 0">
+            <p class="attach">Attachments</p>
+            <div class="name">Name</div>
+            <div class="files" *ngFor="let i of feedbackDetail.files">
+                <p>{{i.files.name}}</p>
+                <mat-icon (click)="download(i.files.url)">get_app</mat-icon>
+            </div>
+        </div>
+    </div>
+</div>

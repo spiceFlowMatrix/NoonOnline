@@ -1,0 +1,701 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/txtFreeTrialAccount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/_10sdp"
+            android:text="@string/free_trial_account"
+            android:textAlignment="center"
+            android:textColor="@color/colorDarkBlue"
+            android:textSize="@dimen/_12sdp"
+            android:textStyle="bold" />
+
+        <View
+            android:id="@+id/view"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_2sdp"
+            android:layout_below="@+id/txtFreeTrialAccount"
+            android:background="@color/colorDarkBlue" />
+
+        <ScrollView
+            android:id="@+id/scrollviewLay"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/viewBottom"
+            android:layout_below="@+id/view">
+
+            <RelativeLayout
+                android:id="@+id/signupRvLay"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <RelativeLayout
+                    android:id="@+id/accountLay"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/_15sdp"
+                    android:layout_marginTop="@dimen/_5sdp">
+
+                    <TextView
+                        android:id="@+id/txtAccount"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+
+                        android:text="@string/account"
+                        android:textSize="@dimen/_16sdp" />
+
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/txtAccount"
+                        android:layout_marginHorizontal="@dimen/_5sdp">
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/signupEmailWrapper"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:theme="@style/EditTextTheme">
+
+                            <com.xw.repo.XEditText
+                                android:id="@+id/signupEmail"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:hint="@string/email_address"
+                                android:inputType="textEmailAddress"
+                                android:text=""
+                                android:textColor="@color/colorPrimaryDark"
+                                android:textColorHint="@color/colorPrimary"
+                                android:textSize="@dimen/_12sdp"
+                                app:x_disableEmoji="true" />
+
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/signupPasswordWrapper"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/signupEmailWrapper"
+                            android:layout_marginTop="@dimen/_8sdp"
+                            android:theme="@style/EditTextTheme">
+
+                            <com.xw.repo.XEditText
+                                android:id="@+id/signupPassword"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:hint="@string/password"
+                                android:inputType="textPassword"
+                                android:text=""
+                                android:textColor="@color/colorPrimaryDark"
+                                android:textColorHint="@color/colorPrimary"
+                                android:textSize="@dimen/_12sdp"
+                                app:x_disableEmoji="true" />
+
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/signupConfirmPasswordWrapper"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/signupPasswordWrapper"
+                            android:layout_marginTop="@dimen/_8sdp"
+                            android:theme="@style/EditTextTheme">
+
+                            <com.xw.repo.XEditText
+                                android:id="@+id/signupConfirmPassword"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+
+                                android:hint="@string/confirm_password"
+                                android:inputType="textPassword"
+                                android:text=""
+                                android:textColor="@color/colorPrimaryDark"
+                                android:textColorHint="@color/colorPrimary"
+                                android:textSize="@dimen/_12sdp"
+                                app:x_disableEmoji="true" />
+
+                        </com.google.android.material.textfield.TextInputLayout>
+                    </RelativeLayout>
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/personalInfoLay"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/accountLay"
+                    android:layout_marginHorizontal="@dimen/_15sdp"
+                    android:layout_marginTop="@dimen/_10sdp">
+
+                    <TextView
+                        android:id="@+id/txtPersonalInfo"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+
+                        android:text="@string/personal_information"
+                        android:textSize="@dimen/_16sdp" />
+
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/txtPersonalInfo"
+                        android:layout_marginHorizontal="@dimen/_5sdp"
+                        android:orientation="vertical">
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/signupNameWrapper"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:theme="@style/EditTextTheme">
+
+                            <com.xw.repo.XEditText
+                                android:id="@+id/signupName"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+
+                                android:hint="@string/name"
+                                android:inputType="textEmailAddress"
+                                android:text=""
+                                android:textColor="@color/colorPrimaryDark"
+                                android:textColorHint="@color/colorPrimary"
+                                android:textSize="@dimen/_12sdp"
+                                app:x_disableEmoji="true" />
+
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/signupFatherNameSurnameWrapper"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/_3sdp"
+                            android:theme="@style/EditTextTheme">
+
+                            <com.xw.repo.XEditText
+                                android:id="@+id/signupFatherNameSurname"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+
+                                android:hint="@string/father_name_surname"
+                                android:inputType="text"
+                                android:text=""
+                                android:textColor="@color/colorPrimaryDark"
+                                android:textColorHint="@color/colorPrimary"
+                                android:textSize="@dimen/_12sdp"
+                                app:x_disableEmoji="true" />
+
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/wrraperSpinnerGender"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="@dimen/_2sdp"
+                            android:theme="@style/EditTextTheme">
+
+                            <com.ibl.apps.util.MaterialBetterSpinner
+                                android:id="@+id/genderSpinner"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:drawableEnd="@drawable/ic_arrow_down_black"
+                                android:drawablePadding="@dimen/_5sdp"
+                                android:hint="@string/gender"
+                                android:textColor="@color/colorBlack"
+                                android:textColorHint="@color/colorGray"
+                                android:textSize="@dimen/_12sdp" />
+
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <TextView
+                            android:id="@+id/txtGender"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/_2sdp"
+                            android:layout_marginTop="@dimen/_2sdp"
+                            android:text="@string/gender"
+                            android:visibility="gone" />
+
+                        <!--  <Spinner
+                              android:id="@+id/genderSpinner"
+                              android:layout_width="match_parent"
+                              android:layout_height="wrap_content"
+                              android:layout_marginTop="@dimen/_5sdp"
+                              android:background="@drawable/spinner_background"
+                              android:padding="@dimen/_4sdp"
+                              android:visibility="gone" />-->
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/wrraperDateOfBirth"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/_2sdp"
+                            android:theme="@style/EditTextTheme">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/edtDateOfBirth"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:drawableEnd="@drawable/calendar_iocn"
+                                android:drawablePadding="@dimen/_5sdp"
+                                android:editable="false"
+                                android:focusableInTouchMode="false"
+                                android:hint="@string/birthday"
+                                android:text=""
+                                android:textColor="@color/colorBlack"
+                                android:textColorHint="@color/colorPrimary"
+                                android:textSize="@dimen/_12sdp" />
+
+                            <!-- <ImageView
+                                 android:id="@+id/calenderIcon"
+                                 android:layout_width="@dimen/_20sdp"
+                                 android:layout_height="@dimen/_15sdp"
+                                 android:layout_alignParentEnd="true"
+                                 android:layout_marginTop="@dimen/_9sdp"
+                                 android:src="@drawable/calendar_iocn" />-->
+
+
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/signupbirthplaceWrapper"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:theme="@style/EditTextTheme">
+
+                            <com.xw.repo.XEditText
+                                android:id="@+id/signupbirthplace"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+
+                                android:hint="@string/birthplace_optional"
+                                android:inputType="text"
+                                android:text=""
+                                android:textColor="@color/colorPrimaryDark"
+                                android:textColorHint="@color/colorPrimary"
+                                android:textSize="@dimen/_12sdp"
+                                app:x_disableEmoji="true" />
+
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <TextView
+                            android:id="@+id/txtProvince"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/_2sdp"
+                            android:layout_marginTop="@dimen/_3sdp"
+                            android:text="@string/province"
+                            android:visibility="gone" />
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/wrraperSpinnerProvince"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="@dimen/_2sdp"
+                            android:theme="@style/EditTextTheme">
+
+                            <com.ibl.apps.util.MaterialBetterSpinner
+                                android:id="@+id/provinceSpinner"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:drawableEnd="@drawable/ic_arrow_down_black"
+                                android:drawablePadding="@dimen/_5sdp"
+
+                                android:hint="@string/province"
+                                android:textColor="@color/colorBlack"
+                                android:textColorHint="@color/colorGray"
+                                android:textSize="@dimen/_12sdp" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <!-- <Spinner
+                             android:id="@+id/provinceSpinner"
+                             android:layout_width="match_parent"
+                             android:layout_height="wrap_content"
+                             android:layout_marginTop="@dimen/_5sdp"
+                             android:background="@drawable/spinner_background"
+                             android:padding="@dimen/_4sdp" />-->
+
+                        <TextView
+                            android:id="@+id/txtCity"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/_2sdp"
+                            android:layout_marginTop="@dimen/_2sdp"
+                            android:text="@string/city_district"
+                            android:visibility="gone" />
+
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/wrraperSpinnerCity"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="@dimen/_2sdp"
+                            android:theme="@style/EditTextTheme">
+
+                            <com.ibl.apps.util.MaterialBetterSpinner
+                                android:id="@+id/citySpinner"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:drawableEnd="@drawable/ic_arrow_down_black"
+                                android:drawablePadding="@dimen/_5sdp"
+
+                                android:hint="@string/city_district"
+                                android:textColor="@color/colorBlack"
+                                android:textColorHint="@color/colorGray"
+                                android:textSize="@dimen/_12sdp" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <!-- <Spinner
+                             android:id="@+id/citySpinner"
+                             android:layout_width="match_parent"
+                             android:layout_height="wrap_content"
+                             android:layout_marginTop="@dimen/_5sdp"
+                             android:background="@drawable/spinner_background"
+                             android:padding="@dimen/_4sdp" />-->
+
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/signupVillageAreaWrapper"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/_5sdp"
+                            android:theme="@style/EditTextTheme">
+
+                            <com.xw.repo.XEditText
+                                android:id="@+id/signupVillageArea"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+
+                                android:hint="@string/village_area"
+                                android:inputType="text"
+                                android:text=""
+                                android:textColor="@color/colorPrimaryDark"
+                                android:textColorHint="@color/colorPrimary"
+                                android:textSize="@dimen/_12sdp"
+                                app:x_disableEmoji="true" />
+
+                        </com.google.android.material.textfield.TextInputLayout>
+
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/signupSchoolWrapper"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/_5sdp"
+                            android:theme="@style/EditTextTheme">
+
+                            <com.xw.repo.XEditText
+                                android:id="@+id/signupSchool"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+
+                                android:hint="@string/school"
+                                android:inputType="text"
+                                android:text=""
+                                android:textColor="@color/colorPrimaryDark"
+                                android:textColorHint="@color/colorPrimary"
+                                android:textSize="@dimen/_12sdp"
+                                app:x_disableEmoji="true" />
+
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <TextView
+                            android:id="@+id/txtGrade"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/_2sdp"
+                            android:layout_marginTop="@dimen/_2sdp"
+                            android:text="@string/grade"
+                            android:visibility="gone" />
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/wrraperSpinnerGrade"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="@dimen/_2sdp"
+                            android:theme="@style/EditTextTheme">
+
+                            <com.ibl.apps.util.MaterialBetterSpinner
+                                android:id="@+id/gradeSpinner"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:drawableEnd="@drawable/ic_arrow_down_black"
+                                android:drawablePadding="@dimen/_5sdp"
+                                android:hint="@string/grade"
+                                android:textColor="@color/colorBlack"
+                                android:textColorHint="@color/colorGray"
+                                android:textSize="@dimen/_12sdp" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <!--<Spinner
+                            android:id="@+id/gradeSpinner"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/_5sdp"
+                            android:background="@drawable/spinner_background"
+                            android:padding="@dimen/_4sdp" />-->
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/signupTazKiraNumberWrapper"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/_5sdp"
+                            android:theme="@style/EditTextTheme">
+
+                            <com.xw.repo.XEditText
+                                android:id="@+id/signupTazKiraNumber"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+
+                                android:hint="@string/tazkira_number_optional"
+                                android:inputType="number"
+                                android:text=""
+                                android:textColor="@color/colorPrimaryDark"
+                                android:textColorHint="@color/colorPrimary"
+                                android:textSize="@dimen/_12sdp"
+                                app:x_disableEmoji="true" />
+
+                        </com.google.android.material.textfield.TextInputLayout>
+                    </LinearLayout>
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/contactInfoLay"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/personalInfoLay"
+                    android:layout_marginHorizontal="@dimen/_15sdp"
+                    android:layout_marginTop="@dimen/_10sdp">
+
+                    <TextView
+                        android:id="@+id/txtContactInfo"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+
+                        android:text="@string/contact_information"
+                        android:textSize="@dimen/_17sdp" />
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/txtContactInfo"
+                        android:layout_marginHorizontal="@dimen/_5sdp"
+                        android:orientation="vertical">
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/signupPhoneNumberWrapper"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:theme="@style/EditTextTheme">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/signupPhoneNumber"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:hint="@string/phone_number"
+                                android:inputType="phone"
+                                android:maxLength="10"
+                                android:text=""
+                                android:textColor="@color/colorPrimaryDark"
+                                android:textColorHint="@color/colorPrimary"
+                                android:textSize="@dimen/_12sdp"
+                                app:x_disableEmoji="true" />
+
+                        </com.google.android.material.textfield.TextInputLayout>
+
+
+                        <TextView
+                            android:id="@+id/txtfbSkypy"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/signupPhoneNumberWrapper"
+                            android:layout_marginStart="@dimen/_2sdp"
+                            android:layout_marginTop="@dimen/_2sdp"
+                            android:text="@string/facebook_skypy_optional" />
+
+                        <LinearLayout
+                            android:id="@+id/fbSkkypyLay"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/txtfbSkypy"
+                            android:orientation="horizontal"
+                            android:weightSum="2">
+
+                            <!-- <android.support.design.widget.TextInputLayout
+                                 android:id="@+id/wrraperSpinnerFbSkypy"
+                                 android:layout_width="@dimen/_100sdp"
+                                 android:layout_weight="1"
+                                 android:layout_height="wrap_content"
+                                 android:layout_marginEnd="@dimen/_2sdp"
+                                 android:theme="@style/EditTextTheme">
+
+                                 <com.ibl.apps.Utils.MaterialBetterSpinner
+                                     android:id="@+id/fbSkypySpinner"
+                                     android:layout_width="@dimen/_100sdp"
+                                     android:layout_height="wrap_content"
+                                     android:hint="@string/facebook_skypy_optional"
+                                     android:textColor="@color/colorBlack"
+                                     android:textColorHint="@color/colorGray"
+                                     android:textSize="@dimen/_12sdp" />
+                             </android.support.design.widget.TextInputLayout>-->
+
+
+                            <com.xw.repo.XEditText
+                                android:id="@+id/signupFbSkypy"
+                                android:layout_width="0dp"
+                                android:layout_height="@dimen/_30sdp"
+                                android:layout_marginTop="@dimen/_3sdp"
+                                android:layout_weight="1.1"
+                                android:inputType="text"
+                                android:padding="@dimen/_4sdp"
+                                android:text=""
+                                android:textColor="@color/colorPrimaryDark"
+                                android:textColorHint="@color/colorPrimary"
+                                android:textSize="@dimen/_12sdp"
+                                android:theme="@style/EditTextTheme"
+                                app:x_disableEmoji="true" />
+
+                            <com.ibl.apps.util.MaterialBetterSpinner
+                                android:id="@+id/fbSkypySpinner"
+                                android:layout_width="0dp"
+                                android:layout_height="@dimen/_30sdp"
+                                android:layout_marginStart="@dimen/_7sdp"
+                                android:layout_marginTop="@dimen/_3sdp"
+                                android:layout_weight="0.9"
+                                android:drawableEnd="@drawable/ic_arrow_down_black"
+                                android:drawablePadding="@dimen/_5sdp"
+                                android:focusable="false"
+                                android:padding="@dimen/_4sdp"
+                                android:text="@string/facebook"
+                                android:theme="@style/EditTextTheme" />
+
+                        </LinearLayout>
+
+
+                        <TextView
+                            android:id="@+id/txtaboutus"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/fbSkkypyLay"
+                            android:layout_marginStart="@dimen/_2sdp"
+                            android:layout_marginTop="@dimen/_5sdp"
+                            android:text="@string/how_did_you_hear_about_us"
+                            android:visibility="gone" />
+
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/wrraperSpinnerAboutus"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@id/fbSkkypyLay"
+                            android:layout_marginTop="@dimen/_5sdp"
+                            android:layout_marginEnd="@dimen/_2sdp"
+                            android:theme="@style/EditTextTheme">
+
+                            <com.ibl.apps.util.MaterialBetterSpinner
+                                android:id="@+id/aboutusSpinner"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:drawableEnd="@drawable/ic_arrow_down_black"
+                                android:drawablePadding="@dimen/_5sdp"
+                                android:hint="@string/how_did_you_hear_about_us"
+                                android:textColor="@color/colorBlack"
+                                android:textColorHint="@color/colorGray"
+                                android:textSize="@dimen/_12sdp" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/wrraperSpinnerAboutus"
+                            android:orientation="horizontal">
+
+                            <androidx.appcompat.widget.AppCompatCheckBox
+                                android:id="@+id/chkTerms"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:checked="false"
+                                android:theme="@style/checkBoxComponent" />
+
+                            <TextView
+                                android:id="@+id/txtaccept"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/accept_terms_conditions"
+                                android:textAlignment="viewStart"
+                                android:textColor="@color/colorPrimaryDark"
+                                android:textSize="@dimen/_13sdp" />
+
+                            <TextView
+                                android:id="@+id/txtTerms"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:onClick="onClick"
+                                android:text="@string/terms_conditions"
+                                android:textAlignment="viewStart"
+                                android:textColor="@color/colorPrimary"
+                                android:textSize="@dimen/_13sdp" />
+                        </LinearLayout>
+
+                    </RelativeLayout>
+
+                </RelativeLayout>
+
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cardviewsignup"
+                    android:layout_width="@dimen/_170sdp"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/contactInfoLay"
+                    android:layout_centerInParent="true"
+                    android:layout_marginTop="@dimen/_20sdp"
+                    android:layout_marginBottom="@dimen/_20sdp"
+                    android:clickable="true"
+                    android:elevation="@dimen/_20sdp"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    android:outlineAmbientShadowColor="@color/colorDarkBlue"
+                    android:outlineSpotShadowColor="@color/colorDarkBlue"
+                    android:shadowColor="@color/colorDarkBlue"
+                    app:cardBackgroundColor="@color/colorDarkBlue"
+                    app:cardCornerRadius="@dimen/_20sdp"
+                    app:cardElevation="@dimen/_5sdp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:padding="@dimen/_8sdp"
+                        android:text="@string/register"
+                        android:textColor="@color/colorWhite"
+                        android:textSize="@dimen/_14sdp" />
+
+                </androidx.cardview.widget.CardView>
+            </RelativeLayout>
+        </ScrollView>
+
+        <View
+            android:id="@+id/viewBottom"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_2sdp"
+            android:layout_above="@+id/txtAlreadyAccount"
+            android:background="@color/colorDarkBlue" />
+
+        <TextView
+            android:id="@+id/txtAlreadyAccount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:padding="@dimen/_10sdp"
+            android:text="@string/already_have_an_account"
+            android:textAlignment="center"
+            android:textColor="@color/colorDarkBlue"
+            android:textSize="@dimen/_12sdp"
+            android:textStyle="bold" />
+
+    </RelativeLayout>
+</layout>

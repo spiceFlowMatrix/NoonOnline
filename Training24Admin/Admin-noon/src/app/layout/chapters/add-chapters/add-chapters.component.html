@@ -1,0 +1,93 @@
+<div>
+   
+    <h4>
+        <noon-loader *ngIf="isCallingApi"></noon-loader>
+    </h4>
+    <div class="row">
+        <div class="col col-xl-12 col-lg-12">
+
+            <form class="form-horizontal noon-form" #manageChapterForm="ngForm"
+                (ngSubmit)="manageChapterForm.form.valid && manageChapter()">
+                <div class="text-right">
+                        <button mat-raised-button class="cancel-btn" backDirection>Cancel</button>
+                        <button mat-raised-button class="m-l-20px save-btn" type="submit" [disabled]="manageChapterForm.invalid || isCallingApi">Save</button>
+                </div>
+                <p class="fs-20">
+                    <span *ngIf="isEditView">Edit</span><span *ngIf="!isEditView">New</span> Chapter
+                </p>
+                <mat-card>
+                    <mat-form-field class="full-width">
+                        <input matInput type="text" id="chapter_name" placeholder="Title" name="chapter_name"
+                        [(ngModel)]="chapterModel.name " #chapter_name="ngModel" required>
+                        <div *ngIf="chapter_name.invalid && (chapter_name.touched || manageChapterForm.submitted)">
+                            <p class="input-info error-message" *ngIf="chapter_name.errors.required">Chapter name is
+                                required</p>
+                            </div>
+                        </mat-form-field>
+                    </mat-card>
+                        <!-- <div class="form-group row">
+                            <label class="control-label col-sm-4" for="chapter_name">Name :</label>
+                            <div class="col col-sm-8">
+                                <input type="text" matInput id="chapter_name" class="form-control" placeholder="Enter chapter name" name="chapter_name"
+                                [(ngModel)]="chapterModel.name " #chapter_name="ngModel" required>
+                                <div *ngIf="chapter_name.invalid && (chapter_name.touched || manageChapterForm.submitted)">
+                            <p class="input-info error-message" *ngIf="chapter_name.errors.required">Course name is
+                                required</p>
+                        </div>
+                    </div>
+                </div> -->
+                <!-- <div class="form-group row">
+                    <label class="control-label col-sm-4" for="chapter_code">Code :</label>
+                    <div class="col col-sm-8">
+                        <input type="text" id="chapter_code" class="form-control" placeholder="Enter code" name="chapter_code"
+                            [(ngModel)]="chapterModel.code" #chapter_code="ngModel" required>
+                        <div *ngIf="chapter_code.invalid && (chapter_code.touched || manageChapterForm.submitted)">
+                            <p class="input-info error-message" *ngIf="chapter_code.errors.required">Code is required</p>
+                        </div>
+                    </div>
+                </div> -->
+
+                <!-- <div class="form-group row">
+                    <label class="control-label col-sm-4" for="course">Course :</label>
+                    <div class="col col-sm-8">
+                        <select id="course" class="form-control" [disabled]="backViewLink ? true : false" placeholder="Enter Course" name="course" [(ngModel)]="chapterModel.courseid"
+                            #course="ngModel" required name="course">
+                            <option [value]=undefined disabled>Select</option>
+                            <option *ngFor="let course of courseList" [value]="course.id">{{course.name}}</option>
+                        </select>
+                        <div *ngIf="course.invalid && (course.touched || manageChapterForm.submitted)">
+                            <p class="input-info error-message" *ngIf="course.errors.required">Course selection is
+                                required</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="control-label col-sm-4" for="quizId">Quiz :</label>
+                    <div class="col col-sm-8">
+                        <select id="quizId" class="form-control" name="quizId" [(ngModel)]="chapterModel.quizid"
+                            #quizId="ngModel" required name="quizId">
+                            <option [value]=undefined disabled>Select</option>
+                            <option *ngFor="let quiz of quizList" [value]="quiz.id">{{quiz.code}}</option>
+                        </select>
+                        <div *ngIf="quizId.invalid && (quizId.touched || manageChapterForm.submitted)">
+                            <p class="input-info error-message" *ngIf="quizId.errors.required">Quiz selection is required</p>
+                        </div>
+                    </div>
+                </div> -->
+                <!-- <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-8 pull-right">
+                        <button type="submit" class="btn btn-primary m-r-20px" *ngIf="isEditView"
+                            [disabled]="manageChapterForm.invalid || isCallingApi">Edit
+                            chapter
+                        </button>
+                        <button type="submit" class="btn btn-primary m-r-20px" *ngIf="!isEditView"
+                            [disabled]="manageChapterForm.invalid || isCallingApi">Add
+                            chapter
+                        </button>
+                        <button class="btn btn-danger" backDirection>Cancel</button>
+                    </div>
+                </div> -->
+            </form>
+        </div>
+    </div>
+</div>

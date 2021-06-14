@@ -1,0 +1,31 @@
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/txtNofeedback"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="@string/no_feedback_available"
+            android:textAlignment="center"
+            android:textSize="@dimen/_12sdp" />
+
+        <include
+            android:id="@+id/rv_completed"
+            layout="@layout/recycleview_verticle_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentEnd="true" />
+
+        <include
+            android:id="@+id/progressDialogLay"
+            layout="@layout/item_progressbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true" />
+    </RelativeLayout>
+</layout>

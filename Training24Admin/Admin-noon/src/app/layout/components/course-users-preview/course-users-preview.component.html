@@ -1,0 +1,53 @@
+<ng-template #courseUsersPreviewDialog let-c="close" let-d="dismiss">
+    <div class="modal-header">
+        <h4 class="modal-title">
+            {{courseUsersPreviewObj.name}}
+            <br>
+            <sub>{{courseUsersPreviewObj.code}}</sub>
+        </h4>
+        <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <p>
+            {{courseUsersPreviewObj.description}}
+        </p>
+        <p *ngIf="!courseUsersPreviewObj.userDetails || (courseUsersPreviewObj.userDetails&& courseUsersPreviewObj.userDetails.length < 1)">
+            No user found.
+        </p>
+        <div class="table-responsive noon-table" *ngIf="courseUsersPreviewObj.userDetails && courseUsersPreviewObj.userDetails.length > 0">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Photo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let user of courseUsersPreviewObj.userDetails;let i=index;">
+                        <td>{{user.id}}</td>
+                        <td>
+                            <span *ngIf="user.username">
+                                {{user.username}}
+                            </span>
+                            <span *ngIf="!user.username">
+                                --
+                            </span>
+                        </td>
+                        <td>{{user.email}}</td>
+                        <td>
+                            <img src="assets/images/logo.png" *ngIf="!user.profilepicurl" class="course-avatar" />
+                            <img src="{{user.profilepicurl}}" *ngIf="user.profilepicurl" class="course-avatar" />
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="d('Cancel click')">Close</button>
+    </div>
+</ng-template>

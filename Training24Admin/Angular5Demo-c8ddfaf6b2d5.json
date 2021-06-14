@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "angular5demo-10146",
+  "private_key_id": "c8ddfaf6b2d556ca534e675845f5c2f592d8227b",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDXUqmesJUIeLrS\nsxLsVgnSz/FtSmWQ4PklxOO3tRafgywlHmDCdKGlQUdGueu2CdxVVzbOyxXAVXEQ\njDPgRfz3tTaeJ4j/E2+u07bg/ERThLHrsk6eH0UIyzxagO0u+f7csvGVzm8RXhRI\n+gUbEj8vki3J7J9VbjqKKZRpTymvrDwP4EbDZWuRfMTJFTzvs1WtfTBajVMRuf75\nMyIhK6qwjLEvDNQKIlp6U45uY9JxH+qxcKMveoF4jSUkeWxVJUSc64F1NjQaayll\nP3LE4d8M9CYXS7cGstns8lpmqEW3BkLDcVjnnVr3bPb+KcK8yiL9ibkA4tTpI4kA\nP0tUEcd1AgMBAAECggEACCk8IwhNstkAOTAXie2G5eF3U1BXx/bVfBYIRvRFdHd3\nnF6MtGT/LuVSojjBfBv2NGvZ8uZ2/HNaxGMz/ci2ZfSNfBUrnZkw2rCekEDpqSTl\nKUcy3yt4VDrzwW18uJ5/tgFydRiD4CuYRDrps0OnGhKFyyCDTsQ2L4XxSU/6ZC7D\nxCsVGAOeq5N3jvyf+NipK60bO0hIFaIe/0ivqzL0293t4Wkbe7r8oXdMeMwA0Dnb\nWlV1/QZ6CnGwfV4xgj0L/TbJygr8dhzb0f0wUARZyS5xMJiSq86MsXGQ7r7hbq5A\nLIEadmtbYHyK1/ASig63nw50TDlpfic2l6o2zDunzwKBgQD4TSxfti+GgQnxRs7e\nVSk6nfYfpP3ua2D1gkx4WBgtDUHS4t0tNLPL3hNRx1+/eZpjHrPtno4Xi1cuFdmc\n/3rIyrVJ06B8YZAVEPjVGhsV11zamSO65YC+lcjSwKJ8U34Kbyk6ziRPJjnS/FeK\nHqyj1/LueDgw31FJFdltcGv3/wKBgQDd/7sRAHESDvo8L8Ylhk6XNKN/Dq77Lgoy\nD81Ko4VPvzJ1niKjsDYEzHGxsAW2MoLtGhSqx2PwhNxa8iV4TAAkS4m/kDDKvHGp\n7xZY7DHAVVfdTVbAf2FqrNJd3y9MI65DxCUlSvABOQFKXLFM0X9qLHjossrabLc0\nGXq+x43giwKBgGMkrWsqG5/hNk8YrtEnv+af2/6Wqq3gQj7FYDNNOZoDiRzjaNz8\nBi6I5b3pldmmfHbHc6CVhrbv9Ed6ggGmISi7h9eKoLIJYraGqFSur9HwxCqkqxed\nO+Lde+pq8HYkAFe6OwQ3+1d/M+eCypFj3hstxtphNk6NXK+KAd8o3HORAoGAO7ut\nt/tocTV6e2tXY41p5CGTxIJM7uUKdUHvOSAapMSLbT5pj6XAQzZHeUoln0qkE+wq\nl3EjIPp+2DHDh0Tb3Og+Xj8MAeEGrHTajH6xPFE6XR+MMiuUKMHrsLp23YPURgOn\nAwvQ3GNcR4f9ZPAR2p2wwtwo3PDXsrsQXfkP4dUCgYBddtRUHcl4y1negBoiYAUw\nFtNf9316pv2f09/xvoiByUUvH/V+2fpALKtUZiyIGoJMVr0ZfXT35hFyB8QwkkY5\n6q8dG0i7PKxwMwRbPXlbsEx4hDiLmozddsC9nT3RFrUa9r7i77akP/NHJxOkNB5L\nmHCUuM21ou5s0Ykq9vE7vg==\n-----END PRIVATE KEY-----\n",
+  "client_email": "angular5demoservice@angular5demo-10146.iam.gserviceaccount.com",
+  "client_id": "100503256403513942131",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/angular5demoservice%40angular5demo-10146.iam.gserviceaccount.com"
+}

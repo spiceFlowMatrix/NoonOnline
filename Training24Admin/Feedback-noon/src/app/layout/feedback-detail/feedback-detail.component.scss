@@ -1,0 +1,36 @@
+.noon-tab-content {
+    padding: 10px;
+    border: 1px solid #e5e5e5;
+}
+
+.metadata .row {
+    padding: 5px 0px;
+}
+
+.chat-container {
+    position: sticky;
+    top: 0;
+    bottom: 0;
+    height: fit-content;
+}
+
+.chat-body {
+    position: relative;
+    .message-input-area {
+        margin-bottom: 10px;
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        .message_input {
+            outline: none;
+            padding: 0px 15px;
+            border-radius: 30px;
+            border: 1px solid #E5E5E5;
+            width: 100%;
+            height: 42px;
+        }
+        .send_button {
+            outline: none;
+        }
+    }
+}

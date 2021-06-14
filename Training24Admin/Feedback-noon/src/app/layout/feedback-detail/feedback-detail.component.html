@@ -1,0 +1,50 @@
+<div class="noon-container">
+  <div class="row" style="position:relative;">
+    <div class="col-lg-8 col-md-8 col-sm-12">
+      <div>
+        <div>
+          <ngb-tabset>
+            <ngb-tab title="Metadata">
+              <ng-template ngbTabContent>
+                <noon-metadata [data]="feedbackDetails"></noon-metadata>
+              </ng-template>
+            </ngb-tab>
+            <ngb-tab title="Timestamps">
+              <ng-template ngbTabContent>
+                <noon-timestamps [data]="feedbackDetails"></noon-timestamps>
+              </ng-template>
+            </ngb-tab>
+            <ngb-tab title="Informer details">
+              <ng-template ngbTabContent>
+                <noon-informer-detail [data]="feedbackDetails"></noon-informer-detail>
+              </ng-template>
+            </ngb-tab>
+          </ngb-tabset>
+        </div>
+        <div class="mt-2">
+          <ngb-tabset activeId="filming-status">
+            <ngb-tab title="Filming Status" id="filming-status">
+              <ng-template ngbTabContent>
+                <noon-filming-status></noon-filming-status>
+              </ng-template>
+            </ngb-tab>
+            <ngb-tab title="Graphics Status" id="graphics-status">
+              <ng-template ngbTabContent>
+                <noon-graphics-status></noon-graphics-status>
+              </ng-template>
+            </ngb-tab>
+            <ngb-tab title="Editing Status" id="editing-status">
+              <ng-template ngbTabContent>
+                <noon-editing-status></noon-editing-status>
+              </ng-template>
+            </ngb-tab>
+          </ngb-tabset>
+        </div>
+
+      </div>      
+    </div>
+    <div class="col-lg-4 col-md-4 col-sm-12 chat-container">
+      <noon-chatbox></noon-chatbox>
+    </div>
+  </div>
+</div>

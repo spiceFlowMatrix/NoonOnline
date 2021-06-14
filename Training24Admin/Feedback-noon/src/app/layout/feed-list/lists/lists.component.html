@@ -1,0 +1,382 @@
+<div class="main-container">
+    <noon-loader *ngIf="isCallingApi"></noon-loader>
+    <div class="feed-list-header">
+        <mat-label class="title">Feedback Detail</mat-label>
+        <ng-container *ngIf="tabIndex == 0">
+            <mat-icon class="done" (click)="moveToStage('progressfromQueue')">done</mat-icon>
+            <mat-label class="progress-text" (click)="moveToStage('progressfromQueue')">Move to In Progress</mat-label>
+            <mat-icon class="close" (click)="moveToStage('archivefromQueue')">close</mat-icon>
+            <mat-label class="archive" (click)="moveToStage('archivefromQueue')">Close</mat-label>
+        </ng-container>
+        <ng-container *ngIf="tabIndex == 1">
+            <mat-icon class="done" (click)="moveToStage('complete')">done</mat-icon>
+            <mat-label class="progress-text" (click)="moveToStage('complete')">Mark as completed</mat-label>
+            <mat-icon class="close" (click)="moveToStage('archivefromProcess')">close</mat-icon>
+            <mat-label class="archive" (click)="moveToStage('archivefromProcess')">Close</mat-label>
+        </ng-container>
+        <ng-container *ngIf="tabIndex == 3">
+            <mat-icon class="done" (click)="moveToStage('progressfromArchive')">done</mat-icon>
+            <mat-label class="progress-text" (click)="moveToStage('progressfromArchive')">Move to In Progress
+            </mat-label>
+            <!-- <mat-icon class="close">close</mat-icon>
+            <mat-label class="archive">Archive</mat-label> -->
+        </ng-container>
+    </div>
+    <mat-divider></mat-divider>
+    <mat-tab-group mat-align-tabs="start" [selectedIndex]="tabIndex" (selectedTabChange)="tabChange($event)">
+        <mat-tab label="In Queue">
+            <div class="filter">
+                <div>
+                    <mat-label style="font-weight:500;">Filters</mat-label>
+                </div>
+                <div class="apply-filter" (click)="applyFilter('queue')">
+                    <mat-icon>filter_list</mat-icon>
+                    <mat-label>APPLY FILTER</mat-label>
+                </div>
+            </div>
+            <div class="filter-container">
+                <mat-form-field>
+                    <mat-label>Category</mat-label>
+                    <mat-select [(value)]="filterModel.categoryid">
+                        <mat-option value=0>None</mat-option>
+                        <mat-option *ngFor="let cat of categoryList" value="{{cat.id}}">{{cat.name}}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <mat-form-field style="margin-left: 30px">
+                    <input matInput placeholder="Submitted Date" (dateInput)="change($event.value)"
+                        [satDatepicker]="picker7" [(ngModel)]="sub_date" readonly>
+                    <sat-datepicker #picker7 [rangeMode]="true">
+                    </sat-datepicker>
+                    <sat-datepicker-toggle matSuffix [for]="picker7"></sat-datepicker-toggle>
+                </mat-form-field>
+                <mat-form-field style="margin-left: 30px">
+                    <mat-label>Submitted by</mat-label>
+                    <mat-select [(value)]="filterModel.userid">
+                        <mat-option value=0>None</mat-option>
+                        <mat-option *ngFor="let user of feedbackUser" value="{{user.id}}">{{user.username}}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <mat-divider></mat-divider>
+            <table *ngIf="queueData" mat-table [dataSource]="queueData" class="mat-elevation-z8">
+
+                <ng-container matColumnDef="selectQueue">
+                    <th mat-header-cell *matHeaderCellDef>
+                        <mat-checkbox (change)="$event ? masterQueueToggle() : null"
+                            [checked]="queueSelection.hasValue() && isAllQueueSelected()"
+                            [indeterminate]="queueSelection.hasValue() && !isAllQueueSelected()"
+                            [aria-label]="checkboxQueueLabel()">
+                        </mat-checkbox>
+                    </th>
+                    <td mat-cell *matCellDef="let row">
+                        <mat-checkbox (click)="$event.stopPropagation()"
+                            (change)="$event ? queueSelection.toggle(row) : null"
+                            [checked]="queueSelection.isSelected(row)" [aria-label]="checkboxQueueLabel(row)">
+                        </mat-checkbox>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="description">
+                    <th mat-header-cell *matHeaderCellDef> Description </th>
+                    <td mat-cell *matCellDef="let element"> {{element.description}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="category">
+                    <th mat-header-cell *matHeaderCellDef> Category </th>
+                    <td mat-cell *matCellDef="let element"> {{element.category.name}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="submitted_by">
+                    <th mat-header-cell *matHeaderCellDef> Submitted By </th>
+                    <td mat-cell *matCellDef="let element"> {{element.user.fullname}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="submitted_date">
+                    <th mat-header-cell *matHeaderCellDef> Submitted Date </th>
+                    <td mat-cell *matCellDef="let element"> {{element.submitteddate | date:'longDate'}} </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="queueDisplayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: queueDisplayedColumns;" (click)="openDetail(row)">
+                </tr>
+            </table>
+            <mat-paginator [length]="totalQueue" [pageSize]="10" (page)="queuePageChange($event)">
+            </mat-paginator>
+        </mat-tab>
+        <mat-tab label="In Progress">
+            <div class="filter">
+                <div>
+                    <mat-label style="font-weight:500;">Filters</mat-label>
+                </div>
+                <div class="apply-filter" (click)="applyFilter('progress')">
+                    <mat-icon>filter_list</mat-icon>
+                    <mat-label>APPLY FILTER</mat-label>
+                </div>
+            </div>
+            <div class="filter-container">
+                <mat-form-field>
+                    <mat-label>Category</mat-label>
+                    <mat-select [(value)]="filterModel.categoryid">
+                        <mat-option value=0>None</mat-option>
+                        <mat-option *ngFor="let cat of categoryList" value="{{cat.id}}">{{cat.name}}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <mat-form-field style="margin-left: 30px">
+                    <input matInput placeholder="Submitted Date" [satDatepicker]="picker5"
+                        (dateInput)="change($event.value)" [(ngModel)]="sub_date">
+                    <sat-datepicker #picker5 [rangeMode]="true">
+                    </sat-datepicker>
+                    <sat-datepicker-toggle matSuffix [for]="picker5"></sat-datepicker-toggle>
+                </mat-form-field>
+                <mat-form-field style="margin-left: 30px">
+                    <input matInput [matDatepicker]="start_picker" (dateInput)="changeStart($event.value)"
+                        placeholder="Start Date" [(ngModel)]="start_date">
+                    <mat-datepicker-toggle matSuffix [for]="start_picker"></mat-datepicker-toggle>
+                    <mat-datepicker #start_picker></mat-datepicker>
+                </mat-form-field>
+                <mat-form-field style="margin-left: 30px">
+                    <mat-label>Submitted by</mat-label>
+                    <mat-select [(value)]="filterModel.userid">
+                        <mat-option value=0>None</mat-option>
+                        <mat-option *ngFor="let user of feedbackUser" value="{{user.id}}">{{user.username}}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <mat-divider></mat-divider>
+            <table *ngIf="progressData" mat-table [dataSource]="progressData" class="mat-elevation-z8">
+
+                <ng-container matColumnDef="selectProgress">
+                    <th mat-header-cell *matHeaderCellDef>
+                        <mat-checkbox (change)="$event ? masterProgressToggle() : null"
+                            [checked]="progressSelection.hasValue() && isAllProgressSelected()"
+                            [indeterminate]="progressSelection.hasValue() && !isAllProgressSelected()"
+                            [aria-label]="checkboxProgressLabel()">
+                        </mat-checkbox>
+                    </th>
+                    <td mat-cell *matCellDef="let row">
+                        <mat-checkbox (click)="$event.stopPropagation()"
+                            (change)="$event ? progressSelection.toggle(row) : null"
+                            [checked]="progressSelection.isSelected(row)" [aria-label]="checkboxProgressLabel(row)">
+                        </mat-checkbox>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="description">
+                    <th mat-header-cell *matHeaderCellDef> Description </th>
+                    <td mat-cell *matCellDef="let element"> {{element.description}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="category">
+                    <th mat-header-cell *matHeaderCellDef> Category </th>
+                    <td mat-cell *matCellDef="let element"> {{element.category.name}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="submitted_by">
+                    <th mat-header-cell *matHeaderCellDef> Submitted By </th>
+                    <td mat-cell *matCellDef="let element"> {{element.user.fullname}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="start_date">
+                    <th mat-header-cell *matHeaderCellDef> Start Date </th>
+                    <td mat-cell *matCellDef="let element"> {{element.startdate | date:'longDate'}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="submitted_date">
+                    <th mat-header-cell *matHeaderCellDef> Submitted Date </th>
+                    <td mat-cell *matCellDef="let element"> {{element.submitteddate | date:'longDate'}} </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="progressDisplayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: progressDisplayedColumns;" (click)="openDetail(row)">
+                </tr>
+            </table>
+            <mat-paginator [length]="totalProgress" [pageSize]="10" (page)="progressPageChange($event)">
+            </mat-paginator>
+        </mat-tab>
+        <mat-tab label="Completed">
+            <div class="filter">
+                <div>
+                    <mat-label style="font-weight:500;">Filters</mat-label>
+                </div>
+                <div class="apply-filter" (click)="applyFilter('complete')">
+                    <mat-icon>filter_list</mat-icon>
+                    <mat-label>APPLY FILTER</mat-label>
+                </div>
+            </div>
+            <div class="filter-container">
+                <mat-form-field>
+                    <mat-label>Category</mat-label>
+                    <mat-select [(value)]="filterModel.categoryid">
+                        <mat-option value=0>None</mat-option>
+                        <mat-option *ngFor="let cat of categoryList" value="{{cat.id}}">{{cat.name}}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <mat-form-field style="margin-left: 30px">
+                    <input matInput placeholder="Submitted Date" (dateInput)="change($event.value)"
+                        [satDatepicker]="picker1" [(ngModel)]="sub_date">
+                    <sat-datepicker #picker1 [rangeMode]="true">
+                    </sat-datepicker>
+                    <sat-datepicker-toggle matSuffix [for]="picker1"></sat-datepicker-toggle>
+                </mat-form-field>
+                <mat-form-field style="margin-left: 30px">
+                    <input matInput [matDatepicker]="start_pickerc" (dateInput)="changeStart($event.value)"
+                        placeholder="Start Date" [(ngModel)]="start_date">
+                    <mat-datepicker-toggle matSuffix [for]="start_pickerc"></mat-datepicker-toggle>
+                    <mat-datepicker #start_pickerc></mat-datepicker>
+                </mat-form-field>
+                <mat-form-field style="margin-left: 30px">
+                    <mat-label>Submitted by</mat-label>
+                    <mat-select [(value)]="filterModel.userid">
+                        <mat-option value=0>None</mat-option>
+                        <mat-option *ngFor="let user of feedbackUser" value="{{user.id}}">{{user.username}}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <mat-divider></mat-divider>
+            <table *ngIf="completeData" mat-table [dataSource]="completeData" class="mat-elevation-z8">
+
+                <ng-container matColumnDef="selectCompleted">
+                    <th mat-header-cell *matHeaderCellDef>
+                        <mat-checkbox (change)="$event ? masterCompleteToggle() : null"
+                            [checked]="completeSelection.hasValue() && isAllCompleteSelected()"
+                            [indeterminate]="completeSelection.hasValue() && !isAllCompleteSelected()"
+                            [aria-label]="checkboxCompleteLabel()">
+                        </mat-checkbox>
+                    </th>
+                    <td mat-cell *matCellDef="let row">
+                        <mat-checkbox (click)="$event.stopPropagation()"
+                            (change)="$event ? completeSelection.toggle(row) : null"
+                            [checked]="completeSelection.isSelected(row)" [aria-label]="checkboxCompleteLabel(row)">
+                        </mat-checkbox>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="description">
+                    <th mat-header-cell *matHeaderCellDef> Description </th>
+                    <td mat-cell *matCellDef="let element"> {{element.description}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="category">
+                    <th mat-header-cell *matHeaderCellDef> Category </th>
+                    <td mat-cell *matCellDef="let element"> {{element.category.name}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="submitted_by">
+                    <th mat-header-cell *matHeaderCellDef> Submitted By </th>
+                    <td mat-cell *matCellDef="let element"> {{element.user.fullname}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="start_date">
+                    <th mat-header-cell *matHeaderCellDef> Start Date </th>
+                    <td mat-cell *matCellDef="let element"> {{element.startdate | date:'longDate'}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="completed_date">
+                    <th mat-header-cell *matHeaderCellDef> Completed Date </th>
+                    <td mat-cell *matCellDef="let element"> {{element.complateddate | date:'longDate'}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="submitted_date">
+                    <th mat-header-cell *matHeaderCellDef> Submitted Date </th>
+                    <td mat-cell *matCellDef="let element"> {{element.submitteddate | date:'longDate'}} </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="completeDisplayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: completeDisplayedColumns;" (click)="openDetail(row)">
+                </tr>
+            </table>
+            <mat-paginator [length]="totalCompleted" [pageSize]="10" (page)="completePageChange($event)">
+            </mat-paginator>
+        </mat-tab>
+        <mat-tab label="Closed">
+            <div class="filter">
+                <div>
+                    <mat-label style="font-weight:500;">Filters</mat-label>
+                </div>
+                <div class="apply-filter" (click)="applyFilter('archive')">
+                    <mat-icon>filter_list</mat-icon>
+                    <mat-label>APPLY FILTER</mat-label>
+                </div>
+            </div>
+            <div class="filter-container">
+                <mat-form-field id="cat">
+                    <mat-label>Category</mat-label>
+                    <mat-select [(value)]="filterModel.categoryid">
+                        <mat-option value=0>None</mat-option>
+                        <mat-option *ngFor="let cat of categoryList" value="{{cat.id}}">{{cat.name}}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <mat-form-field style="margin-left: 30px">
+                    <input matInput placeholder="Submitted Date" (dateInput)="change($event.value)"
+                        [satDatepicker]="picker2" [(ngModel)]="sub_date">
+                    <sat-datepicker #picker2 [rangeMode]="true">
+                    </sat-datepicker>
+                    <sat-datepicker-toggle matSuffix [for]="picker2"></sat-datepicker-toggle>
+                </mat-form-field>
+                <mat-form-field style="margin-left: 30px">
+                    <input matInput [matDatepicker]="arch_picker" (dateInput)="changeArchive($event.value)"
+                        placeholder="Archived Date" [(ngModel)]="archive_date">
+                    <mat-datepicker-toggle matSuffix [for]="arch_picker"></mat-datepicker-toggle>
+                    <mat-datepicker #arch_picker></mat-datepicker>
+                </mat-form-field>
+                <mat-form-field style="margin-left: 30px" id="sub_by">
+                    <mat-label>Submitted by</mat-label>
+                    <mat-select [(value)]="filterModel.userid">
+                        <mat-option value=0>None</mat-option>
+                        <mat-option *ngFor="let user of feedbackUser" value="{{user.id}}">{{user.username}}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
+            <mat-divider></mat-divider>
+            <table *ngIf="archiveData" mat-table [dataSource]="archiveData" class="mat-elevation-z8">
+
+                <ng-container matColumnDef="selectArchived">
+                    <th mat-header-cell *matHeaderCellDef>
+                        <mat-checkbox (change)="$event ? masterArchiveToggle() : null"
+                            [checked]="archiveSelection.hasValue() && isAllArchiveSelected()"
+                            [indeterminate]="archiveSelection.hasValue() && !isAllArchiveSelected()"
+                            [aria-label]="checkboxArchiveLabel()">
+                        </mat-checkbox>
+                    </th>
+                    <td mat-cell *matCellDef="let row">
+                        <mat-checkbox (click)="$event.stopPropagation()"
+                            (change)="$event ? archiveSelection.toggle(row) : null"
+                            [checked]="archiveSelection.isSelected(row)" [aria-label]="checkboxArchiveLabel(row)">
+                        </mat-checkbox>
+                    </td>
+                </ng-container>
+
+                <ng-container matColumnDef="description">
+                    <th mat-header-cell *matHeaderCellDef> Description </th>
+                    <td mat-cell *matCellDef="let element"> {{element.description}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="category">
+                    <th mat-header-cell *matHeaderCellDef> Category </th>
+                    <td mat-cell *matCellDef="let element"> {{element.category.name}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="submitted_by">
+                    <th mat-header-cell *matHeaderCellDef> Submitted By </th>
+                    <td mat-cell *matCellDef="let element"> {{element.user.fullname}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="archived_date">
+                    <th mat-header-cell *matHeaderCellDef> Archived Date </th>
+                    <td mat-cell *matCellDef="let element"> {{element.archiveddate | date:'longDate'}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="submitted_date">
+                    <th mat-header-cell *matHeaderCellDef> Submitted Date </th>
+                    <td mat-cell *matCellDef="let element"> {{element.submitteddate | date:'longDate'}} </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="archiveDisplayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: archiveDisplayedColumns;" (click)="openDetail(row)">
+                </tr>
+            </table>
+            <mat-paginator [length]="totalArchived" [pageSize]="10" (page)="archivePageChange($event)">
+            </mat-paginator>
+        </mat-tab>
+    </mat-tab-group>
+</div>

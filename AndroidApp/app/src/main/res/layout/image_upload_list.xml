@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <LinearLayout
+        android:layout_width="@dimen/_60sdp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_6sdp"
+        android:orientation="horizontal">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:id="@+id/uploadedImg"
+                android:layout_width="@dimen/_55sdp"
+                android:layout_height="@dimen/_95sdp"
+                android:layout_marginTop="@dimen/_9sdp"
+                android:background="@drawable/border_image"
+                android:padding="@dimen/_1sdp"
+                android:scaleType="fitXY"
+                android:visibility="gone" />
+
+            <RelativeLayout
+                android:id="@+id/videoViewLay"
+                android:layout_width="@dimen/_55sdp"
+                android:layout_height="@dimen/_95sdp"
+                android:layout_marginTop="@dimen/_9sdp"
+                android:background="@drawable/border_image"
+                android:padding="@dimen/_1sdp"
+                android:visibility="visible">
+
+                <VideoView
+                    android:id="@+id/video_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentBottom="true"
+                    android:visibility="visible" />
+
+                <!--                <FrameLayout-->
+                <!--                    android:id="@+id/placeholderLay"-->
+                <!--                    android:layout_width="match_parent"-->
+                <!--                    android:layout_height="match_parent"-->
+                <!--                    android:background="@drawable/ic_no_image_found"-->
+                <!--                    android:visibility="visible" />-->
+            </RelativeLayout>
+
+            <ImageView
+                android:id="@+id/imgRemove"
+                android:layout_width="@dimen/_12sdp"
+                android:layout_height="@dimen/_12sdp"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="@dimen/_5sdp"
+                android:src="@drawable/circle_cross" />
+        </RelativeLayout>
+    </LinearLayout>
+</layout>

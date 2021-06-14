@@ -1,0 +1,41 @@
+<ng-template #quizPreviewDialog let-c="close" let-d="dismiss">
+    <div class="modal-header">
+        <h4 class="modal-title">
+            {{quizPreviewObj.name}}
+            <br>
+            <sub>Duration : {{quizPreviewObj.timeout}} (in min.)</sub>
+        </h4>
+        <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <div class="row" *ngFor="let question of quizPreviewObj.questions; let i=index;">
+            <div class="col-sm-12">
+                <div class="card mb-3">
+                    <div class="card-header">
+                        {{question.questiontext}}
+                        <button class="btn btn-info btn-action btn-noon-info" *ngIf="question.explanation" title="{{question.explanation}}">
+                            <i class="fa fa-info"></i></button>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <div class="checkbox" *ngFor="let answer of question.answers; let j=index;">
+                                <label>
+                                    <input type="checkbox">
+                                    {{answer.answer}}
+                                    <button class="btn btn-info btn-action btn-noon-info" *ngIf="answer.extraText"
+                                        title="{{answer.extraText}}">
+                                        <i class="fa fa-info"></i></button>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="d('Cancel click')">Close</button>
+    </div>
+</ng-template>

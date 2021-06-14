@@ -1,0 +1,1 @@
+include ':app', ':giraffeplayer2', ':prdownloader', ':android-file-chooser'

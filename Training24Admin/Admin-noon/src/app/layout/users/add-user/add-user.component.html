@@ -1,0 +1,512 @@
+<div>
+    <h4>
+        <a class="btn btn-success btn-lg back" backDirection>
+            <span class="fa fa-arrow-left"></span>
+        </a>
+        <span *ngIf="isEditView">Edit</span><span *ngIf="!isEditView">Add</span> User
+        <noon-loader *ngIf="isCallingApi"></noon-loader>
+    </h4>
+    <p *ngIf="!isEditView">(You can assign course in edit mode)</p>
+    <div class="row">
+        <div class="col col-xl-6 col-lg-12">
+            <form class="form-horizontal noon-form" #manageUserForm="ngForm"
+                (ngSubmit)="manageUserForm.form.valid && manageUser()">
+                <div class="form-group row">
+                    <label class="control-label col-sm-4" for="email">User type :</label>
+                    <div class="col col-sm-8">
+                        <!-- <select class="form-control" name="roleId" [(ngModel)]="userModel.roleId" required>
+                            <option [value]=undefined disabled>Select Role</option>
+                            <option *ngFor="let role of userRoles" [value]="role.id">{{role.name}}</option>
+                        </select> -->
+                        <div *ngFor="let role of userModel.roles;let index=index;let last=last;">
+                            <div>
+                                <select id="role_{{index}}" required
+                                    class="form-control noon-form-control list-inline-item"
+                                    [(ngModel)]="userModel.roles[index].roleid" #role="ngModel" name="role_{{index}}"
+                                    (change)="checkForStudent();">
+                                    <option value='' disabled>Select</option>
+                                    <option *ngFor="let role of userRoles" [value]="role.id">{{role.name}}</option>
+                                </select>
+                                <div class="list-inline-item" style="position: relative;bottom: 3px;">
+                                    <button class="btn btn-danger btn-action" title="Delete"
+                                        *ngIf="userModel.roles.length > 1 && !last"
+                                        (click)="userModel.roles.splice(index,1);checkForStudent();">
+                                        <i class="fa fa-minus"></i></button>
+                                    <button class="btn btn-danger btn-action"
+                                        [disabled]="!userModel.roles[index].roleid" title="Add" *ngIf="last"
+                                        (click)="userModel.roles.push({ roleid: '' });checkForStudent();">
+                                        <i class="fa fa-plus"></i>
+                                    </button>
+                                </div>
+                                <div *ngIf="role.invalid && (role.touched || manageUserForm.submitted)">
+                                    <p class="input-info error-message" *ngIf="role.errors.required">
+                                        Role selection is required
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="control-label col-sm-4" for="username">
+                        Username :
+                        &nbsp;<i class="fa fa-refresh fa-spin" *ngIf="isUserNameChecking"></i>
+                    </label>
+                    <div class="col col-sm-8">
+                        <input type="text" class="form-control" placeholder="Enter Username" name="username"
+                            [(ngModel)]="userModel.username" [pattern]="'^[a-zA-Z]{1,15}$'" #username="ngModel" debounce
+                            delay="700" (func)="checkUsernameExist()" required>
+                        <div *ngIf="username.invalid && (username.touched || manageUserForm.submitted)">
+                            <p class="input-info error-message" *ngIf="username.errors.required">Username is required
+                            </p>
+                            <p class="input-info error-message" *ngIf="username.errors.pattern">Username is not valid.
+                                Accept only alphabets and maximum 15 characters</p>
+                        </div>
+                        <p class="input-info error-message" *ngIf="userModel.username && isUserNameExist">Username is
+                            already taken</p>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="control-label col-sm-4" for="email">Email :</label>
+                    <div class="col col-sm-8">
+                        <input type="email" [disabled]="isEditView" class="form-control" placeholder="Enter email"
+                            [pattern]="emailPattern" name="email" [(ngModel)]="userModel.email" #email="ngModel"
+                            required>
+                        <div *ngIf="email.invalid && (email.touched || manageUserForm.submitted)">
+                            <p class="input-info error-message" *ngIf="email.errors.required">Email is required</p>
+                            <p class="input-info error-message" *ngIf="email.errors.pattern">Email is not valid.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row" *ngIf="isAgent">
+                    <label class="control-label col-sm-4" for="description">Partner background :</label>
+                    <div class="col col-sm-8">
+                        <textarea rows="3" id="description" class="form-control" placeholder="Enter partner background"
+                            name="description" [(ngModel)]="userModel.partnerBackgroud" #description="ngModel"
+                            required></textarea>
+                        <div *ngIf="description.invalid && (description.touched || manageUserForm.submitted)">
+                            <p class="input-info error-message" *ngIf="description.errors.required">
+                                Enter partner background is required
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row" *ngIf="isAgent">
+                    <label class="control-label col-sm-4" for="focalPoint">Focal point :</label>
+                    <div class="col col-sm-8">
+                        <input type="text" id="focalPoint" class="form-control" placeholder="Enter Focal point"
+                            name="focalPoint" [(ngModel)]="userModel.focalPoint" #focalPoint="ngModel" required>
+                        <div *ngIf="focalPoint.invalid && (focalPoint.touched || manageUserForm.submitted)">
+                            <p class="input-info error-message" *ngIf="focalPoint.errors.required">Focal point is
+                                required</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row" *ngIf="isAgent">
+                    <label class="control-label col-sm-4" for="position">Position :</label>
+                    <div class="col col-sm-8">
+                        <input type="text" id="position" class="form-control" placeholder="Enter position"
+                            name="position" [(ngModel)]="userModel.position" #position="ngModel" required>
+                        <div *ngIf="position.invalid && (position.touched || manageUserForm.submitted)">
+                            <p class="input-info error-message" *ngIf="position.errors.required">Position is
+                                required</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row" *ngIf="isAgent">
+                    <label class="control-label col-sm-4" for="phone">Phone :</label>
+                    <div class="col col-sm-8">
+                        <input type="tel" id="phone" name="phone" class="form-control input-underline input-lg"
+                            placeholder="Phone" #phone="ngModel" [(ngModel)]="userModel.phonenumber" required>
+                        <div *ngIf="phone.invalid && (phone.touched || manageUserForm.submitted)">
+                            <p class="input-info error-message" *ngIf="phone.errors.required">Phone is required</p>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+                <div class="form-group row" *ngIf="isAgent">
+                    <label class="control-label col-sm-4" for="physical_address">Physical address :</label>
+                    <div class="col col-sm-8">
+                        <input type="text" id="physicalAddress" class="form-control"
+                            placeholder="Enter Physical address" name="physical_address"
+                            [(ngModel)]="userModel.physicalAddress" #physical_address="ngModel" required>
+                        <div *ngIf="physical_address.invalid && (physical_address.touched || manageUserForm.submitted)">
+                            <p class="input-info error-message" *ngIf="physical_address.errors.required">
+                                Physical address is required
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group row" *ngIf="isAgent">
+                    <label class="control-label col-sm-4" for="status">Is Active :</label>
+                    <div class="col col-md-8">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="status" [(ngModel)]="userModel.isactive" #status="ngModel">
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row" *ngIf="isAgent">
+                    <label class="control-label col-sm-4" for="category">Category :</label>
+                    <div class="col col-sm-8">
+                        <select id="category" class="form-control" placeholder="Enter category" name="category"
+                            [(ngModel)]="userModel.agentCategoryId" #category="ngModel" required>
+                            <option [value]=undefined disabled>Select</option>
+                            <option *ngFor="let category of categorylist" [value]="category.id">
+                                {{category.categoryName}}</option>
+                        </select>
+                        <div *ngIf="category.invalid && (category.touched || manageUserForm.submitted)">
+                            <p class="input-info error-message" *ngIf="category.errors.required">
+                                Category selection is required
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row" *ngIf="isAgent">
+                    <label class="control-label col-sm-4" for="currency">Currency :</label>
+                    <div class="col col-sm-8">
+                        <select id="currency" class="form-control" placeholder="Enter currency" name="currency"
+                            [(ngModel)]="userModel.currencyCode" #currency="ngModel" required>
+                            <option [value]=undefined disabled>Select</option>
+                            <option *ngFor="let currency of currencyLists" [value]="currency.code">{{currency.code}}
+                            </option>
+                        </select>
+                        <div *ngIf="currency.invalid && (currency.touched || manageUserForm.submitted)">
+                            <p class="input-info error-message" *ngIf="currency.errors.required">
+                                Currency selection is required
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row" *ngIf="isAgent">
+                    <label class="control-label col-sm-4" for="agreedMonthlyDeposit">Agreed monthly deposit :</label>
+                    <div class="col col-sm-8">
+                        <input type="tel" id="agreedMonthlyDeposit" name="agreedMonthlyDeposit"
+                            class="form-control input-underline input-lg" placeholder="Agreed monthly deposit"
+                            #agreedMonthlyDeposit="ngModel" [(ngModel)]="userModel.agreedMonthlyDeposit" required>
+                        <div
+                            *ngIf="agreedMonthlyDeposit.invalid && (agreedMonthlyDeposit.touched || manageUserForm.submitted)">
+                            <p class="input-info error-message" *ngIf="agreedMonthlyDeposit.errors.required">
+                                Agreed monthly deposit is required
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group row" *ngIf="isStudent">
+                    <label class="control-label col-sm-4" for="is_skippable">Is Chapter & Lesson Skippable :</label>
+                    <div class="col col-md-8">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="is_skippable" [(ngModel)]="userModel.is_skippable"
+                                    #is_skippable="ngModel">
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group row" *ngIf="isStudent">
+                    <label class="control-label col-sm-4" for="is_skippable">Is authorized for discussion:</label>
+                    <div class="col col-md-8">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="is_discussion_authorized"
+                                    [(ngModel)]="userModel.is_discussion_authorized"
+                                    #is_discussion_authorized="ngModel">
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group row" *ngIf="isParent">
+                    <label class="control-label col-sm-4" for="is_skippable">Is Allow Map:</label>
+                    <div class="col col-md-8">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="is_allow_for_map"
+                                    [(ngModel)]="userModel.isallowmap"
+                                    #is_allow_for_map="ngModel">
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group row" *ngIf="isEditView && isStudent">
+                    <label class="control-label col-sm-4" for="reminders">
+                        Reminders :
+                    </label>
+                    <div class="col col-sm-8">
+                        <input type="number" class="form-control" id="reminders" placeholder="Enter Reminders"
+                            name="reminders" [(ngModel)]="userModel.reminder" #reminders="ngModel" required>
+                        <div *ngIf="reminders.invalid && (reminders.touched || manageUserForm.submitted)">
+                            <p class="input-info error-message" *ngIf="reminders.errors.required">Reminders is required
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group row" *ngIf="isEditView && isStudent">
+                    <label class="control-label col-sm-4" for="timeout">
+                        Intervals (In hours) :
+                    </label>
+                    <div class="col col-sm-8">
+                        <input type="number" class="form-control" id="intervals" placeholder="Enter intervals"
+                            name="intervals" [(ngModel)]="userModel.intervals" #intervals="ngModel" required>
+                        <div *ngIf="intervals.invalid && (intervals.touched || manageUserForm.submitted)">
+                            <p class="input-info error-message" *ngIf="intervals.errors.required">Intervals is required
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group row" *ngIf="isEditView && isStudent">
+                    <label class="control-label col-sm-4" for="istimeout">Timeout (On/Off) :</label>
+                    <div class="col col-md-8">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="istimeout" [(ngModel)]="userModel.istimeouton"
+                                    #istimeout="ngModel">
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="control-label col-sm-4" for="pwd">Password :</label>
+                    <div class="col col-sm-8">
+                        <input type="password" class="form-control" placeholder="Enter password"
+                            title="Use 8 or more characters with a mix of letters, numbers & symbols" name="password"
+                            [(ngModel)]="userModel.password" #password="ngModel"
+                            [pattern]="'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[^\w\s]).{8,}$'"
+                            [required]="!isEditView">
+                        <!-- [pattern]="passwordPattern" -->
+                        <div *ngIf="password.invalid && (password.touched || manageUserForm.submitted)">
+                            <p class="input-info error-message" *ngIf="password.errors.required">Password is required
+                            </p>
+                            <p class="input-info error-message" *ngIf="password.errors.pattern">Password must contain 8
+                                or
+                                more characters with a mix of letters, numbers & symbols.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="control-label col-sm-4" for="pwd">Confirm Password :</label>
+                    <div class="col col-sm-8">
+                        <input type="password" class="form-control" name="confirmPassword"
+                            [(ngModel)]="userModel.confirmPassword" placeholder="Confirm Password"
+                            #confirmPassword="ngModel" [required]="!isEditView">
+                        <div *ngIf="(password.touched || manageUserForm.submitted)">
+                            <p class="input-info error-message"
+                                *ngIf="userModel.password && (userModel.password !== userModel.confirmPassword)">
+                                Password and confirm password not matches.
+                            </p>
+                            <p class="input-info success-message"
+                                *ngIf="userModel.password && (userModel.password == userModel.confirmPassword)">
+                                Password and confirm password matches.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <div class="col-sm-offset-2 col-sm-0 col-md-4"></div>
+                    <div class="col-sm-offset-2 col-sm-12 col-md-8 pull-right">
+                        <button type="submit" class="btn btn-primary m-r-20px" *ngIf="isEditView"
+                            [disabled]="userModel.password !== userModel.confirmPassword || isUserNameChecking">Edit
+                            user</button>
+                        <button type="submit" class="btn btn-primary m-r-20px" *ngIf="!isEditView"
+                            [disabled]="manageUserForm.invalid || isUserNameChecking || (userModel.password !== userModel.confirmPassword)">Add
+                            user
+                        </button>
+                        <button class="btn btn-danger" backDirection>Cancel</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="mt-2 row" *ngIf="isEditView">
+        <div class="col col-xl-6 col-lg-12">
+            <div class="col-sm-offset-2 col-sm-8 pull-right">
+                <button type="button" class="btn btn-primary m-r-20px" (click)="openAddCourseModal({})">
+                    Add course to user
+                </button>
+            </div>
+        </div>
+        <div class="mt-2 col col-xl-12 col-lg-12" *ngIf="userCourseList && userCourseList.length > 0">
+            <div class="row">
+                <div class="col col-xl-12 col-lg-12">
+                    <div class="table-responsive noon-table">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Id</th>
+                                    <th>Name</th>
+                                    <th>Code</th>
+                                    <th *ngIf="userModel.roleName.indexOf('Student') > -1">Start Date</th>
+                                    <th *ngIf="userModel.roleName.indexOf('Student') > -1">End Date</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let course of userCourseList;let i=index;">
+                                    <td>{{course.id}}</td>
+                                    <td>{{course.name}}</td>
+                                    <td>{{course.code}}</td>
+                                    <td *ngIf="userModel.roleName.indexOf('Student') > -1">{{course.startDate |
+                                        date:'mediumDate'}}</td>
+                                    <td *ngIf="userModel.roleName.indexOf('Student') > -1">{{course.endDate |
+                                        date:'mediumDate'}}</td>
+                                    <td>
+                                        <button class="btn btn-primary btn-action" title="Edit"
+                                            (click)="openAddCourseModal(course)"
+                                            routerLinkActive="router-link-active"><i class="fa fa-pencil"></i></button>
+                                        <button class="btn btn-danger btn-action" title="Delete"
+                                            (click)="openDeleteConfirmation(course,i)">
+                                            <i class="fa fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div *ngIf="filterCourseModel.totalCount > 0">
+                        <ngb-pagination [collectionSize]="filterCourseModel.totalCount"
+                            class="d-flex justify-content-end" [pageSize]="filterCourseModel.perpagerecord"
+                            [(page)]="filterCourseModel.pagenumber" [maxSize]="5" [boundaryLinks]="true"
+                            aria-label="Default pagination" (pageChange)="onPageChange($event)"></ngb-pagination>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <app-common-dialog #listdialog (deleteEvent)="deleteCourseFromUser($event)"></app-common-dialog>
+    </div>
+</div>
+
+<ng-template #assignCourseDialog let-c="close" let-d="dismiss">
+    <!-- <form class="form-horizontal noon-form" #assignCourseForm="ngForm" (ngSubmit)="assignCourseForm.form.valid && addCourseToUser()"> -->
+    <form class="form-horizontal noon-form" #assignCourseForm="ngForm"
+        (ngSubmit)="assignCourseForm.form.valid && addCourses()">
+        <div class="modal-header">
+            <h4 class="modal-title">Add course to user</h4>
+            <noon-loader *ngIf="isCallingApi" [withmessage]="true"></noon-loader>
+            <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group row">
+                <label class="control-label col-sm-4" for="school">School :</label>
+                <div class="col col-sm-8">
+                    <select id="school" class="form-control" placeholder="Enter school" name="school"
+                        [(ngModel)]="addCourseToUserModel.schoolid" #school="ngModel" required
+                        (change)="schoolChange()">
+                        <option [value]=undefined disabled>Select</option>
+                        <option *ngFor="let school of schoolsList" [value]="school.id">{{school.name}}</option>
+                    </select>
+                    <div *ngIf="school.invalid && (school.touched || assignCourseForm.submitted)">
+                        <p class="input-info error-message" *ngIf="school.errors.required">School selection is
+                            required</p>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="control-label col-sm-4" for="grade">Grade :</label>
+                <div class="col col-sm-8">
+                    <select id="grade" class="form-control" placeholder="Enter Grade" name="grade"
+                        [(ngModel)]="addCourseToUserModel.gradeid" #grade="ngModel" required
+                        [disabled]="!addCourseToUserModel.schoolid" (change)="gradeChange()">
+                        <option [value]=undefined disabled>Select</option>
+                        <option *ngFor="let grade of tempGradeList" [value]="grade.id">{{grade.name}}</option>
+                    </select>
+                    <div *ngIf="grade.invalid && (grade.touched || assignCourseForm.submitted)">
+                        <p class="input-info error-message" *ngIf="grade.errors.required">Grade selection is
+                            required</p>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="control-label col-sm-4" for="course">Course :</label>
+                <div class="col col-sm-8">
+                    <select id="course" class="form-control" placeholder="Enter Course" name="course"
+                        [(ngModel)]="addCourseToUserModel.courseid" #course="ngModel" required
+                        [disabled]="!addCourseToUserModel.gradeid">
+                        <option [value]=undefined disabled>Select</option>
+                        <option *ngFor="let course of coursesList" [value]="course.courseid">{{course.name}}</option>
+                    </select>
+                    <div *ngIf="course.invalid && (course.touched || assignCourseForm.submitted)">
+                        <p class="input-info error-message" *ngIf="course.errors.required">Course selection is
+                            required</p>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group row" *ngIf="userModel.roleName.indexOf('Student') > -1 ">
+                <label class="control-label col-sm-4" for="course">Duration :</label>
+                <!-- <div class="col col-sm-8"> -->
+                <!-- <ngb-datepicker #dp (select)="onDateSelection($event)" [displayMonths]="2" [dayTemplate]="t">
+                    </ngb-datepicker>
+                    <ng-template #t let-date="date" let-focused="focused">
+                        <span class="custom-day" [class.focused]="focused" [class.range]="isRange(date)" [class.faded]="isHovered(date) || isInside(date)"
+                            (mouseenter)="hoveredDate = date" (mouseleave)="hoveredDate = null">
+                            {{ date.day }}
+                        </span>
+                    </ng-template> -->
+                <!-- <div *ngIf="course.invalid && (course.touched || assignCourseForm.submitted)">
+                        <p class="input-info error-message" *ngIf="course.errors.required">Course selection is
+                            required</p>
+                    </div> -->
+                <!-- </div> -->
+                <div class="col-sm-4">
+                    <input class="form-control" placeholder="Start date" name="sd" required [displayMonths]="1"
+                        [(ngModel)]="addCourseToUserModel.startdate" ngbDatepicker #sd="ngbDatepicker"
+                        (focus)="sd.toggle()" (dateSelect)="dateChanged($event,'fromDate')">
+                    <div *ngIf="sd.invalid && (sd.touched || assignCourseForm.submitted)">
+                        <p class="input-info error-message" *ngIf="sd.errors.required">Course selection is
+                            required</p>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <input class="form-control" placeholder="End date" name="ed" required [displayMonths]="1"
+                        [(ngModel)]="addCourseToUserModel.enddate" ngbDatepicker #ed="ngbDatepicker"
+                        (focus)="ed.toggle()" (dateSelect)="dateChanged($event,'toDate')">
+                    <div *ngIf="ed.invalid && (ed.touched || assignCourseForm.submitted)">
+                        <p class="input-info error-message" *ngIf="ed.errors.required">Course selection is
+                            required</p>
+                    </div>
+                    <div class="list-inline-item pull-right mt-2" [hidden]="addCourseToUserModel.id">
+                        <button type="button" id="add" class="btn btn-danger btn-action" title="Add"
+                            (click)="addTempCourse()">
+                            <i class="fa fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="row temp-list" [hidden]="addCourseToUserModel.id">
+                <div class="col-md-1 pos-rel"
+                    *ngFor="let item of tempCoursesModel;let i=index;let first=first;let last=last;">
+                    <button type="button" id="show_{{i}}" class="btn btn-action"
+                        [ngClass]="tempCoursesModelIndex==i ? 'btn-primary' : 'btn-default'"
+                        (click)="moveToCourseSelection($event,i)">
+                        {{i+1}}
+                    </button>
+                    <span class="del-course-icon" *ngIf="tempCoursesModel.length >1">
+                        <i class="fa fa-minus" (click)="removeCourse($event,i,first,last)"></i>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-info" [disabled]="!addCourseToUserModel.courseid || isCallingApi">
+                <span *ngIf="!addCourseToUserModel.id">Add</span>
+                <span *ngIf="addCourseToUserModel.id">Edit</span>
+                course
+            </button>
+        </div>
+    </form>
+</ng-template>

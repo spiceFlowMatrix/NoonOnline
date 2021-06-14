@@ -1,0 +1,46 @@
+<div class="login-page" >
+    <div class="row justify-content-md-center">
+        <div class="col-lg-4 col-md-8 col-sm-12">
+            <div class="form form-lg">
+                <img class="user-avatar" src="assets/images/logo.png" width="100px" />
+                <h1>Noon - Registration</h1>
+                <form role="form" #signUpForm="ngForm" (ngSubmit)="signUpForm.form.valid && register()">
+                    <div class="form-content">
+                        <div class="form-group">
+                            <input type="email" name="user_email" class="form-control input-underline input-lg" [pattern]="emailPattern" [(ngModel)]="registrationModel.user_email"
+                                placeholder="Email" #user_email="ngModel" required>
+                            <div *ngIf="user_email.invalid && (user_email.touched || signUpForm.submitted)">
+                                <p class="input-info error-message" *ngIf="user_email.errors.required">Email is required</p>
+                                <p class="input-info error-message" *ngIf="user_email.errors.pattern">Email is not valid.</p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <input type="password" title="Use 8 or more characters with a mix of letters, numbers & symbols" name="password" class="form-control input-underline input-lg"
+                                [pattern]="passwordPattern" [(ngModel)]="registrationModel.password" placeholder="Password" #password="ngModel"
+                                required>
+                            <div *ngIf="password.invalid && (password.touched || signUpForm.submitted)">
+                                <p class="input-info error-message" *ngIf="password.errors.required">Password is required</p>
+                                <p class="input-info error-message" *ngIf="password.errors.pattern">Password must contain
+                                    8 or more characters with a mix of letters, numbers & symbols.</p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <input type="password" name="confirm_password" class="form-control input-underline input-lg" [(ngModel)]="registrationModel.confirm_password"
+                                placeholder="Confirm Password" #confirm_password="ngModel" required>
+                            <div *ngIf="confirm_password.invalid && (confirm_password.touched || signUpForm.submitted)">
+                                <p class="input-info error-message" *ngIf="registrationModel.password > 0 && (registrationModel.password !== registrationModel.confirm_password)">
+                                    Password and confirm password not matches.
+                                </p>
+                                <p class="input-info success-message" *ngIf="registrationModel.password && (registrationModel.password == registrationModel.confirm_password)">
+                                    Password and confirm password matches.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary rounded-btn" type="submit">Register</button>
+                    <button class="btn btn-primary rounded-btn" [routerLink]="['/feed']"> Login </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,65 @@
+.quiz-form {
+    .card-body {
+        position: relative;
+        .del-pic {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            padding-top: 4px;
+            padding-left: 0.5px;
+            border-radius: 50%;
+            width: 27px;
+            height: 27px;
+            background: rgba(230, 15, 15, 0.95);
+            color: white;
+            cursor: pointer;
+        }
+    }
+}
+.full-width {
+    width: 100%;
+}
+.card-container {
+    padding: 20px 20px 0;
+}
+mat-card {
+    border-radius: 4px;
+}
+
+.container-check {
+    display: flex;
+    align-items: center;
+}
+mat-checkbox {
+    margin-right: 15px;
+}
+.add-btn {
+    border-radius: 4px;
+    color: #ffffff;
+    background-color: #100d59;
+}
+.cancel-btn {
+    border-radius: 4px;
+    background-color: #ffffff;
+}
+.attach-quill {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.form-control {
+    border:none;
+    border-radius: 0;
+    border-bottom: 1px solid gray;
+}
+.fs-20 {
+    font-size: 20px
+}
+.remove-choice {
+    text-align: end;
+    // margin-bottom: 20px;
+    padding-left: 15px;
+}
+.outline-0 {
+    outline: 0 !important;
+}

@@ -1,0 +1,103 @@
+<div>
+    <div class="row">
+        <div class="col col-xl-12 col-lg-12">
+            <div class="row">
+                <h3 class="control-label col-md-4 col-sm-12">Question List</h3>
+                <h3 class="control-label col-md-8 col-sm-12 no-padding">
+                    <button class="btn btn-info pull-right m-r-20px" title="Add question type" [routerLink]="['/questions/add-question']">Add
+                        question
+                    </button>
+                    <app-noon-search class="list-inline-item pull-right mr-4" (func)="search($event)"></app-noon-search>
+                </h3>
+            </div>
+            <noon-loader *ngIf="isQuestionsLoading"></noon-loader>
+            <div class="table-responsive noon-table">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Text</th>
+                            <th>Explanation</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let question of questionsList;let i=index;">
+                            <td>{{question.id}}</td>
+                            <td>{{question.questionText}}</td>
+                            <td>{{question.explanation}}</td>
+                            <td>
+                                <button class="btn btn-primary btn-action" title="Assign answers" (click)="openAssignAnswerModal(question)"
+                                    routerLinkActive="router-link-active"><i class="fa fa-paperclip"></i></button>
+                                <button class="btn btn-primary btn-action" title="Edit" routerLink="/questions/edit-question/{{question.id}}"
+                                    routerLinkActive="router-link-active"><i class="fa fa-pencil"></i></button>
+                                <button class="btn btn-danger btn-action" title="Delete" (click)="openDeleteConfirmation(question,i)">
+                                    <i class="fa fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div *ngIf="filterModel.totalCount > 0">
+                <ngb-pagination [collectionSize]="filterModel.totalCount" class="d-flex justify-content-end" [pageSize]="filterModel.perpagerecord"
+                    [(page)]="filterModel.pagenumber" [maxSize]="5" [boundaryLinks]="true" aria-label="Default pagination"
+                    (pageChange)="onPageChange($event)"></ngb-pagination>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #assignAnswerDialog let-c="close" let-d="dismiss">
+    <form class="form-horizontal noon-form" #assignAnswerForm="ngForm">
+        <div class="modal-header">
+            <h4 class="modal-title">Add course to bundle</h4>
+            <noon-loader *ngIf="isLoadingAddAns"></noon-loader>
+            <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">            
+            <div class="form-body list" *ngFor="let answer of questionAnswers;let last=last;let i=index;">
+                <div class="form-group row">
+                    <label class="control-label col-sm-2" for="answer_{{i}}">Answer* :</label>
+                    <div class="col col-sm-8">
+                        <input type="text" id="answer_{{i}}" class="form-control" [ngClass]="{'error' : (!questionAnswers[i].answer && questionAnswers[i].notFilled)}"
+                            placeholder="Enter answer" name="answer_{{i}}" [(ngModel)]="questionAnswers[i].answer"
+                            required>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="control-label col-sm-2" for="extraText_{{i}}">Extra Text :</label>
+                    <div class="col col-sm-8">
+                        <input type="text" id="extraText_{{i}}" class="form-control" placeholder="Enter Extra Text"
+                            name="extraText_{{i}}" [(ngModel)]="questionAnswers[i].extraText" required>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="control-label col-sm-2" for="isCorrect">Is correct :</label>
+                    <div class="col col-sm-6">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" value="" name="isCorrect+{{i}}" [(ngModel)]="questionAnswers[i].isCorrect"
+                                    #isCorrect="ngModel">
+                                Is Answer
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col col-sm-4" *ngIf="tempQues.isMultiAnswer">
+                        <button class="btn btn-danger btn-action" title="Delete" *ngIf="questionAnswers.length > 1 && !last"
+                            (click)="questionAnswers.splice(i,1);">
+                            <i class="fa fa-minus"></i></button>
+                        <button class="btn btn-danger btn-action" title="Add" *ngIf="last" (click)="addAnswer()">
+                            <i class="fa fa-plus"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-info" (click)="addAnswersToQuestion()">Add answers</button>
+        </div>
+    </form>
+</ng-template>
+
+<app-common-dialog #listdialog (deleteEvent)="deleteQuestion($event)"></app-common-dialog>

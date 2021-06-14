@@ -1,0 +1,90 @@
+<div>
+  <ngb-accordion #acc="ngbAccordion" [activeIds]="panels">
+    <ngb-panel title="Sales Agents" id="sales_agents_panel">
+      <ng-template ngbPanelContent>
+        <div class="card-body table-responsive noon-custom-table pt-0">
+          <h3 class="control-label col-md-12 col-sm-12 no-padding">
+            <button class="btn btn-info pull-right m-r-20px mb-1" title="Add" [routerLink]="['/agents/add-agent']">New
+              Agent</button>
+          </h3>
+          <table class="table table-hover table-striped">
+            <thead>
+              <tr>
+                <th>Agent Name</th>
+                <th>Agent Category</th>
+                <th>Details</th>
+                <th>Agreements</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let agent of agentList;let i=index;">
+                <td>{{agent.agentName}}</td>
+                <td>{{agent.categoryName}}</td>
+                <td>
+                  <button class="btn btn-primary btn-action" title="edit" routerLink="/agents/edit-agent/{{agent.salesAgentId}}"  routerLinkActive="router-link-active">
+                    <i class="fa fa-pencil"></i>
+                  </button>
+                </td>
+                <td>
+                  <button class="btn btn-primary btn-action" title="view existing">
+                    <i class="fa fa-eye"></i>
+                  </button>
+                  <button class="btn btn-primary btn-action" title="generate new">
+                    <i class="fa fa-plus"></i>
+                  </button>
+                </td>
+                <td>
+                  <button class="btn btn-danger btn-action" title="Delete" (click)="openDeleteConfirmation(agent,i)">
+                    <i class="fa fa-trash"></i>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div *ngIf="aglfilterModel.totalCount > 0">
+          <ngb-pagination [collectionSize]="aglfilterModel.totalCount" class="d-flex justify-content-end" [pageSize]="aglfilterModel.perpagerecord"
+            [(page)]="aglfilterModel.pagenumber" [maxSize]="5" [boundaryLinks]="true" aria-label="Default pagination"
+            (pageChange)="onPageChange($event,'agl')"></ngb-pagination>
+        </div>
+      </ng-template>
+    </ngb-panel>
+    <ngb-panel title="Agent categories" id="agents_category_panel">
+      <ng-template ngbPanelContent>
+        <div class="card-body table-responsive noon-custom-table pt-0">
+          <h3 class="control-label col-md-12 col-sm-12 no-padding">
+            <button class="btn btn-info pull-right m-r-20px mb-1" title="Add" [routerLink]="['/agents/add-agent-category']">New
+              Agent Category</button>
+          </h3>
+          <table class="table table-hover table-striped">
+            <thead>
+              <tr>
+                <th>Category Name</th>
+                <th>Commission %</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let agentCategory of agentCategoryList;let i=index;">
+                <td>{{agentCategory.categoryName}}</td>
+                <td>{{agentCategory.commission}}</td>
+                <td>
+                  <button class="btn btn-primary btn-action" title="Edit" routerLink="/agents/edit-agent-category/{{agentCategory.id}}">
+                    <i class="fa fa-pencil"></i>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div *ngIf="agclfilterModel.totalCount > 0">
+            <ngb-pagination [collectionSize]="agclfilterModel.totalCount" class="d-flex justify-content-end" [pageSize]="agclfilterModel.perpagerecord"
+              [(page)]="agclfilterModel.pagenumber" [maxSize]="5" [boundaryLinks]="true" aria-label="Default pagination"
+              (pageChange)="onPageChange($event,'agcl')"></ngb-pagination>
+          </div>
+      </ng-template>
+    </ngb-panel>
+  </ngb-accordion>
+</div>
+<app-common-dialog #listdialog (deleteEvent)="deleteAgent($event)"></app-common-dialog>

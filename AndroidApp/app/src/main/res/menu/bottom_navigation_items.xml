@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/action_item1"
+        android:icon="@drawable/ic_course_icon"
+        android:title="@string/item_1" />
+
+    <item
+        android:id="@+id/action_item3"
+        android:icon="@drawable/ic_question_answer"
+        android:title="@string/item_4" />
+    <item
+        android:id="@+id/action_item4"
+        android:icon="@drawable/ic_book_library"
+        android:title="@string/item_5" />
+
+    <!--<item-->
+        <!--android:id="@+id/action_item2"-->
+        <!--android:icon="@drawable/ic_progress_report"-->
+        <!--android:title="@string/progress_report" />-->
+
+    <!--<item
+        android:id="@+id/action_item5"
+        android:icon="@drawable/ic_assignment"
+        android:title="@string/item_2"
+        android:visible="false" />-->
+
+
+</menu>

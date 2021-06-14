@@ -1,0 +1,17 @@
+.right-dir {
+    position: absolute;
+    right: -20px;
+    z-index: 1010;
+    bottom: 0;
+    text-align: right;
+    color: #c3c3c3;
+}
+
+.task-check{
+    width: 18px !important;
+    height: 18px !important;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    padding-top: 2px;
+    font-size: 11px;
+}

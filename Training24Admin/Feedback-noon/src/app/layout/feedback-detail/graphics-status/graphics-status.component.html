@@ -1,0 +1,194 @@
+<div class="noon-tab-content">
+  <div class="row">
+    <div class="col-md-6 col-xs-12" style="border-right: 2px solid #e5e5e5;">
+      <div class="row">
+        <div class="col-md-9">
+          Filming staff
+        </div>
+        <div class="col-md-3">
+          <button class="btn btn-primary rounded-btn" (click)="assignPersonsModal()">
+            Add
+          </button>
+        </div>
+      </div>
+      <div class="">
+        <div class="card-body table-responsive">
+          <table class="table table-hover table-striped">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Role</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let i of [1,1,1,1,1,1,1]">
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 col-xs-12">
+      <div class="row">
+        <div class="col-md-9">
+          Filming tasks
+        </div>
+        <div class="col-md-3">
+          <button class="btn btn-primary rounded-btn" (click)="assignTasksModal()">
+            Add
+          </button>
+        </div>
+      </div>
+      <div class="">
+        <div class="card-body table-responsive">
+          <table class="table table-hover table-striped">
+            <thead>
+              <tr>
+                <th>Graphic</th>
+                <th>Type</th>
+                <th>Submission date</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let i of [1,1,1,1]">
+                <td>
+                  <a href="javascript:void(0)" style="margin-right:3px">Edit</a>
+                </td>
+                <td>
+                  logo
+                </td>
+                <td>
+
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6 col-xs-12">
+      <div class="card mb-3" style="margin-top:10px;">
+        <div class="card-body btn text-center">
+          Approve Graphics
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 col-xs-12">
+      <div class="card mb-3" style="margin-top:10px;">
+        <div class="card-body btn text-center">
+          Reject Graphics
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #assignPersonsDialog let-c="close" let-d="dismiss">
+  <form class="form-horizontal noon-form" #assignPersonsForm="ngForm" (ngSubmit)="assignPersonsForm.form.valid && addCourseAny()">
+    <div class="modal-header">
+      <h4 class="modal-title">Assign graphics staff</h4>
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group row">
+        <label class="control-label col-sm-4" for="name">Name:</label>
+        <div class="col col-sm-8">
+          <input type="text" class="form-control" placeholder="Enter name" name="name" [(ngModel)]="addPersonModel.name"
+            #name="ngModel" required>
+          <div *ngIf="name.invalid && (name.touched || assignPersonsForm.submitted)">
+            <p class="input-info error-message" *ngIf="name.errors.required">Name is required</p>
+          </div>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label class="control-label col-sm-4" for="role">Role:</label>
+        <div class="col col-sm-8">
+          <input type="text" class="form-control" placeholder="Enter role" name="role" [(ngModel)]="addPersonModel.role"
+            #role="ngModel" required>
+          <div *ngIf="role.invalid && (role.touched || assignPersonsForm.submitted)">
+            <p class="input-info error-message" *ngIf="role.errors.required">Role is required</p>
+          </div>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label class="control-label col-sm-4" for="actions">Actions:</label>
+        <div class="col col-sm-8">
+          <input type="text" class="form-control" placeholder="Enter actions" name="actions" [(ngModel)]="addPersonModel.actions"
+            #actions="ngModel" required>
+          <div *ngIf="actions.invalid && (actions.touched || assignPersonsForm.submitted)">
+            <p class="input-info error-message" *ngIf="actions.errors.required">Actions is required</p>
+          </div>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label class="control-label col-sm-4" for="description">Description:</label>
+        <div class="col col-sm-8">
+          <textarea rows="3" id="description" class="form-control" placeholder="Enter description" name="description"
+            [(ngModel)]="addPersonModel.description" #description="ngModel" required></textarea>
+          <div *ngIf="description.invalid && (description.touched || assignPersonsForm.submitted)">
+            <p class="input-info error-message" *ngIf="description.errors.required">Description is required</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="submit" class="btn btn-info" [disabled]="!assignPersonsForm.valid">Add
+        task</button>
+    </div>
+  </form>
+</ng-template>
+
+<ng-template #assignTasksDialog let-c="close" let-d="dismiss">
+  <form class="form-horizontal noon-form" #assignTasksForm="ngForm" (ngSubmit)="assignTasksForm.form.valid && addCourseAny()">
+    <div class="modal-header">
+      <h4 class="modal-title">Assign tasks</h4>
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group row">
+        <label class="control-label col-sm-4" for="graphics">Graphics:</label>
+        <div class="col col-sm-8">
+          <input type="text" class="form-control" placeholder="Enter graphics" name="graphics" [(ngModel)]="assignTaskModel.graphics"
+            #graphics="ngModel" required>
+          <div *ngIf="graphics.invalid && (graphics.touched || assignTasksForm.submitted)">
+            <p class="input-info error-message" *ngIf="graphics.errors.required">Graphics is required</p>
+          </div>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label class="control-label col-sm-4" for="type">Type:</label>
+        <div class="col col-sm-8">
+          <input type="text" class="form-control" placeholder="Enter type" name="type" [(ngModel)]="assignTaskModel.type"
+            #type="ngModel" required>
+          <div *ngIf="type.invalid && (type.touched || assignTasksForm.submitted)">
+            <p class="input-info error-message" *ngIf="type.errors.required">Type is required</p>
+          </div>
+        </div>
+      </div>      
+      <div class="form-group row">
+        <label class="control-label col-sm-4" for="description">Description:</label>
+        <div class="col col-sm-8">
+          <textarea rows="3" id="description" class="form-control" placeholder="Enter description" name="description"
+            [(ngModel)]="assignTaskModel.description" #description="ngModel" required></textarea>
+          <div *ngIf="description.invalid && (description.touched || assignTasksForm.submitted)">
+            <p class="input-info error-message" *ngIf="description.errors.required">Description is required</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="submit" class="btn btn-info" [disabled]="!assignTasksForm.valid">Add
+        task</button>
+    </div>
+  </form>
+</ng-template>

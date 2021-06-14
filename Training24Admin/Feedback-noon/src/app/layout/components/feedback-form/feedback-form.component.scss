@@ -1,0 +1,187 @@
+.recording-list .list-group-item .row .actions {
+    padding: 5px !important;
+}
+
+.files-list .list-group-item {
+    padding: 5px 5px 5px 15px !important;
+}
+
+.actions .control {
+    cursor: pointer;
+    min-width: 20px;
+}
+
+.description {
+    font-size: 13px;
+    margin-bottom: 2px;
+}
+
+.description-text:hover {
+    background: white !important;
+}
+
+.list-group-item:hover {
+    background-color: rgba(0, 0, 0, .075);
+}
+
+//new ui
+.card {
+    padding: 10px 20px 10px 20px;
+}
+
+.card-body {
+    padding: 0px;
+}
+
+.feedback_header {
+    height: 70px;
+}
+
+.contact_detail {
+    padding-bottom: 15px;
+    margin-top: 15px;
+}
+
+.feedback_detail {
+    margin-top: 15px;
+}
+
+.form-group-new {
+    margin: 0px !important;
+    display: flex;
+    align-items: center;
+    border: none;
+}
+
+.address_icon,
+.envelope_icon,
+.phone_icon {
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+    position: absolute;
+    padding: 12px;
+    margin-left: 5px;
+    color: #666666;
+}
+
+.category_dropdown {
+    margin-left: 35px;
+    margin-right: 40px;
+    border: none;
+    font-size: 13px;
+    margin-bottom: 2px;
+}
+
+.circle_icon {
+    font-size: 22px;
+    color: #5bc0eb;
+}
+
+.border_none {
+    border: none;
+    margin-left: 50px;
+    margin-right: 60px;
+    font-size: 13px;
+}
+
+.time_section {
+    margin-top: 15px;
+}
+
+.time_body {
+    margin: 10px 35px 0px 35px;
+}
+
+.time {
+    color: grey;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.start_time {
+    color: grey;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.image_icon {
+    color: grey;
+    font-size: 12px;
+}
+
+.file_icon {
+    color: lightgrey;
+    font-size: 12px;
+}
+
+.file_text {
+    max-width: calc(100% - 20px);
+    color: #5bc0eb;
+    font-size: 12px;
+    margin-bottom: 0px;
+}
+
+.close_icon {
+    margin-left: 5px;
+    font-size: 12px;
+    color: #f1491d;
+    cursor: pointer;
+    padding: 2px;
+}
+
+.minus_icon {
+    color: #f1491d;
+    font-size: 14px;
+    float: right;
+    cursor: pointer;
+}
+
+.time_text {
+    color: #f5643e;
+    font-size: 12px;
+    margin-top: 3px;
+}
+
+.left_area {
+    position: absolute;
+    right: 55px;
+}
+
+.orange_dot_icon {
+    font-size: 8px;
+    color: #f1491d;
+    padding: 3px;
+    margin-left: 5px;
+    margin-top: 3px;
+}
+
+.microphone_icon {
+    width: 23px;
+    background-color: #5bc0eb;
+    height: 23px;
+    border-radius: 12px;
+    margin-left: 5px;
+}
+
+.microphone {
+    color: black;
+    padding: 6px;
+}
+
+.drop_area {
+    height: 100%;
+    width: 100%;
+}
+
+.document_icon {
+    font-size: 40px;
+}
+
+.txt_align {
+    text-align: center;
+}
+
+.document_btn {
+    background-color: lightgrey;
+}

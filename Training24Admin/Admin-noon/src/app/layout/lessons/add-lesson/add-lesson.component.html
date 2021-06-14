@@ -1,0 +1,233 @@
+<div>
+    <h4>
+        <!-- <a class="btn btn-success btn-lg back" backDirection> -->
+        <!-- <span class="fa fa-arrow-left"></span> -->
+        <!-- </a> -->
+        <!-- <span *ngIf="lessonModel.chaptername">{{lessonModel.chaptername}}
+            <i class="fa fa-arrow-right" aria-hidden="true"></i>&nbsp;
+        </span>
+        <span *ngIf="isEditView">Edit</span><span *ngIf="!isEditView">Add</span> Lesson -->
+        <noon-loader *ngIf="isCallingApi"></noon-loader>
+    </h4>
+    <div class="row">
+        <div class="col col-xl-12 col-lg-12">
+            <form class="form-horizontal noon-form" #manageLessonForm="ngForm">
+
+                <div class="card-container">
+                    <p class="fs-20">
+                        <span *ngIf="lessonModel.chaptername">{{lessonModel.chaptername}}
+                            <i class="fa fa-arrow-right" aria-hidden="true"></i>&nbsp;
+                        </span>
+                        <span *ngIf="isEditView">Edit</span><span *ngIf="!isEditView">Add</span> Lesson
+                    </p>
+                </div>
+                <div class="card-container">
+                    <mat-card>
+                        <mat-form-field class="full-width">
+                            <input matInput type="text" id="name" placeholder="Enter name" name="name"
+                                [(ngModel)]="lessonModel.name" #name="ngModel" required>
+                            <div *ngIf="name.invalid && (name.touched || manageLessonForm.submitted)">
+                                <p class="input-info error-message" *ngIf="name.errors.required">Name is required
+                                </p>
+                            </div>
+                        </mat-form-field>
+                    </mat-card>
+                </div>
+
+                <div class="card-container">
+                    <p class="video-text">Video</p>
+                </div>
+
+                <div class="card-container">
+                    <mat-card>
+                        <mat-form-field class="full-width">
+                            <!-- <input matInput id="typeahead-templatev" type="text" placeholder="Enter File name"
+                                [(ngModel)]="videofilename" [ngbTypeahead]="Videosearch" [resultTemplate]="rtv"
+                                [inputFormatter]="formatterv" #videofile="ngModel" required name="videofile"
+                                (selectItem)="selectVideoFile($event)" /> -->
+                            <input type="text" placeholder="Enter File name" matInput [formControl]="myvideoControl"
+                                required name="videofile" [matAutocomplete]="video">
+                            <mat-autocomplete (optionSelected)="selectVideoFile()" #video="matAutocomplete"
+                                [displayWith]="displayFnVideo">
+                                <mat-option *ngFor="let videooption of videoFilesList" [value]="videooption">
+                                    {{videooption.name}}
+                                </mat-option>
+                            </mat-autocomplete>
+                        </mat-form-field>
+                        <div class="col-12 rmpm dropzone" appDrag (files)="videoFilesDropped($event)">
+                            <div class="text-wrapper">
+                                <div class="centered">Drop your file here</div>
+                                <div class="centered">Or</div>
+                                <div class="centered">
+                                    <button mat-raised-button class="file-btn outline-0" for="videofile"
+                                        (click)="selectFile(2)">SELECT
+                                        FILE</button>
+                                    <input type="file" id="videofile" style="display: none" name="file"
+                                        (change)="fileSelected($event,2)" accept="video/*">
+                                </div>
+                            </div>
+                        </div>
+                        <mat-progress-bar *ngIf="showVideoProgress" class="m-t-20px" [color]="primary" [mode]="mode"
+                            [value]="uploadedPercentage" [bufferValue]="0">
+                        </mat-progress-bar>
+                        <!-- <ng-template #rtv let-r="result" let-t="term">
+                            <ngb-highlight [result]="r.name" [term]="t"></ngb-highlight>
+                        </ng-template> -->
+                    </mat-card>
+                </div>
+
+                <div class="card-container">
+                    <p class="video-text">Pdf</p>
+                </div>
+
+                <div class="card-container">
+                    <mat-card>
+                        <mat-form-field class="full-width">
+                            <!-- <input matInput id="typeahead-templatep" type="text" placeholder="Enter File name"
+                                [(ngModel)]="pdffilename" [ngbTypeahead]="pdfsearch" [resultTemplate]="rtp"
+                                [inputFormatter]="formatterp" #pdffile="ngModel" required name="pdffile"
+                                (selectItem)="selectpdfFile($event)" /> -->
+                            <input type="text" placeholder="Enter File name" matInput [formControl]="mypdfControl"
+                                required name="pdffile" [matAutocomplete]="auto">
+                            <mat-autocomplete (optionSelected)="selectpdfFile()" #auto="matAutocomplete"
+                                [displayWith]="displayFnPdf">
+                                <mat-option *ngFor="let option of pdfFilesList" [value]="option">
+                                    {{option.name}}
+                                </mat-option>
+                            </mat-autocomplete>
+                        </mat-form-field>
+                        <div class="col-12 rmpm dropzone" appDrag (files)="pdfFilesDropped($event)">
+                            <div class="text-wrapper">
+                                <div class="centered">Drop your file here</div>
+                                <div class="centered">Or</div>
+                                <div class="centered">
+                                    <button mat-raised-button class="file-btn outline-0" for="pdffile"
+                                        (click)="selectFile(1)">SELECT
+                                        FILE</button>
+                                    <input type="file" id="pdffile" style="display: none" name="file"
+                                        (change)="fileSelected($event,1)" accept="application/pdf">
+                                </div>
+                            </div>
+                        </div>
+                        <mat-progress-bar *ngIf="showPdfProgress" class="m-t-20px" [color]="primary" [mode]="mode"
+                            [value]="uploadedPercentage" [bufferValue]="0">
+                        </mat-progress-bar>
+                        <!-- <ng-template #rtp let-r="result" let-t="term">
+                            <ngb-highlight [result]="r.name" [term]="t"></ngb-highlight>
+                        </ng-template> -->
+                    </mat-card>
+                </div>
+
+                <div class="card-container">
+                    <p class="video-text">Assignment</p>
+                </div>
+
+                <div class="card-container">
+                    <mat-card>
+                        <mat-form-field class="full-width">
+                            <input type="text" matInput id="name" [(ngModel)]="assignmentName" #assignname="ngModel"
+                                placeholder="Enter name" name="assignname">
+                            <!-- [(ngModel)]="assignmentModel.name"   #name="ngModel" required -->
+                            <!-- <div *ngIf="assignname.invalid && (assignname.touched || manageLessonForm.submitted)">
+                                <p class="input-info error-message" *ngIf="assignname.errors.required">Name is required
+                                </p>
+                            </div> -->
+                        </mat-form-field>
+                        <mat-form-field class="full-width">
+                            <textarea matInput id="assigndescription" placeholder="Enter description"
+                                [(ngModel)]="assignmentDesc" #assigndescription="ngModel" name="description"></textarea>
+                        </mat-form-field>
+                        <div class="col-12 rmpm dropzone" appDrag (files)="assignmentFileDrop($event)">
+                            <div class="text-wrapper">
+                                <div class="centered">Drop your file here</div>
+                                <div class="centered">Or</div>
+                                <div class="centered">
+                                    <button mat-raised-button class="file-btn outline-0" (click)="openAllFileModal()"
+                                        for="assignfile">SELECT
+                                        FILE</button>
+                                    <input type="file" id="assignfile" name="assignfile" style="display: none"
+                                        multiple="multiple" (change)="assignmentfileSelected($event)" accept="image/*,application/pdf,
+                                        application/vnd.ms-excel,.xlsx,
+                                        application/msword,
+                                        .docs,application/vnd.ms-powerpoint,.pptx,.pps,
+                                        application/vnd.openxmlformats-officedocument.presentationml.presentation,
+                                        application/vnd.openxmlformats-officedocument.presentationml.slideshow,
+                                        video/*">
+                                </div>
+                            </div>
+                        </div>
+                        <mat-progress-bar *ngIf="showAssignmentProgress" class="m-t-20px" [color]="primary" [mode]="mode"
+                            [value]="uploadedPercentage" [bufferValue]="0">
+                        </mat-progress-bar>
+                        <!-- <mat-form-field class="full-width"> -->
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Filename</th>
+                                    <th>Type</th>
+                                    <!-- <th>Code</th> -->
+                                    <th>Size</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody *ngIf="assignmentfiles">
+                                <tr *ngFor="let afile of assignmentfiles;let i = index">
+                                    <td>{{afile.filename}}</td>
+                                    <td>{{afile.filetypename}}</td>
+                                    <td>{{afile.filesize/1024}}Kb</td>
+                                    <td>
+                                        <button class="btn btn-danger btn-action outline-0" title="Delete"
+                                            (click)="DeleteFile(i)">
+                                            <!-- (click)="openDeleteConfirmation(lesson,i)" -->
+                                            <i class="fa fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <!-- </mat-form-field> -->
+                    </mat-card>
+                </div>
+                <video id="mynAllVideo" width="320" height="176" controls style="display:none">
+                    <!-- <video id="myVideo" width="320" height="176" controls> -->
+                    <!-- <source src="mov_bbb.mp4" type="video/mp4"> -->
+                    <!-- <source src="mov_bbb.ogg" type="video/ogg"> -->
+                    Your browser does not support HTML5 video.
+                </video>
+                <div class="text-right card-container">
+                    <button mat-raised-button class="cancel-btn" backDirection>Cancel</button>
+                    <button *ngIf="!isEditView" mat-raised-button class="m-l-20px save-btn outline-0" type="submit"
+                        [disabled]="manageLessonForm.invalid || isCallingApi" (click)="manageLession()">Save</button>
+                    <button *ngIf="isEditView" mat-raised-button class="m-l-20px save-btn outline-0" type="submit"
+                        [disabled]="manageLessonForm.invalid || isCallingApi" (click)="updateLesson()">Edit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<noon-upload-status #fileUploadStatusDialog [data]="uploadedPercentage"></noon-upload-status>
+<!-- <ng-template #fileUploadDialog let-c="close" let-d="dismiss">
+    <div class="modal-header">
+        <h4 class="modal-title">Uploading in progress...</h4>
+        <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <div class="form-group row justify-content-md-start">
+            <div class="col col-md-12" style="position:relative">
+                <h4 style="position: absolute;z-index: 9999;top: 40%;left: 25%;">
+                    Uploading {{uploadedPercentage | number:'1.0-0'}}% uploaded...
+                    <br>
+                    <b><span >(Now taking time for store at DB)</span></b>
+                </h4>
+                <div>
+                    <div class="timeline-item">
+                        <div class="animated-background">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template> -->

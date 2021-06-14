@@ -1,0 +1,24 @@
+.noon-form-control .list-inline-item {
+    padding: 1px;
+}
+
+.temp-list{
+    .col-md-1:hover{
+        .del-course-icon {
+            display: inline-block;
+        }
+    }
+    .del-course-icon {
+        display: none;
+        position: absolute;
+        right: 10px;
+        top: -5px;
+        background: red;
+        color: white;
+        border-radius: 50%;
+        padding: 0px 2px;
+        width: 17px;
+        height: 17px;
+        text-align: center;
+    }
+}

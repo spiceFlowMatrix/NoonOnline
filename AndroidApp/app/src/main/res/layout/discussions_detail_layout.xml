@@ -1,0 +1,475 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorWhite"
+        android:fitsSystemWindows="true">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <LinearLayout
+                    android:id="@+id/toolbarLay"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_above="@+id/bottomLAY"
+                    android:layout_alignParentTop="true"
+                    android:orientation="vertical">
+
+                    <androidx.appcompat.widget.Toolbar
+                        android:id="@+id/toolBar"
+                        android:layout_width="match_parent"
+                        android:layout_height="?attr/actionBarSize"
+                        android:background="@color/colorlightGray"
+                        android:theme="@style/AppTheme.Toolbar"
+                        app:popupTheme="@style/AppTheme.PopupOverlay">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="end"
+                            android:layout_marginEnd="@dimen/_10sdp"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:id="@+id/discussionsDelete"
+                                android:layout_width="@dimen/_17sdp"
+                                android:layout_height="@dimen/_17sdp"
+                                android:layout_marginEnd="@dimen/_10sdp"
+                                android:adjustViewBounds="true"
+                                app:srcCompat="@drawable/ic_delete" />
+
+
+                            <FrameLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content">
+
+
+                                <ImageView
+                                    android:id="@+id/discussionsEdit"
+                                    android:layout_width="@dimen/_17sdp"
+                                    android:layout_height="@dimen/_17sdp"
+                                    android:adjustViewBounds="true"
+                                    android:tint="@color/colorBlack"
+                                    app:srcCompat="@drawable/ic_edit" />
+
+                                <ImageView
+                                    android:id="@+id/discussionsCheckEdit"
+                                    android:layout_width="@dimen/_17sdp"
+                                    android:layout_height="@dimen/_17sdp"
+                                    android:adjustViewBounds="true"
+                                    android:tint="@color/colorBlack"
+                                    android:visibility="gone"
+                                    app:srcCompat="@drawable/ic_check_black" />
+
+
+                            </FrameLayout>
+
+
+                        </LinearLayout>
+
+
+                    </androidx.appcompat.widget.Toolbar>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/colorGray" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/_10sdp"
+                        android:layout_marginEnd="@dimen/_10sdp"
+                        android:orientation="vertical">
+
+                        <RelativeLayout
+                            android:id="@+id/laySwitch"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/_5sdp"
+                            android:layout_marginBottom="@dimen/_10sdp"
+                            android:visibility="gone">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/_15sdp"
+                                android:text="@string/share_with"
+                                android:textColor="@color/colorDarkGray"
+                                android:textSize="@dimen/_11sdp" />
+
+                            <Switch
+                                android:id="@+id/shareSwitch"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentEnd="true" />
+
+                        </RelativeLayout>
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <LinearLayout
+                                android:id="@+id/profileLay"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/_15sdp"
+                                android:visibility="visible">
+
+                                <de.hdodenhof.circleimageview.CircleImageView
+                                    android:id="@+id/commentprofileImage"
+                                    android:layout_width="@dimen/_40sdp"
+                                    android:layout_height="@dimen/_40sdp"
+                                    android:src="@drawable/profile"
+                                    app:civ_border_width="0dp" />
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:id="@+id/userInfoLay"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/_9sdp"
+                                android:layout_toEndOf="@+id/profileLay"
+                                android:orientation="horizontal">
+
+                                <LinearLayout
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:id="@+id/txtUsername"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginEnd="@dimen/_5sdp"
+                                        android:singleLine="true"
+                                        android:text="User Name"
+                                        android:textColor="@color/colorBlack"
+                                        android:textSize="@dimen/_12sdp" />
+
+                                    <!--<android.support.design.widget.TextInputLayout-->
+                                    <!--android:id="@+id/discussionsNameWrapper"-->
+                                    <!--android:layout_width="match_parent"-->
+                                    <!--android:layout_height="wrap_content">-->
+
+                                    <!--<com.xw.repo.XEditText-->
+                                    <!--android:id="@+id/edtdiscussionsName"-->
+                                    <!--android:layout_width="match_parent"-->
+                                    <!--android:layout_height="wrap_content"-->
+                                    <!--android:ellipsize="end"-->
+                                    <!--android:hint="@string/discussions_topic_name"-->
+                                    <!--android:inputType="textNoSuggestions"-->
+                                    <!--android:maxLines="1"-->
+                                    <!--android:singleLine="true"-->
+                                    <!--android:textColor="@color/colorBlack"-->
+                                    <!--android:textColorHint="@color/colorPrimary"-->
+                                    <!--android:textSize="@dimen/_13sdp"-->
+                                    <!--app:x_disableEmoji="true" />-->
+
+                                    <!--</android.support.design.widget.TextInputLayout>-->
+
+                                    <TextView
+                                        android:id="@+id/txtTime"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="@dimen/_minus5sdp"
+                                        android:text="12:45 PM"
+                                        android:textColor="@color/colorMoreDarkGray"
+                                        android:textSize="@dimen/_10sdp"
+                                        android:visibility="visible" />
+
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:id="@+id/likeDislikeLay"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal"
+                                    android:visibility="visible">
+
+                                    <TextView
+                                        android:id="@+id/txtDisLikeCount"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginEnd="@dimen/_2sdp"
+                                        android:text="0"
+                                        android:textColor="@color/colorMoreDarkGray"
+                                        android:textSize="@dimen/_13sdp" />
+
+                                    <ImageView
+                                        android:id="@+id/thumbDownImage"
+                                        android:layout_width="@dimen/_20sdp"
+                                        android:layout_height="@dimen/_20sdp"
+                                        android:layout_marginTop="@dimen/_5sdp"
+                                        app:srcCompat="@drawable/ic_thumb_down" />
+
+
+                                    <ImageView
+                                        android:id="@+id/thumbUpImage"
+                                        android:layout_width="@dimen/_20sdp"
+                                        android:layout_height="@dimen/_20sdp"
+                                        android:layout_marginStart="@dimen/_13sdp"
+                                        app:srcCompat="@drawable/ic_thumb_up_gray" />
+
+                                    <TextView
+                                        android:id="@+id/txtLikeCount"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="@dimen/_2sdp"
+                                        android:text="0"
+                                        android:textColor="@color/colorMoreDarkGray"
+                                        android:textSize="@dimen/_13sdp" />
+                                </LinearLayout>
+
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@+id/userInfoLay"
+                                android:layout_marginStart="@dimen/_7sdp"
+                                android:layout_toEndOf="@+id/profileLay"
+                                android:orientation="vertical">
+
+                                <!--<TextView-->
+                                <!--android:id="@+id/txt_topicname"-->
+                                <!--android:layout_width="wrap_content"-->
+                                <!--android:layout_height="wrap_content"-->
+                                <!--android:layout_marginTop="@dimen/_15sdp"-->
+                                <!--android:text=""-->
+                                <!--android:textSize="@dimen/_15sdp" />-->
+
+                                <!--<TextView-->
+                                <!--android:id="@+id/txt_description"-->
+                                <!--android:layout_width="wrap_content"-->
+                                <!--android:layout_height="wrap_content"-->
+                                <!--android:layout_marginTop="@dimen/_minus5sdp"-->
+                                <!--android:text=""-->
+                                <!--android:textSize="@dimen/_13sdp" />-->
+
+                                <com.google.android.material.textfield.TextInputLayout
+                                    android:id="@+id/discussionsTopicNameWrapper"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="@dimen/_minus8sdp"
+                                    android:visibility="visible">
+
+                                    <EditText
+                                        android:id="@+id/edtdiscussionsTopicName"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:ellipsize="end"
+                                        android:hint="@string/discussions_topic_name"
+                                        android:maxLines="1"
+                                        android:singleLine="true"
+                                        android:text=""
+                                        android:textAlignment="viewStart"
+                                        android:textColor="@color/colorPrimaryDark"
+                                        android:textColorHint="@color/colorPrimary"
+                                        android:textSize="@dimen/_15sdp"
+                                        app:x_disableEmoji="true" />
+
+                                </com.google.android.material.textfield.TextInputLayout>
+
+
+                                <com.google.android.material.textfield.TextInputLayout
+                                    android:id="@+id/discussionsTopicDescriptionWrapper"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:visibility="gone">
+
+                                    <EditText
+                                        android:id="@+id/edtddiscussionsTopicDescription"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:ellipsize="end"
+                                        android:hint="@string/discussions_topic_description"
+                                        android:inputType="none"
+                                        android:maxLines="2"
+                                        android:text=""
+                                        android:textAlignment="viewStart"
+                                        android:textColor="@color/colorPrimaryDark"
+                                        android:textColorHint="@color/colorPrimary"
+                                        android:textSize="@dimen/_13sdp"
+                                        app:x_disableEmoji="true" />
+                                </com.google.android.material.textfield.TextInputLayout>
+
+                                <TextView
+                                    android:id="@+id/txt_description"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="@dimen/_3sdp"
+                                    android:layout_marginTop="@dimen/_minus15sdp"
+                                    android:ellipsize="end"
+                                    android:maxLines="2"
+                                    android:text=""
+                                    android:textAlignment="viewStart"
+                                    android:textSize="@dimen/_13sdp"
+                                    android:visibility="gone" />
+                            </LinearLayout>
+                        </RelativeLayout>
+
+
+                        <LinearLayout
+                            android:id="@+id/cardpickerLay"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/_60sdp"
+                            android:layout_marginTop="@dimen/_5sdp"
+                            android:layout_marginBottom="@dimen/_10sdp"
+                            android:orientation="horizontal"
+                            android:visibility="gone">
+
+                            <androidx.cardview.widget.CardView
+                                android:id="@+id/cardAddFilePicker"
+                                android:layout_width="@dimen/_30sdp"
+                                android:layout_height="@dimen/_30sdp"
+                                android:layout_gravity="center"
+                                android:layout_marginEnd="@dimen/_10sdp"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:foreground="?android:attr/selectableItemBackground"
+                                app:cardBackgroundColor="@color/colorGreen"
+                                app:cardCornerRadius="3dp"
+                                app:cardElevation="1dp">
+
+                                <ImageView
+                                    android:layout_width="@dimen/_20sdp"
+                                    android:layout_height="@dimen/_20sdp"
+                                    android:layout_gravity="center"
+                                    android:tint="@color/colorWhite"
+                                    app:srcCompat="@drawable/ic_add" />
+
+                            </androidx.cardview.widget.CardView>
+
+                            <include
+                                android:id="@+id/rcVerticalLay"
+                                layout="@layout/recycleview_verticle_layout"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <View
+                        android:id="@+id/horizontalView"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/_1sdp"
+                        android:background="@color/colorMoreDarkGray">
+
+                    </View>
+
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <include
+                            android:id="@+id/rcVerticalLayout"
+                            layout="@layout/recycleview_verticle_layout"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_above="@+id/progressDialogLay"
+                            android:padding="@dimen/_15sdp" />
+
+                        <include
+                            android:id="@+id/progressDialogLay"
+                            layout="@layout/item_progressbar"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentBottom="true" />
+
+                    </RelativeLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/bottomLAY"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:gravity="center_vertical"
+                    android:orientation="vertical"
+                    android:visibility="visible">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/_50sdp"
+                        android:background="@color/colorlightGray"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <androidx.cardview.widget.CardView
+                            android:id="@+id/cardCommentpicker"
+                            android:layout_width="@dimen/_17sdp"
+                            android:layout_height="@dimen/_17sdp"
+                            android:layout_margin="@dimen/_7sdp"
+                            app:cardBackgroundColor="@color/colorGreen"
+                            app:cardCornerRadius="3dp"
+                            app:cardElevation="1dp">
+
+                            <ImageView
+                                android:layout_width="@dimen/_15sdp"
+                                android:layout_height="@dimen/_15sdp"
+                                android:layout_gravity="center"
+                                app:srcCompat="@drawable/ic_add" />
+
+                        </androidx.cardview.widget.CardView>
+
+                        <androidx.cardview.widget.CardView
+                            android:id="@+id/cardview2"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_margin="@dimen/_7sdp"
+                            app:cardBackgroundColor="@color/colorWhite"
+                            app:cardCornerRadius="23dp"
+                            app:cardElevation="1dp">
+
+                            <EditText
+                                android:id="@+id/txtbox"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:background="@null"
+                                android:drawableEnd="@drawable/ic_send"
+                                android:drawablePadding="@dimen/_5sdp"
+                                android:gravity="center_vertical"
+                                android:paddingStart="@dimen/_15sdp"
+                                android:paddingTop="@dimen/_5sdp"
+                                android:paddingEnd="@dimen/_10sdp"
+                                android:paddingBottom="@dimen/_5sdp"
+                                android:singleLine="true"
+                                android:text="" />
+
+                        </androidx.cardview.widget.CardView>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </RelativeLayout>
+
+            <FrameLayout
+                android:id="@+id/filechooserFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/colorWhite"
+                android:visibility="gone" />
+
+        </FrameLayout>
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+</layout>

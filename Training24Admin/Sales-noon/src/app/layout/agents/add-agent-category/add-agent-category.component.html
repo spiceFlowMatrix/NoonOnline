@@ -1,0 +1,46 @@
+<div>
+    <h4>
+        <a class="btn btn-success btn-lg back" backDirection>
+            <span class="fa fa-arrow-left"></span>
+        </a>
+        <span *ngIf="isEditView">Edit</span><span *ngIf="!isEditView">Add</span> agent category
+        <noon-loader *ngIf="isCallingApi"></noon-loader>
+    </h4>
+    <div class="row">
+        <div class="col col-xl-6 col-lg-12">
+            <form class="form-horizontal noon-form" #manageAgentCategoryForm="ngForm" (ngSubmit)="manageAgentCategoryForm.form.valid && manageQuestionType()">
+                <div class="form-group row">
+                    <label class="control-label col-sm-4" for="categoryName">Name :</label>
+                    <div class="col col-sm-8">
+                        <input type="text" id="categoryName" class="form-control" placeholder="Enter category name" name="categoryName"
+                            [(ngModel)]="agentCategoryModel.categoryName" #categoryName="ngModel" required>
+                        <div *ngIf="categoryName.invalid && (categoryName.touched || manageAgentCategoryForm.submitted)">
+                            <p class="input-info error-message" *ngIf="categoryName.errors.required">Category Name is required</p>
+                        </div>
+                    </div>
+                </div>                
+                <div class="form-group row">
+                    <label class="control-label col-sm-4" for="name">Commissions :</label>
+                    <div class="col col-sm-8">
+                        <input type="tel" id="commission" name="commission" class="form-control input-underline input-lg"
+                          placeholder="Commissions" #commission="ngModel" [(ngModel)]="agentCategoryModel.commission"
+                          required>
+                        <div *ngIf="commission.invalid && (commission.touched || manageAgentCategoryForm.submitted)">
+                            <p class="input-info error-message" *ngIf="commission.errors.required">Commissions is required</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-8 pull-right">
+                        <button type="submit" class="btn btn-primary m-r-20px" *ngIf="isEditView" [disabled]="manageAgentCategoryForm.invalid || isCallingApi">Edit
+                            agent category</button>
+                        <button type="submit" class="btn btn-primary m-r-20px" *ngIf="!isEditView" [disabled]="manageAgentCategoryForm.invalid || isCallingApi">Add
+                            agent category
+                        </button>
+                        <button class="btn btn-danger" backDirection>Cancel</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,169 @@
+<div class="ml-3 mr-2">
+    <noon-loader *ngIf="isCallingApi"></noon-loader>
+    <div class="row">
+        <div [ngClass]="isDetailCalled ? 'col-md-6' : 'col-md-12'" class="noon-box">
+            <div class="custom-card pt-4" style="height: calc(100vh - 80px);overflow-y: scroll;overflow-x: hidden;">
+                <div class="pos-rel pl-2">
+                    <h5 class="mb-0 font-weight-bold action-bar">
+                        <span class="text-uppercase">Active</span>
+                        <span class="setting-icon">
+                            <i class="fa fa-cog pos-rel" aria-hidden="true" placement="bottom" [autoClose]="false"
+                                [ngbPopover]="popContent" [popoverClass]="'settingpopover'" #filterPopOver="ngbPopover"
+                                (click)="initForm()"></i>
+                        </span>
+                    </h5>
+                    <ng-template #popContent>
+                        <form #feedbackFilterForm="ngForm" role="form">
+                            <div class="filter-container">
+                                <div class="text-right mb-1">
+                                    <span class="d-md-inline-block mr-4 reset-filter-label" *ngIf="feedbackModel.isfilterneeded" (click)="resetfilter()">
+                                    <!-- <span class="d-md-inline-block mr-4 reset-filter-label" (click)="resetfilter()"> -->
+                                        Reset
+                                    </span>
+                                    <span class="d-md-inline-block">
+                                        <i class="fa fa-times close-icon" aria-hidden="true" (click)="closeFilterPopOver()"></i>
+                                    </span>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label>Grade</label>
+                                        <select class="form-control filter-control" name="filterGrade" (change)="gradeChange(feedbackModel.grade)"
+                                            [(ngModel)]="feedbackModel.grade">
+                                            <option [value]=undefined disabled>Select</option>
+                                            <option *ngFor="let grade of gradeList" [value]="grade.id">{{grade.name}}</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label>Filter option</label>
+                                        <select class="form-control filter-control" name="fltroptiongrade" [(ngModel)]="feedbackModel.fltroptiongrade">
+                                            <option value="1">= Equals</option>
+                                            <option value="2">Similar</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row mt-4">
+                                    <div class="col-md-6">
+                                        <label>Course</label>
+                                        <select class="form-control filter-control" name="filterCourse" [(ngModel)]="feedbackModel.courseid"
+                                            (change)="courseAddedToFilter(feedbackModel.courseid)">
+                                            <option [value]=undefined disabled>Select</option>
+                                            <option *ngFor="let course of gradeCourseList" [value]="course.courseid">{{course.name}}</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 p-0 pos-rel">
+                                        <p class="mb-0 filter-courses" *ngIf="feedbackModel.selectedCourses">
+                                            <!-- <span *ngFor="let course of feedbackModel.selectedCourses" class="selected-course"> -->
+                                            <span *ngFor="let course of feedbackModel.selectedCourses;let i=index;" class="selected-course">
+                                                {{course.name}}
+                                                <i class="fa fa-times cancel-icon" aria-hidden="true" (click)="feedbackModel.selectedCourses.splice(i,1);applyfeedbackFilter(null);"></i>
+                                            </span>
+                                        </p>
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        <div class="head-avatar d-md-inline-block" [style.background]="'#57B7E0'"
+                                            [style.color]="'white'">
+                                            <i class="fa fa-calendar"></i>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 pl-2 pr-0">
+                                        <label class="mb-0">End Date</label>
+                                        <input class="form-control filter-control" style="height: 0px !important;
+                                    position: relative;
+                                    top: 15px;
+                                    opacity: 0;"
+                                            placeholder="yyyy-mm-dd" name="d2" #c2="ngModel" [(ngModel)]="feedbackModel.enddate"
+                                            ngbDatepicker #d2="ngbDatepicker" (dateSelect)="filterDateSelected($event)">
+                                        <p (click)="d2.toggle()" style="cursor:pointer">
+                                            <span *ngIf="!filterDate">Select Date</span>
+                                            <span *ngIf="filterDate">{{filterDate | date : 'd MMMM, yyyy'}}</span>
+                                        </p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label>Filter option</label>
+                                        <select class="form-control filter-control" name="fltroptionenddate"
+                                            [(ngModel)]="feedbackModel.fltroptionenddate">
+                                            <option value="1">= Equals</option>
+                                            <option value="2">Similar</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </ng-template>
+                    <hr class="mt-2 mb-4">
+                </div>
+                <div class="list-group feedback-list ml-3">
+                    <ng-container *ngFor="let feedback of feedbackList.newfeedback; let i=index">
+                        <div (click)="openDetailView(feedback,false,'newfeedback')">
+                            <noon-task-input-item [data]="feedback" [fieldId]="'newfeedback'+i" (doneEvent)="callAddTask()"
+                                [isDisabled]="true" [isNotificationNeeded]="true" [isFeedback]="true"></noon-task-input-item>
+                        </div>
+                    </ng-container>
+                </div>
+                <div class="mt-4 pl-2">
+                    <h5 class="mb-0 font-weight-bold">
+                        <span class="text-uppercase">Completed</span>
+                    </h5>
+                    <hr class="mt-2 mb-4">
+                </div>
+                <div class="list-group feedback-list ml-3">
+                    <ng-container *ngFor="let feedback of feedbackList.completedfeedback; let i=index">
+                        <div (click)="openDetailView(feedback,false,'completedfeedback')">
+                            <noon-task-input-item [data]="feedback" [fieldId]="'completedfeedback'+i" [isDisabled]="true"
+                                [isNotificationNeeded]="true" [isFeedback]="true"></noon-task-input-item>
+                        </div>
+                    </ng-container>
+                </div>
+                <div class="mt-4 pl-2">
+                    <h5 class="mb-0 font-weight-bold">
+                        <span class="text-uppercase">Uploaded</span>
+                    </h5>
+                    <hr class="mt-2 mb-4">
+                </div>
+                <div class="list-group feedback-list ml-3">
+                    <ng-container *ngFor="let feedback of feedbackList.uploadedfeedback; let i=index">
+                        <div (click)="openDetailView(feedback,false,'uploadedfeedback')">
+                            <noon-task-input-item [data]="feedback" [fieldId]="'uploadedfeedback'+i" [isDisabled]="true"
+                                [isNotificationNeeded]="true" [isFeedback]="true"></noon-task-input-item>
+                        </div>
+                    </ng-container>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 noon-box" [hidden]="!isDetailCalled">
+            <div class="custom-card" style="height: calc(100vh - 80px);overflow-y: scroll;">
+                <router-outlet></router-outlet>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- <div>
+    <div class="row">
+        <div class="col col-md-6 col-sm-12" *ngFor="let feedback of feedbackList;let i=index;">
+            <div class="card mt-1">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col col-md-12">
+                            <h5 class="mb-0"><b>Contact information</b></h5>
+                            <hr>
+                            <p class="mb-0">{{feedback.contact.firstName}}</p>
+                            <p class="mb-0">
+                                <a href="mailto:{{feedback.contact.email}}">{{feedback.contact.email}}</a>
+                            </p>
+                            <p class="mb-0">
+                                <a href="tel:{{feedback.contact.phone}}">{{feedback.contact.phone}}</a>
+                            </p>
+                        </div>
+                    </div>
+                    <p class="text-right mb-0">
+                        <i>{{feedback.creationdate}}</i>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> -->

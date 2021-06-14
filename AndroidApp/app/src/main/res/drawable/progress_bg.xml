@@ -1,0 +1,55 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@android:id/secondaryProgress">
+        <shape
+            android:innerRadiusRatio="6"
+            android:shape="ring"
+            android:thicknessRatio="20.0"
+            android:useLevel="true"
+            android:innerRadius="@dimen/_65sdp"
+            android:thickness="@dimen/_50sdp">
+
+<!--
+            <gradient
+                android:centerColor="@color/colormorelightGray"
+                android:endColor="@color/colormorelightGray"
+                android:startColor="@color/colormorelightGray"
+                android:type="sweep" />-->
+            <stroke
+                android:width="1dp"
+                android:color="@color/colorDarkGray"/>
+
+        </shape>
+    </item>
+
+    <item android:id="@android:id/progress">
+        <rotate
+            android:fromDegrees="270"
+            android:pivotX="50%"
+            android:pivotY="50%"
+            android:toDegrees="270">
+
+            <shape
+                android:innerRadiusRatio="6"
+                android:shape="ring"
+                android:thickness="@dimen/_50sdp"
+                android:thicknessRatio="20.0"
+                android:innerRadius="@dimen/_65sdp"
+                android:useLevel="true">
+
+
+                <rotate
+                    android:fromDegrees="0"
+                    android:pivotX="50%"
+                    android:pivotY="50%"
+                    android:toDegrees="360" />
+
+                <gradient
+                    android:centerColor="@color/skyblue"
+                    android:endColor="@color/skyblue"
+                    android:startColor="@color/skyblue"
+                    android:type="sweep" />
+
+            </shape>
+        </rotate>
+    </item>
+</layer-list>

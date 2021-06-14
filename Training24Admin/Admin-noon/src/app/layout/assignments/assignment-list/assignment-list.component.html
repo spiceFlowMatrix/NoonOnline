@@ -1,0 +1,47 @@
+<div>
+    <div class="row">
+        <div class="col col-xl-12 col-lg-12">
+            <div class="row">
+                <h3 class="control-label col-md-4 col-sm-12">Assignment List</h3>
+                <h3 class="control-label col-md-8 col-sm-12 no-padding" *ngIf="utilService.getAccountDetails()">
+                    <button class="btn btn-info pull-right m-r-20px" title="Add question type" *ngIf="utilService.getRoles().indexOf('admin') > -1" [routerLink]="['/assignments/add-assignment']">Add
+                        assignment
+                    </button>
+                    <app-noon-search class="list-inline-item pull-right mr-4" (func)="search($event)"></app-noon-search>
+                </h3>
+            </div>
+            <noon-loader *ngIf="isAssignmentsLoading"></noon-loader>
+            <div class="table-responsive noon-table">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Name</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let assignment of assignmentsList;let i=index;">
+                            <td>{{assignment.id}}</td>
+                            <td>
+                                {{assignment.name}}
+                            </td>
+                            <td>
+                                <button class="btn btn-primary btn-action" title="Edit" routerLink="/assignments/edit-assignment/{{assignment.id}}"
+                                    routerLinkActive="router-link-active"><i class="fa fa-pencil"></i></button>
+                                <button class="btn btn-danger btn-action" title="Delete" (click)="openDeleteConfirmation(assignment,i)">
+                                    <i class="fa fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div *ngIf="filterModel.totalCount > 0">
+                <ngb-pagination [collectionSize]="filterModel.totalCount" class="d-flex justify-content-end" [pageSize]="filterModel.perpagerecord"
+                    [(page)]="filterModel.pagenumber" [maxSize]="5" [boundaryLinks]="true" aria-label="Default pagination"
+                    (pageChange)="onPageChange($event)"></ngb-pagination>
+            </div>
+        </div>
+    </div>
+</div>
+<app-common-dialog #listdialog (deleteEvent)="deleteAssignment($event)"></app-common-dialog>
