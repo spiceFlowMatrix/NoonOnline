@@ -761,7 +761,6 @@ public class MainDashBoardActivity extends BaseActivity implements View.OnClickL
     }
 
     private void displayDialog() {
-        // TODO Auto-generated method stub
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {

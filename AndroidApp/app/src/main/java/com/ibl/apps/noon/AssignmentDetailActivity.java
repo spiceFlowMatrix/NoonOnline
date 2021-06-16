@@ -121,7 +121,7 @@ import retrofit2.Response;
 
 import static com.ibl.apps.noon.AssignmentAddActivity.fileUploadList;
 
-
+//todo dd assignment detail activity
 public class AssignmentDetailActivity extends BaseActivity implements View.OnClickListener, ViewFiles {
 
     private final static int READ_EXTERNAL_STORAGE_PERMISSION_REQUEST_CODE = 13;
@@ -727,7 +727,7 @@ public class AssignmentDetailActivity extends BaseActivity implements View.OnCli
                             Toast.makeText(this, getString(R.string.please_select_student), Toast.LENGTH_SHORT).show();
                         }
                     } else {
-                        Intent intent = new Intent(getApplicationContext(), AssignmentDetailActivity.class);
+                        Intent intent = new Intent(getApplicationContext(), AssignmentAddActivity.class);
                         intent.putExtra(Const.Assignment, new Gson().toJson(assignment));
                         intent.putExtra(Const.Flag, flag);
                         startActivityForResult(intent, 200);
@@ -1981,7 +1981,7 @@ public class AssignmentDetailActivity extends BaseActivity implements View.OnCli
                     public void onSuccess(RestResponse<AssignmentData> assignmentDataRestResponse) {
                         hideDialog();
                         Toast.makeText(getApplicationContext(), assignmentDataRestResponse.getMessage(), Toast.LENGTH_SHORT).show();
-
+                        Log.e("DDDDDD","D"+userRoleName);
                         if (!TextUtils.isEmpty(userRoleName)) {
                             if (userRoleName.equals(Const.TeacherKEY)) {
                                 flagPassApiCallCommentsTeacher(Integer.parseInt(userNewId));

@@ -311,6 +311,8 @@ public class CoursePriviewObject {
 
         private String itemorder;
 
+        private int type;
+
         public String getItemorder() {
             return itemorder;
         }
@@ -381,6 +383,14 @@ public class CoursePriviewObject {
 
         public void setProgressVal(int progressVal) {
             this.progressVal = progressVal;
+        }
+
+        public int getType() {
+            return type;
+        }
+
+        public void setType(int type) {
+            this.type = type;
         }
 
         @Override

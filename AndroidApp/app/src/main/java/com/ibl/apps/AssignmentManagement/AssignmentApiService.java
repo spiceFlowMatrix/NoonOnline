@@ -74,7 +74,9 @@ public interface AssignmentApiService {
                                                                 @Part("fileTypeId") RequestBody fileTypeId,
                                                                 @Part("duration") RequestBody duration,
                                                                 @Part("filesize") RequestBody filesize,
-                                                                @Part("totalpages") RequestBody totalpages);    @POST("Lesson/AssginmentSubmission")
+                                                                @Part("totalpages") RequestBody totalpages);
+
+    @POST("Lesson/AssginmentSubmission")
     Single<RestResponse<AssignmentData>> submitAssignmentLession(@Body JsonObject body);
 
     @POST("Assignment/AssginmentSubmission")

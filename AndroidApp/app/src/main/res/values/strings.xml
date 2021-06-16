@@ -454,11 +454,17 @@
     <string name="sync_progress_add">ProgressSyncAdd Progressed</string>
     <string name="sync_record_progressed">SyncRecords Progressed</string>
     <string name="sync_api_running">You need to wait until Sync API is running in your background process</string>
-    <string name="assignment_unauthorize_warning">You have not subscribed for the assignment module</string>
     <string name="expired">Expired</string>
     <string name="cache">Cache</string>
     <string name="sync">Sync</string>
     <string name="invalid_mac_ip">Invalid mac address or IP address</string>
+
+
+    <!--   Updated String Values -->
+    <string name="quiz_downloaded" translatable="false">امتحان موفقانه دانلود شد.</string>
+    <string name="quiz_download_notification" translatable="false">در حال دانلود امتحان</string>
+    <string name="quiz_setup" translatable="false">لطفا انتظار بکشید، تا ما امتحان را برای شما آماده بسازیم.</string>
+    <string name="assignment_unauthorize_warning" translatable="false">شما به بخش امتحانات اشتراک ننموده‌اید.</string>
 
     <!--<string name="pashto_school">مدرسة الباشتو</string>-->
     <!--For Pashto Notification Translation-->

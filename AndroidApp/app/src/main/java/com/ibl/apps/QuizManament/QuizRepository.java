@@ -7,6 +7,9 @@ import com.ibl.apps.Network.ApiClient;
 import com.ibl.apps.noon.NoonApplication;
 
 import io.reactivex.Single;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Response;
 
 public class QuizRepository implements QuizApiService {
     private QuizApiService quizApiService;
@@ -28,5 +31,15 @@ public class QuizRepository implements QuizApiService {
     @Override
     public Single<QuizMainObject> fetchQuizData(String Id) {
         return quizApiService.fetchQuizData(Id);
+    }
+
+    @Override
+    public Call<ResponseBody> fetchAllQuestionData(String Id) {
+        return null;
+    }
+
+    @Override
+    public Call<ResponseBody> downloadQuizFiles(String Id) {
+        return null;
     }
 }
