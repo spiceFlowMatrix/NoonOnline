@@ -1,0 +1,1146 @@
+<!-- <a (click)="initiateRecording()" class="btn btn-primary" *ngIf="!recording"> Start Recording </a>
+<a (click)="stopRecording()" class="btn btn-danger" *ngIf="recording"> Stop Recording </a>
+<audio controls="" *ngIf="url">
+  <source [src]="utilService.sanitize(url)" type="audio/wav">
+</audio>
+<audio controls="" id="player" (ontimeupdate)="initProgressBar()">
+  <source [src]="'assets/tu.mp3'" type="audio/wav">
+</audio> 
+<div class="row">
+  <div class="col-md-7">
+    <div class="player-container">
+      <div class="d-md-inline-block pull-left ml-2">
+        <span (click)=" togglePlay()" *ngIf="!isPlaying"><i class="fa fa-play"></i></span>
+        <span (click)=" togglePlay()" *ngIf="isPlaying"><i class="fa fa-pause"></i></span>
+      </div>
+      <div class="d-md-inline-block">
+        <mv-slider [(value)]="audioSeek" [min]="1" [max]="100" [enabled]="enabled" (slideStart)="audioSeekChange('start')"
+          (slideStop)="audioSeekChange('stop')">
+
+        </mv-slider>
+      </div>
+    </div>
+  </div>
+</div> -->
+
+<!--  <div class="noon-container">
+  <noon-loader *ngIf="isCallingApi"></noon-loader>
+  <div class="row">
+    <div class="col-lg-9 col-md-9 col-sm-12">
+      <ngb-accordion [closeOthers]="true" activeIds="contactDetail" #feedbackAccordin (panelChange)="beforeChange($event)">
+        <ngb-panel id="contactDetail">
+          <ng-template ngbPanelTitle>
+            <div class="row no-margin">
+              <div class="col-md-9 no-padding">
+                <p class="mb-0">{{'CONTACT_DETAIL' | translate}}
+                  <span *ngIf="isFormSubmitted">
+                    {{contactDetail.firstName ? ': ':''}}{{contactDetail.firstName}}
+                  </span>
+                </p>
+              </div>
+              <div class="col-md-2 text-right" *ngIf="isFormSubmitted && contactDetail.firstName">
+                <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+              </div>
+            </div>
+          </ng-template>
+          <ng-template ngbPanelContent>
+            <div class="row">
+              <div class="col-lg-5 col-sm-12 col-xs-12">
+                <form role="form" #contactDetailForm="ngForm" (ngSubmit)="contactDetailForm.form.valid && onAddContactDetailForm()">
+                  <div class="form-content">
+                    <div class="form-group">
+                      <input type="text" name="firstName" class="form-control input-underline input-lg" placeholder="{{'FULL_NAME' | translate}}"
+                        #firstName="ngModel" [(ngModel)]="contactDetail.firstName" required>
+                      <div *ngIf="firstName.invalid && (firstName.touched || contactDetailForm.submitted)">
+                        <p class="input-info error-message" *ngIf="firstName.errors.required">{{'FULLNAME_REQUIRED'|
+                          translate}}</p>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <input type="email" name="email" class="form-control input-underline input-lg" placeholder="{{'EMAIl' | translate}}"
+                        [pattern]="emailPattern" #email="ngModel" [(ngModel)]="contactDetail.email" required>
+                      <div *ngIf="email.invalid && (email.touched || contactDetailForm.submitted)">
+                        <p class="input-info error-message" *ngIf="email.errors.required">{{'EMAIL_REQUIRED'|
+                          translate}}</p>
+                        <p class="input-info error-message" *ngIf="email.errors.pattern">{{'EMAIL_INVALID'| translate}}</p>
+                      </div>
+                    </div>
+                    <div class="form-group row no-margin">
+                      <div class="col-md-2 no-padding">
+                        <input type="tel" id="phone_num_code" name="phone_num_code" class="form-control input-underline input-lg"
+                          style="max-width:70px;" placeholder="+91" #phone_num_code="ngModel" [(ngModel)]="contactDetail.countryCode">
+                      </div>
+                      <div class="col-md-10 no-padding">
+                        <input type="tel" id="phone_num" name="phone_num" class="form-control input-underline input-lg"
+                          placeholder="{{'PHONE_NUMBER' | translate}}" #phone_num="ngModel" [(ngModel)]="contactDetail.phone"
+                          required>
+                        <div *ngIf="phone_num.invalid && (phone_num.touched || contactDetailForm.submitted)">
+                          <p class="input-info error-message" *ngIf="phone_num.errors.required">{{'PHONENUM_REQUIRED'|
+                            translate}}</p>
+                          <p class="input-info error-message" *ngIf="phone_num.errors.pattern">{{'PHONE_INVALID'|
+                            translate}}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <button class="btn btn-primary rounded-btn" style="margin-top:1rem;" type="submit" [disabled]="contactDetailForm.invalid || isLoading">
+                    {{'ADD_CONTACT_DETAIL' | translate}}</button>&nbsp;
+                </form>
+              </div>
+            </div>
+          </ng-template>
+        </ngb-panel>
+        <ngb-panel id="feedBackDetail">
+          <ng-template ngbPanelTitle>
+            <p class="mb-0">{{'FEEDBACK_DETAIL' | translate}}</p>
+          </ng-template>
+          <ng-template ngbPanelContent>
+            <form class="form-horizontal">
+              <div class="row">
+                <div class="form-group col-lg-5">
+                  <label class="control-label no-padding" for="category">{{'PLEASE_SELECT_CATEGORY' | translate}}</label>
+                  <select class="form-control" name="categoryId" [(ngModel)]="feedBackDetailModel.categoryId" (change)="cetegoryChange()">
+                    <option [value]=undefined disabled>{{'SELECT_CATEGORY' | translate}}</option>
+                    <option *ngFor="let category of categotyLists" [value]="category.id">{{category.name | translate}}</option>
+                  </select>
+                </div>
+              </div>
+              <div *ngIf="feedBackDetailModel.categoryId">
+                <div class="row">
+                  <div class="form-group col-lg-5">
+                    <label class="control-label no-padding" for="grade">{{'Grade' | translate}}</label>
+                    <select class="form-control" name="roleId" [(ngModel)]="feedBackDetailModel.gradeId" (change)="gradeChange(feedBackDetailModel.gradeId)"
+                      [ngClass]="{'error' : isValiationError && !feedBackDetailModel.gradeId}">
+                      <option [value]=undefined disabled>{{'Select' | translate}}</option>
+                      <option *ngFor="let grade of gradeList" [value]="grade.id">{{grade.name | translate}}</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="form-group col-lg-5">
+                    <label class="control-label no-padding" for="course">{{'Course' | translate}}</label>
+                    <select class="form-control" name="roleId" [(ngModel)]="feedBackDetailModel.courseId" (change)="courseChange(feedBackDetailModel.courseId)"
+                      [ngClass]="{'error' : isValiationError && !feedBackDetailModel.courseId}">
+                      <option [value]=undefined disabled>{{'Select' | translate}}</option>
+                      <option *ngFor="let course of gradeCourseList" [value]="course.courseid">{{course.name |
+                        translate}}</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="row" *ngIf="feedBackDetailModel.categoryId !=6">
+                  <div class="form-group col-lg-5">
+                    <label class="control-label no-padding" for="lesson">{{'Lesson' | translate}}</label>
+                    <select class="form-control" name="roleId" [(ngModel)]="feedBackDetailModel.lessonId" [ngClass]="{'error' : isValiationError && !feedBackDetailModel.lessonId}">
+                      <option [value]=undefined disabled>{{'Select' | translate}}</option>
+                      <option *ngFor="let lesson of lessonsList" [value]="lesson.id">{{lesson.name}}</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="row" *ngIf="feedBackDetailModel.categoryId ==6">
+                  <div class="form-group col-lg-5">
+                    <label class="control-label no-padding" for="chapters">{{'Chapter' | translate}}</label>
+                    <select class="form-control" name="roleId" [(ngModel)]="feedBackDetailModel.chapterId" [ngClass]="{'error' : isValiationError && !feedBackDetailModel.chapterId}">
+                      <option [value]=undefined disabled>{{'Select' | translate}}</option>
+                      <option *ngFor="let chapter of chaptersList" [value]="chapter.id">{{chapter.name}}</option>
+                    </select>
+                  </div>
+                </div>   -->
+<!-- <div class="row" *ngIf="feedBackDetailModel.categoryId == 1 || feedBackDetailModel.categoryId == 4">
+                  <div class="form-group col-lg-5">
+                    <label class="control-label no-padding" for="chapters">{{'Description' | translate}}</label>
+                    <textarea class="form-control" placeholder="Description" rows="3" name="feedback_description"
+                      [(ngModel)]="feedBackDetailModel.Description"></textarea>
+                  </div>
+                </div> -->
+<!--  <section>
+                  <h6 *ngIf="(feedBackDetailModel.categoryId != 6 && feedBackDetailModel.categoryId != 5)">
+                    {{'FEEDBACK_START_TIMES' | translate}}
+                  </h6>
+                  <div class="row">
+                    <div class="col-lg-4 col-md-4" *ngIf="(feedBackDetailModel.categoryId != 6 && feedBackDetailModel.categoryId != 5)">
+                      <ul class="list-group recording-list">
+                        <li class="list-group-item text-right">
+                          <button class="btn btn-primary rounded-btn" (click)="openfeedBackInputModal()">
+                            {{'Add' | translate}}
+                          </button>
+                        </li>
+                        <li class="list-group-item" style="padding: 0.25rem 1.25rem;cursor: pointer;" *ngFor="let feedBack of feedBackTimes;let i= index;">
+                          <div class="row" (click)="feedBackActiveIndex = i;">
+                            <div class="col-md-8" style="padding: 5px;">
+                              {{feedBack.timeLabel}}
+                            </div>
+                            <div class="col-md-4 actions">
+                              <i class="control fa fa-pencil-square-o text-left" aria-hidden="true" (click)="openfeedBackInputModal(i)"></i>
+                              <i class="control fa fa-minus text-right" aria-hidden="true" (click)="removeFeedbackTime(i)"></i>
+                            </div>
+                          </div>
+                        </li>
+                      </ul>
+                    </div>
+                    <div class="col-lg-8 col-md-8" *ngIf="feedBackTimes.length > 0">
+                      <div class="form-group">
+                        <label>{{'ISSUE_DESCRIPTION' | translate}}</label>
+                        <textarea class="form-control" rows="3" name="description_{{feedBackActiveIndex}}" [(ngModel)]="feedBackTimes[feedBackActiveIndex].description"></textarea>
+                      </div>
+                      <div class="row">
+                        <div class="col-lg-7 col-md-7">
+                          <ul class="list-group files-list">
+                            <li class="list-group-item">
+                              <div class="row">
+                                <div class="col-md-8">
+                                  {{'IMAGE_ATTACHMENTS' | translate}}
+                                </div>
+                                <div class="col-md-4 actions" style="padding: 0px;">
+                                  <button class="btn btn-primary rounded-btn" style="padding: 0.375rem 0.4rem;" (click)="selectFile('imageFilesInput')">{{'Browse'
+                                    | translate}}</button>
+                                  <input type="file" style="display:none;" (change)="onSelectFiles($event)" id="imageFilesInput"
+                                    multiple="true" accept="image/*">
+                                </div>
+                              </div>
+                            </li>
+                            <li class="list-group-item" *ngFor="let file of feedBackTimes[feedBackActiveIndex].imageFiles;let i=index;">
+                              <div class="row">
+                                <div class="col-md-9">
+                                  <a href="javascript:void(0)">{{file.name}}</a>
+                                </div>
+                                <div class="col-md-3 actions">
+                                  <i class="control fa fa-minus text-right" aria-hidden="true" (click)="feedBackTimes[feedBackActiveIndex].imageFiles.splice(i,1);"></i>
+                                </div>
+                              </div>
+                            </li>
+                            <li class="list-group-item">
+                              <div class="row">
+                                <div class="col-md-12 text-center">
+                                  <file-drop headertext="{{'DROP_FILES_HERE' | translate}}" (onFileDrop)="dropped($event)"
+                                    class="drop-file">
+                                  </file-drop>
+                                </div>
+                              </div>
+                            </li>
+                          </ul>
+                        </div>
+                        <div class="col-lg-5 col-md-5">
+                          <ul class="list-group files-list">
+                            <li class="list-group-item">
+                              <div class="row">
+                                <div class="col-md-8">
+                                  {{'VOICE_NOTES' | translate}}
+                                </div>
+                                <div class="col-md-4 actions">
+                                  <i class="control fa fa-microphone text-right" aria-hidden="true" (click)="feedBackTimes[feedBackActiveIndex].audioFiles.push(1)"></i>
+                                </div>
+                              </div>
+                            </li>
+                            <li class="list-group-item" *ngFor="let item of feedBackTimes[feedBackActiveIndex].audioFiles;let i=index;">
+                              <div class="row">
+                                <div class="col-md-8">
+                                  Audio {{i}}
+                                </div>
+                                <div class="col-md-4 actions">
+                                  <i class="control fa fa-minus text-right" aria-hidden="true" (click)="feedBackTimes[feedBackActiveIndex].audioFiles.splice(i,1)"></i>
+                                </div>
+                              </div>
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+              </div>
+              <div *ngIf="feedBackTimes.length> 0" class="mt-3 text-center">
+                <button class="btn btn-primary" style="margin:0 auto;" [disabled]="feedBackTimes.length < 1" (click)="submitFeedback()"
+                  *ngIf="feedBackDetailModel.categoryId">
+                  <div class="card-body btn text-center">
+                    {{'SUBMIT_FEEDBACK' | translate}}
+                  </div>
+                </button>
+              </div>
+            </form>
+          </ng-template>
+        </ngb-panel>
+      </ngb-accordion>
+    </div>
+    <div class="col-lg-3 col-md-3 col-sm-12">
+      <ul class="list-group files-list">
+        <li class="list-group-item">
+          {{'News' | translate}}
+        </li>
+        <li class="list-group-item description-text">
+          <div>
+            <h6>
+              {{'Build' | translate}}
+            </h6>
+            <p class="description">{{'B_TEXT' | translate}}</p>
+          </div>
+          <div>
+            <h6>{{'NEW_FEATURES' | translate}}</h6>
+            <p class="description">{{'N_TEXT'| translate}}</p>
+          </div>
+          <div>
+            <h6>{{'BUG_FIXES' | translate}}</h6>
+            <p class="description">{{'F_TEXT' | translate}}</p>
+          </div>   -->
+<!-- <div>
+            <h6>{{'Changes' | translate}}</h6>
+            <p class="description">Lorem Ipsum is simply dummy text of the printing</p>
+            <p class="description">Lorem Ipsum is simply dummy text of the printing</p>
+            <p class="description">Lorem Ipsum is simply dummy text of the printing</p>
+          </div> -->
+<!--  </li>
+      </ul>
+    </div>
+  </div>
+</div>   -->
+
+<ng-template #feedbackTimeModelContent>
+    <div class="modal-header">
+        <h4 class="modal-title" id="modal-basic-title">
+            {{ "FEEDBACK_TIME" | translate }}
+        </h4>
+        <button
+            type="button"
+            class="close"
+            aria-label="Close"
+            (click)="feedbackModalRef.dismiss('Cross click')"
+        >
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div *ngIf="timeModelflag" class="modal-body">
+        <form>
+            <div class="form-group">
+                <label for="time">{{ "Time" | translate }} :</label>
+                <div class="input-group">
+                    <ngb-timepicker
+                        [(ngModel)]="time"
+                        name="time"
+                        [seconds]="true"
+                    ></ngb-timepicker>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div *ngIf="!timeModelflag" class="modal-body">
+        <h3>{{ 'CAN_NOT_ADD_CATEGORY' | translate }}</h3>
+    </div>
+    <div *ngIf="timeModelflag" class="modal-footer">
+        <button
+            type="button"
+            class="btn btn-outline-dark"
+            (click)="manageFeedbackTime()"
+        >
+            {{ "Save" | translate }}
+        </button>
+    </div>
+    <div *ngIf="!timeModelflag" class="modal-footer">
+        <button type="button" class="btn btn-outline-dark" (click)="dismiss()">
+            {{ "Ok" | translate }}
+        </button>
+    </div>
+</ng-template>
+
+<div class="row">
+    <noon-loader *ngIf="isCallingApi"></noon-loader>
+    <div class="col-md-12">
+        <div>
+            <div class="detail_section">
+                <form
+                    class="form-horizontal"
+                    role="form"
+                    #contactDetailForm="ngForm"
+                    (ngSubmit)="
+                        contactDetailForm.form.valid && submitFeedback()
+                    "
+                >
+                    <div class="contact_detail border_bottom">
+                        <div class="contact_header">
+                            <!-- <div class="row no-margin">
+                <i class="fa fa-user header_icon"></i>
+                <p class="header_content"></p>
+              </div> -->
+                            <div class="row section-title mt-2 mb-2">
+                                <div class="col-md-1 pl-4">
+                                    <i class="fa fa-user"></i>
+                                </div>
+                                <div class="col-md-11 text-uppercase">
+                                    {{'CONTACT_DETAIL' | translate}}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div
+                                    class="form-content"
+                                    style="margin-left:8px;"
+                                >
+                                    <div class="row">
+                                        <div
+                                            class="fa fa-address-book col-lg-2 address_icon"
+                                        ></div>
+                                        <div class="form-group-new">
+                                            <input
+                                                type="text"
+                                                name="firstName"
+                                                class="form-control font-weight-medium input-underline input-lg border_none"
+                                                placeholder="{{'FULL_NAME' | translate}}"
+                                                #firstName="ngModel"
+                                                [(ngModel)]="
+                                                    contactDetail.firstName
+                                                "
+                                                required
+                                            />
+                                            <!--  <div *ngIf="firstName.invalid && (firstName.touched || contactDetailForm.submitted)">
+                          <p class="input-info error-message" *ngIf="firstName.errors.required">{{'FULLNAME_REQUIRED'|
+                            translate}}</p>
+                        </div> -->
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div
+                                            class="fa fa-envelope col-lg-2 envelope_icon"
+                                        ></div>
+                                        <div class="form-group-new">
+                                            <input
+                                                type="email"
+                                                name="email"
+                                                class="form-control font-weight-medium input-underline input-lg border_none"
+                                                placeholder="{{'EMAIL' | translate}}"
+                                                [pattern]="emailPattern"
+                                                #email="ngModel"
+                                                [(ngModel)]="
+                                                    contactDetail.email
+                                                "
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+                                    <div
+                                        *ngIf="
+                                            email.invalid &&
+                                            (email.touched ||
+                                                contactDetailForm.submitted)
+                                        "
+                                    >
+                                        <p
+                                            class="input-info error-message"
+                                            *ngIf="email.errors.required"
+                                        >
+                                            {{ "EMAIL_REQUIRED" | translate }}
+                                        </p>
+                                        <p
+                                            class="input-info error-message"
+                                            *ngIf="email.errors.pattern"
+                                        >
+                                            {{ "EMAIL_INVALID" | translate }}
+                                        </p>
+                                    </div>
+                                    <div class="row">
+                                        <div
+                                            class="fa fa-phone col-lg-2 phone_icon"
+                                        ></div>
+                                        <div class="form-group-new">
+                                            <!--  <div class="col-md-2 no-padding">
+                          <input type="tel" id="phone_num_code" name="phone_num_code" class="form-control input-underline input-lg"
+                            style="max-width:70px;border:none;" placeholder="+91" #phone_num_code="ngModel" [(ngModel)]="contactDetail.countryCode">
+                        </div> -->
+
+                                            <input
+                                                type="tel"
+                                                id="phone_num"
+                                                name="phone_num"
+                                                class="form-control font-weight-medium input-underline input-lg border_none"
+                                                style="border:none;"
+                                                placeholder="{{'PHONE_NUMBER' | translate}}"
+                                                #phone_num="ngModel"
+                                                [(ngModel)]="
+                                                    contactDetail.phone
+                                                "
+                                                required
+                                            />
+                                            <!-- <div *ngIf="phone_num.invalid && (phone_num.touched || contactDetailForm.submitted)">
+                            <p class="input-info error-message" *ngIf="phone_num.errors.required">{{'PHONENUM_REQUIRED'|
+                              translate}}</p>
+                            <p class="input-info error-message" *ngIf="phone_num.errors.pattern">{{'PHONE_INVALID'|
+                              translate}}</p>
+                          </div> -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="feedback_detail border_bottom">
+                        <div class="contact_header">
+                            <!-- <div class="row no-margin" style="height: 25px;">
+                <i class="fa fa-bars header_icon"></i>
+                <p class="header_content">FEEDBACK DETAILS</p>
+              </div> -->
+                            <div class="row section-title mt-2 mb-2">
+                                <div class="col-md-1 pl-4">
+                                    <i class="fa fa-bars"></i>
+                                </div>
+                                <div class="col-md-11 text-uppercase">
+                                    {{'FEEDBACK_DETAIL' | translate}}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="form-group-new col-lg-5">
+                                <select
+                                    class="form-control font-weight-medium category_dropdown"
+                                    name="categoryId"
+                                    [(ngModel)]="feedBackDetailModel.categoryId"
+                                    (change)="cetegoryChange()"
+                                >
+                                    <option [value]="undefined" disabled
+                                        >{{'Category' | translate}}</option
+                                    >
+                                    <option
+                                        *ngFor="let category of categotyLists"
+                                        [value]="category.id"
+                                        >{{ category.name | translate }}</option
+                                    >
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="form-group-new col-lg-5">
+                                <select
+                                    class="form-control font-weight-medium category_dropdown"
+                                    name="gradeId"
+                                    [(ngModel)]="feedBackDetailModel.gradeId"
+                                    (change)="
+                                        gradeChange(feedBackDetailModel.gradeId)
+                                    "
+                                    [ngClass]="{
+                                        error:
+                                            isValiationError &&
+                                            !feedBackDetailModel.gradeId
+                                    }"
+                                >
+                                    <option [value]="undefined" disabled
+                                        >{{'Grade' | translate}}</option
+                                    >
+                                    <option
+                                        *ngFor="let grade of gradeList"
+                                        [value]="grade.id"
+                                        >{{ grade.name | translate }}</option
+                                    >
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="form-group-new col-lg-5">
+                                <select
+                                    class="form-control font-weight-medium category_dropdown"
+                                    name="courseId"
+                                    [(ngModel)]="feedBackDetailModel.courseId"
+                                    (change)="
+                                        courseChange(
+                                            feedBackDetailModel.courseId,
+                                            feedBackDetailModel.categoryId
+                                        )
+                                    "
+                                    [ngClass]="{
+                                        error:
+                                            isValiationError &&
+                                            !feedBackDetailModel.courseId
+                                    }"
+                                >
+                                    <option [value]="undefined" disabled
+                                        >{{'Course' | translate}}</option
+                                    >
+                                    <option
+                                        *ngFor="let course of gradeCourseList"
+                                        [value]="course.courseid"
+                                        >{{ course.name | translate }}</option
+                                    >
+                                </select>
+                            </div>
+                        </div>
+
+                        <div
+                            class="row"
+                            *ngIf="feedBackDetailModel.categoryId != 6"
+                        >
+                            <div class="form-group-new col-lg-5">
+                                <select
+                                    class="form-control font-weight-medium category_dropdown"
+                                    name="lessonId"
+                                    [(ngModel)]="feedBackDetailModel.lessonId"
+                                    [ngClass]="{
+                                        error:
+                                            isValiationError &&
+                                            !feedBackDetailModel.lessonId
+                                    }"
+                                >
+                                    <option [value]="undefined" disabled
+                                        >{{'Lesson' | translate}}</option
+                                    >
+                                    <option
+                                        *ngFor="let lesson of lessonsList"
+                                        [value]="lesson.id"
+                                        >{{ lesson.name }}</option
+                                    >
+                                </select>
+                            </div>
+                        </div>
+                        <div
+                            class="row"
+                            *ngIf="feedBackDetailModel.categoryId == 6"
+                        >
+                            <div class="form-group-new col-lg-5">
+                                <select
+                                    class="form-control font-weight-medium category_dropdown"
+                                    name="chapterId"
+                                    [(ngModel)]="feedBackDetailModel.chapterId"
+                                    [ngClass]="{
+                                        error:
+                                            isValiationError &&
+                                            !feedBackDetailModel.chapterId
+                                    }"
+                                >
+                                    <option [value]="undefined" disabled
+                                        >{{'Chapter' | translate}}</option
+                                    >
+                                    <option
+                                        *ngFor="let chapter of chaptersList"
+                                        [value]="chapter.id"
+                                        >{{ chapter.name }}</option
+                                    >
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="time_section">
+                        <div class="time_header">
+                            <!-- <div class="row no-margin">
+                <i class="fa fa-clock-o header_icon"></i>
+                <p class="header_content">START TIMES</p>
+                <i class="fa fa-plus-circle circle_icon" (click)="addfeedBackTime()"></i>
+              </div> -->
+                            <div class="row section-title mt-2 mb-2">
+                                <div class="col-md-1 pl-4">
+                                    <i class="fa fa-clock-o"></i>
+                                </div>
+                                <div class="col-md-10 text-uppercase">
+                                    {{'START_TIMES' | translate}}
+                                </div>
+                                <div class="col-md-1">
+                                    <i
+                                        class="fa fa-plus-circle circle_icon"
+                                        (click)="addfeedBackTime()"
+                                    ></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            class="time_body"
+                            *ngFor="
+                                let feedBack of feedBackTimes;
+                                let i = index
+                            "
+                        >
+                            <file-drop
+                                (onFileDrop)="dropped($event, i)"
+                                class="file-drop feedback-file-drop"
+                            >
+                                <div class="drop_area col-md-12">
+                                    <div
+                                        class="row col-md-12 no-padding no-margin"
+                                    >
+                                        <div
+                                            class="col-md-2 no-padding"
+                                            (click)="openfeedBackInputModal(i)"
+                                        >
+                                            <p class="time font-weight-medium">
+                                                {{ feedBack.timeLabel }}
+                                            </p>
+                                        </div>
+                                        <div class="col-md-3 no-padding">
+                                            <p
+                                                class="start_time font-weight-medium"
+                                                (click)="
+                                                    openfeedBackInputModal(i)
+                                                "
+                                            >
+                                                {{'START_TIME' | translate}}
+                                            </p>
+                                        </div>
+                                        <div class="col-md-7 no-padding">
+                                            <div class="minus_icon">
+                                                <i
+                                                    class="fa fa-minus-circle"
+                                                    (click)="
+                                                        removeFeedbackTime(i)
+                                                    "
+                                                ></i>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group-new">
+                                        <textarea
+                                            class="form-control"
+                                            rows="3"
+                                            placeholder="{{'TYPE_HERE'| translate}}"
+                                            name="description_{{ i }}"
+                                            [(ngModel)]="feedBack.description"
+                                        ></textarea>
+                                    </div>
+
+                                    <div
+                                        class="row col-md-12 no-margin no-padding"
+                                        style="margin-top:10px;"
+                                    >
+                                        <div class="col-md-1 no-padding">
+                                            <div class="image_icon">
+                                                <i
+                                                    class="fa fa-address-book-o"
+                                                    (click)="
+                                                        selectFile(
+                                                            'imageFilesInput_' +
+                                                                i
+                                                        )
+                                                    "
+                                                ></i>
+                                            </div>
+                                            <input
+                                                type="file"
+                                                style="display:none;"
+                                                name="imageFilesInput_{{ i }}"
+                                                (change)="
+                                                    onSelectFiles($event, i)
+                                                "
+                                                id="imageFilesInput_{{ i }}"
+                                                multiple="true"
+                                                accept="image/*"
+                                            />
+                                        </div>
+                                        <div class="col-md-1 no-padding">
+                                            <div class="file_icon">
+                                                <i
+                                                    class="fa fa-file-image-o"
+                                                ></i>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-10 no-padding">
+                                            <div
+                                                class="row col-md-12 no-margin no-padding"
+                                                *ngFor="
+                                                    let file of feedBackTimes[i]
+                                                        .imageFiles;
+                                                    let j = index
+                                                "
+                                            >
+                                                <p class="file_text" (click)="downloadFile(file)">
+                                                    {{
+                                                        feedBack.imageFiles[j]
+                                                            .name
+                                                    }}
+                                                </p>
+                                                <div class="close_icon">
+                                                    <i
+                                                        class="fa fa-times-circle-o"
+                                                        (click)="
+                                                            feedBackTimes[
+                                                                i
+                                                            ].imageFiles.splice(
+                                                                j,
+                                                                1
+                                                            )
+                                                        "
+                                                    ></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 mt-2 pl-0 pr-0">
+                                        <div
+                                            class="row no-margin no-padding"
+                                            *ngFor="
+                                                let file of feedBackTimes[i]
+                                                    .audioFiles;
+                                                let j = index;
+                                                let last = last
+                                            "
+                                        >
+                                            <div class="col-md-7 pl-0">
+                                                <!-- <audio controls="" *ngIf="feedBackTimes[i].audioFiles[j].audiourl">
+                          <source [src]="utilService.sanitize(feedBackTimes[i].audioFiles[j].audiourl)" type="audio/wav">
+                        </audio> -->
+                                                <div
+                                                    class="d-md-inline-block pull-left ml-1 mr-2"
+                                                    *ngIf="
+                                                        feedBackTimes[i]
+                                                            .audioFiles[j]
+                                                            .audiourl
+                                                    "
+                                                >
+                                                    <span
+                                                        class="stop-icon play"
+                                                        [ngClass]="{
+                                                            playing:
+                                                                feedBackTimes[i]
+                                                                    .audioFiles[
+                                                                    j
+                                                                ].isPlaying
+                                                        }"
+                                                        (click)="
+                                                            stopPlaying(i, j)
+                                                        "
+                                                    >
+                                                        <i
+                                                            class="fa fa-circle"
+                                                            aria-hidden="true"
+                                                        ></i>
+                                                    </span>
+                                                </div>
+                                                <div
+                                                    class="d-md-inline-block player-container"
+                                                    *ngIf="
+                                                        feedBackTimes[i]
+                                                            .audioFiles[j]
+                                                            .audiourl
+                                                    "
+                                                >
+                                                    <audio
+                                                        controls=""
+                                                        style="display:none;"
+                                                        id="player_{{ i }}_{{
+                                                            j
+                                                        }}"
+                                                        (ontimeupdate)="
+                                                            initProgressBar(
+                                                                i,
+                                                                j
+                                                            )
+                                                        "
+                                                    >
+                                                        <!-- <source [src]="utilService.sanitize(feedBackTimes[i].audioFiles[j].audiourl)" type="audio/wav"> -->
+                                                        <!-- <source [src]="'assets/tu.mp3'" type="audio/wav"> -->
+                                                    </audio>
+                                                    <div
+                                                        class="d-md-inline-block pull-left ml-2"
+                                                    >
+                                                        <span
+                                                            class="audio-control"
+                                                            (click)="
+                                                                togglePlay(i, j)
+                                                            "
+                                                            *ngIf="
+                                                                !feedBackTimes[
+                                                                    i
+                                                                ].audioFiles[j]
+                                                                    .isPlaying
+                                                            "
+                                                            ><i
+                                                                class="fa fa-play"
+                                                            ></i
+                                                        ></span>
+                                                        <span
+                                                            class="audio-control"
+                                                            (click)="
+                                                                togglePlay(i, j)
+                                                            "
+                                                            *ngIf="
+                                                                feedBackTimes[i]
+                                                                    .audioFiles[
+                                                                    j
+                                                                ].isPlaying
+                                                            "
+                                                            ><i
+                                                                class="fa fa-pause"
+                                                            ></i
+                                                        ></span>
+                                                    </div>
+                                                    <div
+                                                        class="d-md-inline-block"
+                                                    >
+                                                        <!--<mv-slider
+                                                            [(value)]="
+                                                                feedBackTimes[i]
+                                                                    .audioFiles[
+                                                                    j
+                                                                ].audioSeek
+                                                            "
+                                                            [min]="1"
+                                                            [max]="100"
+                                                            [enabled]="enabled"
+                                                            (slideStart)="
+                                                                audioSeekChange(
+                                                                    'start',
+                                                                    i,
+                                                                    j
+                                                                )
+                                                            "
+                                                            (slideStop)="
+                                                                audioSeekChange(
+                                                                    'stop',
+                                                                    i,
+                                                                    j
+                                                                )
+                                                            "
+                                                        >
+                                                        </mv-slider>-->
+                                                    </div>
+                                                    <div
+                                                        class="d-md-inline-block pull-right pr-2"
+                                                        (click)="
+                                                            feedBackTimes[
+                                                                i
+                                                            ].audioFiles.splice(
+                                                                j,
+                                                                1
+                                                            )
+                                                        "
+                                                    >
+                                                        <span
+                                                            class="audio-control trash-icon"
+                                                        >
+                                                            <i
+                                                                class="fa fa-trash"
+                                                            ></i>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-5">
+                                                <span
+                                                    style="position: relative;top: 2px;float: right;"
+                                                >
+                                                    {{
+                                                        feedBackTimes[i]
+                                                            .audioFiles[j]
+                                                            .duration
+                                                    }}
+                                                </span>
+                                                <p
+                                                    class="text-right"
+                                                    *ngIf="last"
+                                                >
+                                                    <span
+                                                        class="audio"
+                                                        (click)="
+                                                            initiateRecording(
+                                                                i,
+                                                                j,
+                                                                feedBackTimes[i]
+                                                                    .audioFiles[
+                                                                    j
+                                                                ]['recording']
+                                                            )
+                                                        "
+                                                    >
+                                                        <i
+                                                            class="fa fa-microphone"
+                                                            *ngIf="
+                                                                !feedBackTimes[
+                                                                    i
+                                                                ].audioFiles[j][
+                                                                    'recording'
+                                                                ]
+                                                            "
+                                                        ></i>
+                                                        <i
+                                                            class="fa fa-stop stop-icon"
+                                                            *ngIf="
+                                                                feedBackTimes[i]
+                                                                    .audioFiles[
+                                                                    j
+                                                                ]['recording']
+                                                            "
+                                                        ></i>
+                                                    </span>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </file-drop>
+                        </div>
+                        <!-- <div class="time_body" *ngFor="let feedBack of feedBackTimes;let i=index;">
+              <div class="row no-margin" style="height:22px;">
+                <p class="time">{{feedBack.timeLabel}}</p>
+                <p class="start_time" (click)="openfeedBackInputModal()">START TIME</p>
+                <div class="minus_icon"><i class="fa fa-minus-circle" (click)="removeFeedbackTime(i)"></i></div>
+              </div>
+              <div class="form-group-new">
+                <textarea class="form-control" rows="3" placeholder="Type here..." name="description_{{feedBackActiveIndex}}"
+                  [(ngModel)]="feedBackTimes[i].description"></textarea>
+              </div>
+              <div class="row no-margin" style="margin-top:10px;">
+                <div class="image_icon"><i class="fa fa-address-book-o" (click)="selectFile('imageFilesInput_'+i)"></i></div>
+                <input type="file" style="display:none;" name="imageFilesInput_{{i}}" (change)="onSelectFiles($event,i)"
+                  id="imageFilesInput_{{i}}" multiple="true" accept="image/*">
+                <div class="file_icon"><i class="fa fa-file-image-o"></i></div>
+                <div class="row no-margin" *ngFor="let file of feedBackTimes[i].imageFiles;let j=index;">
+                  <p class="file_text">{{feedBack.imageFiles[j].name}}</p>
+                  <div *ngIf="feedBackTimes[i].imageFiles.length != 0" class="close_icon"><i class="fa fa-times-circle-o"
+                      (click)="feedBackTimes[i].imageFiles.splice(j,1);"></i></div>
+                </div>
+              </div> -->
+                        <!-- <div class="row no-margin border_bottom" style="padding-bottom:15px;">
+                <div class="right_area">
+                  <div class="dot_icon"><i class="fa fa-circle"></i></div>
+                </div>
+                <div class="row no-margin left_area">
+                  <p class="time_text">00:37</p>
+                  <div class="orange_dot_icon"><i class="fa fa-circle"></i></div>
+                  <div class="microphone_icon">
+                    <i class="fa fa-microphone microphone"></i>
+                  </div>
+                </div>
+              </div> -->
+                        <!-- </div> -->
+                    </div>
+                    <div
+                        *ngIf="feedBackTimes && feedBackTimes.length > 0"
+                        class="mt-3 text-center"
+                    >
+                        <button
+                            class="btn btn-primary"
+                            style="margin:0 auto;"
+                            [disabled]="feedBackTimes.length < 1"
+                            type="submit"
+                            *ngIf="
+                                feedBackDetailModel.lessonId ||
+                                feedBackDetailModel.chapterId
+                            "
+                        >
+                            <div class="card-body btn text-center">
+                                {{ "SUBMIT_FEEDBACK" | translate }}
+                            </div>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- <div class="row mt-2">
+  <div class="col-md-12">
+    <div class="col-md-12 notification_header pt-2" style="border-bottom:2px solid rgba(0, 0, 0, 0.125);border-top: 2px solid rgba(0, 0, 0, 0.125);">
+      <div class="col-md-12 row">
+        <div class="col-md-1 no-padding">
+          <i class="fa fa-bell"></i>
+        </div>
+        <div class="row col-md-11 no-padding">
+          <p><span class="darkgrey font-weight-medium fs-12">Hamza Rahimy created feedback.</span></p>&nbsp;&nbsp;&nbsp;<p><span
+              class="darkgrey font-weight-medium fs-12">28 june at 2:00 PM</span></p>
+        </div>
+      </div>
+      <div class="col-md-12 row">
+        <div class="col-md-1 no-padding">
+          <i class="fa fa-bell"></i>
+        </div>
+        <div class="row col-md-11 no-padding">
+          <p><span class="darkgrey font-weight-medium fs-12">Hamza Rahimy assigned User Name as Qa Manager.</span></p>&nbsp;&nbsp;&nbsp;<p><span
+              class="darkgrey font-weight-medium fs-12">29 june at 3:00 PM</span></p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-12 mt-4 no-padding notification_body">
+      <div class="col-md-12">
+        <div class="col-md-12 row">
+          <div class="col-md-2 no-padding">
+            <div class="head-avatar d-md-inline-block" style="color: white; background: rgb(154, 196, 60);">
+              <i class="fa fa-user"></i>
+            </div>
+          </div>
+          <div class="row col-md-10 no-padding">
+            <p><span class="font-weight-medium fs-12">Hamza Rahimy</span></p>&nbsp;&nbsp;&nbsp;<p><span class="darkgrey font-weight-medium fs-12">29
+                june at 3:00 PM</span></p>
+          </div>
+        </div>
+        <div class="col-md-12 text-content">
+          <div class="col-md-12 row title ml-5 mr-5">
+            <p><span class="darkgrey font-weight-medium fs-12">This is rich comment text.</span></p>&nbsp;<p><span
+                class="font-weight-medium fs-12">This is Bold text within rich text.</span></p>
+          </div>
+          <div class="col-md-12 body ml-5 mr-5">
+            <div class="col-md-12 number">
+              <p class="mb-0"><span class="darkgrey font-weight-medium fs-12">1. This is numbered lined within rich
+                  text.</span></p>
+              <p class="mb-0"><span class="darkgrey font-weight-medium fs-12">2. This is numbered lined within rich
+                  text.</span></p>
+              <p class="mb-0"><span class="darkgrey font-weight-medium fs-12">3. This is numbered lined within rich
+                  text.</span></p>
+            </div>
+            <div class="col-md-12 mt-2 bullet">
+              <p class="mb-0">
+                <li><span class="darkgrey font-weight-medium fs-12">This is bullet text within rich text.</span></li>
+              </p>
+              <p class="mb-0">
+                <li><span class="darkgrey font-weight-medium fs-12">This is bullet text within rich text.</span></li>
+              </p>
+              <p class="mb-0">
+                <li><span class="darkgrey font-weight-medium fs-12">This is bullet text within rich text.</span></li>
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-12 mt-3 row">
+          <div class="col-md-2 no-padding">
+            <div class="head-avatar d-md-inline-block" style="color: white; background: rgb(154, 196, 60);">
+              <i class="fa fa-user"></i>
+            </div>
+          </div>
+          <div class="row col-md-10 no-padding">
+            <p><span class="font-weight-medium fs-12">Hamza Rahimy</span></p>&nbsp;&nbsp;&nbsp;<p><span class="darkgrey font-weight-medium fs-12">29
+                june at 3:00 PM</span></p>
+          </div>
+        </div>
+        <div class="col-md-12 body ml-5 mr-5 mt-4">
+          <div class="col-md-12 row">
+            <div class="col-md-3 txt_align">
+              <div class="document_icon">
+                <i class="fa fa-file-text-o"></i>
+              </div>
+              <div class="btn document_btn col-md-12">document</div>
+            </div>
+            <div class="col-md-3 txt_align">
+              <div class="document_icon">
+                <i class="fa fa-file-text-o"></i>
+              </div>
+              <div class="btn document_btn col-md-12">document</div>
+            </div>
+            <div class="col-md-3 txt_align">
+              <div class="document_icon">
+                <i class="fa fa-file-pdf-o"></i>
+              </div>
+              <div class="btn document_btn col-md-12">document</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-12 pt-4 mt-4" style="border-bottom:2px solid rgba(0, 0, 0, 0.125);border-top: 2px solid rgba(0, 0, 0, 0.125);">
+      <div class="col-md-12 row">
+        <div class="col-md-1 no-padding">
+          <i class="fa fa-bell"></i>
+        </div>
+        <div class="row col-md-11 no-padding">
+          <p><span class="darkgrey font-weight-medium fs-12">Hamza Rahimy assigned User Name as Production Manager.</span></p>&nbsp;&nbsp;&nbsp;<p><span
+              class="darkgrey font-weight-medium fs-12">29 june at 3:00 PM</span></p>
+        </div>
+      </div>
+      <div class="col-md-12 row">
+        <div class="col-md-1 no-padding">
+          <i class="fa fa-bell"></i>
+        </div>
+        <div class="row col-md-11 no-padding">
+          <p><span class="darkgrey font-weight-medium fs-12">Hamza Rahimy assigned User Name as Editing Manager.</span></p>&nbsp;&nbsp;&nbsp;<p><span
+              class="darkgrey font-weight-medium fs-12">29 june at 3:00 PM</span></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> -->

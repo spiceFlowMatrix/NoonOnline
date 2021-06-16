@@ -1,0 +1,65 @@
+<div>
+    <h4>
+        <a class="btn btn-success btn-lg back" backDirection>
+            <span class="fa fa-arrow-left"></span>
+        </a>
+        <span>Add</span> Csv File
+        <noon-loader *ngIf="isCallingApi"></noon-loader>
+    </h4>
+    <div class="row">
+        <div class="col col-xl-6 col-lg-12">
+            <form class="form-horizontal noon-form" #manageCsvForm="ngForm"
+                (ngSubmit)="manageCsvForm.form.valid && manageFile()">
+                <div class="form-group row">
+                    <label class="control-label col-sm-4" for="timeout">Add Lesson Csv File:</label>
+                    <div class="col col-sm-8">
+                        <input type="file" class="form-control" accept=".csv" placeholder="Choose file" name="csvfile"
+                            [(ngModel)]="csvModel.file" (change)="fileSelected($event)" #csvfile="ngModel" required>
+                        <div *ngIf="csvfile.invalid && (csvfile.touched || manageCsvForm.submitted)">
+                            <p class="input-info error-message" *ngIf="csvfile.errors.required">File is required</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-8 pull-right">
+                        <button type="submit" class="btn btn-primary m-r-20px"
+                            [disabled]="manageCsvForm.invalid || isCallingApi">Add
+                            File</button>
+                        <button class="btn btn-danger" backDirection>Cancel</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="m-t-20px">
+    <!-- <h4>
+        <span>Add</span>App Track Csv File
+    </h4> -->
+    <div class="row">
+        <div class="col col-xl-6 col-lg-12">
+            <form class="form-horizontal noon-form" #manageAppCsvForm="ngForm"
+                (ngSubmit)="manageAppCsvForm.form.valid && manageAppTrackFile()">
+                <div class="form-group row">
+                    <label class="control-label col-sm-4" for="csvappfile">Add App Track Csv File:</label>
+                    <div class="col col-sm-8">
+                        <input type="file" class="form-control" accept=".csv" placeholder="Choose file" name="csvappfile"
+                            [(ngModel)]="csvModel.appFile" (change)="fileAppSelected($event)" #csvappfile="ngModel" required>
+                        <div *ngIf="csvappfile.invalid && (csvappfile.touched || manageAppCsvForm.submitted)">
+                            <p class="input-info error-message" *ngIf="csvappfile.errors.required">File is required</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-8 pull-right">
+                        <button type="submit" class="btn btn-primary m-r-20px"
+                            [disabled]="manageAppCsvForm.invalid || isCallingApi">Add
+                            File</button>
+                        <button class="btn btn-danger" backDirection>Cancel</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

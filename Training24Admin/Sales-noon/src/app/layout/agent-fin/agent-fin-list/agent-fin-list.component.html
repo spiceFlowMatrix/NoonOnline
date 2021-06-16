@@ -1,0 +1,88 @@
+<div>
+  <ngb-accordion #acc="ngbAccordion" [activeIds]="panels">
+    <ngb-panel title="Agent account desposits" id="agent_account_desposits">
+      <ng-template ngbPanelContent>
+        <div class="card-body table-responsive noon-custom-table pt-0">
+          <h3 class="control-label col-md-12 col-sm-12 no-padding">
+            <button class="btn btn-info pull-right m-r-20px mb-1" title="Add" [routerLink]="['/agent-fin/add-deposits']">New
+              Deposit</button>
+          </h3>
+          <table class="table table-hover table-striped">
+            <thead>
+              <tr>
+                <th>Deposit date</th>
+                <th>Deposit amount</th>
+                <th>Agent</th>
+                <th>Proof documents</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let agentDeposit of agentDepositList;let i=index;">
+                <td>{{agentDeposit.depositdate | date :'yyyy-MM-dd'}}</td>
+                <td>{{agentDeposit.depositamount}}</td>
+                <td>{{agentDeposit.salesgentname}}</td>
+                <td>
+                  <a href="javascript:void(0)" target="_blank" *ngIf="agentDeposit.documentid" (click)="downloadFiles(agentDeposit.documentid)">Documents</a>
+                </td>
+                <td>
+                  <button class="btn btn-primary btn-action" title="Edit" routerLink="/agent-fin/edit-deposits/{{agentDeposit.id}}">
+                    <i class="fa fa-pencil"></i>
+                  </button>
+                  <!-- <button class="btn btn-danger btn-action" [disabled]="agentDeposit.isrevoke" title="Revoke" (click)="updateSatus(i,'isrevoke')">
+                    <i class="fa fa-undo"></i>
+                  </button> -->
+                  <!-- <button class="btn btn-primary btn-action" [disabled]="agentDeposit.isconfirm" title="Confirm"
+                    (click)="updateSatus(i,'isconfirm')">
+                    <i class="fa fa-thumbs-up"></i>
+                  </button> -->
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div *ngIf="agffilterModel.totalCount > 0">
+          <ngb-pagination [collectionSize]="agffilterModel.totalCount" class="d-flex justify-content-end" [pageSize]="agffilterModel.perpagerecord"
+            [(page)]="agffilterModel.pagenumber" [maxSize]="5" [boundaryLinks]="true" aria-label="Default pagination"
+            (pageChange)="onPageChange($event,'agf')"></ngb-pagination>
+        </div>
+      </ng-template>
+    </ngb-panel>
+    <ngb-panel title="Agent account summary" id="agent_account_summary">
+      <ng-template ngbPanelContent>
+        <div class="card-body table-responsive noon-custom-table pt-0">
+          <table class="table table-hover table-striped">
+            <thead>
+              <tr>
+                <th>Agent</th>
+                <th>Latest deposit</th>
+                <th>Current Balance</th>
+                <th>Total Expenditure</th>
+                <th>Total Deposit</th>
+                <th>Purchase account</th>
+                <th>Deposit account</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{{agentSummeryList.agentname}}</td>
+                <td>{{agentSummeryList.latestdeposit}}</td>
+                <td>{{agentSummeryList.currentbalance}}</td>
+                <td>{{agentSummeryList.totalexpenditure}}</td>
+                <td>{{agentSummeryList.totaldeposit}}</td>
+                <td>{{agentSummeryList.purchasecount}}</td>
+                <td>{{agentSummeryList.depositcount}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <!-- <div *ngIf="agclfilterModel.totalCount > 0">
+            <ngb-pagination [collectionSize]="agclfilterModel.totalCount" class="d-flex justify-content-end" [pageSize]="agclfilterModel.perpagerecord"
+              [(page)]="agclfilterModel.pagenumber" [maxSize]="5" [boundaryLinks]="true" aria-label="Default pagination"
+              (pageChange)="onPageChange($event,'agcl')"></ngb-pagination>
+          </div> -->
+      </ng-template>
+    </ngb-panel>
+  </ngb-accordion>
+</div>
+<!-- <app-common-dialog #listdialog (deleteEvent)="deleteAgent($event)"></app-common-dialog> -->

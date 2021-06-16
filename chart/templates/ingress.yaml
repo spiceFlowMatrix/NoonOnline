@@ -1,0 +1,23 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+    annotations:
+        app.gitlab.com/app: {{ .Values.gitlabCiProjectPath }}
+        app.gitlab.com/env: {{ .Values.gitlabCiProjectEnvironment }}
+        nginx.org/proxy-pass-headers: "id_token"
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+        kubernetes.io/tls-acme: "true"
+    name: {{ .Values.name }}-ingress
+    namespace: {{ .Values.deploymentNamespace }}
+spec:
+    tls:
+    -   hosts:
+        - {{ .Values.webHostingUrl }}
+        secretName: {{ .Values.name }}-host-tls-secret
+    rules:
+    -   host: {{ .Values.webHostingUrl }}
+        http:
+            paths:
+            -   backend:
+                    serviceName: {{ .Values.name }}-service
+                    servicePort: clientapp-port

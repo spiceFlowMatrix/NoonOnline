@@ -1,0 +1,62 @@
+.feed-list-header {
+  display: flex;
+  align-items: center;
+  .title {
+    font-size: 29px;
+  }
+  .done {
+    margin-left: 15px;
+    color: #0390d1;
+    cursor: pointer;
+  }
+  .progress-text {
+    margin-left: 10px;
+    color: #0390d1;
+    cursor: pointer;
+  }
+  .close {
+    margin-left: 15px;
+    color: #ff0000cc;
+    display: flex;
+    align-items: center;
+    opacity: 100;
+  }
+  .archive {
+    margin-left: 10px;
+    color: #ff0000cc;
+    font-weight: 500;
+    cursor: pointer;
+  }
+}
+.filter {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  align-items: center;
+  .apply-filter {
+    display: flex;
+    cursor: pointer;
+    align-items: center;
+    mat-icon {
+      color: #0390d1;
+      cursor: pointer;
+    }
+    mat-label {
+      color: #0390d1;
+      cursor: pointer;
+    }
+  }
+}
+.filter-container {
+  display: flex;
+  // justify-content: space-around;
+}
+
+table {
+  width: 100%;
+}
+.main-container {
+  background: white;
+  padding: 10px;
+  min-height: 500px;
+}

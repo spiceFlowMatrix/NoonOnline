@@ -1,0 +1,25 @@
+<ng-template #fileUploadStatusDialog let-c="close" let-d="dismiss">
+    <div class="modal-header">
+        <h4 class="modal-title">Uploading in progress...</h4>
+        <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <div class="form-group row justify-content-md-start">
+            <div class="col col-md-12" style="position:relative">
+                <h4 style="position: absolute;z-index: 9999;top: 40%;left: 25%;">
+                    Uploading {{uploadedPercentage | number:'1.0-0'}}% uploaded...
+                    <br>
+                    <b><span >(Now taking time for store at DB)</span></b>
+                </h4>
+                <div>
+                    <div class="timeline-item">
+                        <div class="animated-background">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>

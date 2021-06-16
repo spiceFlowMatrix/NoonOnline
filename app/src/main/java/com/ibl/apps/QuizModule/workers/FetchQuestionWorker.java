@@ -93,7 +93,7 @@ public class FetchQuestionWorker extends Worker {
                     List<QuestionEntity> questionEntities = new ArrayList<>();
                     List<AnswerEntity> answerEntities = new ArrayList<>();
                     ArrayList<QuestionModel> quizQuestions = new ArrayList<>(quizResponseModel.getQuizDataModel().getQuestionModels());
-                    for(QuestionModel questionModel : quizQuestions){
+                    for (QuestionModel questionModel : quizQuestions) {
                         QuestionEntity questionEntity = new QuestionEntity();
                         questionEntity.setId(questionModel.getId());
                         questionEntity.setQuizId(quizResponseModel.getQuizDataModel().getQuizId());
@@ -105,7 +105,7 @@ public class FetchQuestionWorker extends Worker {
                         questionEntity.setQuestionPicked(false);
                         questionEntities.add(questionEntity);
 
-                        for(AnswerModel answerModel : questionModel.getAnswerModels()){
+                        for (AnswerModel answerModel : questionModel.getAnswerModels()) {
                             AnswerEntity answerEntity = new AnswerEntity();
                             answerEntity.setId(answerModel.getId());
                             answerEntity.setQuestionId(questionModel.getId());
@@ -124,8 +124,8 @@ public class FetchQuestionWorker extends Worker {
                             .enqueue(new Callback<ResponseBody>() {
                                 @Override
                                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                                    if(response.isSuccessful()){
-                                        try{
+                                    if (response.isSuccessful()) {
+                                        try {
                                             File outputFile = null;
                                             String path = null;
 
@@ -139,7 +139,7 @@ public class FetchQuestionWorker extends Worker {
                                             path = dir.getAbsolutePath();
 
                                             //Create Output file in Main File
-                                            outputFile = new File(dir, quizId+".zip");
+                                            outputFile = new File(dir, quizId + ".zip");
 
                                             //Create New File if not present
                                             if (!outputFile.exists()) {
@@ -168,17 +168,17 @@ public class FetchQuestionWorker extends Worker {
 
                                             setProgress(100);
                                             result[0] = Result.success(outputData);
-                                            Toast.makeText(getApplicationContext(), "Quiz has been downloaded successfully.", Toast.LENGTH_SHORT)
+                                            Toast.makeText(getApplicationContext(), getApplicationContext().getString(R.string.quiz_downloaded), Toast.LENGTH_SHORT)
                                                     .show();
                                             countDownLatch.countDown();
-                                        } catch(IOException ioException){
+                                        } catch (IOException ioException) {
                                             Log.e(TAG, Objects.requireNonNull(ioException.getMessage()));
                                             setProgress(100);
                                             countDownLatch.countDown();
                                         }
-                                    } else{
+                                    } else {
                                         try {
-                                            if(response.errorBody() != null){
+                                            if (response.errorBody() != null) {
                                                 Log.e(TAG, String.valueOf(response.code()));
                                                 Log.e(TAG, response.errorBody().string());
                                             }
@@ -269,7 +269,7 @@ public class FetchQuestionWorker extends Worker {
         if (fileOrDirectory.isDirectory()) {
             for (File child : fileOrDirectory.listFiles()) {
                 deleteRecursive(child);
-                Log.e("deleteRecursive >>","Zip file deleted.");
+                Log.e("deleteRecursive >>", "Zip file deleted.");
             }
         }
         fileOrDirectory.delete();
@@ -287,7 +287,7 @@ public class FetchQuestionWorker extends Worker {
         return new QuizResponseModel();
     }
 
-    private void setProgress(int progress){
+    private void setProgress(int progress) {
         setProgressAsync(
                 new Data.Builder()
                         .putString("quiz_id", quizId)
@@ -307,8 +307,8 @@ public class FetchQuestionWorker extends Worker {
         }
 
         Notification notification = new NotificationCompat.Builder(context, channelId)
-                .setContentTitle("Fetching quiz data")
-                .setTicker("Fetching quiz data")
+                .setContentTitle(getApplicationContext().getString(R.string.quiz_download_notification))
+                .setTicker(getApplicationContext().getString(R.string.quiz_download_notification))
                 .setProgress(100, 0, true)
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setOngoing(true)

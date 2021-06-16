@@ -1,0 +1,65 @@
+.noon-tab-content {
+    padding: 10px;
+    border: 1px solid #e5e5e5;
+}
+
+.metadata .row {
+    padding: 5px 0px;
+}
+
+.row.custom-list {
+    margin: 4px;
+    border: 1px solid #e5e5e5;
+    padding: 10px;
+}
+
+.ws-nowrap {
+    white-space: nowrap;
+}
+
+.noon-list-container {
+    max-height: 40vh;
+    overflow: auto;
+}
+
+.purchase-body {
+    position: relative;
+    .info {
+        width: calc( 100% - 60px);
+        white-space: pre-line;
+        word-break: break-word;
+    }
+    .status {
+        position: absolute;
+        top: 0px;
+        padding: 2px 4px;
+        border-radius: 30px;
+        font-size: 0.65rem !important;
+        border: 1px solid rgb(232, 232, 232);
+        color: white;
+        right: -4px;
+        &.Pending {
+            background: red;
+        }
+        &.Completed {
+            background: green;
+        }
+        &.Waiting {
+            background: #ff6a00;
+        }
+    }
+}
+
+.del-icon {
+    width: 27px;
+    height: 27px;
+    background: red;
+    color: white;
+    border-radius: 50%;
+    padding-top: 7px;
+    cursor: pointer;
+}
+
+.list-selected {
+    border: 2px solid;
+}

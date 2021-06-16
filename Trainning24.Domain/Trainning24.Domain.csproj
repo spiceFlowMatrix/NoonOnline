@@ -1,0 +1,47 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Migrations\20181213054236_LatestMigration.cs" />
+    <Compile Remove="Migrations\20181213060534_SeedingIssue1.cs" />
+    <Compile Remove="Migrations\20181213061048_Seeding.cs" />
+    <Compile Remove="Migrations\20181213061604_Seeding.cs" />
+    <Compile Remove="Migrations\20181213062709_Seeding.cs" />
+    <Compile Remove="Migrations\20181213105401_Seeding.cs" />
+    <Compile Remove="Migrations\20190502085331_UserCourseExpireKey.cs" />
+    <Compile Remove="Migrations\20190502091754_UserCourseExpireKeyUpdate.cs" />
+    <Compile Remove="Migrations\20190502113842_RemoveExpireKey.cs" />
+    <Compile Remove="Migrations\20190502121737_UpdateUserCourseTableExpireKey.cs" />
+    <Compile Remove="Migrations\20190502122222_RemovedExpireFromUserCourse.cs" />
+    <Compile Remove="Migrations\20190502122902_RemoveUnusedKeyExpire.cs" />
+    <Compile Remove="Migrations\20190504054252_UserCourseExpireKeyUpdate_1.cs" />
+    <Compile Remove="Migrations\20190504055951_UserCourseExpireKeyUpdate_1.cs" />
+    <Compile Remove="Migrations\20190808044339_assignmentsubmission_080820191013.cs" />
+    <Compile Remove="Migrations\20190808044639_assignmentsubmission_080820191013_2.cs" />
+    <Compile Remove="Migrations\20190808044914_assignmentsubmission_080820191013.cs" />
+    <Compile Remove="Migrations\20190808073959_assignmentsubmission_080820191013.cs" />
+    <Compile Remove="Migrations\20190808074235_assignmentsubmission_080820191013.cs" />
+    <Compile Remove="Migrations\20190808074404_assignmentsubmission_080820191013.cs" />
+    <Compile Remove="Migrations\20190808095502_assignmentsubmission_080820191013.cs" />
+    <Compile Remove="Migrations\20190826114133_apptimetrack_add_column_26082019.cs" />
+    <Compile Remove="Migrations\20190828094434_addtbl_userquizresult_28082019at314pm.cs" />
+    <Compile Remove="Migrations\20190906062436_update_quizprogress_06092019at1154am.cs" />
+    <Compile Remove="Migrations\20191015050305_feedback_cate_seed_new_column_feedback_tabl152.cs" />
+    <Compile Remove="Migrations\20191015050653_feedback_cate_seed_new_column_feedback_tabl152_15102019.cs" />
+    <Compile Remove="Migrations\20191015051022_feedback_cate_seed_new_column_feedback_tabl152_15102019.cs" />
+    <Compile Remove="Migrations\20191017055549_added_task_management_tbls_17102019.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.1.2" />
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="2.1.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Trainning24.Abstract\Trainning24.Abstract.csproj" />
+  </ItemGroup>
+
+</Project>

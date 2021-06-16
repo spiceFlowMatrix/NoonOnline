@@ -1,0 +1,47 @@
+<div>
+    <div class="row">
+        <div class="col col-xl-12 col-lg-12">
+            <div class="row">
+                <h3 class="control-label col-md-4 col-sm-12">Bundles List</h3>
+                <h3 class="control-label col-md-8 col-sm-12 no-padding">
+                    <button class="btn btn-info pull-right m-r-20px" title="Add bundle" [routerLink]="['/bundles/add-bundle']">Add
+                        bundle
+                    </button>
+                    <app-noon-search class="list-inline-item pull-right mr-4" (func)="search($event)"></app-noon-search>
+                </h3>
+            </div>
+            <noon-loader *ngIf="isBundleLoading"></noon-loader>
+            <div class="table-responsive noon-table">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Name</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let bundle of bundleList;let i=index;">
+                            <td>{{bundle.id}}</td>
+                            <td>
+                                {{bundle.name}}
+                            </td>
+                            <td>
+                                <button class="btn btn-primary btn-action" title="Edit" routerLink="/bundles/edit-bundle/{{bundle.id}}"
+                                    routerLinkActive="router-link-active"><i class="fa fa-pencil"></i></button>
+                                <button class="btn btn-danger btn-action" title="Delete" (click)="openDeleteConfirmation(bundle,i)">
+                                    <i class="fa fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div *ngIf="filterModel.totalCount > 0">
+                <ngb-pagination [collectionSize]="filterModel.totalCount" class="d-flex justify-content-end" [pageSize]="filterModel.perpagerecord"
+                    [(page)]="filterModel.pagenumber" [maxSize]="5" [boundaryLinks]="true" aria-label="Default pagination"
+                    (pageChange)="onPageChange($event)"></ngb-pagination>
+            </div>
+        </div>
+    </div>
+</div>
+<app-common-dialog #listdialog (deleteEvent)="deleteBundle($event)"></app-common-dialog>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <RelativeLayout
+        android:id="@+id/mainItemAssignmentLay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/_10sdp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toStartOf="@+id/assignmentStatusLay"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/txtAssigignmentName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+                android:text=""
+                android:textColor="@color/colorBlack"
+                android:textSize="@dimen/_14sdp" />
+
+            <TextView
+                android:id="@+id/txtSubmitionCount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textColor="@color/colorMoreDarkGray"
+                android:textSize="@dimen/_12sdp" />
+
+        </LinearLayout>
+
+        <FrameLayout
+            android:id="@+id/assignmentStatusLay"
+            android:layout_width="@dimen/_20sdp"
+            android:layout_height="@dimen/_20sdp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true">
+
+
+            <ImageView
+                android:id="@+id/imgassignmentComplite"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone"
+                app:srcCompat="@drawable/ic_check" />
+
+
+            <ImageView
+                android:id="@+id/imgassignmentInComplite"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone"
+                app:srcCompat="@drawable/ic_close" />
+
+
+            <ImageView
+                android:id="@+id/imgassignmentNoStatus"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone"
+                app:srcCompat="@drawable/ic_remove" />
+
+        </FrameLayout>
+
+
+    </RelativeLayout>
+
+</layout>

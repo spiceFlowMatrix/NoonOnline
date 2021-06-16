@@ -1,0 +1,50 @@
+.card-container {
+    padding: 20px 20px 0;
+}
+mat-card {
+    border-radius: 4px;
+}
+.dropzone {
+    min-height: 130px;
+    min-width: 100%;
+    display: table;
+    width: 100%;
+    background-color: #eee;
+    border: dotted 1px #aaa;
+  }
+  
+  .text-wrapper {
+    display: table-cell;
+    vertical-align: middle;
+  }
+  .file-btn {
+    border-radius: 4px;
+    color: #ffffff;
+    background-color: #100d59;
+    font-size: 15px;
+    font-weight: 100;
+  }
+  
+  .centered {
+    font-family: sans-serif;
+    font-size: 1.0em;
+    text-align:center;
+  }
+  .text-right {
+    text-align: right;
+}
+.save-btn {
+    border-radius: 4px;
+    color: #ffffff;
+    background-color: #100d59;
+}
+.cancel-btn {
+    border-radius: 4px;
+    background-color: #ffffff;
+}
+.full-width{
+    width: 100%;
+}
+.fs-20 {
+    font-size: 20px;
+}

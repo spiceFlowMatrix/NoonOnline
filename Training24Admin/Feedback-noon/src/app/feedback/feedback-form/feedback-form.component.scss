@@ -1,0 +1,25 @@
+.recording-list .list-group-item .row .actions {
+    padding: 5px !important;
+}
+
+.files-list .list-group-item {
+    padding: 5px 5px 5px 15px !important;
+}
+
+.actions .control {
+    cursor: pointer;
+    min-width: 20px;
+}
+
+.description {
+    font-size: 13px;
+    margin-bottom: 2px;
+}
+
+.description-text:hover{
+    background: white !important;
+}
+
+.list-group-item:hover {
+    background-color: rgba(0, 0, 0, .075);
+}

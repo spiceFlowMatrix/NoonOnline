@@ -1,0 +1,176 @@
+<div class="task-section pos-rel">
+    <noon-loader *ngIf="isCallingApi"></noon-loader>
+    <!-- filming section -->
+    <div>
+        <div class="row section-title mt-2 mb-2">
+            <div class="col-md-1 pl-4">
+                <i class="fa fa-video-camera "></i>
+            </div>
+            <div class="col-md-11 text-uppercase">
+                Film studio
+            </div>
+        </div>
+        <div class="list-group feedback-list ml-3">
+            <ng-container *ngFor="let p of data.filmingtask; let i=index">
+                <div>                    
+                    <noon-task-input-item [data]="p" [placeholderText]="'Add new task...'" [taskType]="3" [fieldId]="'filmingtask'+i"
+                        (doneEvent)="callAddTask($event,3,'filmingtask')" (taskActionEvent)="actionOnTask($event,3,'filmingtask',i)"  [isDisabled]="!(isAllowToTaskManage || manager.filming)"></noon-task-input-item>
+                </div>
+            </ng-container>
+        </div>
+        <div class="row mt-3 pl-1">
+            <div class="col-md-5 pr-0">
+                <noon-role-assignment [data]="dataService.getUsers().filmingManagers" [userType]="3" [avtcolor]="'white'"
+                    [actionable]="isAllowToManagerSelection" [abackground]="'#9ac43c'" [title]="'Director'" [subtitle]="'Filming head'"
+                    [dataModel]="data.filmingManager" (selectRoleEvent)="publishRoleChangeEvent($event)"></noon-role-assignment>
+            </div>
+            <div class="col-md-7 pr-0 pos-rel">
+                <div class="staff-section">
+                    <span *ngFor="let staff of data.filmingStaffs;let i=index;" class="filming" (mouseenter)="staff.hover=true;"
+                        (mouseleave)="staff.hover=false;">
+                        {{staff.username | textToAvatar}}
+                        <i class="fa fa-times-circle" [hidden]="!staff.hover" (click)="removeStaff(staff,3)" *ngIf="isAllowToStaffAction || manager.filming"></i>
+                    </span>
+                    <span class="add-icon" [autoClose]="'outside'" [ngbPopover]="popContent" #p1="ngbPopover" (click)="openSelectedtionPopOver('filmingStaffs',3)"
+                        *ngIf="isAllowToStaffAction || manager.filming">
+                        <i class="fa fa-plus-circle"></i>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <hr>
+
+    </div>
+    <!-- graphics section -->
+    <div>
+        <div class="row section-title mt-2 mb-2">
+            <div class="col-md-1 pl-4">
+                <i class="fa fa-camera-retro"></i>
+            </div>
+            <div class="col-md-11 text-uppercase">
+                Graphics studio
+            </div>
+        </div>
+        <div class="list-group feedback-list ml-3">
+            <ng-container *ngFor="let p of data.graphicstask; let i=index">
+                <div>
+                    <noon-task-input-item [data]="p" [placeholderText]="'Add new graphic...'" [taskType]="2" (click)="openAddTaskModal($event,i)"
+                        [fieldId]="'graphicstask'+i" (doneEvent)="callAddTask($event,2,'graphicstask')" 
+                        (taskActionEvent)="actionOnTask($event,2,'graphicstask')"
+                        [isDisabled]="true"></noon-task-input-item>
+                </div>
+            </ng-container>
+        </div>
+        <div class="row mt-3 pl-1">
+            <div class="col-md-5 pr-0">
+                <noon-role-assignment [data]="dataService.getUsers().graphicsManagers" [userType]="2" [avtcolor]="'white'"
+                    [actionable]="isAllowToManagerSelection" [abackground]="'#f87820'" [title]="'Graphics'" [subtitle]="'Line head'"
+                    [dataModel]="data.graphicsManager" (selectRoleEvent)="publishRoleChangeEvent($event)"></noon-role-assignment>
+            </div>
+            <div class="col-md-7 pr-0 pos-rel">
+                <div class="staff-section">
+                    <span *ngFor="let staff of data.graphicsStaffs;let i=index;" class="graphics" (mouseenter)="staff.hover=true;"
+                        (mouseleave)="staff.hover=false;">
+                        {{staff.username | textToAvatar}}
+                        <i class="fa fa-times-circle" [hidden]="!staff.hover" (click)="removeStaff(staff,2)" *ngIf="isAllowToStaffAction || manager.graphics"></i>
+                    </span>
+                    <span class="add-icon" [autoClose]="'outside'" [ngbPopover]="popContent" #p1="ngbPopover" (click)="openSelectedtionPopOver('graphicsStaffs',2)"
+                        *ngIf="isAllowToStaffAction || manager.graphics">
+                        <i class="fa fa-plus-circle"></i>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <hr>
+    </div>
+    <!-- editing section -->
+    <div>
+        <div class="row section-title mt-2 mb-2">
+            <div class="col-md-1 pl-4">
+                <i class="fa fa-pencil"></i>
+            </div>
+            <div class="col-md-11 text-uppercase">
+                Editing Room
+            </div>
+        </div>
+        <div class="list-group feedback-list ml-3">
+            <ng-container *ngFor="let p of data.editingtask; let i=index">
+                <div>
+                    <noon-task-input-item [data]="p" [placeholderText]="'Add new tasks...'" [taskType]="1" [fieldId]="'editingtask'+i"
+                        (doneEvent)="callAddTask($event,1,'editingtask')" 
+                        (taskActionEvent)="actionOnTask($event,1,'editingtask')"
+                        [isDisabled]="!(isAllowToTaskManage || manager.editing)"></noon-task-input-item>
+                </div>
+            </ng-container>
+        </div>
+        <div class="row mt-3 pl-1">
+            <div class="col-md-5 pr-0">
+                <noon-role-assignment [data]="dataService.getUsers().editingManagers" [dataModel]="data.editingManager"
+                    [userType]="1" [avtcolor]="'black'" [actionable]="isAllowToManagerSelection" [abackground]="'#fce64b'"
+                    [title]="'Editing'" [subtitle]="'Line head'" (selectRoleEvent)="publishRoleChangeEvent($event)"></noon-role-assignment>
+            </div>
+            <div class="col-md-7 pr-0 pos-rel">
+                <div class="staff-section">
+                    <span *ngFor="let staff of data.editingStaffs;let i=index;" class="editing" (mouseenter)="staff.hover=true;"
+                        (mouseleave)="staff.hover=false;">
+                        {{staff.username | textToAvatar}}
+                        <i class="fa fa-times-circle" [hidden]="!staff.hover" (click)="removeStaff(staff,1)" *ngIf="isAllowToStaffAction || manager.editing"></i>
+                    </span>
+                    <span class="add-icon" [autoClose]="'outside'" [ngbPopover]="popContent" #p1="ngbPopover" (click)="openSelectedtionPopOver('editingStaffs',1)"
+                        *ngIf="isAllowToStaffAction || manager.editing">
+                        <i class="fa fa-plus-circle"></i>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <hr>
+    </div>
+</div>
+<ng-template #popContent>
+    <input id="staff-typehead" style="min-width:150px;" type="text" class="form-control noon-typehead" [(ngModel)]="model"
+        [ngbTypeahead]="search" (focus)="focus$.next($event.target.value)" (click)="click$.next($event.target.value)"
+        #staffselection="ngbTypeahead" [inputFormatter]="formatter" [resultFormatter]="rformatter" (selectItem)="selectItem($event)" />
+</ng-template>
+
+
+<ng-template #assignTasksDialog let-c="close" let-d="dismiss">
+    <form class="form-horizontal noon-form" #assignTasksForm="ngForm" (ngSubmit)="assignTasksForm.form.valid && addGraphicsTasks()">
+        <div class="modal-header">
+            <h4 class="modal-title">Assign tasks</h4>
+            <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group row">
+                <label class="control-label col-sm-3" for="description">Graphics:</label>
+                <div class="col col-sm-9">
+                    <input type="text" class="form-control" placeholder="Add new graphics..." name="description"
+                        [(ngModel)]="assignTaskModel.description" #description="ngModel" required>
+                    <div *ngIf="description.invalid && (description.touched || assignTasksForm.submitted)">
+                        <p class="input-info error-message" *ngIf="description.errors.required">Graphics description is
+                            required</p>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="control-label col-sm-3" for="filelink">Graphics Link :</label>
+                <div class="col col-sm-9">
+                    <!-- <input type="text" class="form-control" placeholder="Graphics link..." name="filelink" [pattern]="urlPattern" -->
+                    <input type="text" class="form-control" placeholder="Graphics link..." name="filelink" [(ngModel)]="assignTaskModel.filelink"
+                        #filelink="ngModel" required>
+                    <div *ngIf="filelink.invalid && (filelink.touched || assignTasksForm.submitted)">
+                        <p class="input-info error-message" *ngIf="filelink.errors.required">Graphics link is required.</p>
+                        <p class="input-info error-message" *ngIf="filelink.errors.pattern">Graphics link is invallid.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-info" [disabled]="!assignTasksForm.valid">
+                <span *ngIf="!assignTaskModel.id">Add</span>
+                <span *ngIf="assignTaskModel.id">Edit</span> graphic task
+            </button>
+        </div>
+    </form>
+</ng-template>

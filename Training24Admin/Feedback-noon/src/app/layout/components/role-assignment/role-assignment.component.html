@@ -1,0 +1,12 @@
+<div>
+    <div class="head-avatar d-md-inline-block"  [style.color]="avtcolor" [style.background]="abackground">
+        <i class="fa fa-user"></i>
+    </div>
+    <div class="d-md-inline-block head-part">
+        <p class="mb-0 title">{{title}}&nbsp;{{subtitle}}</p>
+        <input id="{{fieldId}}" type="text" class="form-control noon-typehead" [(ngModel)]="dataModel" [ngbTypeahead]="search"
+            (focus)="focus$.next($event.target.value)" (click)="click$.next($event.target.value)" #instance="ngbTypeahead"
+            (selectItem)="selectItem($event)" [inputFormatter]="formatter" [resultFormatter]="rformatter" [disabled]="!isRoleActionable"/>
+        <i class="fa fa-caret-down" aria-hidden="true" (click)="focusOnAccountSelection()" [hidden]="!isRoleActionable"></i>
+    </div>
+</div>

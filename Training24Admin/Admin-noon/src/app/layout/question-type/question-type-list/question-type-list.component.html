@@ -1,0 +1,47 @@
+<div>
+    <div class="row">
+        <div class="col col-xl-12 col-lg-12">
+            <div class="row">
+                <h3 class="control-label col-md-4 col-sm-12">Question Type List</h3>
+                <h3 class="control-label col-md-8 col-sm-12 no-padding">
+                    <button class="btn btn-info pull-right m-r-20px" title="Add question type" [routerLink]="['/question-types/add-question-type']">Add
+                        question type
+                    </button>
+                    <app-noon-search class="list-inline-item pull-right mr-4" (func)="search($event)"></app-noon-search>
+                </h3>
+            </div>
+            <noon-loader *ngIf="isQuestionTypeLoading"></noon-loader>
+            <div class="table-responsive noon-table">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Code</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let questionType of questionTypeList;let i=index;">
+                            <td>{{questionType.id}}</td>
+                            <td>
+                                {{questionType.code}}
+                            </td>
+                            <td>
+                                <button class="btn btn-primary btn-action" title="Edit" routerLink="/question-types/edit-question-type/{{questionType.id}}" routerLinkActive="router-link-active"><i
+                                        class="fa fa-pencil"></i></button>
+                                <button class="btn btn-danger btn-action" title="Delete" (click)="openDeleteConfirmation(questionType,i)">
+                                    <i class="fa fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div *ngIf="filterModel.totalCount > 0">
+                <ngb-pagination [collectionSize]="filterModel.totalCount" class="d-flex justify-content-end" [pageSize]="filterModel.perpagerecord"
+                    [(page)]="filterModel.pagenumber" [maxSize]="5" [boundaryLinks]="true" aria-label="Default pagination"
+                    (pageChange)="onPageChange($event)"></ngb-pagination>
+            </div>
+        </div>
+    </div>
+</div>
+<app-common-dialog #listdialog (deleteEvent)="deleteQuestionType($event)"></app-common-dialog>

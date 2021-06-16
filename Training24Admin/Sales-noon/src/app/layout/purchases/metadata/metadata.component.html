@@ -1,0 +1,229 @@
+<div class="metadata noon-tab-content">
+    <noon-loader *ngIf="isCallingApi"></noon-loader>
+    <div>
+        <div class="row">
+            <div class="col-sm-6">
+                <span *ngIf="metadata.purchasedate">
+                    <b>Creation time: </b>{{ metadata.purchasedate }}
+                </span>
+            </div>
+            <div class="col-sm-6">
+                <span *ngIf="metadata.lastmodifieddate">
+                    <b>Last modified time: </b>{{ metadata.lastmodifieddate }}
+                </span>
+            </div>
+        </div>
+        <form
+            class="form-horizontal noon-form"
+            #managePurchaseForm="ngForm"
+            (ngSubmit)="managePurchaseForm.form.valid && managePurchase()"
+        >
+            <div class="row">
+                <div class="form-group col-md-6" >
+                    <label class="control-label no-padding" for="roleId"
+                        >Course</label
+                    >
+                    <ngx-select-dropdown
+                    name="courseids"
+                    (change)="onCourseSelection($event)"
+                    [multiple]="true"
+                    [(value)]="metadata.courseids"
+                    [config]="dropDownConfig"
+                    [options]="courseList"
+                    ></ngx-select-dropdown>
+                    <!-- [value]="metadata.courseids" -->
+                    <!-- <select class="form-control" name="roleId" [(ngModel)]="metadata.courseId">
+          <option [value]=undefined disabled>Select</option>
+          <option *ngFor="let course of courseList" [value]="course.courseid">{{course.subject}}</option>
+        </select> -->
+                </div>
+                <div class="form-group col-md-6">
+                    <label
+                        class="control-label no-padding"
+                        for="discountpackageid"
+                        >Discount package</label
+                    >
+                    <select 
+                    [disabled]="!isSalesAgent"
+                        class="form-control"
+                        name="discountpackageid"
+                  
+                        #discountpackageid="ngModel"
+                        [(ngModel)]="metadata.discountpackageid"
+                        (change)="discountPackageChange()"
+                    >
+                        <option [value]="undefined" >Select</option>
+                        <option
+                            *ngFor="let discountPackage of discountPackages"
+                            [value]="discountPackage.id"
+                        >
+                            {{ discountPackage.packageName }}
+                        </option>
+                    </select>
+                </div>
+            </div>
+      
+            <!-- <div class="row">
+                <div class="form-group col-md-6">
+                    <label class="control-label no-padding" for="salesagentid">
+                        Sales agent
+                    </label>
+                    <select
+                        class="form-control"
+                        name="salesagentid"
+                        [(ngModel)]="metadata.salesagentid"
+                        #salesagentid="ngModel"
+                        required
+                    >
+                        <option [value]="undefined" disabled>Select</option>
+                        <option *ngFor="let agent of agents" [value]="agent.id">
+                            {{ agent.agentName }}
+                        </option>
+                    </select>
+                </div>
+            </div> -->
+            <div class="row">
+                <div class="form-group col-md-3">
+                    <label
+                        class="control-label no-padding"
+                        for="enrollmentduration"
+                        >Enrollment period</label
+                    >
+                    <div class="row">
+                        <div class="col-md-12">
+                            <input
+                                [disabled]="!isSalesAgent"
+                                class="form-control"
+                                placeholder="Start date"
+                                name="sd"
+                                required
+                                [displayMonths]="1"
+                                ngbDatepicker
+                                #sd="ngbDatepicker"
+                                [(ngModel)]="metadata.enrollmentfromdate"
+                                (focus)="sd.toggle()"
+                                (dateSelect)="calculateCourseDuration($event)"
+                            />
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-md-6">
+                    <label class="control-label no-padding" for="noofmonths"
+                        >Select Number of Months</label
+                    >
+                    <div class="row">
+                        <div class="col-md-6">
+                            <select
+                                [disabled]="!isSalesAgent"
+                                class="form-control"
+                                [disabled]="!metadata.enrollmentfromdate"
+                                id="noofmonths"
+                                name="noofmonths"
+                                #noofmonths="ngModel"
+                                [(ngModel)]="metadata.noofmonths"
+                                (change)="calculateCourseDuration()"
+                                required
+                            >
+                                <option value="0" disabled>0</option>
+                                <option *ngFor=" let i of [3,4,5,6,7,8,9,10,11,12]"
+                                    [value]="i">{{ i }}</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <input
+                                class="form-control"
+                                disabled
+                                placeholder="End date"
+                                name="ed"
+                                required
+                                [displayMonths]="1"
+                                ngbDatepicker
+                                #ed="ngbDatepicker"
+                                [(ngModel)]="metadata.enrollmenttodate"
+                                (focus)="ed.toggle()"
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- <div>
+            <ngb-datepicker #dp (select)="onDateSelection($event)" [displayMonths]="2" [dayTemplate]="t">
+            </ngb-datepicker>
+            <ng-template #t let-date="date" let-focused="focused">
+              <span class="custom-day" [class.focused]="focused" [class.range]="isRange(date)" [class.faded]="isHovered(date) || isInside(date)"
+                (mouseenter)="hoveredDate = date" (mouseleave)="hoveredDate = null">
+                {{ date.day }}
+              </span>
+            </ng-template>
+          </div> -->
+                <!-- <div class="form-group col-md-1 no-padding">
+          <button class="btn btn-outline-secondary " (click)="d.toggle()" type="button">
+            <i class="fa fa-calendar"></i>
+          </button>
+        </div> -->
+            </div>
+            <div class="row">
+                <div class="form-group col-md-6">
+                    <label
+                        class="control-label no-padding"
+                        for="subscriptiontypeid">Subscriptions</label>
+                    <select [disabled]="!isSalesAgent" class="form-control" name="subscriptiontypeid" [(ngModel)]="metadata.subscriptiontypeid"
+                        (change)="subscriptionChange()" #subscriptiontypeid="ngModel" required>
+                        <option [value]="undefined" disabled>Select</option>
+                        <option *ngFor="let subscriptionCategory of subscriptionCategories" [value]="subscriptionCategory.id">
+                            {{ subscriptionCategory.name }}
+                        </option>
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-md-6">
+                    <label class="control-label no-padding" for="packageid">
+                        Select Package
+                    </label>
+                    <select [disabled]="!isSalesAgent"
+                        class="form-control"
+                        name="packageid"
+                      
+                        [(ngModel)]="metadata.packageid"
+                        #packageid="ngModel"
+                        (ngModelChange)="onPackageChange($event)"
+                    >
+                        <option [value]="undefined" >Select</option>
+                        <option *ngFor="let package of packageList" [value]="package.id" >
+                            {{ package.name }}
+                        </option>
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-md-6">
+                        <label
+                        class="control-label no-padding"
+                        for="subscriptiontypeid"
+                        >Additional Services</label>
+            </div>
+            </div>
+            <div class="row">
+                    <div class="form-group col-md-3" *ngFor="let service of serviceList; let i = index">
+                            <label class="control-label no-padding" for="subscriptiontypeid">{{service.name}}({{service.price}})</label>
+                                    <div class="col col-md-3">
+                                        <div class="checkbox">
+                                            <label>
+                                                <input [disabled]="!isSalesAgent" type="checkbox" (change)="onServiceChange(service,i)"  name="{{service.name}}" value="{{service.id}}" [(ngModel)]="service.value">
+                                            </label>
+                                        </div>
+                                    </div>
+                    </div>
+            </div>
+     
+            <div class="row">
+                <div class="form-group col-md-12">
+                    <button type="submit" class="btn btn-primary pull-right m-r-20px" [disabled]="managePurchaseForm.invalid || isCallingApi">
+                        Save
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

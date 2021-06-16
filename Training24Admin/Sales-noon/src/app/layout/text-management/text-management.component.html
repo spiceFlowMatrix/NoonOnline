@@ -1,0 +1,48 @@
+<div>
+    <noon-loader *ngIf="isCallingApi"></noon-loader>
+    <h4>
+        <span>Manage Marketing Background Info</span>
+        <button class="btn btn-info pull-right m-r-20px mb-1" title="Save" (click)="saveInfo()">Save</button>
+    </h4>
+    <hr>
+    <div class="row mt-3">
+        <div class="col-md-2">
+            Noon Background
+        </div>
+        <div class="col-md-10">
+            <quill-editor [(ngModel)]="managementInfo.noon_background"></quill-editor>
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="col-md-2">
+            Sales Partner T&C English
+        </div>
+        <div class="col-md-10">
+            <quill-editor [(ngModel)]="managementInfo.sales_partner_eng"></quill-editor>
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="col-md-2">
+            Sales Partner T&C Dari
+        </div>
+        <div class="col-md-10">
+            <quill-editor [(ngModel)]="managementInfo.sales_partner_dari"></quill-editor>
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="col-md-2">
+            School Receipt Notes
+        </div>
+        <div class="col-md-10">
+            <quill-editor [(ngModel)]="managementInfo.school_receipt_notes"></quill-editor>
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="col-md-2">
+            Individual Receipt Notes
+        </div>
+        <div class="col-md-10">
+            <quill-editor [(ngModel)]="managementInfo.individual_receipt_notes"></quill-editor>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,61 @@
+<form>
+    <div class="list-group-item clearfix d-block" [ngClass]="{'selected': data.selected,'approved':!isFeedback && data.status =='Approved','completed':!isFeedback && data.status =='Completed'}">
+        <div>
+            <div class="task-section">
+                <i class="fa fa-check mr-4 noon-check" *ngIf="isFeedback" aria-hidden="true"></i>
+                <i class="fa fa-check mr-4 noon-check task-check" *ngIf="!isFeedback" aria-hidden="true" (click)="actionOnTask()"></i>
+                <div class="left ml-4" [ngClass]="{'full-input': !isFeedback}" (click)="focusInput()">
+                    <input type="text" class="form-control task-input" placeholder="{{placeholderText}}" [disabled]="isDisabled"
+                        [(ngModel)]="data.description" (keypress)="changeInput($event)" name="{{fieldId}}" id="{{fieldId}}"
+                        [style.font-weight]="isFeedback && data.description ? 'bold' : '400'">
+                </div>
+                <div style="width: 42%;text-align: center;" *ngIf="isNotificationNeeded && !data.filelink" class="d-md-inline-block pull-left">
+                    <!-- <span class="task-tags editing" *ngIf="data.editingManager">edit</span>
+                <span class="task-tags filming" *ngIf="data.filmingManager">recording</span>
+                <span class="task-tags graphics" *ngIf="data.graphicsManager">graphics</span> -->
+                    <span class="task-tags editing" [ngClass]="{'o-0': !data.editingManager}">edit</span>
+                    <span class="task-tags filming" [ngClass]="{'o-0': !data.filmingManager}">recording</span>
+                    <span class="task-tags graphics" [ngClass]="{'o-0': !data.graphicsManager}">graphics</span>
+                </div>
+                <div class="right" [ngClass]="{'full-input': !isFeedback}">
+                    <div *ngIf="isNotificationNeeded && !data.filelink" class="d-md-inline-block">
+                        <span class="font-weight-bold small mr-2">
+                            {{data.creationdate | date: 'shortDate'}}
+                        </span>
+                        <i class="fa fa-bell mr-2" aria-hidden="true"></i>
+                    </div>
+                    <div *ngIf="taskType && taskType == 1 && data.creationtime" class="d-md-inline-block">
+                        <span class="font-weight-bold small mr-2">
+                            {{data.creationtime | date: 'shortDate'}}
+                        </span>
+                    </div>
+                    <div class="float-right mt-1" *ngIf="data.filelink">
+                        <a href="{{data.filelink}}" target="_blank">
+                            <u>
+                                graphics file link
+                            </u>
+                        </a>
+                    </div>
+                </div>
+                <div class="right-dir" *ngIf="isFeedback">
+                    <i class="fa fa-angle-right mr-2" aria-hidden="true"></i>
+                </div>
+            </div>
+            <!-- <i class="fa fa-check mr-2 noon-check" aria-hidden="true"></i>
+        <input type="text" class="form-control task-input" placeholder="{{placeholderText}}" [disabled]="isDisabled"
+            [(ngModel)]="data.description" (keypress)="changeInput($event)" name="{{fieldId}}" id="{{fieldId}}">
+        <div class="float-right mt-1" *ngIf="isNotificationNeeded && !data.filelink">
+            <span class="task-tags editing">edit</span>
+            <span class="task-tags filming">recording</span>
+            <span class="task-tags graphics">graphics</span>
+            <span class="text-muted small mr-2">
+                <em>Date</em>
+            </span>
+            <i class="fa fa-bell mr-2" aria-hidden="true"></i>
+        </div>
+        <div class="float-right mt-1" *ngIf="data.filelink">
+            <a href="{{data.filelink}}">graphics link</a>
+        </div> -->
+        </div>
+    </div>
+</form>

@@ -1,0 +1,73 @@
+{
+  "project_info": {
+    "project_number": "811104853915",
+    "firebase_url": "https://training24-197210.firebaseio.com",
+    "project_id": "training24-197210",
+    "storage_bucket": "training24-197210.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:811104853915:android:eb69bee2dc9f7f06",
+        "android_client_info": {
+          "package_name": "com.app.training24.noon"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "811104853915-c0l1g8unaqj6aoi3so16mia5v8vq15db.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDyTHgI4VZ65GfBdjsDBt7bH-3DbjT6Ps0"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:811104853915:android:51e3e0aa3d8ff0eb",
+        "android_client_info": {
+          "package_name": "com.app.training24.noonpashto"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "811104853915-c0l1g8unaqj6aoi3so16mia5v8vq15db.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDyTHgI4VZ65GfBdjsDBt7bH-3DbjT6Ps0"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,90 @@
+<div>
+  <ngb-accordion #acc="ngbAccordion" [activeIds]="activePanels">
+    <ngb-panel title="Course definitions" id="course_definitions">
+      <ng-template ngbPanelContent>
+        <div class="card-body table-responsive noon-custom-table pt-0">
+          <div class="row">
+            <h3 class="control-label col-md-12 col-sm-12 no-padding">
+              <button class="btn btn-info pull-right m-r-20px" title="Add" [routerLink]="['/courses/add-course-definition']"
+                routerLinkActive="router-link-active">Add</button>
+            </h3>
+          </div>
+          <table class="table table-hover table-striped">
+            <thead>
+              <tr>
+                <th>Grade</th>
+                <th>Course</th>
+                <th>Name</th>
+                <th>Base price</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let course of courseDefinitions;let i=index;">
+                <td>{{course.gradeName}}</td>
+                <td>{{course.courseName}}</td>
+                <td>{{course.subject}}</td>
+                <td>{{course.basePrice}}</td>
+                <td>
+                  <button class="btn btn-primary btn-action" title="Edit" routerLink="/courses/edit-course-definition/{{course.id}}">
+                    <i class="fa fa-pencil"></i>
+                  </button>
+                  <button class="btn btn-danger btn-action" title="Delete" (click)="openDeleteConfirmation(course,i,'cd')">
+                    <i class="fa fa-trash"></i>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div *ngIf="cdFilterModel.totalCount > 0">
+          <ngb-pagination [collectionSize]="cdFilterModel.totalCount" class="d-flex justify-content-end" [pageSize]="cdFilterModel.perpagerecord"
+            [(page)]="cdFilterModel.pagenumber" [maxSize]="5" [boundaryLinks]="true" aria-label="Default pagination"
+            (pageChange)="onPageChange($event,'cd')"></ngb-pagination>
+        </div>
+      </ng-template>
+    </ngb-panel>
+    <ngb-panel title="Discount packages" id="discount_packages">
+      <ng-template ngbPanelContent>
+        <div class="card-body table-responsive noon-custom-table pt-0">
+          <h3 class="control-label col-md-12 col-sm-12 no-padding">
+            <button class="btn btn-info pull-right m-r-20px mb-1" title="Add" [routerLink]="['/courses/add-discount-package']">Add</button>
+          </h3>
+          <table class="table table-hover table-striped">
+            <thead>
+              <tr>
+                <th>Package name</th>
+                <th>% off Total price</th>
+                <th>% off each Subscriptions</th>
+                <th># free Subscriptions</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let discountPackage of discountPackages;let i=index">
+                <td>{{discountPackage.packageName}}</td>
+                <td>{{discountPackage.offTotalPrice}}</td>
+                <td>{{discountPackage.offSubscriptions}}</td>
+                <td>{{discountPackage.freeSubscriptions}}</td>
+                <td>
+                  <button class="btn btn-primary btn-action" title="Edit" title="Edit" routerLink="/courses/edit-discount-package/{{discountPackage.id}}">
+                    <i class="fa fa-pencil"></i>
+                  </button>
+                  <button class="btn btn-danger btn-action" title="Delete" (click)="openDeleteConfirmation(discountPackage,i,'dp')">
+                    <i class="fa fa-trash"></i>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div *ngIf="dpFilterModel.totalCount > 0">
+          <ngb-pagination [collectionSize]="dpFilterModel.totalCount" class="d-flex justify-content-end" [pageSize]="dpFilterModel.perpagerecord"
+            [(page)]="dpFilterModel.pagenumber" [maxSize]="5" [boundaryLinks]="true" aria-label="Default pagination"
+            (pageChange)="onPageChange($event,'dp')"></ngb-pagination>
+        </div>
+      </ng-template>
+    </ngb-panel>
+  </ngb-accordion>
+</div>
+<app-common-dialog #listdialog (deleteEvent)="deleteItem($event)"></app-common-dialog>

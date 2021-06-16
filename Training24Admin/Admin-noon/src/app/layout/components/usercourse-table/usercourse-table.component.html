@@ -1,0 +1,36 @@
+<div class="table-responsive noon-table">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Code</th>
+                <th>Card</th>
+                <th *ngIf="roleName == 'Student'">Start Date</th>
+                <th *ngIf="roleName == 'Student'">End Date</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let course of userCourseList;let i=index;">
+                <td>{{course.id}}</td>
+                <td>{{course.name}}</td>
+                <td>{{course.code}}</td>
+                <td>
+                    <img src="assets/images/logo.png" *ngIf="!course.image" class="course-avatar" />
+                    <img src="{{course.image}}" *ngIf="course.image" class="course-avatar" />
+                </td>
+                <td *ngIf="roleName == 'Student'">{{course.startDate | date:'mediumDate'}}</td>
+                <td *ngIf="roleName == 'Student'">{{course.endDate | date:'mediumDate'}}</td>
+                <td>
+                    <button class="btn btn-primary btn-action" title="View" (click)="openCoursePreviewModal(course)"
+                        routerLinkActive="router-link-active"><i class="fa fa-eye"></i></button>
+                    <button class="btn btn-primary btn-action" title="Users" (click)="openCourseUserPreviewModal(course)"
+                        routerLinkActive="router-link-active"><i class="fa fa-users"></i></button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<noon-coursepreview [data]="coursePreviewObj" #coursePreviewDialog></noon-coursepreview>
+<app-course-users-preview [data]="courseUsersPreviewObj" #courseUsersPreviewDialog></app-course-users-preview>
