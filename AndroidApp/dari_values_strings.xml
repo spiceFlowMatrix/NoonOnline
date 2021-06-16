@@ -467,7 +467,7 @@
 
     <string name="quiz_downloaded" translatable="false">امتحان موفقانه دانلود شد.</string>
     <string name="quiz_download_notification" translatable="false">در حال دانلود امتحان</string>
-    <string name="quiz_setup" translatable="false">لطفا انتظار بکشید، تا امتحان را برای شما آماده بسازیم.</string>
+    <string name="quiz_setup" translatable="false">در حال آماده‌سازی امتحان</string>
 
 
     
