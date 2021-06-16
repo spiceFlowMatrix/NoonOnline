@@ -2095,7 +2095,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
 
                 WorkManager.getInstance(getActivity()).enqueue(workRequest);
                 startedQuizDownloading = true;
-                Toast.makeText(getContext(), "Please wait while we setting up quiz for you...", Toast.LENGTH_LONG)
+                Toast.makeText(getContext(), getContext().getString(R.string.quiz_setup), Toast.LENGTH_LONG)
                         .show();
             }
             else{
