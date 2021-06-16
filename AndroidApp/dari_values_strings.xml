@@ -465,6 +465,10 @@
 
     <string name="invalid_mac_ip">شما در حال تلاش برای ورود با یک مک‌آرس و یا آی‌پی غیرمعتبر هستید، لطفا با اداره تعلیمات ن بخاطر معلومات بیشتر تماس بگیرید.</string>
 
+    <string name="quiz_downloaded" translatable="false">امتحان موفقانه دانلود شد.</string>
+    <string name="quiz_download_notification" translatable="false">در حال دانلود امتحان</string>
+    <string name="quiz_setup" translatable="false">لطفا انتظار بکشید، تا امتحان را برای شما آماده بسازیم.</string>
+
 
     
     <!--<string name="pashto_school">مدرسة الباشتو</string>-->
