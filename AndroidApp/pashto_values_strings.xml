@@ -465,6 +465,10 @@
     <string name="sync">همغږي کول</string>
 
     <string name="invalid_mac_ip">تاسو هڅه کوئ چې له یو غیرمعتبره مک‌آدرس یا آی‌پی سره ننوځئ. مهرباني وکړئ د نورو معلوماتو لپاره د ن زده‌کړې له اداري سره اړیکه ونیسئ.</string>
+
+    <string name="quiz_downloaded" translatable="false">ازموینه په بریالیتوب سره ډاونلوډ شوه.</string>
+    <string name="quiz_download_notification" translatable="false">ازموینه د ډاونلوډ په حال کې</string>
+    <string name="quiz_setup" translatable="false">مهرباني وکړئ انتظار وکړئ ، موږ به ستاسو لپاره ازموینه چمتو کړو.</string>
     
 
 
