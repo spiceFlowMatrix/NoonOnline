@@ -51,7 +51,8 @@ import static android.content.Context.MODE_PRIVATE;
 
 public class ApiClient {
     private static Retrofit retrofit = null;
-    private static int REQUEST_TIMEOUT = 120;
+    //todo :: DD updated timeout
+    private static int REQUEST_TIMEOUT = 500;
     private static OkHttpClient okHttpClient;
 
     public static Retrofit getClient(Context context) {

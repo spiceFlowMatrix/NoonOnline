@@ -153,7 +153,7 @@ public class QuizMainObject {
         }
     }
 
-    public class Questions {
+    public static class Questions {
 
         private String id;
 
@@ -241,7 +241,7 @@ public class QuizMainObject {
         }
     }
 
-    public class Answers {
+    public static class Answers {
 
         private String id;
 

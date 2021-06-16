@@ -18,6 +18,12 @@ import com.ibl.apps.Model.LibraryObject;
 import com.ibl.apps.Model.LoginObject;
 import com.ibl.apps.Model.QuizMainObject;
 import com.ibl.apps.Model.StatisticsObject;
+import com.ibl.apps.QuizModule.dao.AnswerDao;
+import com.ibl.apps.QuizModule.dao.QuestionDao;
+import com.ibl.apps.QuizModule.dao.QuizDao;
+import com.ibl.apps.QuizModule.entities.AnswerEntity;
+import com.ibl.apps.QuizModule.entities.QuestionEntity;
+import com.ibl.apps.QuizModule.entities.QuizEntity;
 import com.ibl.apps.RoomDatabase.dao.chapterManagementDatabase.ChapterProgressDao;
 import com.ibl.apps.RoomDatabase.dao.courseManagementDatabase.CourseDao;
 import com.ibl.apps.RoomDatabase.dao.courseManagementDatabase.CourseDetailsDao;
@@ -80,8 +86,12 @@ import com.ibl.apps.RoomDatabase.entity.UserDetails;
         FileProgress.class,
         QuizProgress.class,
         SyncAPITable.class,
-},
-        version = 6,
+        // Quiz related entities
+        QuizEntity.class,
+        QuestionEntity.class,
+        AnswerEntity.class
+        },
+        version = 7,
         exportSchema = false)
 @TypeConverters(DataTypeConverter.class)
 public abstract class AppDatabase extends RoomDatabase {
@@ -247,6 +257,12 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract QuizProgressDao quizProgressDao();
 
     public abstract SyncDataDao syncDataDao();
+
+    public abstract QuizDao quizDao();
+
+    public abstract QuestionDao questionDao();
+
+    public abstract AnswerDao answerDao();
 
    /* //DONE
     public abstract DeviceManagementDataDao deviceManagementDataDao();

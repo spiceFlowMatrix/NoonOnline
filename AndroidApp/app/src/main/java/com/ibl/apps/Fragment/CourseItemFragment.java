@@ -2,6 +2,7 @@ package com.ibl.apps.Fragment;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -30,6 +31,13 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.work.Constraints;
+import androidx.work.Data;
+import androidx.work.NetworkType;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkInfo;
+import androidx.work.WorkManager;
+import androidx.work.WorkQuery;
 
 import com.downloader.Error;
 import com.downloader.OnDownloadListener;
@@ -38,6 +46,7 @@ import com.downloader.PRDownloaderConfig;
 import com.github.barteksc.pdfviewer.listener.OnLoadCompleteListener;
 import com.github.barteksc.pdfviewer.listener.OnPageChangeListener;
 import com.github.barteksc.pdfviewer.listener.OnRenderListener;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -63,10 +72,17 @@ import com.ibl.apps.Model.ProgressItem;
 import com.ibl.apps.Model.QuizMainObject;
 import com.ibl.apps.Model.RestResponse;
 import com.ibl.apps.QuizManament.QuizRepository;
+import com.ibl.apps.QuizModule.entities.AnswerEntity;
+import com.ibl.apps.QuizModule.entities.QuestionEntity;
+import com.ibl.apps.QuizModule.entities.QuestionWithAnswerEntity;
+import com.ibl.apps.QuizModule.entities.QuizEntity;
+import com.ibl.apps.QuizModule.entities.QuizWithQuestionEntity;
+import com.ibl.apps.QuizModule.workers.FetchQuestionWorker;
 import com.ibl.apps.RoomDatabase.dao.courseManagementDatabase.CourseDatabaseRepository;
 import com.ibl.apps.RoomDatabase.dao.lessonManagementDatabase.LessonDatabaseRepository;
 import com.ibl.apps.RoomDatabase.dao.quizManagementDatabase.QuizDatabaseRepository;
 import com.ibl.apps.RoomDatabase.dao.syncAPIManagementDatabase.SyncAPIDatabaseRepository;
+import com.ibl.apps.RoomDatabase.database.AppDatabase;
 import com.ibl.apps.RoomDatabase.entity.ChapterProgress;
 import com.ibl.apps.RoomDatabase.entity.FileProgress;
 import com.ibl.apps.RoomDatabase.entity.LessonNewProgress;
@@ -90,9 +106,11 @@ import com.ibl.apps.util.PrefUtils;
 import com.ibl.apps.util.WrapContentLinearLayoutManager;
 
 import java.io.File;
+import java.lang.reflect.Array;
 import java.security.spec.AlgorithmParameterSpec;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -130,7 +148,6 @@ import static com.ibl.apps.Adapter.CourseItemInnerListAdapter.lessonProgressList
 import static com.ibl.apps.Adapter.CourseItemInnerListAdapter.quizProgressList;
 import static com.ibl.apps.Base.BaseActivity.freeMemory;
 
-
 public class CourseItemFragment extends BaseFragment implements View.OnClickListener, View.OnTouchListener, CourseInnerItemInterface, IOnBackPressed, CourseHideResponse {
 
     CourselessonLayoutBinding fragmentCourseItemLayoutBinding;
@@ -147,7 +164,6 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
     String GradeId, CourseName, LessonName;
@@ -195,23 +211,22 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
     private CoursePriviewObject coursePriviewObjectList;
     private String assignmentSubscription;
 
+    private ArrayList<String> quizIdArrayList = new ArrayList<>();
+    private String myQuizId = "";
+    AppDatabase appDatabase = AppDatabase.getAppDatabase(getContext());
+    private boolean startedQuizDownloading = false;
+
+    private boolean isVisible = false;
+
     public CourseItemFragment() {
         // Required empty public constructor
     }
-
-//    public static CourseItemFragment newInstance(String param1, String param2) {
-//        CourseItemFragment fragment = new CourseItemFragment();
-//        Bundle args = new Bundle();
-//        args.putString(ARG_PARAM1, param1);
-//        args.putString(ARG_PARAM2, param2);
-//        fragment.setArguments(args);
-//        return fragment;
-//    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        Log.e("IIIII", getArguments().toString());
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -229,8 +244,6 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
     public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
     }
-
-    private boolean isVisible = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -260,10 +273,8 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
         return fragmentCourseItemLayoutBinding.getRoot();
     }
 
-
     @Override
     protected void setUp(View view) {
-
         lessonRepository = new LessonRepository();
         quizRepository = new QuizRepository();
         quizDatabaseRepository = new QuizDatabaseRepository();
@@ -295,7 +306,6 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
             AddtionalDiscussions = bundle.getString(Const.AddtionalDiscussions, "");
             fragmentCourseItemLayoutBinding.CourseName.setText(CourseName);
         }
-
 
         PrefUtils.MyAsyncTask asyncTask = (PrefUtils.MyAsyncTask) new PrefUtils.MyAsyncTask(new PrefUtils.MyAsyncTask.AsyncResponse() {
             @Override
@@ -363,77 +373,6 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
             ChapterActivity.pageNo1.removeObserver(observer);
         }
         super.onDestroy();
-    }
-
-    public void setOnClickListener() {
-        //fragmentCourseItemLayoutBinding.pdfViewLayout.FullScreenImage.setOnClickListener(this);
-        fragmentCourseItemLayoutBinding.imageViewLayout.imageViewDialog.setOnClickListener(this);
-        //fragmentCourseItemLayoutBinding.pdfViewLayout.pdfviewNext.setOnClickListener(this);
-        //fragmentCourseItemLayoutBinding.pdfViewLayout.pdfviewPrivious.setOnClickListener(this);
-        //fragmentCourseItemLayoutBinding.pdfViewLayout.transparentImage.setOnTouchListener(this);
-        fragmentCourseItemLayoutBinding.quizViewLayout.QuiztransparentImage.setOnTouchListener(this);
-
-        fragmentCourseItemLayoutBinding.txtAssignmnent.setOnClickListener(this);
-        fragmentCourseItemLayoutBinding.btnbackcourseItem.setOnClickListener(this);
-//        fragmentCourseItemLayoutBinding.txtText.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                final Dialog dialog = new Dialog(getActivity(), android.R.style.Theme_Translucent_NoTitleBar);
-//                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-//                dialog.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
-//                dialog.setCancelable(true);
-//                dialogViewerItemLayoutBinding = DataBindingUtil.inflate(LayoutInflater.from(getActivity()), R.layout.dialog_viewer_item_layout, null, false);
-//                dialog.setContentView(dialogViewerItemLayoutBinding.getRoot());
-//                dialog.show();
-//
-//                dialogViewerItemLayoutBinding.pdfViewLayout.pdfViewPager.fromFile(file)
-//                        .enableSwipe(true) // allows to block changing pages using swipe
-//                        .enableDoubletap(true)
-//                        .defaultPage(0)
-//                        .onLoad(new OnLoadCompleteListener() {
-//                            @Override
-//                            public void loadComplete(int i) {
-//                                dialogViewerItemLayoutBinding.pdfViewLayout.progressDialogLay.placeholder.setVisibility(View.GONE);
-//                                hideDialog();
-//                            }
-//                        })
-//                        .onPageChange(new OnPageChangeListener() {
-//                            @Override
-//                            public void onPageChanged(int page, int pageCount) {
-//
-//                                dialogViewerItemLayoutBinding.pdfViewLayout.txtPageCount.setText(getActivity().getString(R.string.page) + " " + (page + 1) + " " + getActivity().getString(R.string.of) + "  " + pageCount);
-//                                int countper = (int) ((page + 1) * 100 / pageCount);
-//                                dialogViewerItemLayoutBinding.pdfViewLayout.progressBarLayout.progressBar.setProgress(countper);
-//
-//                                if (newcurrantProgress < countper) {
-//                                    new ProgressTask(lessonID, String.valueOf(countper), position, quizID, fileid).execute();
-//                                    newcurrantProgress = countper;
-//                                }
-//                            }
-//                        })
-//                        .enableAnnotationRendering(true)
-//                        .onRender(new OnRenderListener() {
-//                            @Override
-//                            public void onInitiallyRendered(int i) {
-//                              //  dialogViewerItemLayoutBinding.pdfViewLayout.pdfViewPager.fitToWidth(fragmentCourseItemLayoutBinding.pdfViewLayout.pdfViewPager.getCurrentPage());
-//                            }
-//                        })
-//                        .swipeHorizontal(true)
-//                        .enableAntialiasing(true)
-//                        .load();
-//
-//
-//                dialogViewerItemLayoutBinding.pdfViewLayout.pdfviewLay.setVisibility(View.VISIBLE);
-//                dialogViewerItemLayoutBinding.pdfViewLayout.pdfCourseName.setText(CourseName);
-//                dialogViewerItemLayoutBinding.pdfViewLayout.pdflessonName.setText(LessonName);
-//                dialogViewerItemLayoutBinding.pdfViewLayout.backPdfButton.setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View view) {
-//                        dialog.dismiss();
-//                    }
-//                });
-//            }
-//        });
     }
 
     @Override
@@ -535,6 +474,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                         }
                     }
                 } else {
+                    Log.e("NNNNNN","1");
                     showNetworkAlert(getActivity());
                 }
                 break;
@@ -546,10 +486,8 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
         }
     }
 
-
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
-
         int action = motionEvent.getAction();
         switch (view.getId()) {
             case R.id.transparentImage:
@@ -584,397 +522,8 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
         return false;
     }
 
-    private void loadData() {
-        fragmentCourseItemLayoutBinding.rcVerticalLayout.rcVertical.setHasFixedSize(true);
-        fragmentCourseItemLayoutBinding.rcVerticalLayout.rcVertical.setLayoutManager(new WrapContentLinearLayoutManager(NoonApplication.getContext(), LinearLayoutManager.VERTICAL, false));
-
-        courseItemListAdapter = new CourseItemListAdapter(getActivity(), coursePriviewArrayList, this, GradeId, userDetailsObject, ActivityFlag, LessonID, QuizID, isNotification, this, CourseName, assignmentSubscription);
-        fragmentCourseItemLayoutBinding.rcVerticalLayout.rcVertical.setAdapter(courseItemListAdapter);
-
-        if (isNetworkAvailable(getActivity())) {
-            CallApiCoursePriviewList();
-        } else {
-            showDialog(getActivity().getString(R.string.loading));
-            new setLocalDataTask(new CourseItemAsyncResponse() {
-                @Override
-                public CoursePriviewObject getCoursePriviewObject(CoursePriviewObject coursePriviewObject) {
-                    if (coursePriviewObject != null) {
-                        courseItemListAdapter.notifyDataSetChanged();
-                    } else {
-                        showNetworkAlert(getActivity());
-                    }
-
-                    hideDialog();
-                    return null;
-                }
-            }, coursePriviewObject, false).execute();
-        }
-    }
-
-
-    private void CallApiCoursePriviewList() {
-        try {
-            showDialog(getString(R.string.loading));
-            disposable.add(lessonRepository.fetchCoursePriview(GradeId, userId)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeWith(new DisposableSingleObserver<CoursePriviewObject>() {
-                        @Override
-                        public void onSuccess(CoursePriviewObject coursePriviewObject) {
-                            coursePriviewObject.setUserId(userId);
-                            courseItemListAdapter = new CourseItemListAdapter(getActivity(), coursePriviewArrayList, CourseItemFragment.this, GradeId, userDetailsObject, ActivityFlag, LessonID, QuizID, isNotification, CourseItemFragment.this, CourseName, assignmentSubscription);
-                            fragmentCourseItemLayoutBinding.rcVerticalLayout.rcVertical.setAdapter(courseItemListAdapter);
-                            new setLocalDataTask(new CourseItemAsyncResponse() {
-                                @Override
-                                public CoursePriviewObject getCoursePriviewObject(CoursePriviewObject coursePriviewObject) {
-                                    coursePriviewObjectList = coursePriviewObject;
-                                    if (coursePriviewObject != null) {
-                                       /* if (fileProgressList.size() > 0) {
-                                            callApiSyncFiles(fileProgressList);
-                                        }*/
-                                        if (lessonProgressList.size() >= 0) {
-                                            callApiSyncLessonProgress(lessonProgressList);
-                                        }
-                                        if (quizProgressList.size() >= 0) {
-                                            callApiSyncQuiz(quizProgressList);
-                                        }
-                                        if (chapterProgressList.size() >= 0) {
-                                            callApiSyncChapter(chapterProgressList);
-                                        }
-
-                                        courseDatabaseRepository.insertCoursePreviewObjectData(coursePriviewObject);
-                                    } else {
-                                        showNetworkAlert(getActivity());
-                                    }
-                                    //  courseItemListAdapter.notifyDataSetChanged();
-                                    Log.e("notifyChanged--1", "getCoursePriviewObject: ");
-                                    hideDialog();
-                                    return null;
-                                }
-                            }, coursePriviewObject, true).execute();
-                        }
-
-                        @Override
-                        public void onError(Throwable e) {
-                            hideDialog();
-
-                            try {
-                                HttpException error = (HttpException) e;
-                                CoursePriviewObject coursePriviewObject = new Gson().fromJson(error.response().errorBody().string(), CoursePriviewObject.class);
-                                //showSnackBar(fragmentCourseItemLayoutBinding.mainFragmentCourseLayout, coursePriviewObject.getMessage());
-                                new setLocalDataTask(new CourseItemAsyncResponse() {
-                                    @Override
-                                    public CoursePriviewObject getCoursePriviewObject(CoursePriviewObject coursePriviewObject) {
-
-                                        if (coursePriviewObject != null) {
-                                            courseItemListAdapter.notifyDataSetChanged();
-                                        } else {
-                                            showNetworkAlert(getActivity());
-                                        }
-                                        hideDialog();
-
-                                        return null;
-                                    }
-                                }, coursePriviewObject, false).execute();
-                            } catch (Exception e1) {
-                                // showError(e);
-
-                                new setLocalDataTask(new CourseItemAsyncResponse() {
-                                    @Override
-                                    public CoursePriviewObject getCoursePriviewObject(CoursePriviewObject coursePriviewObject) {
-
-                                        if (coursePriviewObject != null) {
-                                            courseItemListAdapter.notifyDataSetChanged();
-                                        } else {
-                                            showError(e);
-                                        }
-                                        hideDialog();
-
-                                        return null;
-                                    }
-                                }, coursePriviewObject, false).execute();
-                            }
-                        }
-                    }));
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-
-    private void callApiSyncLessonProgress(ArrayList<LessonNewProgress> lessonNewProgress) {
-        JsonArray array = new JsonArray();
-        if (!lessonNewProgress.isEmpty()) {
-            for (int i = 0; i < lessonNewProgress.size(); i++) {
-                JsonObject jsonObject = new JsonObject();
-
-                try {
-                    if (!lessonNewProgress.get(i).getProgress().equals("0")) {
-                        jsonObject.addProperty("chapterid", Integer.parseInt(lessonNewProgress.get(i).getChapterId()));
-                        jsonObject.addProperty("lessonid", Integer.parseInt(lessonNewProgress.get(i).getLessonId()));
-                        jsonObject.addProperty("userid", Integer.parseInt(lessonNewProgress.get(i).getUserId()));
-                        jsonObject.addProperty("progress", Integer.parseInt(lessonNewProgress.get(i).getProgress()));
-                        array.add(jsonObject);
-                    }
-                } catch (JsonSyntaxException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        if (array.size() != 0) {
-            disposable.add(lessonRepository.getLessonProgressSync(array)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeWith(new DisposableSingleObserver<RestResponse>() {
-                        @Override
-                        public void onSuccess(RestResponse restResponse) {
-                            if (restResponse.getResponse_code().equals("0")) {
-                                //  Log.e("getLessonProgressSync", "onSuccess: " + array.get(0).getAsString());
-                                lessonProgressList.clear();
-                            }
-                        }
-
-                        @Override
-                        public void onError(Throwable e) {
-                            Log.e("onError", "===callApiSyncLessonProgress===: " + e.getMessage());
-                            try {
-                                if (!userId.equals("")) {
-                                    SyncAPITable syncAPITable = new SyncAPITable();
-
-                                    syncAPITable.setApi_name(getString(R.string.lesson_progressed));
-                                    syncAPITable.setEndpoint_url("LessonProgress/LessonProgressSync");
-                                    syncAPITable.setParameters(String.valueOf(array));
-                                    syncAPITable.setHeaders(PrefUtils.getAuthid(getActivity()));
-                                    syncAPITable.setStatus(getString(R.string.errored_status));
-                                    syncAPITable.setDescription(e.getMessage());
-                                    syncAPITable.setCreated_time(getUTCTime());
-                                    syncAPITable.setGradeName(gradeName);
-                                    syncAPITable.setCourseName(CourseName);
-                                    syncAPITable.setUserid(Integer.parseInt(userId));
-                                    syncAPIDatabaseRepository.insertSyncData(syncAPITable);
-
-                                    NoonApplication.cacheStatus = 2;
-                                    SharedPreferences sharedPreferencesCache = getActivity().getSharedPreferences("cacheStatus", MODE_PRIVATE);
-                                    SharedPreferences.Editor editor = sharedPreferencesCache.edit();
-                                    if (editor != null) {
-                                        editor.clear();
-                                        editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
-                                        editor.apply();
-                                    }
-                                }
-                            } catch (JsonSyntaxException exeption) {
-                                exeption.printStackTrace();
-                            }
-
-                        }
-                    }));
-        }
-    }
-
-    private void callApiSyncChapter(ArrayList<ChapterProgress> chapterprogress) {
-        JsonArray array = new JsonArray();
-        if (!chapterprogress.isEmpty()) {
-            for (int i = 0; i < chapterprogress.size(); i++) {
-                JsonObject jsonObject = new JsonObject();
-                try {
-                    if (!chapterprogress.get(i).getProgress().equals("0")) {
-                        jsonObject.addProperty("courseid", Integer.parseInt(chapterprogress.get(i).getCourseId()));
-                        jsonObject.addProperty("chapterid", Integer.parseInt(chapterprogress.get(i).getChapterId()));
-                        jsonObject.addProperty("userid", Integer.parseInt(chapterprogress.get(i).getUserId()));
-                        jsonObject.addProperty("progress", Integer.parseInt(chapterprogress.get(i).getProgress()));
-                        array.add(jsonObject);
-                    }
-                } catch (JsonSyntaxException e) {
-                    e.printStackTrace();
-                }
-            }
-
-        }
-        if (array.size() != 0) {
-            disposable.add(lessonRepository.getChapterProgressSync(array).subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeWith(new DisposableSingleObserver<RestResponse>() {
-                        @Override
-                        public void onSuccess(RestResponse restResponse) {
-                            if (restResponse.getResponse_code().equals("0")) {
-                                chapterProgressList.clear();
-                            }
-                        }
-
-                        @Override
-                        public void onError(Throwable e) {
-                            Log.e("onError", "===callApiSyncChapter===: " + e.getMessage());
-                            try {
-                                if (!userId.equals("")) {
-                                    SyncAPITable syncAPITable = new SyncAPITable();
-
-                                    syncAPITable.setApi_name(getString(R.string.chapter_progressed));
-                                    syncAPITable.setEndpoint_url("ChapterProgress/ChapterProgressSync");
-                                    syncAPITable.setParameters(String.valueOf(array));
-                                    syncAPITable.setHeaders(PrefUtils.getAuthid(getActivity()));
-                                    syncAPITable.setStatus(getString(R.string.errored_status));
-                                    syncAPITable.setDescription(e.getMessage());
-                                    syncAPITable.setCreated_time(getUTCTime());
-                                    syncAPITable.setGradeName(gradeName);
-                                    syncAPITable.setCourseName(CourseName);
-                                    syncAPITable.setUserid(Integer.parseInt(userId));
-                                    syncAPIDatabaseRepository.insertSyncData(syncAPITable);
-
-                                    NoonApplication.cacheStatus = 2;
-                                    SharedPreferences sharedPreferencesCache = getActivity().getSharedPreferences("cacheStatus", MODE_PRIVATE);
-                                    SharedPreferences.Editor editor = sharedPreferencesCache.edit();
-                                    if (editor != null) {
-                                        editor.clear();
-                                        editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
-                                        editor.apply();
-                                    }
-                                }
-                            } catch (JsonSyntaxException exeption) {
-                                exeption.printStackTrace();
-                            }
-                        }
-                    }));
-        }
-    }
-
-    private void callApiSyncFiles(ArrayList<FileProgress> fileProgressList) {
-
-        JsonArray array = new JsonArray();
-        if (!fileProgressList.isEmpty()) {
-            for (int i = 0; i < fileProgressList.size(); i++) {
-                JsonObject jsonObject = new JsonObject();
-                Log.e("getProgress", "callApiSyncFiles: " + fileProgressList.get(i).getProgress());
-                try {
-                    if (!fileProgressList.get(i).getProgress().equals("0")) {
-                        jsonObject.addProperty("lessonid", Integer.parseInt(fileProgressList.get(i).getLessonId()));
-                        jsonObject.addProperty("fileid", Integer.parseInt(fileProgressList.get(i).getFileId()));
-                        jsonObject.addProperty("userid", Integer.parseInt(fileProgressList.get(i).getUserId()));
-                        jsonObject.addProperty("progress", Integer.parseInt(fileProgressList.get(i).getProgress()));
-                        array.add(jsonObject);
-                    }
-                } catch (JsonSyntaxException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        if (array.size() != 0)
-            disposable.add(lessonRepository.getFileProgressSync(array).subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeWith(new DisposableSingleObserver<RestResponse>() {
-                        @Override
-                        public void onSuccess(RestResponse restResponse) {
-                            if (restResponse.getResponse_code().equals("0")) {
-                                fileProgressList.clear();
-                            }
-                        }
-
-                        @Override
-                        public void onError(Throwable e) {
-                            Log.e("onError", "====callApiSyncFiles=====: " + e.getMessage());
-                            try {
-                                if (!userId.equals("")) {
-                                    SyncAPITable syncAPITable = new SyncAPITable();
-
-                                    syncAPITable.setApi_name(getString(R.string.file_progressed));
-                                    syncAPITable.setEndpoint_url("FileProgress/FileProgressSync");
-                                    syncAPITable.setParameters(String.valueOf(array));
-                                    syncAPITable.setHeaders(PrefUtils.getAuthid(getActivity()));
-                                    syncAPITable.setStatus(getString(R.string.errored_status));
-                                    syncAPITable.setDescription(e.getMessage());
-                                    syncAPITable.setCreated_time(getUTCTime());
-                                    syncAPITable.setGradeName(gradeName);
-                                    syncAPITable.setCourseName(CourseName);
-                                    syncAPITable.setUserid(Integer.parseInt(userId));
-                                    syncAPIDatabaseRepository.insertSyncData(syncAPITable);
-
-                                    NoonApplication.cacheStatus = 2;
-                                    SharedPreferences sharedPreferencesCache = getActivity().getSharedPreferences("cacheStatus", MODE_PRIVATE);
-                                    SharedPreferences.Editor editor = sharedPreferencesCache.edit();
-                                    if (editor != null) {
-                                        editor.clear();
-                                        editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
-                                        editor.apply();
-                                    }
-                                }
-                            } catch (JsonSyntaxException exeption) {
-                                exeption.printStackTrace();
-                            }
-
-                        }
-                    }));
-    }
-
-    private void callApiSyncQuiz(ArrayList<QuizProgress> quizProgress) {
-        JsonArray array = new JsonArray();
-        if (!quizProgress.isEmpty()) {
-            for (int i = 0; i < quizProgress.size(); i++) {
-                JsonObject jsonObject = new JsonObject();
-
-                try {
-                    if (!quizProgress.get(i).getProgress().equals("0")) {
-                        jsonObject.addProperty("chapterid", Integer.parseInt(quizProgress.get(i).getChapterId()));
-                        jsonObject.addProperty("quizid", Integer.parseInt(quizProgress.get(i).getQuizId()));
-                        jsonObject.addProperty("userid", Integer.parseInt(quizProgress.get(i).getUserId()));
-                        jsonObject.addProperty("progress", Integer.parseInt(quizProgress.get(i).getProgress()));
-                        array.add(jsonObject);
-                    }
-                } catch (JsonSyntaxException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        if (array.size() != 0) {
-            disposable.add(quizRepository.getQuizProgressSync(array).subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeWith(new DisposableSingleObserver<RestResponse>() {
-                        @Override
-                        public void onSuccess(RestResponse restResponse) {
-                            if (restResponse.getResponse_code().equals("0")) {
-                                quizProgressList.clear();
-                            }
-                        }
-
-                        @Override
-                        public void onError(Throwable e) {
-                            Log.e("onError", "====callApiSyncQuiz====: " + e.getMessage());
-                            try {
-                                if (!userId.equals("")) {
-                                    SyncAPITable syncAPITable = new SyncAPITable();
-
-                                    syncAPITable.setApi_name(getString(R.string.quiz_attempted));
-                                    syncAPITable.setEndpoint_url("QuizProgress/QuizProgressSync");
-                                    syncAPITable.setParameters(String.valueOf(array));
-                                    syncAPITable.setHeaders(PrefUtils.getAuthid(getActivity()));
-                                    syncAPITable.setStatus(getString(R.string.errored_status));
-                                    syncAPITable.setDescription(e.getMessage());
-                                    syncAPITable.setCreated_time(getUTCTime());
-                                    syncAPITable.setGradeName(gradeName);
-                                    syncAPITable.setCourseName(CourseName);
-                                    syncAPITable.setUserid(Integer.parseInt(userId));
-                                    syncAPIDatabaseRepository.insertSyncData(syncAPITable);
-
-                                    NoonApplication.cacheStatus = 2;
-                                    SharedPreferences sharedPreferencesCache = getActivity().getSharedPreferences("cacheStatus", MODE_PRIVATE);
-                                    SharedPreferences.Editor editor = sharedPreferencesCache.edit();
-                                    if (editor != null) {
-                                        editor.clear();
-                                        editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
-                                        editor.apply();
-                                    }
-                                }
-                            } catch (JsonSyntaxException exeption) {
-                                exeption.printStackTrace();
-                            }
-                        }
-                    }));
-        }
-    }
-
     @Override
     public void courseInnerItem(Context ctx, String fileType, String fileTypeName, String videoUri, int position, String lessonID, final int currantProgress, String quizID, int playpushflag, String chapterid, String fileid, String LessonName) {
-
         try {
             System.gc();
 
@@ -1573,18 +1122,8 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                         }
                         break;
                     case "10":
-                        setupvideoinlandscapmode();
-                        toolbarHideInterface.toolbarHide(getActivity(), true, LessonName);
-                        fragmentCourseItemLayoutBinding.appbarCourseChapter.setVisibility(View.VISIBLE);
-                        fragmentCourseItemLayoutBinding.chapterViewLayout.chapterMainView.setVisibility(View.GONE);
-                        //fragmentCourseItemLayoutBinding.pdfViewLayout.pdfviewLay.setVisibility(View.GONE);
-                        fragmentCourseItemLayoutBinding.videoViewer.videoViewLay.setVisibility(View.GONE);
-                        fragmentCourseItemLayoutBinding.imageViewLayout.imageViewer.setVisibility(View.GONE);
-                        fragmentCourseItemLayoutBinding.quizViewLayout.quizViewer.setVisibility(View.VISIBLE);
-                        fragmentCourseItemLayoutBinding.textPdfAssignmentLay.setVisibility(View.GONE);
-                        fragmentCourseItemLayoutBinding.courseitemView.setVisibility(View.GONE);
+                        Log.e("MMMMM", "Inside case 10");
                         CallApiQuestionList(fragmentCourseItemLayoutBinding, getActivity(), quizID, position);
-
                         break;
                 }
 
@@ -1622,6 +1161,548 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
             }
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        return false;
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        setOrientationDynamically(newConfig.orientation);
+    }
+
+    @Override
+    public void courseHideItem(Context ctx, String fileType) {
+        switch (fileType) {
+            case "1":
+                toolbarHideInterface.toolbarHide(getActivity(), true, LessonName);
+                if (fragmentCourseItemLayoutBinding.videoViewer.videoViewLay.getVisibility() == View.VISIBLE) {
+                    fragmentCourseItemLayoutBinding.videoViewer.videoViewLay.setVisibility(View.GONE);
+                    fragmentCourseItemLayoutBinding.videoViewer.appvideoloadingLay.setVisibility(View.GONE);
+
+                    fragmentCourseItemLayoutBinding.textPdfAssignmentLay.setVisibility(View.GONE);
+                    fragmentCourseItemLayoutBinding.courseitemView.setVisibility(View.GONE);
+                    fragmentCourseItemLayoutBinding.appbarCourseChapter.setVisibility(View.VISIBLE);
+                }
+                fragmentCourseItemLayoutBinding.videoViewer.videoView.getPlayer().stop();
+                fragmentCourseItemLayoutBinding.videoViewer.videoView.getPlayer().releaseMediaPlayer();
+                setOrientationDynamically(getActivity().getResources().getConfiguration().orientation);
+               /* if (fragmentCourseItemLayoutBinding.pdfViewLayout.pdfviewLay.getVisibility() == View.VISIBLE) {
+                    fragmentCourseItemLayoutBinding.pdfViewLayout.pdfviewLay.setVisibility(View.GONE);
+                }*/
+                break;
+            case "2":
+                toolbarHideInterface.toolbarHide(getActivity(), true, LessonName);
+                if (fragmentCourseItemLayoutBinding.videoViewer.videoViewLay.getVisibility() == View.VISIBLE) {
+                    fragmentCourseItemLayoutBinding.videoViewer.videoViewLay.setVisibility(View.GONE);
+                    fragmentCourseItemLayoutBinding.videoViewer.appvideoloadingLay.setVisibility(View.GONE);
+
+                    fragmentCourseItemLayoutBinding.textPdfAssignmentLay.setVisibility(View.GONE);
+                    fragmentCourseItemLayoutBinding.courseitemView.setVisibility(View.GONE);
+                    fragmentCourseItemLayoutBinding.appbarCourseChapter.setVisibility(View.VISIBLE);
+                }
+                fragmentCourseItemLayoutBinding.videoViewer.videoView.getPlayer().stop();
+                fragmentCourseItemLayoutBinding.videoViewer.videoView.getPlayer().releaseMediaPlayer();
+                setOrientationDynamically(getActivity().getResources().getConfiguration().orientation);
+                break;
+            case "3":
+                break;
+            case "10":
+                setOrientationDynamically(getActivity().getResources().getConfiguration().orientation);
+                break;
+        }
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser && ChapterActivity.pageNo == 0) {
+            if (getFragmentManager() != null) {
+
+            }
+        }
+
+    }
+
+    public void setOnClickListener() {
+        //fragmentCourseItemLayoutBinding.pdfViewLayout.FullScreenImage.setOnClickListener(this);
+        fragmentCourseItemLayoutBinding.imageViewLayout.imageViewDialog.setOnClickListener(this);
+        //fragmentCourseItemLayoutBinding.pdfViewLayout.pdfviewNext.setOnClickListener(this);
+        //fragmentCourseItemLayoutBinding.pdfViewLayout.pdfviewPrivious.setOnClickListener(this);
+        //fragmentCourseItemLayoutBinding.pdfViewLayout.transparentImage.setOnTouchListener(this);
+        fragmentCourseItemLayoutBinding.quizViewLayout.QuiztransparentImage.setOnTouchListener(this);
+
+        fragmentCourseItemLayoutBinding.txtAssignmnent.setOnClickListener(this);
+        fragmentCourseItemLayoutBinding.btnbackcourseItem.setOnClickListener(this);
+//        fragmentCourseItemLayoutBinding.txtText.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                final Dialog dialog = new Dialog(getActivity(), android.R.style.Theme_Translucent_NoTitleBar);
+//                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+//                dialog.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
+//                dialog.setCancelable(true);
+//                dialogViewerItemLayoutBinding = DataBindingUtil.inflate(LayoutInflater.from(getActivity()), R.layout.dialog_viewer_item_layout, null, false);
+//                dialog.setContentView(dialogViewerItemLayoutBinding.getRoot());
+//                dialog.show();
+//
+//                dialogViewerItemLayoutBinding.pdfViewLayout.pdfViewPager.fromFile(file)
+//                        .enableSwipe(true) // allows to block changing pages using swipe
+//                        .enableDoubletap(true)
+//                        .defaultPage(0)
+//                        .onLoad(new OnLoadCompleteListener() {
+//                            @Override
+//                            public void loadComplete(int i) {
+//                                dialogViewerItemLayoutBinding.pdfViewLayout.progressDialogLay.placeholder.setVisibility(View.GONE);
+//                                hideDialog();
+//                            }
+//                        })
+//                        .onPageChange(new OnPageChangeListener() {
+//                            @Override
+//                            public void onPageChanged(int page, int pageCount) {
+//
+//                                dialogViewerItemLayoutBinding.pdfViewLayout.txtPageCount.setText(getActivity().getString(R.string.page) + " " + (page + 1) + " " + getActivity().getString(R.string.of) + "  " + pageCount);
+//                                int countper = (int) ((page + 1) * 100 / pageCount);
+//                                dialogViewerItemLayoutBinding.pdfViewLayout.progressBarLayout.progressBar.setProgress(countper);
+//
+//                                if (newcurrantProgress < countper) {
+//                                    new ProgressTask(lessonID, String.valueOf(countper), position, quizID, fileid).execute();
+//                                    newcurrantProgress = countper;
+//                                }
+//                            }
+//                        })
+//                        .enableAnnotationRendering(true)
+//                        .onRender(new OnRenderListener() {
+//                            @Override
+//                            public void onInitiallyRendered(int i) {
+//                              //  dialogViewerItemLayoutBinding.pdfViewLayout.pdfViewPager.fitToWidth(fragmentCourseItemLayoutBinding.pdfViewLayout.pdfViewPager.getCurrentPage());
+//                            }
+//                        })
+//                        .swipeHorizontal(true)
+//                        .enableAntialiasing(true)
+//                        .load();
+//
+//
+//                dialogViewerItemLayoutBinding.pdfViewLayout.pdfviewLay.setVisibility(View.VISIBLE);
+//                dialogViewerItemLayoutBinding.pdfViewLayout.pdfCourseName.setText(CourseName);
+//                dialogViewerItemLayoutBinding.pdfViewLayout.pdflessonName.setText(LessonName);
+//                dialogViewerItemLayoutBinding.pdfViewLayout.backPdfButton.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View view) {
+//                        dialog.dismiss();
+//                    }
+//                });
+//            }
+//        });
+    }
+
+    private void loadData() {
+        fragmentCourseItemLayoutBinding.rcVerticalLayout.rcVertical.setHasFixedSize(true);
+        fragmentCourseItemLayoutBinding.rcVerticalLayout.rcVertical.setLayoutManager(new WrapContentLinearLayoutManager(NoonApplication.getContext(), LinearLayoutManager.VERTICAL, false));
+
+        courseItemListAdapter = new CourseItemListAdapter(getActivity(), coursePriviewArrayList, this, GradeId, userDetailsObject, ActivityFlag, LessonID, QuizID, isNotification, this, CourseName, assignmentSubscription);
+        fragmentCourseItemLayoutBinding.rcVerticalLayout.rcVertical.setAdapter(courseItemListAdapter);
+
+        if (isNetworkAvailable(getActivity())) {
+            CallApiCoursePriviewList();
+        } else {
+            showDialog(getActivity().getString(R.string.loading));
+            new setLocalDataTask(new CourseItemAsyncResponse() {
+                @Override
+                public CoursePriviewObject getCoursePriviewObject(CoursePriviewObject coursePriviewObject) {
+                    if (coursePriviewObject != null) {
+                        courseItemListAdapter.notifyDataSetChanged();
+                    } else {
+                        Log.e("NNNNNN","2");
+                        showNetworkAlert(getActivity());
+                    }
+
+                    hideDialog();
+                    return null;
+                }
+            }, coursePriviewObject, false).execute();
+        }
+    }
+
+    private void CallApiCoursePriviewList() {
+        try {
+            showDialog(getString(R.string.loading));
+            disposable.add(lessonRepository.fetchCoursePriview(GradeId, userId)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeWith(new DisposableSingleObserver<CoursePriviewObject>() {
+                        @Override
+                        public void onSuccess(CoursePriviewObject coursePriviewObject) {
+                            if(coursePriviewObject != null
+                                    && coursePriviewObject.getData() != null
+                                    && coursePriviewObject.getData().getChapters().size() > 0){
+                                for(CoursePriviewObject.Lessons lesson : coursePriviewObject.getData().getChapters().get(0).getLessons()){
+                                    if(lesson.getType() == 2){
+                                        myQuizId = lesson.getId();
+                                        break;
+//                                        quizIdArrayList.add(lesson.getId());
+                                    }
+                                }
+                            }
+
+//                            for(CoursePriviewObject.Chapters chapter: coursePriviewObject.getData().getChapters()){
+//
+//                            }
+                            Log.e("IIIII","Course preview object");
+                            Log.e("IIIII",new Gson().toJson(coursePriviewObject));
+                            coursePriviewObject.setUserId(userId);
+                            courseItemListAdapter = new CourseItemListAdapter(getActivity(), coursePriviewArrayList, CourseItemFragment.this, GradeId, userDetailsObject, ActivityFlag, LessonID, QuizID, isNotification, CourseItemFragment.this, CourseName, assignmentSubscription);
+                            fragmentCourseItemLayoutBinding.rcVerticalLayout.rcVertical.setAdapter(courseItemListAdapter);
+                            new setLocalDataTask(new CourseItemAsyncResponse() {
+                                @Override
+                                public CoursePriviewObject getCoursePriviewObject(CoursePriviewObject coursePriviewObject) {
+                                    coursePriviewObjectList = coursePriviewObject;
+                                    if (coursePriviewObject != null) {
+                                       /* if (fileProgressList.size() > 0) {
+                                            callApiSyncFiles(fileProgressList);
+                                        }*/
+                                        if (lessonProgressList.size() >= 0) {
+                                            callApiSyncLessonProgress(lessonProgressList);
+                                        }
+                                        if (quizProgressList.size() >= 0) {
+                                            callApiSyncQuiz(quizProgressList);
+                                        }
+                                        if (chapterProgressList.size() >= 0) {
+                                            callApiSyncChapter(chapterProgressList);
+                                        }
+
+                                        courseDatabaseRepository.insertCoursePreviewObjectData(coursePriviewObject);
+                                    } else {
+                                        Log.e("NNNNNN","3");
+                                        showNetworkAlert(getActivity());
+                                    }
+                                    //  courseItemListAdapter.notifyDataSetChanged();
+                                    Log.e("notifyChanged--1", "getCoursePriviewObject: ");
+                                    hideDialog();
+                                    return null;
+                                }
+                            }, coursePriviewObject, true).execute();
+
+                            observeQuizSyncWork();
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            hideDialog();
+
+                            try {
+                                HttpException error = (HttpException) e;
+                                CoursePriviewObject coursePriviewObject = new Gson().fromJson(error.response().errorBody().string(), CoursePriviewObject.class);
+                                //showSnackBar(fragmentCourseItemLayoutBinding.mainFragmentCourseLayout, coursePriviewObject.getMessage());
+                                new setLocalDataTask(new CourseItemAsyncResponse() {
+                                    @Override
+                                    public CoursePriviewObject getCoursePriviewObject(CoursePriviewObject coursePriviewObject) {
+
+                                        if (coursePriviewObject != null) {
+                                            courseItemListAdapter.notifyDataSetChanged();
+                                        } else {
+                                            Log.e("NNNNNN","4");
+                                            showNetworkAlert(getActivity());
+                                        }
+                                        hideDialog();
+
+                                        return null;
+                                    }
+                                }, coursePriviewObject, false).execute();
+                            } catch (Exception e1) {
+                                // showError(e);
+
+                                new setLocalDataTask(new CourseItemAsyncResponse() {
+                                    @Override
+                                    public CoursePriviewObject getCoursePriviewObject(CoursePriviewObject coursePriviewObject) {
+
+                                        if (coursePriviewObject != null) {
+                                            courseItemListAdapter.notifyDataSetChanged();
+                                        } else {
+                                            showError(e);
+                                        }
+                                        hideDialog();
+
+                                        return null;
+                                    }
+                                }, coursePriviewObject, false).execute();
+                            }
+                        }
+                    }));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void callApiSyncLessonProgress(ArrayList<LessonNewProgress> lessonNewProgress) {
+        JsonArray array = new JsonArray();
+        if (!lessonNewProgress.isEmpty()) {
+            for (int i = 0; i < lessonNewProgress.size(); i++) {
+                JsonObject jsonObject = new JsonObject();
+
+                try {
+                    if (!lessonNewProgress.get(i).getProgress().equals("0")) {
+                        jsonObject.addProperty("chapterid", Integer.parseInt(lessonNewProgress.get(i).getChapterId()));
+                        jsonObject.addProperty("lessonid", Integer.parseInt(lessonNewProgress.get(i).getLessonId()));
+                        jsonObject.addProperty("userid", Integer.parseInt(lessonNewProgress.get(i).getUserId()));
+                        jsonObject.addProperty("progress", Integer.parseInt(lessonNewProgress.get(i).getProgress()));
+                        array.add(jsonObject);
+                    }
+                } catch (JsonSyntaxException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        if (array.size() != 0) {
+            disposable.add(lessonRepository.getLessonProgressSync(array)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeWith(new DisposableSingleObserver<RestResponse>() {
+                        @Override
+                        public void onSuccess(RestResponse restResponse) {
+                            if (restResponse.getResponse_code().equals("0")) {
+                                //  Log.e("getLessonProgressSync", "onSuccess: " + array.get(0).getAsString());
+                                lessonProgressList.clear();
+                            }
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            Log.e("onError", "===callApiSyncLessonProgress===: " + e.getMessage());
+                            try {
+                                if (!userId.equals("")) {
+                                    SyncAPITable syncAPITable = new SyncAPITable();
+
+                                    syncAPITable.setApi_name(getString(R.string.lesson_progressed));
+                                    syncAPITable.setEndpoint_url("LessonProgress/LessonProgressSync");
+                                    syncAPITable.setParameters(String.valueOf(array));
+                                    syncAPITable.setHeaders(PrefUtils.getAuthid(getActivity()));
+                                    syncAPITable.setStatus(getString(R.string.errored_status));
+                                    syncAPITable.setDescription(e.getMessage());
+                                    syncAPITable.setCreated_time(getUTCTime());
+                                    syncAPITable.setGradeName(gradeName);
+                                    syncAPITable.setCourseName(CourseName);
+                                    syncAPITable.setUserid(Integer.parseInt(userId));
+                                    syncAPIDatabaseRepository.insertSyncData(syncAPITable);
+
+                                    NoonApplication.cacheStatus = 2;
+                                    SharedPreferences sharedPreferencesCache = getActivity().getSharedPreferences("cacheStatus", MODE_PRIVATE);
+                                    SharedPreferences.Editor editor = sharedPreferencesCache.edit();
+                                    if (editor != null) {
+                                        editor.clear();
+                                        editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
+                                        editor.apply();
+                                    }
+                                }
+                            } catch (JsonSyntaxException exeption) {
+                                exeption.printStackTrace();
+                            }
+
+                        }
+                    }));
+        }
+    }
+
+    private void callApiSyncChapter(ArrayList<ChapterProgress> chapterprogress) {
+        JsonArray array = new JsonArray();
+        if (!chapterprogress.isEmpty()) {
+            for (int i = 0; i < chapterprogress.size(); i++) {
+                JsonObject jsonObject = new JsonObject();
+                try {
+                    if (!chapterprogress.get(i).getProgress().equals("0")) {
+                        jsonObject.addProperty("courseid", Integer.parseInt(chapterprogress.get(i).getCourseId()));
+                        jsonObject.addProperty("chapterid", Integer.parseInt(chapterprogress.get(i).getChapterId()));
+                        jsonObject.addProperty("userid", Integer.parseInt(chapterprogress.get(i).getUserId()));
+                        jsonObject.addProperty("progress", Integer.parseInt(chapterprogress.get(i).getProgress()));
+                        array.add(jsonObject);
+                    }
+                } catch (JsonSyntaxException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        }
+        if (array.size() != 0) {
+            disposable.add(lessonRepository.getChapterProgressSync(array).subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeWith(new DisposableSingleObserver<RestResponse>() {
+                        @Override
+                        public void onSuccess(RestResponse restResponse) {
+                            if (restResponse.getResponse_code().equals("0")) {
+                                chapterProgressList.clear();
+                            }
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            Log.e("onError", "===callApiSyncChapter===: " + e.getMessage());
+                            try {
+                                if (!userId.equals("")) {
+                                    SyncAPITable syncAPITable = new SyncAPITable();
+
+                                    syncAPITable.setApi_name(getString(R.string.chapter_progressed));
+                                    syncAPITable.setEndpoint_url("ChapterProgress/ChapterProgressSync");
+                                    syncAPITable.setParameters(String.valueOf(array));
+                                    syncAPITable.setHeaders(PrefUtils.getAuthid(getActivity()));
+                                    syncAPITable.setStatus(getString(R.string.errored_status));
+                                    syncAPITable.setDescription(e.getMessage());
+                                    syncAPITable.setCreated_time(getUTCTime());
+                                    syncAPITable.setGradeName(gradeName);
+                                    syncAPITable.setCourseName(CourseName);
+                                    syncAPITable.setUserid(Integer.parseInt(userId));
+                                    syncAPIDatabaseRepository.insertSyncData(syncAPITable);
+
+                                    NoonApplication.cacheStatus = 2;
+                                    SharedPreferences sharedPreferencesCache = getActivity().getSharedPreferences("cacheStatus", MODE_PRIVATE);
+                                    SharedPreferences.Editor editor = sharedPreferencesCache.edit();
+                                    if (editor != null) {
+                                        editor.clear();
+                                        editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
+                                        editor.apply();
+                                    }
+                                }
+                            } catch (JsonSyntaxException exeption) {
+                                exeption.printStackTrace();
+                            }
+                        }
+                    }));
+        }
+    }
+
+    private void callApiSyncFiles(ArrayList<FileProgress> fileProgressList) {
+        JsonArray array = new JsonArray();
+        if (!fileProgressList.isEmpty()) {
+            for (int i = 0; i < fileProgressList.size(); i++) {
+                JsonObject jsonObject = new JsonObject();
+                Log.e("getProgress", "callApiSyncFiles: " + fileProgressList.get(i).getProgress());
+                try {
+                    if (!fileProgressList.get(i).getProgress().equals("0")) {
+                        jsonObject.addProperty("lessonid", Integer.parseInt(fileProgressList.get(i).getLessonId()));
+                        jsonObject.addProperty("fileid", Integer.parseInt(fileProgressList.get(i).getFileId()));
+                        jsonObject.addProperty("userid", Integer.parseInt(fileProgressList.get(i).getUserId()));
+                        jsonObject.addProperty("progress", Integer.parseInt(fileProgressList.get(i).getProgress()));
+                        array.add(jsonObject);
+                    }
+                } catch (JsonSyntaxException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        if (array.size() != 0)
+            disposable.add(lessonRepository.getFileProgressSync(array).subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeWith(new DisposableSingleObserver<RestResponse>() {
+                        @Override
+                        public void onSuccess(RestResponse restResponse) {
+                            if (restResponse.getResponse_code().equals("0")) {
+                                fileProgressList.clear();
+                            }
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            Log.e("onError", "====callApiSyncFiles=====: " + e.getMessage());
+                            try {
+                                if (!userId.equals("")) {
+                                    SyncAPITable syncAPITable = new SyncAPITable();
+
+                                    syncAPITable.setApi_name(getString(R.string.file_progressed));
+                                    syncAPITable.setEndpoint_url("FileProgress/FileProgressSync");
+                                    syncAPITable.setParameters(String.valueOf(array));
+                                    syncAPITable.setHeaders(PrefUtils.getAuthid(getActivity()));
+                                    syncAPITable.setStatus(getString(R.string.errored_status));
+                                    syncAPITable.setDescription(e.getMessage());
+                                    syncAPITable.setCreated_time(getUTCTime());
+                                    syncAPITable.setGradeName(gradeName);
+                                    syncAPITable.setCourseName(CourseName);
+                                    syncAPITable.setUserid(Integer.parseInt(userId));
+                                    syncAPIDatabaseRepository.insertSyncData(syncAPITable);
+
+                                    NoonApplication.cacheStatus = 2;
+                                    SharedPreferences sharedPreferencesCache = getActivity().getSharedPreferences("cacheStatus", MODE_PRIVATE);
+                                    SharedPreferences.Editor editor = sharedPreferencesCache.edit();
+                                    if (editor != null) {
+                                        editor.clear();
+                                        editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
+                                        editor.apply();
+                                    }
+                                }
+                            } catch (JsonSyntaxException exeption) {
+                                exeption.printStackTrace();
+                            }
+
+                        }
+                    }));
+    }
+
+    private void callApiSyncQuiz(ArrayList<QuizProgress> quizProgress) {
+        JsonArray array = new JsonArray();
+        if (!quizProgress.isEmpty()) {
+            for (int i = 0; i < quizProgress.size(); i++) {
+                JsonObject jsonObject = new JsonObject();
+
+                try {
+                    if (!quizProgress.get(i).getProgress().equals("0")) {
+                        jsonObject.addProperty("chapterid", Integer.parseInt(quizProgress.get(i).getChapterId()));
+                        jsonObject.addProperty("quizid", Integer.parseInt(quizProgress.get(i).getQuizId()));
+                        jsonObject.addProperty("userid", Integer.parseInt(quizProgress.get(i).getUserId()));
+                        jsonObject.addProperty("progress", Integer.parseInt(quizProgress.get(i).getProgress()));
+                        array.add(jsonObject);
+                    }
+                } catch (JsonSyntaxException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        if (array.size() != 0) {
+            disposable.add(quizRepository.getQuizProgressSync(array).subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeWith(new DisposableSingleObserver<RestResponse>() {
+                        @Override
+                        public void onSuccess(RestResponse restResponse) {
+                            if (restResponse.getResponse_code().equals("0")) {
+                                quizProgressList.clear();
+                            }
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            Log.e("onError", "====callApiSyncQuiz====: " + e.getMessage());
+                            try {
+                                if (!userId.equals("")) {
+                                    SyncAPITable syncAPITable = new SyncAPITable();
+
+                                    syncAPITable.setApi_name(getString(R.string.quiz_attempted));
+                                    syncAPITable.setEndpoint_url("QuizProgress/QuizProgressSync");
+                                    syncAPITable.setParameters(String.valueOf(array));
+                                    syncAPITable.setHeaders(PrefUtils.getAuthid(getActivity()));
+                                    syncAPITable.setStatus(getString(R.string.errored_status));
+                                    syncAPITable.setDescription(e.getMessage());
+                                    syncAPITable.setCreated_time(getUTCTime());
+                                    syncAPITable.setGradeName(gradeName);
+                                    syncAPITable.setCourseName(CourseName);
+                                    syncAPITable.setUserid(Integer.parseInt(userId));
+                                    syncAPIDatabaseRepository.insertSyncData(syncAPITable);
+
+                                    NoonApplication.cacheStatus = 2;
+                                    SharedPreferences sharedPreferencesCache = getActivity().getSharedPreferences("cacheStatus", MODE_PRIVATE);
+                                    SharedPreferences.Editor editor = sharedPreferencesCache.edit();
+                                    if (editor != null) {
+                                        editor.clear();
+                                        editor.putString("FlagStatus", String.valueOf(NoonApplication.cacheStatus));
+                                        editor.apply();
+                                    }
+                                }
+                            } catch (JsonSyntaxException exeption) {
+                                exeption.printStackTrace();
+                            }
+                        }
+                    }));
         }
     }
 
@@ -1713,7 +1794,6 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
     }
 
     public void openDialogViewer(String fileType, String fileTypeName, String videoUri, int position, String lessonID, final int currantProgress, String quizID, String CourseName, String LessonName, String fileid) {
-
         final Dialog dialog = new Dialog(getActivity(), android.R.style.Theme_Translucent_NoTitleBar);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
@@ -1895,15 +1975,100 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
         }
     }
 
+    private void observeQuizSyncWork(){
+        if(!myQuizId.equals("")){
+            WorkManager.getInstance(getActivity())
+                    .getWorkInfosByTagLiveData("quiz-sync")
+                    .observe(this, new Observer<List<WorkInfo>>() {
+                        @Override
+                        public void onChanged(List<WorkInfo> workInfos) {
+                            for(WorkInfo workInfo: workInfos){
+                                if(workInfo == null){
+                                    continue;
+                                }
+
+                                // See if work manager is running or enqueued
+                                if(workInfo.getState() == WorkInfo.State.RUNNING) {
+                                    Data progressData = workInfo.getProgress();
+                                    if (progressData.getString("PROGRESS") != null
+                                            && progressData.getString("quiz_id") != null) {
+                                        if (progressData.getString("quiz_id").equalsIgnoreCase(myQuizId)) {
+                                            Log.e("IIIII",
+                                                    "Current quiz work manager is running: " + progressData.getInt("PROGRESS", 0));
+                                        } else {
+                                            Log.e("IIIII",
+                                                    "Current quiz work manager is not running: " + progressData.getInt("PROGRESS", 0));
+                                        }
+                                    }
+                                }
+
+                                if(workInfo.getState() == WorkInfo.State.SUCCEEDED && startedQuizDownloading){
+                                    Log.e("IIIII","work manager ran successfully");
+                                    Data data = workInfo.getOutputData();
+                                    if(data.getString("quiz_id") != null && data.getString("quiz_id").equalsIgnoreCase(myQuizId)){
+                                        setupvideoinlandscapmode();
+                                        toolbarHideInterface.toolbarHide(getActivity(), true, LessonName);
+                                        fragmentCourseItemLayoutBinding.appbarCourseChapter.setVisibility(View.VISIBLE);
+                                        fragmentCourseItemLayoutBinding.chapterViewLayout.chapterMainView.setVisibility(View.GONE);
+                                        //fragmentCourseItemLayoutBinding.pdfViewLayout.pdfviewLay.setVisibility(View.GONE);
+                                        fragmentCourseItemLayoutBinding.videoViewer.videoViewLay.setVisibility(View.GONE);
+                                        fragmentCourseItemLayoutBinding.imageViewLayout.imageViewer.setVisibility(View.GONE);
+                                        fragmentCourseItemLayoutBinding.quizViewLayout.quizViewer.setVisibility(View.VISIBLE);
+                                        fragmentCourseItemLayoutBinding.textPdfAssignmentLay.setVisibility(View.GONE);
+                                        fragmentCourseItemLayoutBinding.courseitemView.setVisibility(View.GONE);
+
+                                        //showDialog(getString(R.string.loading));
+                                        fragmentCourseItemLayoutBinding.quizViewLayout.progressDialogLay.progressBar.setVisibility(View.VISIBLE);
+                                        fragmentCourseItemLayoutBinding.quizViewLayout.resultLayout.mainResultView.setVisibility(View.GONE);
+                                        fragmentCourseItemLayoutBinding.quizViewLayout.ProgressButton.removeAllViews();
+                                        fragmentCourseItemLayoutBinding.quizViewLayout.fragmentquesionViewpager.setPagingEnabled(false);
+
+                                        QuizWithQuestionEntity quizWithQuestionEntity = appDatabase
+                                                .quizDao().getQuizWithQuestionAndAnswer(Long.parseLong(data.getString("quiz_id")));
+                                        QuizMainObject quizMainObject = convertDataToQuizMainObject(quizWithQuestionEntity);
+                                        setQuizMainView(fragmentCourseItemLayoutBinding, getActivity(), quizMainObject);
+                                        quizMainObject.setNewquizId(QuizID);
+                                        quizMainObject.setUserId(userId);
+//                                    quizDatabaseRepository.insertQuizAnswerData(quizMainObject);
+                                        fragmentCourseItemLayoutBinding.quizViewLayout.progressDialogLay.progressBar.setVisibility(View.GONE);
+                                    }
+                                }
+//
+//                                if(workInfo.getState() == WorkInfo.State.FAILED){
+//                                    Log.e("IIIII","work manager failed");
+//                                    Data data = workInfo.getOutputData();
+//                                    if(data.getString("quiz_id") != null && data.getString("quiz_id").equalsIgnoreCase(myQuizId)){
+////                                    dialogViewerItemLayoutBinding.quizViewLayout.progressDialogLay.progressBar.setVisibility(View.GONE);
+//                                        try {
+//                                            if (userId != null && !userId.isEmpty()) {
+//                                                QuizWithQuestionEntity quizWithQuestionEntity = appDatabase
+//                                                        .quizDao().getQuizWithQuestionAndAnswer(Long.parseLong(data.getString("quiz_id")));
+//                                                if(quizWithQuestionEntity != null){
+//                                                    QuizMainObject quizMainObject = convertDataToQuizMainObject(quizWithQuestionEntity);
+//                                                    setQuizMainView(fragmentCourseItemLayoutBinding, getActivity(), quizMainObject);
+//                                                    quizMainObject.setNewquizId(QuizID);
+//                                                    quizMainObject.setUserId(userId);
+//                                                    dialogViewerItemLayoutBinding.quizViewLayout.progressDialogLay.progressBar.setVisibility(View.GONE);
+//                                                } else{
+//                                                    Toast.makeText(getContext(), "There is some error while fetching quiz data from server, You can wait or try again later.", Toast.LENGTH_LONG)
+//                                                            .show();
+//                                                }
+//                                            }
+//                                        } catch (Exception e1) {
+//                                            Log.e("MMMMMM", e1.getMessage());
+//                                            Toast.makeText(getContext(), "Something went wrong, Please try again later.", Toast.LENGTH_LONG)
+//                                                    .show();
+//                                        }
+//                                    }
+//                                }
+                            }
+                        }
+                    });
+        }
+    }
+
     private void CallApiQuestionList(CourselessonLayoutBinding dialogViewerItemLayoutBinding, Context ctx, String quizID, int position) {
         try {
-            //showDialog(getString(R.string.loading));
-
-            dialogViewerItemLayoutBinding.quizViewLayout.progressDialogLay.progressBar.setVisibility(View.VISIBLE);
-            dialogViewerItemLayoutBinding.quizViewLayout.resultLayout.mainResultView.setVisibility(View.GONE);
-            dialogViewerItemLayoutBinding.quizViewLayout.ProgressButton.removeAllViews();
-            dialogViewerItemLayoutBinding.quizViewLayout.fragmentquesionViewpager.setPagingEnabled(false);
-
             new AsyncTask<Void, Void, String>() {
                 @Override
                 protected String doInBackground(Void... voids) {
@@ -1912,65 +2077,151 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                 }
             }.execute();
 
-            if (isNetworkAvailable(ctx)) {
-                disposable.add(quizRepository.fetchQuizData(quizID)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeWith(new DisposableSingleObserver<QuizMainObject>() {
-                            @Override
-                            public void onSuccess(QuizMainObject quizMainObject) {
-                                if (quizMainObject != null) {
-                                    setQuizMainView(dialogViewerItemLayoutBinding, ctx, quizMainObject);
-                                    quizMainObject.setNewquizId(quizID);
-                                    quizMainObject.setUserId(userId);
-                                    quizDatabaseRepository.insertQuizAnswerData(quizMainObject);
-                                    dialogViewerItemLayoutBinding.quizViewLayout.progressDialogLay.progressBar.setVisibility(View.GONE);
-                                }
+            QuizEntity quizEntity = appDatabase.quizDao().getById(Long. parseLong(quizID));
+            if(quizEntity == null){
+                Constraints constraints = new Constraints.Builder()
+                        .setRequiredNetworkType(NetworkType.CONNECTED)
+                        .build();
 
-                            }
+                Data inputData = new Data.Builder()
+                        .putString("quiz_id", quizID)
+                        .build();
 
-                            @Override
-                            public void onError(Throwable e) {
-                                //hideDialog();
-                                dialogViewerItemLayoutBinding.quizViewLayout.progressDialogLay.progressBar.setVisibility(View.GONE);
-                                try {
-                                    HttpException error = (HttpException) e;
-                                    //QuizMainObject quizMainObject = new Gson().fromJson(error.response().errorBody().string(), QuizMainObject.class);
-                                    //showSnackBar(fragmentCourseItemLayoutBinding.mainFragmentCourseLayout, quizMainObject.getMessage());
-                                    if (userId != null && !userId.isEmpty()) {
-                                        QuizMainObject quizMainObject = quizDatabaseRepository.getQuizByUserId(userId, quizID);
-                                        if (quizMainObject != null) {
-                                            setQuizMainView(dialogViewerItemLayoutBinding, ctx, quizMainObject);
-                                            dialogViewerItemLayoutBinding.quizViewLayout.progressDialogLay.progressBar.setVisibility(View.GONE);
-                                        } else {
-                                            showError(e);
-                                        }
-                                    }
+                OneTimeWorkRequest workRequest = new OneTimeWorkRequest.Builder(FetchQuestionWorker.class)
+                        .setConstraints(constraints)
+                        .setInputData(inputData)
+                        .addTag("quiz-sync")
+                        .build();
 
-                                } catch (Exception e1) {
-                                    QuizMainObject quizMainObject = quizDatabaseRepository.getQuizByUserId(userId, quizID);
-                                    if (quizMainObject != null) {
-                                        setQuizMainView(dialogViewerItemLayoutBinding, ctx, quizMainObject);
-                                        dialogViewerItemLayoutBinding.quizViewLayout.progressDialogLay.progressBar.setVisibility(View.GONE);
-                                    } else {
-                                        showError(e);
-                                    }
-                                }
-                            }
-                        }));
-            } else {
-                QuizMainObject quizMainObject = quizDatabaseRepository.getQuizByUserId(userId, quizID);
+                WorkManager.getInstance(getActivity()).enqueue(workRequest);
+                startedQuizDownloading = true;
+                Toast.makeText(getContext(), getContext().getString(R.string.quiz_setup), Toast.LENGTH_LONG)
+                        .show();
+            }
+            else{
+                setupvideoinlandscapmode();
+                toolbarHideInterface.toolbarHide(getActivity(), true, LessonName);
+                dialogViewerItemLayoutBinding.appbarCourseChapter.setVisibility(View.VISIBLE);
+                dialogViewerItemLayoutBinding.chapterViewLayout.chapterMainView.setVisibility(View.GONE);
+                //fragmentCourseItemLayoutBinding.pdfViewLayout.pdfviewLay.setVisibility(View.GONE);
+                dialogViewerItemLayoutBinding.videoViewer.videoViewLay.setVisibility(View.GONE);
+                dialogViewerItemLayoutBinding.imageViewLayout.imageViewer.setVisibility(View.GONE);
+                dialogViewerItemLayoutBinding.quizViewLayout.quizViewer.setVisibility(View.VISIBLE);
+                dialogViewerItemLayoutBinding.textPdfAssignmentLay.setVisibility(View.GONE);
+                dialogViewerItemLayoutBinding.courseitemView.setVisibility(View.GONE);
+
+                //showDialog(getString(R.string.loading));
+                dialogViewerItemLayoutBinding.quizViewLayout.progressDialogLay.progressBar.setVisibility(View.VISIBLE);
+                dialogViewerItemLayoutBinding.quizViewLayout.resultLayout.mainResultView.setVisibility(View.GONE);
+                dialogViewerItemLayoutBinding.quizViewLayout.ProgressButton.removeAllViews();
+                dialogViewerItemLayoutBinding.quizViewLayout.fragmentquesionViewpager.setPagingEnabled(false);
+
+                QuizWithQuestionEntity quizWithQuestionEntity = appDatabase
+                        .quizDao().getQuizWithQuestionAndAnswer(quizEntity.getId());
+                QuizMainObject quizMainObject = convertDataToQuizMainObject(quizWithQuestionEntity);
                 setQuizMainView(dialogViewerItemLayoutBinding, ctx, quizMainObject);
                 dialogViewerItemLayoutBinding.quizViewLayout.progressDialogLay.progressBar.setVisibility(View.GONE);
             }
-
         } catch (Exception e) {
+            Log.e("IIIII", Objects.requireNonNull(e.getLocalizedMessage()));
             e.printStackTrace();
+            Toast.makeText(getContext(), e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
+    public QuizMainObject convertDataToQuizMainObject(QuizWithQuestionEntity quizWithQuestionEntity){
+        int numberOfQuestion = 10;
+        Log.e("IIIII", "In ConvertDataToQuizMainObject ------------------");
+        Log.e("IIIII", quizWithQuestionEntity.getQuiz().getId().toString());
+
+        QuizMainObject quizMainObject = new QuizMainObject();
+        quizMainObject.setNewquizId(quizWithQuestionEntity.getQuiz().getId().toString());
+
+        QuizMainObject.Data data = new QuizMainObject.Data();
+        data.setQuizid(quizWithQuestionEntity.getQuiz().getId().toString());
+        data.setPassmark(quizWithQuestionEntity.getQuiz().getPassMark().toString());
+
+        ArrayList<Long> test = new ArrayList<>();
+        // Filter unpicked questions
+        ArrayList<QuestionWithAnswerEntity> unPickedQuestionAndAnswers = new ArrayList<>();
+
+        for(QuestionWithAnswerEntity que: quizWithQuestionEntity.getQuestions()){
+            test.add(que.getQuestionEntity().getQuizId());
+            if(!que.getQuestionEntity().getQuestionPicked()){
+                unPickedQuestionAndAnswers.add(que);
+            }
+        }
+
+        if(unPickedQuestionAndAnswers.size() < numberOfQuestion){
+            appDatabase.questionDao().updateAllQuestionToUnpicked();
+            unPickedQuestionAndAnswers.clear();
+            unPickedQuestionAndAnswers.addAll(quizWithQuestionEntity.getQuestions());
+        }
+
+        Log.e("IIIII", new Gson().toJson(test));
+        Log.e("IIIII", String.valueOf(unPickedQuestionAndAnswers.size()));
+
+        // Convert it to quizMain Question and Answer
+        List<QuizMainObject.Questions> questions = new ArrayList<>();
+        for(QuestionWithAnswerEntity questionWithAnswerEntity: unPickedQuestionAndAnswers){
+            QuizMainObject.Questions question = new QuizMainObject.Questions();
+            question.setId(questionWithAnswerEntity.getQuestionEntity().getId().toString());
+            question.setQuestiontext(questionWithAnswerEntity.getQuestionEntity().getQuestionText());
+            question.setQuestiontype(questionWithAnswerEntity.getQuestionEntity().getQuestionType().toString());
+            question.setQuestiontypeid(questionWithAnswerEntity.getQuestionEntity().getQuestionTypeId().toString());
+            question.setExplanation(questionWithAnswerEntity.getQuestionEntity().getExplanation());
+            question.setIsmultianswer(questionWithAnswerEntity.getQuestionEntity().getMultiAnswer().toString());
+            question.setImages(new QuizMainObject.Images[0]);
+
+            List<QuizMainObject.Answers> answersList = new ArrayList<>();
+            QuizMainObject.Answers[] answers =
+                    new QuizMainObject.Answers[questionWithAnswerEntity.getAnswers().size()];
+            for(AnswerEntity answerEntity: questionWithAnswerEntity.getAnswers()){
+                QuizMainObject.Answers answer = new QuizMainObject.Answers();
+                answer.setId(answerEntity.getId().toString());
+                answer.setQuizid(quizWithQuestionEntity.getQuiz().getId().toString());
+                answer.setQuestionid(answerEntity.getQuestionId().toString());
+                answer.setAnswer(answerEntity.getAnswer());
+                answer.setExtratext(answerEntity.getExtraText());
+                answer.setIscorrect(answerEntity.getCorrect().toString());
+                answer.setImages(new QuizMainObject.Images[0]);
+                answersList.add(answer);
+            }
+            question.setAnswers(answersList.toArray(answers));
+            questions.add(question);
+        }
+
+        // Shuffle the unpicked questions
+        Collections.shuffle(questions);
+
+        // Picked 10 questions from shuffled question list
+        List<QuizMainObject.Questions> finalList = new ArrayList<>(questions.subList(0, numberOfQuestion));
+
+        Log.e("IIIII", String.valueOf(finalList.size()));
+
+        // Update boolean of picked question of question table in database
+        long[] idsArr = new long[numberOfQuestion];
+        int index = 0;
+        for(QuizMainObject.Questions temp : finalList){
+            idsArr[index] = Long.parseLong(temp.getId());
+            index++;
+        }
+
+        appDatabase.questionDao().updateQuestionToPicked(idsArr);
+
+        Log.e("IIIII", "Question Picked this time");
+        Log.e("IIIII", new Gson().toJson(idsArr));
+
+        // Set questions in QuizMainObject
+        data.setQuestions(finalList);
+        quizMainObject.setData(data);
+        return quizMainObject;
+    }
+
     public void setQuizMainView(CourselessonLayoutBinding dialogViewerItemLayoutBinding, Context ctx, QuizMainObject quizMainObject) {
+        Log.e("MMMMM","Quiz Main View called");
         if (quizMainObject != null) {
+            Log.e("MMMMM", "Quiz Main Object is not null");
             quizQuestionsObjectList.clear();
             dialogViewerItemLayoutBinding.quizViewLayout.questionLayout.setVisibility(View.VISIBLE);
             quizQuestionsObjectList = quizMainObject.getData().getQuestions();
@@ -2071,7 +2322,6 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
     }
 
     private String twoDigitString(int number) {
-
         if (number == 0) {
             return "00";
         }
@@ -2082,7 +2332,6 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
 
         return String.valueOf(number);
     }
-
 
     private void goNextPage(CourselessonLayoutBinding dialogViewerItemLayoutBinding, Context ctx, String nextID, String answerID, String questionID, List<QuizMainObject.Questions> quizQuestionsObjectList, int position, String passingMarks) {
         new AsyncTask<Void, Void, String>() {
@@ -2643,7 +2892,6 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
     }
 
     private String getUTCTime() {
-
         SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss a", Locale.ENGLISH);
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
         String gmtTime = sdf.format(new Date());
@@ -2655,78 +2903,7 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
         return fragmentCourseItemLayoutBinding.quizViewLayout.fragmentquesionViewpager.getCurrentItem() + i;
     }
 
-    @Override
-    public boolean onBackPressed() {
-        return false;
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        setOrientationDynamically(newConfig.orientation);
-    }
-
-    //    public void setOrientationDynamically(int orientation) {
-//
-//        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-//            try {
-//                if (fragmentCourseItemLayoutBinding.videoViewer.videoViewLay.getVisibility() == View.VISIBLE) {
-//                    try {
-//                        fragmentCourseItemLayoutBinding.videoViewer.videoView.getPlayer().setDisplayModel(GiraffePlayer.DISPLAY_FULL_WINDOW);
-//                    } catch (Exception e) {
-//                        e.printStackTrace();
-//                    }
-//                } else {
-//                    fragmentCourseItemLayoutBinding.mainFragmentCourseLayout.setOrientation(LinearLayout.HORIZONTAL);
-//
-//                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 0.6f);
-//                    params.setMargins(15, 15, 0, 15);
-//                    fragmentCourseItemLayoutBinding.courseLessonCardview.setLayoutParams(params);
-//
-//                    LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 0.4f);
-//                    params1.setMargins(0, 0, 0, 0);
-//                    fragmentCourseItemLayoutBinding.nestedScrollView.setLayoutParams(params1);
-//
-//                    FrameLayout.LayoutParams params3 = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
-//                    fragmentCourseItemLayoutBinding.videoViewer.videoViewLay.setLayoutParams(params3);
-//                    //fragmentCourseItemLayoutBinding.pdfViewLayout.pdfviewLay.setLayoutParams(params3);
-//                    fragmentCourseItemLayoutBinding.quizViewLayout.quizViewer.setLayoutParams(params3);
-//                }
-//
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//
-//        } else if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-//
-//            try {
-//                fragmentCourseItemLayoutBinding.mainFragmentCourseLayout.setOrientation(LinearLayout.VERTICAL);
-//                fragmentCourseItemLayoutBinding.videoViewer.videoView.getPlayer().setDisplayModel(GiraffePlayer.DISPLAY_NORMAL);
-//
-//                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-//                params.setMargins(0, 0, 0, 0);
-//                fragmentCourseItemLayoutBinding.courseLessonCardview.setLayoutParams(params);
-//
-//                LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
-//                params1.setMargins(0, 0, 0, 0);
-//                fragmentCourseItemLayoutBinding.nestedScrollView.setLayoutParams(params1);
-//
-//                FrameLayout.LayoutParams params3 = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, (int) getResources().getDimension(R.dimen._175sdp));
-//                fragmentCourseItemLayoutBinding.videoViewer.videoViewLay.setLayoutParams(params3);
-//
-//                FrameLayout.LayoutParams params4 = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, (int) getResources().getDimension(R.dimen._250sdp));
-//                //fragmentCourseItemLayoutBinding.pdfViewLayout.pdfviewLay.setLayoutParams(params4);
-//
-//                FrameLayout.LayoutParams params5 = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, (int) getResources().getDimension(R.dimen._300sdp));
-//                fragmentCourseItemLayoutBinding.quizViewLayout.quizViewer.setLayoutParams(params5);
-//
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//        }
-//    }
     public void setOrientationDynamically(int orientation) {
-
         if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
             try {
                 if (fragmentCourseItemLayoutBinding.videoViewer.videoViewLay.getVisibility() == View.VISIBLE) {
@@ -2788,7 +2965,6 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
         }
     }
 
-
     public void setupvideoinlandscapmode() {
         int orientation = getActivity().getResources().getConfiguration().orientation;
         if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -2809,51 +2985,30 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
         }
     }
 
-    @Override
-    public void courseHideItem(Context ctx, String fileType) {
+    public void showHitLimitDialog(Context context) {
+        HitLimitDialogBinding hitLimitDialogBinding = DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.hit_limit_dialog, null, false);
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setView(hitLimitDialogBinding.getRoot());
 
-        switch (fileType) {
-            case "1":
-                toolbarHideInterface.toolbarHide(getActivity(), true, LessonName);
-                if (fragmentCourseItemLayoutBinding.videoViewer.videoViewLay.getVisibility() == View.VISIBLE) {
-                    fragmentCourseItemLayoutBinding.videoViewer.videoViewLay.setVisibility(View.GONE);
-                    fragmentCourseItemLayoutBinding.videoViewer.appvideoloadingLay.setVisibility(View.GONE);
+        final AlertDialog alertDialog = builder.create();
+        hitLimitDialogBinding.txtNoThanksClick.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alertDialog.dismiss();
+            }
+        });
 
-                    fragmentCourseItemLayoutBinding.textPdfAssignmentLay.setVisibility(View.GONE);
-                    fragmentCourseItemLayoutBinding.courseitemView.setVisibility(View.GONE);
-                    fragmentCourseItemLayoutBinding.appbarCourseChapter.setVisibility(View.VISIBLE);
-                }
-                fragmentCourseItemLayoutBinding.videoViewer.videoView.getPlayer().stop();
-                fragmentCourseItemLayoutBinding.videoViewer.videoView.getPlayer().releaseMediaPlayer();
-                setOrientationDynamically(getActivity().getResources().getConfiguration().orientation);
-               /* if (fragmentCourseItemLayoutBinding.pdfViewLayout.pdfviewLay.getVisibility() == View.VISIBLE) {
-                    fragmentCourseItemLayoutBinding.pdfViewLayout.pdfviewLay.setVisibility(View.GONE);
-                }*/
-                break;
-            case "2":
-                toolbarHideInterface.toolbarHide(getActivity(), true, LessonName);
-                if (fragmentCourseItemLayoutBinding.videoViewer.videoViewLay.getVisibility() == View.VISIBLE) {
-                    fragmentCourseItemLayoutBinding.videoViewer.videoViewLay.setVisibility(View.GONE);
-                    fragmentCourseItemLayoutBinding.videoViewer.appvideoloadingLay.setVisibility(View.GONE);
-
-                    fragmentCourseItemLayoutBinding.textPdfAssignmentLay.setVisibility(View.GONE);
-                    fragmentCourseItemLayoutBinding.courseitemView.setVisibility(View.GONE);
-                    fragmentCourseItemLayoutBinding.appbarCourseChapter.setVisibility(View.VISIBLE);
-                }
-                fragmentCourseItemLayoutBinding.videoViewer.videoView.getPlayer().stop();
-                fragmentCourseItemLayoutBinding.videoViewer.videoView.getPlayer().releaseMediaPlayer();
-                setOrientationDynamically(getActivity().getResources().getConfiguration().orientation);
-                break;
-            case "3":
-                break;
-            case "10":
-                setOrientationDynamically(getActivity().getResources().getConfiguration().orientation);
-                break;
-        }
+        hitLimitDialogBinding.txtPendingClick.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alertDialog.dismiss();
+                startActivity(new Intent(context, CacheEventsListActivity.class));
+            }
+        });
+        alertDialog.show();
     }
 
     public class ProgressTask extends AsyncTask<Void, Void, String> {
-
         private String lessonID;
         private String progressval;
         private int position = 0;
@@ -3004,7 +3159,6 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
     }
 
     public class setLocalDataTask extends AsyncTask<Void, Void, CoursePriviewObject> {
-
         CoursePriviewObject coursePriviewObject;
         CourseItemAsyncResponse delegate = null;
         boolean network = false;
@@ -3166,39 +3320,5 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
         } else {
             return false;
         }
-    }
-
-    @Override
-    public void setUserVisibleHint(boolean isVisibleToUser) {
-        super.setUserVisibleHint(isVisibleToUser);
-        if (isVisibleToUser && ChapterActivity.pageNo == 0) {
-            if (getFragmentManager() != null) {
-
-            }
-        }
-
-    }
-
-    public void showHitLimitDialog(Context context) {
-        HitLimitDialogBinding hitLimitDialogBinding = DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.hit_limit_dialog, null, false);
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setView(hitLimitDialogBinding.getRoot());
-
-        final AlertDialog alertDialog = builder.create();
-        hitLimitDialogBinding.txtNoThanksClick.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                alertDialog.dismiss();
-            }
-        });
-
-        hitLimitDialogBinding.txtPendingClick.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                alertDialog.dismiss();
-                startActivity(new Intent(context, CacheEventsListActivity.class));
-            }
-        });
-        alertDialog.show();
     }
 }

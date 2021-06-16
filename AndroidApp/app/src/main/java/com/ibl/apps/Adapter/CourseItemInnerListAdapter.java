@@ -66,12 +66,14 @@ import com.ibl.apps.Model.QuizMainObject;
 import com.ibl.apps.Model.SignedUrlObject;
 import com.ibl.apps.Network.ApiClient;
 import com.ibl.apps.Network.ApiService;
+import com.ibl.apps.QuizModule.entities.QuizEntity;
 import com.ibl.apps.RoomDatabase.dao.chapterManagementDatabase.ChapterDatabaseRepository;
 import com.ibl.apps.RoomDatabase.dao.courseManagementDatabase.CourseDatabaseRepository;
 import com.ibl.apps.RoomDatabase.dao.lessonManagementDatabase.LessonDatabaseRepository;
 import com.ibl.apps.RoomDatabase.dao.quizManagementDatabase.QuizDatabaseRepository;
 import com.ibl.apps.RoomDatabase.dao.syncAPIManagementDatabase.SyncAPIDatabaseRepository;
 import com.ibl.apps.RoomDatabase.dao.userManagementDatabse.UserDatabaseRepository;
+import com.ibl.apps.RoomDatabase.database.AppDatabase;
 import com.ibl.apps.RoomDatabase.entity.ChapterProgress;
 import com.ibl.apps.RoomDatabase.entity.FileDownloadStatus;
 import com.ibl.apps.RoomDatabase.entity.FileProgress;
@@ -133,7 +135,7 @@ import static android.view.View.VISIBLE;
 /**
  * Created on 28/09/17 by iblinfotech.
  */
-
+//todo DD course list item
 public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemInnerListAdapter.MyViewHolder> implements View.OnClickListener, DroidListener {
 
 
@@ -515,6 +517,7 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
 //                holder.courseInnerItemLayoutBinding.tvProgress.setText(String.valueOf(lessonprogress/lessonfiles.size()).concat(" ").concat(holder.itemView.getContext().getString(R.string.completed1)));
             }
         } else if (!TextUtils.isEmpty(model.getNumquestions())) {
+            Log.e("MMMMM", new Gson().toJson(model));
             holder.courseInnerItemLayoutBinding.layPlayContent.setVisibility(GONE);
             holder.courseInnerItemLayoutBinding.imgquizContent.setVisibility(VISIBLE);
             //holder.courseInnerItemLayoutBinding.imageFileIcon.setImageResource(R.drawable.ic_quiz);
@@ -542,9 +545,11 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
                 quizProgressList.add(quizProgress);
             }
 
-            QuizMainObject quizMainObject = quizDatabaseRepository.getQuizByUserId(userId, model.getId());
-
-            if (quizMainObject != null) {
+            Log.e("NNNNN", userId);
+            QuizEntity quizEntity = AppDatabase.getAppDatabase(ctx).quizDao().getById(Long.parseLong(model.getId()));
+//            QuizMainObject quizMainObject = quizDatabaseRepository.getQuizByUserId(userId, model.getId());
+            Log.e("NNNNN", new Gson().toJson(quizEntity));
+            if (quizEntity != null) {
                 holder.courseInnerItemLayoutBinding.disableLay.setVisibility(GONE);
             } else {
                 if (isNetworkAvailable(ctx)) {
@@ -726,9 +731,11 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
             }
         });
 
+        //todo dd quiz list item click
         holder.courseInnerItemLayoutBinding.cardItemLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.e("NNNNN", "item on click");
                 holder.courseInnerItemLayoutBinding.cardItemLayout.setEnabled(false);
                 holder.courseInnerItemLayoutBinding.imgdownloadContent.setEnabled(false);
                 if (holder.courseInnerItemLayoutBinding.progressBarSpinnerLayout.progressBar.getVisibility() != VISIBLE) {
@@ -768,6 +775,7 @@ public class CourseItemInnerListAdapter extends RecyclerView.Adapter<CourseItemI
         holder.courseInnerItemLayoutBinding.disableLay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.e("NNNNN", "disableLay on click listener => "+isNotification);
                 if (isNotification) {
                     holder.courseInnerItemLayoutBinding.disableLay.setVisibility(GONE);
                     holder.courseInnerItemLayoutBinding.cardItemLayout.performClick();
