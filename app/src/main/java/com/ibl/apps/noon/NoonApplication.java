@@ -268,7 +268,6 @@ public class NoonApplication extends MultiDexApplication implements LifecycleObs
                 Runtime.getRuntime().exec(cmd);
                 Log.e("logfile", "onCreate:" + Runtime.getRuntime().exec(cmd));
             } catch (IOException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }, 1000);
