@@ -333,7 +333,7 @@
     <string name="quiz">امتحان</string>
     <string name="empty_last_online">:آخرین وقت آنلاین --</string>
     <string name="all_users">همه کاربران&#160;</string>
-    <string name="user_selected">کابر انتحاب شده</string>
+    <string name="user_selected">کاربر انتحاب شده</string>
 
     <string name="done">تکمیل</string>
     <string name="select_user">انتخاب کاربر</string>
@@ -467,7 +467,7 @@
 
     <string name="quiz_downloaded" translatable="false">امتحان موفقانه دانلود شد.</string>
     <string name="quiz_download_notification" translatable="false">در حال دانلود امتحان</string>
-    <string name="quiz_setup" translatable="false">لطفا انتظار بکشید، تا امتحان را برای شما آماده بسازیم.</string>
+    <string name="quiz_setup" translatable="false">در حال آماده‌سازی امتحان</string>
 
 
     
