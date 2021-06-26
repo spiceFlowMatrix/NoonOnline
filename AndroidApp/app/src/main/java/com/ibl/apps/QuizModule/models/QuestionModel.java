@@ -35,6 +35,10 @@ public class QuestionModel {
     @Expose
     private List<AnswerModel> answerModels;
 
+    @SerializedName("images")
+    @Expose
+    private ImageModel[] imageModels;
+
     public QuestionModel() {
     }
 
@@ -92,5 +96,13 @@ public class QuestionModel {
 
     public void setAnswerModels(List<AnswerModel> answerModels) {
         this.answerModels = answerModels;
+    }
+
+    public ImageModel[] getImageModels() {
+        return imageModels;
+    }
+
+    public void setImageModels(ImageModel[] imageModels) {
+        this.imageModels = imageModels;
     }
 }

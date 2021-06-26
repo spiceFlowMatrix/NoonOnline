@@ -73,6 +73,7 @@ import com.ibl.apps.Model.QuizMainObject;
 import com.ibl.apps.Model.RestResponse;
 import com.ibl.apps.QuizManament.QuizRepository;
 import com.ibl.apps.QuizModule.entities.AnswerEntity;
+import com.ibl.apps.QuizModule.entities.ImageEntity;
 import com.ibl.apps.QuizModule.entities.QuestionEntity;
 import com.ibl.apps.QuizModule.entities.QuestionWithAnswerEntity;
 import com.ibl.apps.QuizModule.entities.QuizEntity;
@@ -2171,7 +2172,19 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
             question.setQuestiontypeid(questionWithAnswerEntity.getQuestionEntity().getQuestionTypeId().toString());
             question.setExplanation(questionWithAnswerEntity.getQuestionEntity().getExplanation());
             question.setIsmultianswer(questionWithAnswerEntity.getQuestionEntity().getMultiAnswer().toString());
-            question.setImages(new QuizMainObject.Images[0]);
+            ArrayList<QuizMainObject.Images> imgList = new ArrayList<>();
+//            Log.e("RRRRR", new Gson().toJson(questionWithAnswerEntity.getImages()));
+            if(questionWithAnswerEntity.getImages().size() > 0){
+                for (ImageEntity imageEntity : questionWithAnswerEntity.getImages()){
+                    if(imageEntity.getAnswerId() == null){
+                        QuizMainObject.Images img = new QuizMainObject.Images();
+                        img.setFileid(imageEntity.getId().toString());
+                        img.setUrl(imageEntity.getUrl());
+                        imgList.add(img);
+                    }
+                }
+            }
+            question.setImages(imgList.toArray(new QuizMainObject.Images[imgList.size()]));
 
             List<QuizMainObject.Answers> answersList = new ArrayList<>();
             QuizMainObject.Answers[] answers =
@@ -2184,7 +2197,20 @@ public class CourseItemFragment extends BaseFragment implements View.OnClickList
                 answer.setAnswer(answerEntity.getAnswer());
                 answer.setExtratext(answerEntity.getExtraText());
                 answer.setIscorrect(answerEntity.getCorrect().toString());
-                answer.setImages(new QuizMainObject.Images[0]);
+                ArrayList<QuizMainObject.Images> imgList2 = new ArrayList<>();
+                if(questionWithAnswerEntity.getImages().size() > 0){
+                    for (ImageEntity imageEntity : questionWithAnswerEntity.getImages()){
+                        Log.e("QQQQQ", imageEntity.getAnswerId()+" => "+answerEntity.getId());
+                        if(imageEntity.getAnswerId() != null && imageEntity.getAnswerId().toString().equalsIgnoreCase(answerEntity.getId().toString())){
+                            Log.e("QQQQQ", "inside if");
+                            QuizMainObject.Images img = new QuizMainObject.Images();
+                            img.setFileid(imageEntity.getId().toString());
+                            img.setUrl(imageEntity.getUrl());
+                            imgList2.add(img);
+                        }
+                    }
+                }
+                answer.setImages(imgList2.toArray(new QuizMainObject.Images[imgList2.size()]));
                 answersList.add(answer);
             }
             question.setAnswers(answersList.toArray(answers));

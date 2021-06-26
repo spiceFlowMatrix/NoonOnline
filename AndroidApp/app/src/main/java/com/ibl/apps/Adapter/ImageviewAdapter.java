@@ -5,6 +5,10 @@ import android.content.Context;
 import androidx.databinding.DataBindingUtil;
 import androidx.annotation.NonNull;
 import androidx.viewpager.widget.PagerAdapter;
+
+import android.net.Uri;
+import android.os.Environment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +22,7 @@ import com.ibl.apps.util.GlideApp;
 import com.ibl.apps.noon.R;
 import com.ibl.apps.noon.databinding.ImageviewpagerLayoutBinding;
 
+import java.io.File;
 import java.util.ArrayList;
 
 /**
@@ -49,10 +54,29 @@ public class ImageviewAdapter extends PagerAdapter {
         ImageView quiznextImage = (ImageView) itemView.findViewById(R.id.quiznextImage);
 
         if (model.getUrl() != null) {
-            GlideApp.with(ctx)
-                    .load(model.getUrl())
-                    .error(R.drawable.ic_no_image_found)
-                    .into(quizImage);
+            Log.e("BBBBB", "url is not null, can load image");
+            String fileUrl = model.getUrl();
+            String extension = fileUrl.substring(fileUrl.lastIndexOf("."), fileUrl.indexOf("?"));
+            Log.e("BBBBBB", Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)+"/noon/"+model.getFileid()+extension);
+            File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "noon/"+model.getFileid()+extension);
+            Log.e("BBBBBB", file.getAbsolutePath());
+            if(file.exists()){
+                Log.e("BBBBBB", "file exists");
+                GlideApp.with(ctx)
+                        .load(Uri.fromFile(file))
+                        .error(R.drawable.ic_no_image_found)
+                        .into(quizImage);
+            } else{
+                Log.e("BBBBBB", "file not exists");
+                GlideApp.with(ctx)
+                        .load(model.getUrl())
+                        .error(R.drawable.ic_no_image_found)
+                        .into(quizImage);
+            }
+//            GlideApp.with(ctx)
+//                        .load(model.getUrl())
+//                        .error(R.drawable.ic_no_image_found)
+//                        .into(quizImage);
 
             if (flag != 0) {
                 frameImage.setBackgroundColor(ctx.getResources().getColor(R.color.colorTransparent));
