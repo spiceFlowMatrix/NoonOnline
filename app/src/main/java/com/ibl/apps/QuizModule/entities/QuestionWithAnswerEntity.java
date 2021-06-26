@@ -14,6 +14,12 @@ public class QuestionWithAnswerEntity {
             parentColumn = "id",
             entityColumn = "question_id"
     )
+    public List<ImageEntity> images;
+
+    @Relation(
+            parentColumn = "id",
+            entityColumn = "question_id"
+    )
     public List<AnswerEntity> answers;
 
     public QuestionWithAnswerEntity() {
@@ -25,6 +31,14 @@ public class QuestionWithAnswerEntity {
 
     public void setQuestionEntity(QuestionEntity questionEntity) {
         this.questionEntity = questionEntity;
+    }
+
+    public List<ImageEntity> getImages() {
+        return images;
+    }
+
+    public void setImages(List<ImageEntity> images) {
+        this.images = images;
     }
 
     public List<AnswerEntity> getAnswers() {
