@@ -94,7 +94,7 @@ import com.ibl.apps.RoomDatabase.entity.UserDetails;
         ImageEntity.class,
         AnswerEntity.class
         },
-        version = 8,
+        version = 9,
         exportSchema = false)
 @TypeConverters(DataTypeConverter.class)
 public abstract class AppDatabase extends RoomDatabase {
@@ -107,13 +107,20 @@ public abstract class AppDatabase extends RoomDatabase {
                     context.getApplicationContext(),
                     AppDatabase.class, "NoonDatabase")
                     .fallbackToDestructiveMigration()
-                    //.addMigrations(MIGRATION_1_2)
+                    .addMigrations(MIGRATION_8_9)
                     .allowMainThreadQueries()
                     .build();
         }
 
         return INSTANCE;
     }
+
+    static final Migration MIGRATION_8_9 = new Migration(8, 9) {
+        @Override
+        public void migrate(SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE images ADD COLUMN answer_id INTEGER DEFAULT NULL");
+        }
+    };
 
     //Add column
     static final Migration MIGRATION_1_2 = new Migration(3, 4) {

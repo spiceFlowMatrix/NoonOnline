@@ -20,6 +20,9 @@ public class ImageEntity {
     @ColumnInfo(name = "question_id", index = true)
     private Long questionId;
 
+    @ColumnInfo(name = "answer_id")
+    private Long answerId;
+
     @ColumnInfo(name = "url")
     private String url;
 
@@ -40,6 +43,14 @@ public class ImageEntity {
 
     public void setQuestionId(Long questionId) {
         this.questionId = questionId;
+    }
+
+    public Long getAnswerId() {
+        return answerId;
+    }
+
+    public void setAnswerId(Long answerId) {
+        this.answerId = answerId;
     }
 
     public String getUrl() {

@@ -126,6 +126,17 @@ public class FetchQuestionWorker extends Worker {
                             answerEntity.setExtraText(answerModel.getExtraText());
                             answerEntity.setCorrect(answerModel.isCorrect());
                             answerEntities.add(answerEntity);
+
+                            if(answerModel.getImageModels() != null && answerModel.getImageModels().length > 0){
+                                for (ImageModel imageModel: answerModel.getImageModels()){
+                                    ImageEntity imageEntity = new ImageEntity();
+                                    imageEntity.setId(imageModel.getId());
+                                    imageEntity.setQuestionId(questionModel.getId());
+                                    imageEntity.setAnswerId(answerModel.getId());
+                                    imageEntity.setUrl(imageModel.getUrl());
+                                    imageEntities.add(imageEntity);
+                                }
+                            }
                         }
                     }
                     appDatabase.questionDao().insertAll(questionEntities);
