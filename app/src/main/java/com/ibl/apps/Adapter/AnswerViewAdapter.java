@@ -4,10 +4,13 @@ import android.content.Context;
 import androidx.databinding.DataBindingUtil;
 import android.os.AsyncTask;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.gson.Gson;
 import com.ibl.apps.Model.QuizMainObject;
 import com.ibl.apps.RoomDatabase.dao.quizManagementDatabase.QuizDatabaseRepository;
 import com.ibl.apps.RoomDatabase.entity.QuizAnswerSelect;
@@ -70,7 +73,9 @@ public class AnswerViewAdapter extends RecyclerView.Adapter<AnswerViewAdapter.My
         holder.answerItemLayoutBinding.txtAnswerText.setText(answerText);
         holder.answerItemLayoutBinding.txtAnswerText.getSettings().setDefaultFontSize((int) ctx.getResources().getDimension(R.dimen._5sdp));
 
+        Log.e("RRRRR", new Gson().toJson(model));
         if (model.getImages().length != 0) {
+            Log.e("BBBBB", "there is images in answer");
             holder.answerItemLayoutBinding.layanswerimag.setVisibility(View.VISIBLE);
             ArrayList<QuizMainObject.Images> listimage = new ArrayList<>();
             Collections.addAll(listimage, model.getImages());
@@ -78,6 +83,7 @@ public class AnswerViewAdapter extends RecyclerView.Adapter<AnswerViewAdapter.My
             holder.answerItemLayoutBinding.answerImagePager.setAdapter(imageviewAdapter);
             //holder.answerItemLayoutBinding.indicator.setViewPager(holder.answerItemLayoutBinding.answerImagePager);
         } else {
+            Log.e("BBBBB", "there is no images in answer");
             holder.answerItemLayoutBinding.layanswerimag.setVisibility(View.GONE);
         }
 

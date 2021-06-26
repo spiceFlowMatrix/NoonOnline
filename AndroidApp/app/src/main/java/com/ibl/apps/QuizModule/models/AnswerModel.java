@@ -25,6 +25,10 @@ public class AnswerModel {
     @Expose
     private long questionId;
 
+    @SerializedName("images")
+    @Expose
+    private ImageModel[] imageModels;
+
     public AnswerModel() {
     }
 
@@ -66,5 +70,13 @@ public class AnswerModel {
 
     public void setQuestionId(long questionId) {
         this.questionId = questionId;
+    }
+
+    public ImageModel[] getImageModels() {
+        return imageModels;
+    }
+
+    public void setImageModels(ImageModel[] imageModels) {
+        this.imageModels = imageModels;
     }
 }

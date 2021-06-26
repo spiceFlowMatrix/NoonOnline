@@ -22,9 +22,11 @@ import com.google.gson.reflect.TypeToken;
 import com.ibl.apps.Network.ApiClient;
 import com.ibl.apps.QuizManament.QuizApiService;
 import com.ibl.apps.QuizModule.entities.AnswerEntity;
+import com.ibl.apps.QuizModule.entities.ImageEntity;
 import com.ibl.apps.QuizModule.entities.QuestionEntity;
 import com.ibl.apps.QuizModule.entities.QuizEntity;
 import com.ibl.apps.QuizModule.models.AnswerModel;
+import com.ibl.apps.QuizModule.models.ImageModel;
 import com.ibl.apps.QuizModule.models.QuestionModel;
 import com.ibl.apps.QuizModule.models.QuizResponseModel;
 import com.ibl.apps.RoomDatabase.database.AppDatabase;
@@ -92,6 +94,7 @@ public class FetchQuestionWorker extends Worker {
 
                     List<QuestionEntity> questionEntities = new ArrayList<>();
                     List<AnswerEntity> answerEntities = new ArrayList<>();
+                    List<ImageEntity> imageEntities = new ArrayList<>();
                     ArrayList<QuestionModel> quizQuestions = new ArrayList<>(quizResponseModel.getQuizDataModel().getQuestionModels());
                     for (QuestionModel questionModel : quizQuestions) {
                         QuestionEntity questionEntity = new QuestionEntity();
@@ -105,6 +108,16 @@ public class FetchQuestionWorker extends Worker {
                         questionEntity.setQuestionPicked(false);
                         questionEntities.add(questionEntity);
 
+                        if(questionModel.getImageModels() != null && questionModel.getImageModels().length > 0){
+                            for (ImageModel imageModel: questionModel.getImageModels()){
+                                ImageEntity imageEntity = new ImageEntity();
+                                imageEntity.setId(imageModel.getId());
+                                imageEntity.setQuestionId(questionModel.getId());
+                                imageEntity.setUrl(imageModel.getUrl());
+                                imageEntities.add(imageEntity);
+                            }
+                        }
+
                         for (AnswerModel answerModel : questionModel.getAnswerModels()) {
                             AnswerEntity answerEntity = new AnswerEntity();
                             answerEntity.setId(answerModel.getId());
@@ -113,10 +126,21 @@ public class FetchQuestionWorker extends Worker {
                             answerEntity.setExtraText(answerModel.getExtraText());
                             answerEntity.setCorrect(answerModel.isCorrect());
                             answerEntities.add(answerEntity);
+
+                            if(answerModel.getImageModels() != null && answerModel.getImageModels().length > 0){
+                                for (ImageModel imageModel: answerModel.getImageModels()){
+                                    ImageEntity imageEntity = new ImageEntity();
+                                    imageEntity.setId(imageModel.getId());
+                                    imageEntity.setQuestionId(questionModel.getId());
+                                    imageEntity.setAnswerId(answerModel.getId());
+                                    imageEntity.setUrl(imageModel.getUrl());
+                                    imageEntities.add(imageEntity);
+                                }
+                            }
                         }
                     }
                     appDatabase.questionDao().insertAll(questionEntities);
-
+                    appDatabase.imageDao().insertAll(imageEntities);
                     appDatabase.answerDao().insertAll(answerEntities);
                     setProgress(50);
 

@@ -19,9 +19,11 @@ import com.ibl.apps.Model.LoginObject;
 import com.ibl.apps.Model.QuizMainObject;
 import com.ibl.apps.Model.StatisticsObject;
 import com.ibl.apps.QuizModule.dao.AnswerDao;
+import com.ibl.apps.QuizModule.dao.ImageDao;
 import com.ibl.apps.QuizModule.dao.QuestionDao;
 import com.ibl.apps.QuizModule.dao.QuizDao;
 import com.ibl.apps.QuizModule.entities.AnswerEntity;
+import com.ibl.apps.QuizModule.entities.ImageEntity;
 import com.ibl.apps.QuizModule.entities.QuestionEntity;
 import com.ibl.apps.QuizModule.entities.QuizEntity;
 import com.ibl.apps.RoomDatabase.dao.chapterManagementDatabase.ChapterProgressDao;
@@ -89,9 +91,10 @@ import com.ibl.apps.RoomDatabase.entity.UserDetails;
         // Quiz related entities
         QuizEntity.class,
         QuestionEntity.class,
+        ImageEntity.class,
         AnswerEntity.class
         },
-        version = 7,
+        version = 9,
         exportSchema = false)
 @TypeConverters(DataTypeConverter.class)
 public abstract class AppDatabase extends RoomDatabase {
@@ -104,13 +107,20 @@ public abstract class AppDatabase extends RoomDatabase {
                     context.getApplicationContext(),
                     AppDatabase.class, "NoonDatabase")
                     .fallbackToDestructiveMigration()
-                    //.addMigrations(MIGRATION_1_2)
+                    .addMigrations(MIGRATION_8_9)
                     .allowMainThreadQueries()
                     .build();
         }
 
         return INSTANCE;
     }
+
+    static final Migration MIGRATION_8_9 = new Migration(8, 9) {
+        @Override
+        public void migrate(SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE images ADD COLUMN answer_id INTEGER DEFAULT NULL");
+        }
+    };
 
     //Add column
     static final Migration MIGRATION_1_2 = new Migration(3, 4) {
@@ -263,6 +273,8 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract QuestionDao questionDao();
 
     public abstract AnswerDao answerDao();
+
+    public abstract ImageDao imageDao();
 
    /* //DONE
     public abstract DeviceManagementDataDao deviceManagementDataDao();
