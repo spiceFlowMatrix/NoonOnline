@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
@@ -307,6 +307,8 @@ namespace Training24Admin.Controllers
                 {
                     User user = _usersBusiness.GetUserbyId(Usession.UserId);
 
+                    //userDto.Id = user.Id;
+                    //userDto.FullName = user.FullName;
                     //userDto.Id = user.Id;
                     //userDto.FullName = user.FullName;
                     //userDto.Email = user.Email;
