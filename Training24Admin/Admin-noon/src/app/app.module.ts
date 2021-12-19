@@ -14,7 +14,7 @@ import { AuthService, AuthenticationService } from './shared/services';
 import { KatexModule } from 'ng-katex';
 import { ToastrModule } from 'ngx-toastr';
 import { SatDatepickerModule, SatNativeDateModule } from 'saturn-datepicker';
-// AoT requires an exported function for factories
+// AoT requires an exported function for factoriess
 export const createTranslateLoader = (http: HttpClient) => {
     /* for development
     return new TranslateHttpLoader(
