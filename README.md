@@ -1,12 +1,25 @@
-# Noon Online
+# Noon Online (Defunct)
 
-This is a defunct project that was shut down. It was built as a platform make the standard school curricula easily accessible to children all across Afghanistan.
+Noon Online was an educational platform designed to provide Afghan children with access to standardized curricula through mobile and web applications, tracking student progress to enhance learning accessibility.
 
-The platform consited of:
+## My Contributions
 
-- An web application for administrators to publish content that was produced in-house and manage access to courses.
-- An Android app that would be used by students and parents to use the published courses.
-- A REST API built with ASP.NET Core that would serve as the backend for both the Android and web applications.
+As CTO, I joined the project in its late stages and enhanced development and deployment workflows:
+
+- Developed a CI/CD pipeline to automate builds and deployments, enabling the team to focus on engineering tasks.
+- Implemented a QA workflow to catch and resolve issues before they reached users.
+- Optimized the codebase for API performance, memory usage, and stability to prevent crashes.
+
+Though now defunct, this project highlights my skills in process automation, quality assurance, and performance optimization across a multi-platform application.
+
+## Tech Stack
+
+- **Backend:** ASP.NET Core (REST API)
+- **Web Frontend:** Angular
+- **Mobile:** Android Native
+- **Database:** PostgreSQL
+- **CI/CD:** GitLab, Docker, Kubernetes, Helm
+- **Cloud:** Google Cloud Platform, Cloud SQL, Logging, Cloud Storage
 
 ## How to run the application in a Windows 10 or Ubuntu 18.04.04 LTS.
 
@@ -16,11 +29,12 @@ The platform consited of:
 
 First, we required to install Nodejs which you can get from [here](https://nodejs.org/en/download/)
 
-After installing node js we have to install angular with the command 
+After installing node js we have to install angular with the command
 
 ```bash
 npm install -g @angular/cli
 ```
+
 After installing angular we have to go to the appropriate repo in order to run applications.
 
 To run we need 2 commands :
@@ -40,11 +54,13 @@ sudo apt-get update
 sudo apt-get install nodejs
 sudo apt-get install npm
 ```
+
 After the above command executed successfully now, it turns to install angular environment and you can install it following below commands :
 
 ```bash
 npm install -g @angular/cli
 ```
+
 After installing angular we have to go to the appropriate repo in order to run applications.
 
 To run we need 2 commands:
@@ -96,7 +112,7 @@ sudo apt-get update
 sudo apt-get install dotnet-sdk-2.1 <replace with the latest version want to use>
 ```
 
-Build all class libraries from the solution 
+Build all class libraries from the solution
 
 ```bash
 dotnet build
@@ -124,85 +140,87 @@ you got the explanation and tutorial to run .net core app via docker image.
 ### The full list of prerequisite infrastructure for the application and critical configuration guidelines for them.
 
 #### For angular web apps
-There’s no prerequisite infrastructure for the  application 
+
+There’s no prerequisite infrastructure for the application
 
 #### For .Net Core app
 
-There’s no prerequisite infrastructure for the  application
+There’s no prerequisite infrastructure for the application
 
 ### The full list of system environment variables required to run the application in its target environment
 
-Enviroment Variable name| Porpose | Example Values
- --- | --- | ---
-`ASPNETCORE_ENVIRONMENT` | this one is for hosting environment like development or production | ex `Staging` or `Production`
-`ASPNET_DB_CONNECTIONSTRING` | database connection string | ex `server=ServerDetails;user id=UserName;database=NameOfDB;SslMode=none;Convert Zero Datetime=true;Allow User Variables=true;CharSet=utf8;`
-`MANAGEMENTURL_ENVIRONMENT`| this one is for Auth0 management environment | ex `https://yourdomain.auth0.com/oauth/token`
-`CLIENT_ID_ENVIRONMENT`| this one is for Auth0 client id | ex`Provide your auth0 client id`
-`CLIENT_SECRET_ENVIRONMENT` | this one is for client secret | ex `Provide your auth0 client secret key`
-`AUDIENCE_ENVIRONMENT`| this one for Auth0 audience environment | ex `https://yourdomain.auth0.com/api/v2/`
-`DOMAINNAME_ENVIRONMENT`| this one is for domain name with Auth0 | ex `yourdomain.auth0.com`
-`PRIMARY_DOMAIN`| domain provider of email server | ex `smtp.gmail.com`
-`PRIMARY_PORT`| email provider port | ex `587`
-`USERNAME_EMAIL` | your support email account | ex `yourmail@mail.com`
-`USERNAME_PASSWORD` | support email account password | ex `test@test`
-`LANGUAGE` | use fa for dari and pa for pashto if null then it consider as English | ex `fa`
-`URLS` | use for listing application on port that we specified you need to mention both http and https url | ex `http://*:80;https://*:443`
-`CLIENT_ID` | this one is for angular app, optional because it's already set in above named with `CLIENT_ID_ENVIRONMENT` | ex`Provide your auth0 client id`
-`AUTH_DOMAIN` | this one is for angular app, optional because it's already set in above named with `DOMAINNAME_ENVIRONMENT` | ex `yourdomain.auth0.com`
-`AUDIENCE` | this one is for angular app, optional because it's already set in above named with `AUDIENCE_ENVIRONMENT` | ex `https://yourdomain.auth0.com/api/v2/`
+| Enviroment Variable name     | Porpose                                                                                                     | Example Values                                                                                                                               |
+| ---------------------------- | ----------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ASPNETCORE_ENVIRONMENT`     | this one is for hosting environment like development or production                                          | ex `Staging` or `Production`                                                                                                                 |
+| `ASPNET_DB_CONNECTIONSTRING` | database connection string                                                                                  | ex `server=ServerDetails;user id=UserName;database=NameOfDB;SslMode=none;Convert Zero Datetime=true;Allow User Variables=true;CharSet=utf8;` |
+| `MANAGEMENTURL_ENVIRONMENT`  | this one is for Auth0 management environment                                                                | ex `https://yourdomain.auth0.com/oauth/token`                                                                                                |
+| `CLIENT_ID_ENVIRONMENT`      | this one is for Auth0 client id                                                                             | ex`Provide your auth0 client id`                                                                                                             |
+| `CLIENT_SECRET_ENVIRONMENT`  | this one is for client secret                                                                               | ex `Provide your auth0 client secret key`                                                                                                    |
+| `AUDIENCE_ENVIRONMENT`       | this one for Auth0 audience environment                                                                     | ex `https://yourdomain.auth0.com/api/v2/`                                                                                                    |
+| `DOMAINNAME_ENVIRONMENT`     | this one is for domain name with Auth0                                                                      | ex `yourdomain.auth0.com`                                                                                                                    |
+| `PRIMARY_DOMAIN`             | domain provider of email server                                                                             | ex `smtp.gmail.com`                                                                                                                          |
+| `PRIMARY_PORT`               | email provider port                                                                                         | ex `587`                                                                                                                                     |
+| `USERNAME_EMAIL`             | your support email account                                                                                  | ex `yourmail@mail.com`                                                                                                                       |
+| `USERNAME_PASSWORD`          | support email account password                                                                              | ex `test@test`                                                                                                                               |
+| `LANGUAGE`                   | use fa for dari and pa for pashto if null then it consider as English                                       | ex `fa`                                                                                                                                      |
+| `URLS`                       | use for listing application on port that we specified you need to mention both http and https url           | ex `http://*:80;https://*:443`                                                                                                               |
+| `CLIENT_ID`                  | this one is for angular app, optional because it's already set in above named with `CLIENT_ID_ENVIRONMENT`  | ex`Provide your auth0 client id`                                                                                                             |
+| `AUTH_DOMAIN`                | this one is for angular app, optional because it's already set in above named with `DOMAINNAME_ENVIRONMENT` | ex `yourdomain.auth0.com`                                                                                                                    |
+| `AUDIENCE`                   | this one is for angular app, optional because it's already set in above named with `AUDIENCE_ENVIRONMENT`   | ex `https://yourdomain.auth0.com/api/v2/`                                                                                                    |
 
 ### The full list of system environment variables required to successfully perform the CI/CD process for the application.
 
-Enviroment Variable name| Porpose | Example Values
- --- | --- | ---
-`ASPNETCORE_ENVIRONMENT` | this one is for hosting environment like development or production | ex `Staging` or `Production`
-`ASPNET_DB_CONNECTIONSTRING` | database connection string | ex `server=ServerDetails;user id=UserName;database=NameOfDB;SslMode=none;Convert Zero Datetime=true;Allow User Variables=true;CharSet=utf8;`
-`MANAGEMENTURL_ENVIRONMENT`| this one is for Auth0 management environment | ex `https://yourdomain.auth0.com/oauth/token`
-`CLIENT_ID_ENVIRONMENT`| this one is for Auth0 client id | ex`Provide your auth0 client id`
-`CLIENT_SECRET_ENVIRONMENT` | this one is for client secret | ex `Provide your auth0 client secret key`
-`AUDIENCE_ENVIRONMENT`| this one for Auth0 audience environment | ex `https://yourdomain.auth0.com/api/v2/`
-`DOMAINNAME_ENVIRONMENT`| this one is for domain name with Auth0 | ex `yourdomain.auth0.com`
-`PRIMARY_DOMAIN`| domain provider of email server | ex `smtp.gmail.com`
-`PRIMARY_PORT`| email provider port | ex `587`
-`USERNAME_EMAIL` | your support email account | ex `yourmail@mail.com`
-`USERNAME_PASSWORD` | support email account password | ex `test@test`
-`LANGUAGE` | use fa for dari and pa for pashto if null then it consider as English | ex `fa`
-`URLS` | use for listing application on port that we specified you need to mention both http and https url | http://*:80;https://*:443
-`CLIENT_ID` | this one is for angular app, optional because it's already set in above named with `CLIENT_ID_ENVIRONMENT` | ex`Provide your auth0 client id`
-`AUTH_DOMAIN` | this one is for angular app, optional because it's already set in above named with `DOMAINNAME_ENVIRONMENT` | ex `yourdomain.auth0.com`
-`AUDIENCE` | this one is for angular app, optional because it's already set in above named with `AUDIENCE_ENVIRONMENT` | ex `https://yourdomain.auth0.com/api/v2/`
+| Enviroment Variable name     | Porpose                                                                                                     | Example Values                                                                                                                               |
+| ---------------------------- | ----------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ASPNETCORE_ENVIRONMENT`     | this one is for hosting environment like development or production                                          | ex `Staging` or `Production`                                                                                                                 |
+| `ASPNET_DB_CONNECTIONSTRING` | database connection string                                                                                  | ex `server=ServerDetails;user id=UserName;database=NameOfDB;SslMode=none;Convert Zero Datetime=true;Allow User Variables=true;CharSet=utf8;` |
+| `MANAGEMENTURL_ENVIRONMENT`  | this one is for Auth0 management environment                                                                | ex `https://yourdomain.auth0.com/oauth/token`                                                                                                |
+| `CLIENT_ID_ENVIRONMENT`      | this one is for Auth0 client id                                                                             | ex`Provide your auth0 client id`                                                                                                             |
+| `CLIENT_SECRET_ENVIRONMENT`  | this one is for client secret                                                                               | ex `Provide your auth0 client secret key`                                                                                                    |
+| `AUDIENCE_ENVIRONMENT`       | this one for Auth0 audience environment                                                                     | ex `https://yourdomain.auth0.com/api/v2/`                                                                                                    |
+| `DOMAINNAME_ENVIRONMENT`     | this one is for domain name with Auth0                                                                      | ex `yourdomain.auth0.com`                                                                                                                    |
+| `PRIMARY_DOMAIN`             | domain provider of email server                                                                             | ex `smtp.gmail.com`                                                                                                                          |
+| `PRIMARY_PORT`               | email provider port                                                                                         | ex `587`                                                                                                                                     |
+| `USERNAME_EMAIL`             | your support email account                                                                                  | ex `yourmail@mail.com`                                                                                                                       |
+| `USERNAME_PASSWORD`          | support email account password                                                                              | ex `test@test`                                                                                                                               |
+| `LANGUAGE`                   | use fa for dari and pa for pashto if null then it consider as English                                       | ex `fa`                                                                                                                                      |
+| `URLS`                       | use for listing application on port that we specified you need to mention both http and https url           | http://_:80;https://_:443                                                                                                                    |
+| `CLIENT_ID`                  | this one is for angular app, optional because it's already set in above named with `CLIENT_ID_ENVIRONMENT`  | ex`Provide your auth0 client id`                                                                                                             |
+| `AUTH_DOMAIN`                | this one is for angular app, optional because it's already set in above named with `DOMAINNAME_ENVIRONMENT` | ex `yourdomain.auth0.com`                                                                                                                    |
+| `AUDIENCE`                   | this one is for angular app, optional because it's already set in above named with `AUDIENCE_ENVIRONMENT`   | ex `https://yourdomain.auth0.com/api/v2/`                                                                                                    |
 
-
-### Android application configuration details and documentation 
+### Android application configuration details and documentation
 
 #### Run Build in Terminal
 
-##### How to build app in production 
+##### How to build app in production
 
-Change  Credential in strings.xml file (Replace these values) from below location of repo:
+Change Credential in strings.xml file (Replace these values) from below location of repo:
+
 ```
 app>src>release>res>values>strings.xml
 ```
+
 Values you need to replace in string.xml file like below :
 
 1. Open string.xml file from location that provided above.
-2. Put values in front of Varible name 
+2. Put values in front of Varible name
 3. Save file in same location
-4. Proceed to build application in production by following below steps 
+4. Proceed to build application in production by following below steps
 
-Variable | Purpose | Example values
---- | --- | ---
-`com_auth0_client_id ` | provide your auth0 id here | ex `your auth0 id`
-`com_auth0_domain` | provide your auth0 domain here | ex `yourdomain.auth0.com`
-`com_auth0_audience` | this one for Auth0 audience environment | ex `https://yourdomain.auth0.com/api/v2/`
-`com_auth0_database_connection` | Use auth0 authencation type | ex `Username-Password-Authentication`
-`com_auth0_scope` | auth0 authentication scope | ex `openid offline_access`
-`BASE_URL` | your api hosting url | ex `https://yourdoamin.com/api/v1/`
-`YOUR_API_KEY` | file encryption library api key |ex `your api key`
+| Variable                        | Purpose                                 | Example values                            |
+| ------------------------------- | --------------------------------------- | ----------------------------------------- |
+| `com_auth0_client_id `          | provide your auth0 id here              | ex `your auth0 id`                        |
+| `com_auth0_domain`              | provide your auth0 domain here          | ex `yourdomain.auth0.com`                 |
+| `com_auth0_audience`            | this one for Auth0 audience environment | ex `https://yourdomain.auth0.com/api/v2/` |
+| `com_auth0_database_connection` | Use auth0 authencation type             | ex `Username-Password-Authentication`     |
+| `com_auth0_scope`               | auth0 authentication scope              | ex `openid offline_access`                |
+| `BASE_URL`                      | your api hosting url                    | ex `https://yourdoamin.com/api/v1/`       |
+| `YOUR_API_KEY`                  | file encryption library api key         | ex `your api key`                         |
 
 ###### Steps needs to follow:
 
-Step 1: 
+Step 1:
 
 Set the ADB path in the environment variable
 Need to set the android SDK path.
@@ -213,20 +231,21 @@ Ex.= "C:\Users\Lenovo\AppData\Local\Android\sdk\platform-tools"
 
 Setup Android Environment Variables refer to this link [here](http://www.automationtestinghub.com/setup-android-environment-variables/)
 
-Step 2: 
+Step 2:
 
 Open a command prompt and redirect to projects root folder [Enter the command to project folder]
 
 ```
 Ex. = cd  "C:\Users\Lenovo\Desktop\ noon android application"
 ```
-Step 3: 
+
+Step 3:
 
 Type **gradlew assemblerelease** command.
 
 After entering this command wait a few moments then it will display a message BUILD SUCCESSFULLY.
 
-Step 4: 
+Step 4:
 
 Type **gradlew installrelease** command.
 
@@ -234,10 +253,10 @@ This step is defined to install an APK in a device/emulator which is connected t
 
 **Note: Must be connected to a device with a system via USB.**
 
-
 ##### How to build app in staging
 
-Change  Credential in strings.xml file (Replace these values) from below location of repo:
+Change Credential in strings.xml file (Replace these values) from below location of repo:
+
 ```
 app>src>staging>res>values>strings.xml
 ```
@@ -245,42 +264,44 @@ app>src>staging>res>values>strings.xml
 Values you need to replace in string.xml file like below :
 
 1. Open string.xml file from location that provided above.
-2. Put values in front of Varible name 
+2. Put values in front of Varible name
 3. Save file in same location
-4. Proceed to build application in production by following below steps 
+4. Proceed to build application in production by following below steps
 
-Variable | Purpose | Example values
---- | --- | ---
-`com_auth0_client_id ` | provide your auth0 id here | ex `your auth0 id`
-`com_auth0_domain` | provide your auth0 domain here | ex `yourdomain.auth0.com`
-`com_auth0_audience` | this one for Auth0 audience environment | ex `https://yourdomain.auth0.com/api/v2/`
-`com_auth0_database_connection` | Use auth0 authencation type | ex `Username-Password-Authentication`
-`com_auth0_scope` | auth0 authentication scope | ex `openid offline_access`
-`BASE_URL` | your api hosting url | ex `https://yourdoamin.com/api/v1/`
-`YOUR_API_KEY` | file encryption library api key |ex `your api key`
+| Variable                        | Purpose                                 | Example values                            |
+| ------------------------------- | --------------------------------------- | ----------------------------------------- |
+| `com_auth0_client_id `          | provide your auth0 id here              | ex `your auth0 id`                        |
+| `com_auth0_domain`              | provide your auth0 domain here          | ex `yourdomain.auth0.com`                 |
+| `com_auth0_audience`            | this one for Auth0 audience environment | ex `https://yourdomain.auth0.com/api/v2/` |
+| `com_auth0_database_connection` | Use auth0 authencation type             | ex `Username-Password-Authentication`     |
+| `com_auth0_scope`               | auth0 authentication scope              | ex `openid offline_access`                |
+| `BASE_URL`                      | your api hosting url                    | ex `https://yourdoamin.com/api/v1/`       |
+| `YOUR_API_KEY`                  | file encryption library api key         | ex `your api key`                         |
 
-Step 1: 
+Step 1:
 
 Set the ADB path in the environment variable
 Need to set the android SDK path.
+
 ```
 Ex. = "C:\Users\Lenovo\AppData\Local\Android\sdk\platform-tools "
 ```
 
-Step 2: 
+Step 2:
 
 Open a command prompt and redirect to projects root folder [Enter command project folder]
+
 ```
 Ex. = cd  "C:\Users\Lenovo\Desktop\ noon android application"
 ```
 
-Step 3 : 
+Step 3 :
 
 Type **gradlew assemblestaging** command.
 
 After entering this command wait a few moments then it will display a message BUILD SUCCESSFULLY.
 
-Step 4: 
+Step 4:
 
 Type **gradlew installstaging** command.
 
@@ -288,16 +309,15 @@ This step is defined to install an APK in a device/emulator which is connected t
 
 **Note : Must be connected to a device with a system via USB.**
 
-
 ### Generate Signed APK using Commands
 
-Step 1: 
+Step 1:
 
 What is keystore ?
 
-As a security measure, Android requires that apps be signed in order to be installed. Signing an app first requires creating keystores. A keystore is a storage mechanism for security certificates. A public key certificate is used to sign an APK before deployment to services like the Google Play Store.  Signing the APK in this fashion allows Google to provide a high level of certainty that future updates to your APK of the same app come from you and not some malicious  third party.
+As a security measure, Android requires that apps be signed in order to be installed. Signing an app first requires creating keystores. A keystore is a storage mechanism for security certificates. A public key certificate is used to sign an APK before deployment to services like the Google Play Store. Signing the APK in this fashion allows Google to provide a high level of certainty that future updates to your APK of the same app come from you and not some malicious third party.
 
-Type below command in terminal 
+Type below command in terminal
 
 ```bash
 jarsigner -keystore YOUR_KEYSTORE_PATH -storepass YOUR_KEYSTORE_PASSWORD app/build/outputs/apk/release/app-release-signed.apk YOUR_KEY_ALIAS
@@ -307,9 +327,9 @@ jarsigner -keystore YOUR_KEYSTORE_PATH -storepass YOUR_KEYSTORE_PASSWORD app/bui
 
 `YOUR_KEYSTORE_PASSWORD` - password for keystore file, this will be set during genration of keystore file. after we need to use same password everytime to sign application using keystore.
 
-Step 2: 
+Step 2:
 
-Zipaligning the apk 
+Zipaligning the apk
 
 What is ziplingn?
 
@@ -342,17 +362,18 @@ AndroidApp>app>src>main>res>raw>noonssl.crt
 ```
 
 ### For google-services.json file in the application
+
 goole-services.json file used for pushnotification and google service like firebase. interage in application.
 
 google-services.json file contains all require information about project and credentails information in it that is used in application while using any of google service.
 
 From below step you can find and download google-service.json file :
+
 1. Signin in to [Firebase](https://console.firebase.google.com/u/0/)
-2. Click on project if already exist 
+2. Click on project if already exist
 3. Click Setting Icon, then select Project settings.
 4. In the Your apps card, select the platform for the app you want created.
-5. Click  google-services.json, then add it to your app.
-
+5. Click google-services.json, then add it to your app.
 
 From below location you can find the google-services.json file and you can change or replace if needed :
 
