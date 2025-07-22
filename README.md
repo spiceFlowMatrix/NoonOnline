@@ -1,8 +1,18 @@
-# How to run the application in a Windows 10 or Ubuntu 18.04.04 LTS.
+# Noon Online
 
-## Run angular applications
+This is a defunct project that was shut down. It was built as a platform make the standard school curricula easily accessible to children all across Afghanistan.
 
-### To a Run application on Windows
+The platform consited of:
+
+- An web application for administrators to publish content that was produced in-house and manage access to courses.
+- An Android app that would be used by students and parents to use the published courses.
+- A REST API built with ASP.NET Core that would serve as the backend for both the Android and web applications.
+
+## How to run the application in a Windows 10 or Ubuntu 18.04.04 LTS.
+
+### Run angular applications
+
+#### To a Run application on Windows
 
 First, we required to install Nodejs which you can get from [here](https://nodejs.org/en/download/)
 
@@ -21,7 +31,7 @@ ng serve -o (To run the application in a local environment)
 ng build --prod (To make a build of the repo to deploy it on the server which process create build in dist folder)
 ```
 
-### To a Run application on Ubuntu
+#### To a Run application on Ubuntu
 
 First, install Nodejs from below commands
 
@@ -45,9 +55,9 @@ ng serve -o (To run the application in a local environment)
 ng build --prod (To make a build of the repo to deploy it on the server which process create build in dist folder)
 ```
 
-## Run .Net core application
+### Run .Net core application
 
-### Run .Net core in Windows
+#### Run .Net core in Windows
 
 Make sure that you've installed Visual Studio 2017 or above
 
@@ -63,7 +73,7 @@ Now after a successful build, you can run the project by click F5 or option prov
 
 To publish code you can right-click on Traning24Admin > Publish, incase you need to deploy your application on the server
 
-### Run .Net core in Ubuntu
+#### Run .Net core in Ubuntu
 
 The first thing to do is to install the necessary repository. To do this, open a terminal window and issue the following commands:
 
@@ -104,23 +114,23 @@ To publish code in release mode using below command:
 dotnet publish -c Release
 ```
 
-## To run hosted applications (web apps) via docker image
+### To run hosted applications (web apps) via docker image
 
 [Here](https://www.whitehorses.nl/blog/running-angular-application-docker-dummies) you got the best explanation for running angular web app via docker image for angular apps.
 
 [Here](https://docs.microsoft.com/en-us/dotnet/core/docker/build-container)
 you got the explanation and tutorial to run .net core app via docker image.
 
-## The full list of prerequisite infrastructure for the application and critical configuration guidelines for them.
+### The full list of prerequisite infrastructure for the application and critical configuration guidelines for them.
 
-### For angular web apps
+#### For angular web apps
 There’s no prerequisite infrastructure for the  application 
 
-### For .Net Core app
+#### For .Net Core app
 
 There’s no prerequisite infrastructure for the  application
 
-## The full list of system environment variables required to run the application in its target environment
+### The full list of system environment variables required to run the application in its target environment
 
 Enviroment Variable name| Porpose | Example Values
  --- | --- | ---
@@ -141,7 +151,7 @@ Enviroment Variable name| Porpose | Example Values
 `AUTH_DOMAIN` | this one is for angular app, optional because it's already set in above named with `DOMAINNAME_ENVIRONMENT` | ex `yourdomain.auth0.com`
 `AUDIENCE` | this one is for angular app, optional because it's already set in above named with `AUDIENCE_ENVIRONMENT` | ex `https://yourdomain.auth0.com/api/v2/`
 
-## The full list of system environment variables required to successfully perform the CI/CD process for the application.
+### The full list of system environment variables required to successfully perform the CI/CD process for the application.
 
 Enviroment Variable name| Porpose | Example Values
  --- | --- | ---
@@ -163,11 +173,11 @@ Enviroment Variable name| Porpose | Example Values
 `AUDIENCE` | this one is for angular app, optional because it's already set in above named with `AUDIENCE_ENVIRONMENT` | ex `https://yourdomain.auth0.com/api/v2/`
 
 
-## Android application configuration details and documentation 
+### Android application configuration details and documentation 
 
-### Run Build in Terminal
+#### Run Build in Terminal
 
-#### How to build app in production 
+##### How to build app in production 
 
 Change  Credential in strings.xml file (Replace these values) from below location of repo:
 ```
@@ -190,7 +200,7 @@ Variable | Purpose | Example values
 `BASE_URL` | your api hosting url | ex `https://yourdoamin.com/api/v1/`
 `YOUR_API_KEY` | file encryption library api key |ex `your api key`
 
-##### Steps needs to follow:
+###### Steps needs to follow:
 
 Step 1: 
 
@@ -225,7 +235,7 @@ This step is defined to install an APK in a device/emulator which is connected t
 **Note: Must be connected to a device with a system via USB.**
 
 
-#### How to build app in staging
+##### How to build app in staging
 
 Change  Credential in strings.xml file (Replace these values) from below location of repo:
 ```
@@ -279,7 +289,7 @@ This step is defined to install an APK in a device/emulator which is connected t
 **Note : Must be connected to a device with a system via USB.**
 
 
-## Generate Signed APK using Commands
+### Generate Signed APK using Commands
 
 Step 1: 
 
@@ -319,7 +329,7 @@ https://stackoverflow.com/questions/50705658/how-to-sign-an-apk-through-command-
 
 https://developer.android.com/studio/build/building-cmdline#sign_cmdline
 
-## For replace SSL certs in application
+### For replace SSL certs in application
 
 The SSL Certificate require to verify BASE_URL for api endpoints.
 
@@ -331,7 +341,7 @@ From below location, you can change SSL certs, please make sure while replacing 
 AndroidApp>app>src>main>res>raw>noonssl.crt
 ```
 
-## For google-services.json file in the application
+### For google-services.json file in the application
 goole-services.json file used for pushnotification and google service like firebase. interage in application.
 
 google-services.json file contains all require information about project and credentails information in it that is used in application while using any of google service.
