@@ -12,6 +12,15 @@ As CTO, I joined the project in its late stages and enhanced development and dep
 
 Though now defunct, this project highlights my skills in process automation, quality assurance, and performance optimization across a multi-platform application.
 
+
+## DevOps/Stack Highlights
+
+> **Note:** This project relies on several services from Google Cloud Platform and Auth0, so a live demo isn’t available. The repository includes CI/CD configurations, Helm chart, and Dockerfiles used in production.
+
+- [`.gitlab-ci.yml`](./.gitlab-ci.yml): Automated building, and deployment for multi-environment setups.
+- Two main Dockerfiles to containerize API and web app (built in the `.gitlab-ci.yml`), supporting dual builds and deployments for different content pipelines and languages.
+- [Helm Chart](./chart/Chart.yaml): Managed Kubernetes deployments on GKE.
+
 ## Tech Stack
 
 - **Backend:** ASP.NET Core (REST API)
