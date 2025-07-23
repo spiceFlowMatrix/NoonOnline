@@ -35,7 +35,7 @@ Though now defunct, this project highlights my skills in process automation, qua
 graph TD
     A[Angular Web App] --> B[ASP.NET Core API]
     C[Android Native App] --> B
-    B --> D[PostgreSQL (Cloud SQL)]
+    B --> D[PostgreSQL - Cloud SQL]
     B --> E[Google Cloud Storage]
     B --> F[Auth0]
     A --> F
