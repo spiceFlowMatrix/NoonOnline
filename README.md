@@ -31,6 +31,17 @@ Though now defunct, this project highlights my skills in process automation, qua
 - **CI/CD:** GitLab, Docker, Kubernetes, Helm
 - **Cloud:** Google Cloud Platform, Cloud SQL, Logging, Cloud Storage
 
+## Architecture
+```mermaid
+graph TD
+    A[Angular Web App] --> B[ASP.NET Core API]
+    C[Android Native App] --> B
+    B --> D[PostgreSQL]
+    B --> E[Google Cloud Storage]
+    B --> F[Auth0]
+    A --> F
+```
+
 <!-- ## How to run the application in a Windows 10 or Ubuntu 18.04.04 LTS.
 
 ### Run angular applications
