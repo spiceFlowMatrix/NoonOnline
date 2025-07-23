@@ -21,6 +21,7 @@ Though now defunct, this project highlights my skills in process automation, qua
 - Two main Dockerfiles to containerize API and web app (built in the `.gitlab-ci.yml`), supporting dual builds and deployments for different content pipelines and languages.
 - [Helm Chart](./chart/Chart.yaml): Managed Kubernetes deployments on GKE.
 
+
 ## Tech Stack
 
 - **Backend:** ASP.NET Core (REST API)
@@ -30,7 +31,7 @@ Though now defunct, this project highlights my skills in process automation, qua
 - **CI/CD:** GitLab, Docker, Kubernetes, Helm
 - **Cloud:** Google Cloud Platform, Cloud SQL, Logging, Cloud Storage
 
-## How to run the application in a Windows 10 or Ubuntu 18.04.04 LTS.
+<!-- ## How to run the application in a Windows 10 or Ubuntu 18.04.04 LTS.
 
 ### Run angular applications
 
@@ -388,4 +389,4 @@ From below location you can find the google-services.json file and you can chang
 
 ```
 AndroidApp>app>google-services.json
-```
+``` -->
