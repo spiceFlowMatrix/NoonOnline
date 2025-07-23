@@ -12,7 +12,6 @@ As CTO, I joined the project in its late stages and enhanced development and dep
 
 Though now defunct, this project highlights my skills in process automation, quality assurance, and performance optimization across a multi-platform application.
 
-
 ## DevOps/Stack Highlights
 
 > **Note:** This project relies on several services from Google Cloud Platform and Auth0, so a live demo isn’t available. The repository includes CI/CD configurations, Helm chart, and Dockerfiles used in production.
@@ -20,7 +19,6 @@ Though now defunct, this project highlights my skills in process automation, qua
 - [`.gitlab-ci.yml`](./.gitlab-ci.yml): Automated building, and deployment for multi-environment setups.
 - Two main Dockerfiles to containerize API and web app (built in the `.gitlab-ci.yml`), supporting dual builds and deployments for different content pipelines and languages.
 - [Helm Chart](./chart/Chart.yaml): Managed Kubernetes deployments on GKE.
-
 
 ## Tech Stack
 
@@ -31,15 +29,18 @@ Though now defunct, this project highlights my skills in process automation, qua
 - **CI/CD:** GitLab, Docker, Kubernetes, Helm
 - **Cloud:** Google Cloud Platform, Cloud SQL, Logging, Cloud Storage
 
-## Architecture
+## System Architecture
+
 ```mermaid
 graph TD
     A[Angular Web App] --> B[ASP.NET Core API]
     C[Android Native App] --> B
-    B --> D[PostgreSQL]
+    B --> D[PostgreSQL (Cloud SQL)]
     B --> E[Google Cloud Storage]
     B --> F[Auth0]
     A --> F
+    C --> F
+    B --> G[Google Cloud Logging]
 ```
 
 <!-- ## How to run the application in a Windows 10 or Ubuntu 18.04.04 LTS.
