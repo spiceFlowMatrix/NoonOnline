@@ -12,6 +12,8 @@ As CTO, I joined the project in its late stages and enhanced development and dep
 
 Though now defunct, this project highlights my skills in process automation, quality assurance, and performance optimization across a multi-platform application.
 
+> This architecture was in the middle of migration towards Clean Architecture when the project had to be shut down. See [here](https://github.com/spiceFlowMatrix/BridgeTrunk) for the WIP migration.
+
 ## DevOps/Stack Highlights
 
 > **Note:** This project relies on several services from Google Cloud Platform and Auth0, so a live demo isn’t available. The repository includes CI/CD configurations, Helm chart, and Dockerfiles used in production.
